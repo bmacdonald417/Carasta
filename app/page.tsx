@@ -18,7 +18,7 @@ function Hero() {
           <div className="relative w-full max-w-4xl overflow-hidden rounded-lg">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/carasta/hero-phones.png"
+              src="https://placehold.co/960x480/1a1a1a/888888?text=Carasta+App+on+Devices"
               alt="Carasta app on devices"
               className="w-full object-contain"
               width={960}
@@ -39,7 +39,7 @@ function WhatIsCarasta() {
         <div className="relative aspect-[3/4] max-h-[560px] overflow-hidden rounded-lg bg-gradient-to-br from-carasta-muted to-carasta-ink">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/brand/carasta/what-is-phone.png"
+            src="https://placehold.co/400x600/1a1a1a/888888?text=Carasta"
             alt="Phone in hand"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
@@ -242,7 +242,7 @@ function FollowSocial() {
             <div className="relative aspect-square max-w-md overflow-hidden rounded-lg bg-carasta-border">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/brand/carasta/social/hero-car.png"
+                src="https://placehold.co/400x400/1a1a1a/888888?text=Carasta+Community"
                 alt="Carasta community"
                 className="h-full w-full object-cover"
               />
@@ -259,7 +259,7 @@ function FollowSocial() {
               <div className="mt-4 aspect-video w-full overflow-hidden rounded bg-carasta-ink/10">
                 <iframe
                   title="Why Carasta"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  src="https://www.youtube.com/embed/PB3J1s_ARqU"
                   className="h-full w-full"
                   allowFullScreen
                 />
