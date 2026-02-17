@@ -1,0 +1,72 @@
+/**
+ * Carasta marketing theme — design tokens from reference screenshots.
+ * Imported by app/globals.css.
+ */
+
+:root {
+  /* Backgrounds */
+  --carasta-bg: #d7d7d7;
+  --carasta-card-bg: #ffffff;
+  --carasta-white: #ffffff;
+
+  /* Text */
+  --carasta-ink: #0b0b0b;
+  --carasta-muted: #3a3a3a;
+
+  /* Borders */
+  --carasta-border: rgba(0, 0, 0, 0.15);
+
+  /* Brand blocks */
+  --carasta-blue: #1b238e;
+  --carasta-red: #a41515;
+
+  /* Typography — set by layout when using Carasta fonts */
+  --carasta-font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+}
+
+/* Editorial serif defaults when Carasta theme is active */
+body.carasta-theme {
+  background-color: var(--carasta-bg);
+  color: var(--carasta-ink);
+  font-family: var(--carasta-font-serif);
+  line-height: 1.5;
+}
+
+body.carasta-theme h1,
+body.carasta-theme h2,
+body.carasta-theme h3,
+body.carasta-theme .carasta-heading {
+  font-family: var(--carasta-font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+body.carasta-theme p,
+body.carasta-theme .carasta-body {
+  line-height: 1.6;
+}
+
+/* Card utility */
+.carasta-card {
+  background-color: var(--carasta-card-bg);
+  border: 1px solid var(--carasta-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem 2rem;
+}
+
+/* Container width for wide layout */
+.carasta-container {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .carasta-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
