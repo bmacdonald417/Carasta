@@ -50,7 +50,7 @@ export default async function AuctionsPage({
     orderBy,
     take: 50,
     include: {
-      images: { orderBy: { sortOrder: "asc" }, take: 1 },
+      images: { orderBy: { sortOrder: "asc" }, take: 2 },
       bids: { orderBy: { amountCents: "desc" }, take: 1 },
       seller: { select: { handle: true } },
     },

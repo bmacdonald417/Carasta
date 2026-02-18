@@ -1,34 +1,39 @@
 /**
- * Carasta marketing theme — design tokens from reference screenshots.
- * Imported by app/globals.css.
+ * Carasta Enterprise theme — Luxury/Enterprise design system.
+ * White-dominant (#FFFFFF), deep black (#000000), premium typography.
  */
 
 :root {
-  /* Backgrounds */
-  --carasta-bg: #d7d7d7;
+  /* Enterprise palette */
+  --carasta-bg: #ffffff;
   --carasta-card-bg: #ffffff;
   --carasta-white: #ffffff;
 
-  /* Text */
-  --carasta-ink: #0b0b0b;
-  --carasta-muted: #3a3a3a;
+  /* Text — deep black primary */
+  --carasta-ink: #000000;
+  --carasta-muted: #6b7280;
 
-  /* Borders */
-  --carasta-border: rgba(0, 0, 0, 0.15);
+  /* Borders — subtle gray layering */
+  --carasta-border: rgba(0, 0, 0, 0.08);
 
-  /* Brand blocks */
+  /* Brand accents — for CTAs and Live status */
   --carasta-blue: #1b238e;
   --carasta-red: #a41515;
 
-  /* Typography — set by layout when using Carasta fonts */
+  /* Glassmorphism */
+  --carasta-glass-bg: rgba(255, 255, 255, 0.8);
+  --carasta-glass-border: rgba(255, 255, 255, 0.2);
+
+  /* Typography */
   --carasta-font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --carasta-font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
 }
 
-/* Editorial serif defaults when Carasta theme is active */
+/* Enterprise theme — clean white, high contrast */
 body.carasta-theme {
   background-color: var(--carasta-bg);
   color: var(--carasta-ink);
-  font-family: var(--carasta-font-serif);
+  font-family: var(--carasta-font-sans);
   line-height: 1.5;
 }
 
@@ -36,10 +41,10 @@ body.carasta-theme h1,
 body.carasta-theme h2,
 body.carasta-theme h3,
 body.carasta-theme .carasta-heading {
-  font-family: var(--carasta-font-serif);
+  font-family: var(--font-inter), "Inter", system-ui, sans-serif;
   font-weight: 600;
+  letter-spacing: -0.025em;
   line-height: 1.2;
-  letter-spacing: -0.02em;
 }
 
 body.carasta-theme p,
@@ -47,15 +52,28 @@ body.carasta-theme .carasta-body {
   line-height: 1.6;
 }
 
-/* Card utility */
+/* Glass card — premium overlay effect */
 .carasta-card {
   background-color: var(--carasta-card-bg);
   border: 1px solid var(--carasta-border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   padding: 1.5rem 2rem;
 }
 
-/* Container width for wide layout */
+/* Glassmorphism header/nav */
+.carasta-glass {
+  background: var(--carasta-glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--carasta-border);
+}
+
+.carasta-glass-scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Container */
 .carasta-container {
   max-width: 1280px;
   margin-left: auto;

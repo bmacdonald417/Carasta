@@ -1,7 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
+import { ReserveMeter } from "@/components/auction/ReserveMeter";
+import { CountdownTimer } from "@/components/auction/CountdownTimer";
+import { getReserveMeterPercent } from "@/lib/auction-utils";
 
 export function AuctionCard({
   auction,
@@ -21,45 +27,85 @@ export function AuctionCard({
   };
   highBidCents: number;
 }) {
-  const img = auction.images[0]?.url ?? "https://placehold.co/600x400/1a1a1a/666?text=No+image";
+  const img =
+    auction.images[0]?.url ??
+    "https://placehold.co/600x400/1a1a1a/666?text=No+image";
+  const secondaryImg = auction.images[1]?.url;
   const end = new Date(auction.endAt);
   const isLive = auction.status === "LIVE";
+  const reservePercent = getReserveMeterPercent(
+    highBidCents,
+    auction.reservePriceCents
+  );
 
   return (
     <Link href={`/auctions/${auction.id}`}>
-      <Card className="overflow-hidden transition-all hover:shadow-lg">
-        <div className="relative aspect-video w-full overflow-hidden bg-muted">
-          <Image
-            src={img}
-            alt={auction.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
-          {!isLive && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-              <span className="rounded-xl bg-muted px-3 py-1 font-display text-sm font-semibold uppercase">
-                {auction.status}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className="group overflow-hidden border-neutral-200 transition-all duration-300 hover:shadow-xl hover:shadow-neutral-200/50">
+          <div className="relative aspect-video w-full overflow-hidden bg-neutral-100">
+            <Image
+              src={img}
+              alt={auction.title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+            {secondaryImg && (
+              <Image
+                src={secondaryImg}
+                alt=""
+                fill
+                className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                sizes="(max-width: 768px) 100vw, 33vw"
+              />
+            )}
+            {/* LIVE badge — pulsing */}
+            {isLive && (
+              <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow-lg">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+                Live
+              </div>
+            )}
+            {!isLive && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                <span className="rounded-xl bg-neutral-800 px-4 py-2 font-display text-sm font-semibold uppercase text-white">
+                  {auction.status}
+                </span>
+              </div>
+            )}
+          </div>
+          <CardContent className="p-4">
+            <p className="text-xs text-neutral-500">
+              {auction.year} {auction.make} {auction.model}
+            </p>
+            <h2 className="mt-1 font-display text-lg font-semibold tracking-tight line-clamp-1 text-neutral-900">
+              {auction.title}
+            </h2>
+            <p className="mt-2 text-lg font-semibold text-[hsl(var(--performance-red))]">
+              {formatCurrency(highBidCents)}
+              <span className="ml-1 text-sm font-normal text-neutral-500">
+                high bid
               </span>
+            </p>
+            {reservePercent != null && (
+              <div className="mt-3">
+                <ReserveMeter
+                  currentCents={highBidCents}
+                  reserveCents={auction.reservePriceCents}
+                />
+              </div>
+            )}
+            <div className="mt-3 flex items-center justify-between text-xs text-neutral-500">
+              <CountdownTimer endAt={end} />
+              <span>@{auction.seller?.handle ?? "seller"}</span>
             </div>
-          )}
-        </div>
-        <CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">
-            {auction.year} {auction.make} {auction.model}
-          </p>
-          <h2 className="mt-1 font-display text-lg font-semibold line-clamp-1">
-            {auction.title}
-          </h2>
-          <p className="mt-2 text-sm font-medium text-[hsl(var(--performance-red))]">
-            {formatCurrency(highBidCents)}
-            <span className="ml-1 text-muted-foreground">high bid</span>
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Ends {end.toLocaleDateString()} · @{auction.seller?.handle ?? "seller"}
-          </p>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     </Link>
   );
 }
