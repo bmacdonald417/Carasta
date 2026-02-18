@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { createAuction } from "./actions";
+import { createAuction, saveAuctionDraft } from "./actions";
 import { useToast } from "@/components/ui/use-toast";
 
 const DEFAULT_DAYS = 7;
@@ -34,6 +34,53 @@ export function CreateAuctionWizard({ className }: { className?: string }) {
 
   function update(f: Partial<typeof form>) {
     setForm((prev) => ({ ...prev, ...f }));
+  }
+
+  async function saveDraft() {
+    const year = Number(form.year);
+    if (isNaN(year) || year < 1900 || year > 2100) {
+      toast({ title: "Invalid year", variant: "destructive" });
+      return;
+    }
+    const mileage = form.mileage === "" ? undefined : Number(form.mileage);
+    const reserveCents =
+      form.reservePriceCents === ""
+        ? undefined
+        : Math.round(Number(form.reservePriceCents) * 100);
+    const buyNowCents =
+      form.buyNowPriceCents === ""
+        ? undefined
+        : Math.round(Number(form.buyNowPriceCents) * 100);
+    const startAt = new Date();
+    const endAt = new Date(startAt.getTime() + form.durationDays * 24 * 60 * 60 * 1000);
+    const buyNowExpiresAt = buyNowCents != null ? new Date(startAt.getTime() + BUY_NOW_HOURS * 60 * 60 * 1000) : undefined;
+    const imageUrls = form.imageUrls.split(/[\n,]/).map((u) => u.trim()).filter(Boolean);
+
+    setLoading(true);
+    const result = await saveAuctionDraft({
+      title: form.title.trim() || "Untitled",
+      description: form.description.trim() || undefined,
+      year,
+      make: form.make.trim(),
+      model: form.model.trim(),
+      trim: form.trim.trim() || undefined,
+      mileage,
+      vin: form.vin.trim() || undefined,
+      reservePriceCents: reserveCents,
+      buyNowPriceCents: buyNowCents,
+      buyNowExpiresAt,
+      startAt,
+      endAt,
+      imageUrls,
+    });
+    setLoading(false);
+    if (result.ok && result.auctionId) {
+      toast({ title: "Draft saved" });
+      router.push(`/auctions/${result.auctionId}`);
+      router.refresh();
+    } else {
+      toast({ title: result.error ?? "Failed", variant: "destructive" });
+    }
   }
 
   async function submit() {
@@ -199,9 +246,14 @@ export function CreateAuctionWizard({ className }: { className?: string }) {
               className="mt-1"
             />
           </div>
-          <Button onClick={() => setStep(2)} className="w-full">
-            Next
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={saveDraft} disabled={loading} className="flex-1">
+              Save draft
+            </Button>
+            <Button onClick={() => setStep(2)} className="flex-1">
+              Next
+            </Button>
+          </div>
         </div>
       )}
 
@@ -252,9 +304,12 @@ export function CreateAuctionWizard({ className }: { className?: string }) {
               className="mt-1 min-h-[80px]"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
               Back
+            </Button>
+            <Button variant="outline" onClick={saveDraft} disabled={loading} className="flex-1">
+              Save draft
             </Button>
             <Button
               onClick={submit}

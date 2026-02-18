@@ -52,6 +52,17 @@ export default async function ProfilePage({
     distinct: ["auctionId"],
   });
 
+  const soldAuctions = await prisma.auction.findMany({
+    where: { status: "SOLD" },
+    include: {
+      bids: { orderBy: { amountCents: "desc" }, take: 1 },
+      images: { orderBy: { sortOrder: "asc" }, take: 1 },
+    },
+  });
+  const wonAuctions = soldAuctions.filter(
+    (a) => a.bids[0]?.bidderId === user.id
+  );
+
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8">
       <div className="rounded-2xl border border-border/50 bg-card/80 p-6">
@@ -110,7 +121,7 @@ export default async function ProfilePage({
           </div>
         </div>
 
-        <div className="mt-6 flex gap-4">
+        <div className="mt-6 flex flex-wrap gap-4">
           <Button variant="outline" size="sm" asChild>
             <Link href={`/u/${user.handle}/garage`}>Garage</Link>
           </Button>
@@ -118,6 +129,47 @@ export default async function ProfilePage({
             <Link href={`/u/${user.handle}/dream`}>Dream Garage</Link>
           </Button>
         </div>
+
+        {wonAuctions.length > 0 && (
+          <div className="mt-8">
+            <h2 className="font-display text-lg font-semibold">Won Auctions</h2>
+            <p className="text-sm text-muted-foreground">
+              Auctions won by @{user.handle}
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {wonAuctions.map((a) => (
+                <Link key={a.id} href={`/auctions/${a.id}`}>
+                  <div className="flex gap-4 rounded-xl border border-neutral-200 p-4 transition hover:bg-neutral-50">
+                    <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
+                      {a.images[0]?.url ? (
+                        <Image
+                          src={a.images[0].url}
+                          alt={a.title}
+                          fill
+                          className="object-cover"
+                          sizes="112px"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-xs text-neutral-400">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium line-clamp-1">{a.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {a.year} {a.make} {a.model}
+                      </p>
+                      <p className="text-sm font-semibold text-[hsl(var(--performance-red))]">
+                        Won at ${((a.bids[0]?.amountCents ?? 0) / 100).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

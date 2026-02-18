@@ -9,9 +9,12 @@ import { ReserveMeter } from "@/components/auction/ReserveMeter";
 import { CountdownTimer } from "@/components/auction/CountdownTimer";
 import { getReserveMeterPercent } from "@/lib/auction-utils";
 
+const CLOSING_SOON_MS = 24 * 60 * 60 * 1000;
+
 export function AuctionCard({
   auction,
   highBidCents,
+  bidCount = 0,
 }: {
   auction: {
     id: string;
@@ -26,6 +29,7 @@ export function AuctionCard({
     seller: { handle: string } | null;
   };
   highBidCents: number;
+  bidCount?: number;
 }) {
   const img =
     auction.images[0]?.url ??
@@ -33,6 +37,8 @@ export function AuctionCard({
   const secondaryImg = auction.images[1]?.url;
   const end = new Date(auction.endAt);
   const isLive = auction.status === "LIVE";
+  const isClosingSoon =
+    isLive && new Date(auction.endAt).getTime() - Date.now() < CLOSING_SOON_MS;
   const reservePercent = getReserveMeterPercent(
     highBidCents,
     auction.reservePriceCents
@@ -65,9 +71,16 @@ export function AuctionCard({
             )}
             {/* LIVE badge — pulsing */}
             {isLive && (
-              <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow-lg">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-                Live
+              <div className="absolute left-3 top-3 flex flex-col gap-1.5">
+                <div className="flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow-lg">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+                  Live
+                </div>
+                {isClosingSoon && (
+                  <div className="rounded-full bg-amber-500 px-3 py-1 text-xs font-semibold text-white shadow-lg">
+                    Closing Soon
+                  </div>
+                )}
               </div>
             )}
             {!isLive && (
@@ -99,9 +112,12 @@ export function AuctionCard({
                 />
               </div>
             )}
-            <div className="mt-3 flex items-center justify-between text-xs text-neutral-500">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
               <CountdownTimer endAt={end} />
-              <span>@{auction.seller?.handle ?? "seller"}</span>
+              <div className="flex items-center gap-3">
+                <span>{bidCount} bids</span>
+                <span>@{auction.seller?.handle ?? "seller"}</span>
+              </div>
             </div>
           </CardContent>
         </Card>

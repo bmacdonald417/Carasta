@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -177,7 +178,12 @@ function PostCard({
   onToggleLike: (postId: string, currentlyLiked: boolean) => void;
 }) {
   return (
-    <Card>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+    <Card className="overflow-hidden border-neutral-200 transition-shadow hover:shadow-md">
       <CardContent className="p-4">
         <Link
           href={`/u/${post.author.handle}`}
@@ -231,5 +237,6 @@ function PostCard({
         </div>
       </CardContent>
     </Card>
+    </motion.div>
   );
 }

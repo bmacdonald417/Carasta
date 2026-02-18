@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AppSidebar } from "@/components/layout/AppSidebar";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -145,15 +147,20 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </div>
       </motion.header>
 
-      <main
-        className={
-          isMarketing
-            ? "flex-1 bg-white text-neutral-900"
-            : "flex-1 bg-background text-foreground"
-        }
-      >
-        {children}
-      </main>
+      <div className="flex flex-1">
+        <AppSidebar />
+        <main
+          className={`min-w-0 flex-1 pb-16 lg:pb-0 ${
+            isMarketing
+              ? "bg-white text-neutral-900"
+              : "bg-background text-foreground"
+          }`}
+        >
+          {children}
+        </main>
+      </div>
+
+      <MobileBottomNav />
 
       {/* Footer — brand red + black wave */}
       <footer className="mt-auto">

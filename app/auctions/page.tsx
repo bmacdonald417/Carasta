@@ -53,6 +53,7 @@ export default async function AuctionsPage({
       images: { orderBy: { sortOrder: "asc" }, take: 2 },
       bids: { orderBy: { amountCents: "desc" }, take: 1 },
       seller: { select: { handle: true } },
+      _count: { select: { bids: true } },
     },
   });
 
@@ -87,6 +88,7 @@ export default async function AuctionsPage({
               key={a.id}
               auction={a}
               highBidCents={a.bids[0]?.amountCents ?? 0}
+              bidCount={a._count.bids}
             />
           ))
         )}

@@ -27,6 +27,23 @@ async function getFeaturedAuctions() {
   return withHighBid;
 }
 
+async function getSneakPeekAuctions() {
+  const now = new Date();
+  const soon = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const auctions = await prisma.auction.findMany({
+    where: { status: "LIVE", endAt: { lte: soon, gte: now } },
+    orderBy: { endAt: "asc" },
+    take: 3,
+    include: {
+      images: { orderBy: { sortOrder: "asc" }, take: 1 },
+      bids: { orderBy: { amountCents: "desc" }, take: 1 },
+      seller: { select: { handle: true } },
+      _count: { select: { bids: true } },
+    },
+  });
+  return auctions;
+}
+
 async function getRecentAuctions() {
   const auctions = await prisma.auction.findMany({
     where: { status: "LIVE" },
@@ -36,6 +53,7 @@ async function getRecentAuctions() {
       images: { orderBy: { sortOrder: "asc" }, take: 2 },
       bids: { orderBy: { amountCents: "desc" }, take: 1 },
       seller: { select: { handle: true } },
+      _count: { select: { bids: true } },
     },
   });
   return auctions;
@@ -44,10 +62,12 @@ async function getRecentAuctions() {
 export default async function HomePage() {
   let featuredAuctions: Awaited<ReturnType<typeof getFeaturedAuctions>> = [];
   let recentAuctions: Awaited<ReturnType<typeof getRecentAuctions>> = [];
+  let sneakPeekAuctions: Awaited<ReturnType<typeof getSneakPeekAuctions>> = [];
   try {
-    [featuredAuctions, recentAuctions] = await Promise.all([
+    [featuredAuctions, recentAuctions, sneakPeekAuctions] = await Promise.all([
       getFeaturedAuctions(),
       getRecentAuctions(),
+      getSneakPeekAuctions(),
     ]);
   } catch {
     // DB may be unavailable at build time
@@ -69,6 +89,30 @@ export default async function HomePage() {
     <div className="bg-white">
       {/* The Showroom — hero carousel */}
       <ShowroomHero auctions={featuredForHero} />
+
+      {/* Sneak Peek — closing soon */}
+      {sneakPeekAuctions.length > 0 && (
+        <section className="border-t border-neutral-100 bg-[#1b238e]/5 py-12 md:py-16">
+          <div className="carasta-container">
+            <h2 className="font-display text-2xl font-semibold tracking-tight text-neutral-900 md:text-3xl">
+              Sneak Peek — Closing Soon
+            </h2>
+            <p className="mt-1 text-neutral-600">
+              These auctions end in the next 24 hours. Don&apos;t miss out.
+            </p>
+            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {sneakPeekAuctions.map((a) => (
+                <AuctionCard
+                  key={a.id}
+                  auction={a}
+                  highBidCents={a.bids[0]?.amountCents ?? 0}
+                  bidCount={a._count.bids}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Featured live auctions grid */}
       <section className="border-t border-neutral-100 py-16 md:py-24">
@@ -110,6 +154,7 @@ export default async function HomePage() {
                   key={a.id}
                   auction={a}
                   highBidCents={a.bids[0]?.amountCents ?? 0}
+                  bidCount={a._count.bids}
                 />
               ))
             )}
