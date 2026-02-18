@@ -181,6 +181,43 @@ export default async function HomePage() {
             A premium car auction experience with transparent bidding, reserve
             meters, anti-sniping, and a connected community of collectors.
           </p>
+          <p className="mt-6 text-sm font-medium text-neutral-500">
+            Download the app
+          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="https://apps.apple.com/us/app/carasta/id6740201534"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="overflow-hidden rounded-lg transition-opacity hover:opacity-90"
+              aria-label="Download on the App Store"
+            >
+              <div className="h-12 overflow-hidden rounded-lg md:h-14">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/brand/carasta/app-store-badges.png"
+                  alt="Download on the App Store"
+                  className="h-24 w-[140px] object-cover object-top"
+                />
+              </div>
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.hidden_cherry_45273"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="overflow-hidden rounded-lg transition-opacity hover:opacity-90"
+              aria-label="Get it on Google Play"
+            >
+              <div className="h-12 overflow-hidden rounded-lg md:h-14">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/brand/carasta/app-store-badges.png"
+                  alt="Get it on Google Play"
+                  className="h-24 w-[140px] object-cover object-bottom"
+                />
+              </div>
+            </a>
+          </div>
         </div>
       </section>
     </div>

@@ -182,40 +182,42 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   CARASTA
                 </span>
               </div>
-              <div className="flex flex-col items-center gap-4 md:flex-row md:gap-8">
+              <div className="flex flex-col items-center gap-4 md:flex-row md:gap-6">
                 <a
-                  href="https://apps.apple.com"
+                  href="https://apps.apple.com/us/app/carasta/id6740201534"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block"
+                  className="block overflow-hidden rounded-lg transition-opacity hover:opacity-90"
+                  aria-label="Download on the App Store"
                 >
-                  <img
-                    src="/brand/carasta/appstore-badge.png"
-                    alt="Download on the App Store"
-                    width={140}
-                    height={46}
-                    className="h-10 object-contain md:h-11"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
+                  <div className="h-10 overflow-hidden rounded-md md:h-11">
+                    <img
+                      src="/brand/carasta/app-store-badges.png"
+                      alt="Download on the App Store"
+                      className="h-[88px] w-[140px] object-cover object-top"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  </div>
                 </a>
                 <a
-                  href="https://play.google.com"
+                  href="https://play.google.com/store/apps/details?id=com.hidden_cherry_45273"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block"
+                  className="block overflow-hidden rounded-lg transition-opacity hover:opacity-90"
+                  aria-label="Get it on Google Play"
                 >
-                  <img
-                    src="/brand/carasta/googleplay-badge.png"
-                    alt="Get it on Google Play"
-                    width={160}
-                    height={46}
-                    className="h-10 object-contain md:h-11"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
+                  <div className="h-10 overflow-hidden rounded-md md:h-11">
+                    <img
+                      src="/brand/carasta/app-store-badges.png"
+                      alt="Get it on Google Play"
+                      className="h-[88px] w-[140px] object-cover object-bottom"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  </div>
                 </a>
               </div>
               <div className="text-center md:text-right">
