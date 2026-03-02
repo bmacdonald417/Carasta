@@ -53,6 +53,7 @@ export default async function AuctionDetailPage({
                 src={auction.images[0].url}
                 alt={auction.title}
                 fill
+                unoptimized
                 className="object-cover"
                 priority
                 sizes="(max-width: 1024px) 100vw, 66vw"
@@ -74,6 +75,7 @@ export default async function AuctionDetailPage({
                     src={img.url}
                     alt=""
                     fill
+                    unoptimized
                     className="object-cover"
                     sizes="128px"
                   />
@@ -133,6 +135,7 @@ export default async function AuctionDetailPage({
                     src={auction.seller.avatarUrl}
                     alt=""
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 ) : null}

@@ -69,6 +69,7 @@ export function AuctionCard({
               src={img}
               alt={auction.title}
               fill
+              unoptimized
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 33vw"
             />
@@ -77,6 +78,7 @@ export function AuctionCard({
                 src={secondaryImg}
                 alt=""
                 fill
+                unoptimized
                 className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 sizes="(max-width: 768px) 100vw, 33vw"
               />
