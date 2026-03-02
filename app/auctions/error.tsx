@@ -26,7 +26,7 @@ export default function AuctionsError({
       </p>
       <button
         onClick={reset}
-        className="mt-6 rounded-lg bg-[#00E5FF]/20 px-4 py-2 text-sm font-medium text-[#00E5FF] hover:bg-[#00E5FF]/30"
+        className="mt-6 rounded-lg bg-[#ff3b5c]/20 px-4 py-2 text-sm font-medium text-[#ff3b5c] hover:bg-[#ff3b5c]/30"
       >
         Try again
       </button>

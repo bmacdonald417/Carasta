@@ -105,7 +105,18 @@ export default async function HomePage() {
               {sneakPeekAuctions.map((a, i) => (
                 <AuctionCard
                   key={a.id}
-                  auction={a}
+                  auction={{
+                    id: a.id,
+                    title: a.title,
+                    year: a.year,
+                    make: a.make,
+                    model: a.model,
+                    endAt: a.endAt.toISOString(),
+                    status: a.status,
+                    reservePriceCents: a.reservePriceCents,
+                    images: a.images,
+                    seller: a.seller,
+                  }}
                   highBidCents={a.bids[0]?.amountCents ?? 0}
                   bidCount={a._count.bids}
                   index={i}
@@ -131,7 +142,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/auctions"
-              className="hidden shrink-0 items-center gap-2 rounded-lg border border-[#00E5FF]/30 bg-[#00E5FF]/10 px-4 py-2.5 font-medium text-[#00E5FF] transition hover:bg-[#00E5FF]/20 md:inline-flex"
+              className="hidden shrink-0 items-center gap-2 rounded-lg border border-[#ff3b5c]/30 bg-[#ff3b5c]/10 px-4 py-2.5 font-medium text-[#ff3b5c] transition hover:bg-[#ff3b5c]/20 md:inline-flex"
             >
               View all
               <Gavel className="h-4 w-4" />
@@ -145,7 +156,7 @@ export default async function HomePage() {
                 </p>
                 <Link
                   href="/auctions"
-                  className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#00E5FF] hover:underline"
+                  className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#ff3b5c] hover:underline"
                 >
                   Browse Auctions
                   <Gavel className="h-4 w-4" />
@@ -155,7 +166,18 @@ export default async function HomePage() {
               recentAuctions.map((a, i) => (
                 <AuctionCard
                   key={a.id}
-                  auction={a}
+                  auction={{
+                    id: a.id,
+                    title: a.title,
+                    year: a.year,
+                    make: a.make,
+                    model: a.model,
+                    endAt: a.endAt.toISOString(),
+                    status: a.status,
+                    reservePriceCents: a.reservePriceCents,
+                    images: a.images,
+                    seller: a.seller,
+                  }}
                   highBidCents={a.bids[0]?.amountCents ?? 0}
                   bidCount={a._count.bids}
                   index={i}
@@ -166,7 +188,7 @@ export default async function HomePage() {
           <div className="mt-8 text-center md:hidden">
             <Link
               href="/auctions"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#00E5FF]/20 px-4 py-2.5 font-medium text-[#00E5FF] transition hover:bg-[#00E5FF]/30"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#ff3b5c]/20 px-4 py-2.5 font-medium text-[#ff3b5c] transition hover:bg-[#ff3b5c]/30"
             >
               View all auctions
               <Gavel className="h-4 w-4" />

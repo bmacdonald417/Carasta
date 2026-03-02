@@ -13,8 +13,8 @@
     --card-foreground: 240 5% 96%;
     --popover: 240 10% 6%;
     --popover-foreground: 240 5% 96%;
-    --primary: 187 100% 50%;
-    --primary-foreground: 240 10% 4%;
+    --primary: 348 100% 60%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 240 6% 10%;
     --secondary-foreground: 240 5% 96%;
     --muted: 240 6% 10%;
@@ -25,10 +25,10 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 6% 16%;
     --input: 240 6% 16%;
-    --ring: 187 100% 50%;
+    --ring: 348 100% 60%;
     --performance-red: 348 100% 60%;
     --reserve-emerald: 160 84% 39%;
-    --neon-blue: 187 100% 50%;
+    --neon-blue: 348 100% 60%;
     --neon-lime: 72 100% 50%;
   }
 }

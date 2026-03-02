@@ -35,7 +35,7 @@ export function AppSidebar() {
               <motion.div
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                   isActive
-                    ? "bg-[#00E5FF]/90 text-[#0a0a0f] shadow-lg shadow-[#00E5FF]/20"
+                    ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
                     : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                 }`}
                 whileHover={{ scale: 1.02 }}
@@ -58,7 +58,7 @@ export function AppSidebar() {
           <motion.div
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               pathname.includes("/garage")
-                ? "bg-[#00E5FF]/90 text-[#0a0a0f] shadow-lg shadow-[#00E5FF]/20"
+                ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
                 : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
             }`}
             whileHover={{ scale: 1.02 }}
@@ -72,7 +72,7 @@ export function AppSidebar() {
           <motion.div
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               pathname.startsWith("/merch")
-                ? "bg-[#00E5FF]/90 text-[#0a0a0f] shadow-lg shadow-[#00E5FF]/20"
+                ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
                 : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
             }`}
             whileHover={{ scale: 1.02 }}

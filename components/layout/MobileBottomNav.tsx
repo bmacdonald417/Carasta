@@ -35,7 +35,7 @@ export function MobileBottomNav() {
               href={href}
               className={`flex flex-col items-center gap-1 px-4 py-2 text-xs font-medium transition ${
                 isActive
-                  ? "text-[#00E5FF]"
+                  ? "text-[#ff3b5c]"
                   : "text-neutral-500 hover:text-neutral-300"
               }`}
             >

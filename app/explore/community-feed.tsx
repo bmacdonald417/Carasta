@@ -103,10 +103,10 @@ export function CommunityFeed({
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="grid w-full grid-cols-2 border-white/10 bg-white/5">
-          <TabsTrigger value="trending" className="data-[state=active]:bg-[#00E5FF]/20 data-[state=active]:text-[#00E5FF]">
+          <TabsTrigger value="trending" className="data-[state=active]:bg-[#ff3b5c]/20 data-[state=active]:text-[#ff3b5c]">
             Trending
           </TabsTrigger>
-          <TabsTrigger value="following" className="data-[state=active]:bg-[#00E5FF]/20 data-[state=active]:text-[#00E5FF]">
+          <TabsTrigger value="following" className="data-[state=active]:bg-[#ff3b5c]/20 data-[state=active]:text-[#ff3b5c]">
             Following
           </TabsTrigger>
         </TabsList>
@@ -187,7 +187,7 @@ function PostCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-    <Card className="overflow-hidden border-white/10 bg-white/5 transition-all hover:border-[#00E5FF]/20 hover:shadow-lg hover:shadow-[#00E5FF]/5">
+    <Card className="overflow-hidden border-white/10 bg-white/5 transition-all hover:border-[#ff3b5c]/20 hover:shadow-lg hover:shadow-[#ff3b5c]/5">
       <CardContent className="p-4">
         <Link
           href={`/u/${post.author.handle}`}

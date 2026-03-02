@@ -92,7 +92,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 href={href}
                 className={`font-medium transition ${
                   pathname === href
-                    ? "text-[#00E5FF]"
+                    ? "text-[#ff3b5c]"
                     : "text-neutral-400 hover:text-neutral-100"
                 }`}
               >
@@ -112,7 +112,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               <span className="text-neutral-500">…</span>
             ) : session ? (
               <DropdownMenu>
-                <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-[#0a0a0f] focus:ring-2 focus:ring-[#00E5FF]">
+                <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-[#0a0a0f] focus:ring-2 focus:ring-[#ff3b5c]">
                   <Avatar className="h-8 w-8 border border-white/10">
                     <AvatarImage src={session.user?.image ?? undefined} />
                     <AvatarFallback className="bg-neutral-800 text-xs text-neutral-300">
@@ -152,7 +152,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             ) : (
               <Link
                 href="/auth/sign-in"
-                className="font-medium text-neutral-400 transition hover:text-[#00E5FF]"
+                className="font-medium text-neutral-400 transition hover:text-[#ff3b5c]"
               >
                 Sign in
               </Link>
@@ -208,14 +208,14 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 </p>
                 <a
                   href="mailto:info@carasta.com"
-                  className="text-[#00E5FF]/90 hover:text-[#00E5FF]"
+                  className="text-[#ff3b5c]/90 hover:text-[#ff3b5c]"
                 >
                   info@carasta.com
                 </a>
               </div>
             </div>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00E5FF]/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#ff3b5c]/20 to-transparent" />
         </div>
         <div className="border-t border-white/10 bg-[#0a0a0f] py-6">
           <div className="carasta-container flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
@@ -225,13 +225,13 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             <nav className="flex gap-6 text-sm">
               <Link
                 href="/terms"
-                className="text-neutral-500 transition hover:text-[#00E5FF]"
+                className="text-neutral-500 transition hover:text-[#ff3b5c]"
               >
                 Terms &amp; Conditions
               </Link>
               <Link
                 href="/privacy"
-                className="text-neutral-500 transition hover:text-[#00E5FF]"
+                className="text-neutral-500 transition hover:text-[#ff3b5c]"
               >
                 Privacy Policy
               </Link>

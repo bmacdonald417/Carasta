@@ -52,8 +52,8 @@ export default async function AdminPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-[#00E5FF]/20 p-2">
-              <Gavel className="h-5 w-5 text-[#00E5FF]" />
+            <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
+              <Gavel className="h-5 w-5 text-[#ff3b5c]" />
             </div>
             <div>
               <p className="text-sm text-neutral-500">Total Auctions</p>
@@ -65,8 +65,8 @@ export default async function AdminPage() {
         </div>
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-[#00E5FF]/20 p-2">
-              <Users className="h-5 w-5 text-[#00E5FF]" />
+            <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
+              <Users className="h-5 w-5 text-[#ff3b5c]" />
             </div>
             <div>
               <p className="text-sm text-neutral-500">Total Users</p>
@@ -142,7 +142,7 @@ export default async function AdminPage() {
                   <td className="px-4 py-3">
                     <Link
                       href={`/auctions/${a.id}`}
-                      className="font-medium text-[#00E5FF] hover:underline"
+                      className="font-medium text-[#ff3b5c] hover:underline"
                     >
                       {a.year} {a.make} {a.model}
                     </Link>
@@ -159,7 +159,7 @@ export default async function AdminPage() {
                   <td className="px-4 py-3 text-right">
                     <Link
                       href={`/auctions/${a.id}`}
-                      className="text-sm text-[#00E5FF] hover:underline"
+                      className="text-sm text-[#ff3b5c] hover:underline"
                     >
                       View
                     </Link>

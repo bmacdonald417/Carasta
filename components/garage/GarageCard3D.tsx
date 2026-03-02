@@ -36,7 +36,7 @@ export function GarageCard3D({
       className="group"
     >
       <Link href={`/u/${ownerHandle}/garage`}>
-        <Card className="overflow-hidden border-white/10 bg-white/5 transition-all duration-300 hover:border-[#00E5FF]/30 hover:shadow-lg hover:shadow-[#00E5FF]/5">
+        <Card className="overflow-hidden border-white/10 bg-white/5 transition-all duration-300 hover:border-[#ff3b5c]/30 hover:shadow-lg hover:shadow-[#ff3b5c]/5">
           <div
             className="relative aspect-video w-full overflow-hidden bg-neutral-900"
             style={{

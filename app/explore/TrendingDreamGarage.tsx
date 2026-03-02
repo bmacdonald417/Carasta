@@ -33,7 +33,7 @@ export function TrendingDreamGarage() {
 
   return (
     <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-      <h2 className="flex items-center gap-2 font-display text-lg font-semibold uppercase tracking-wider text-[#00E5FF]">
+      <h2 className="flex items-center gap-2 font-display text-lg font-semibold uppercase tracking-wider text-[#ff3b5c]">
         <Car className="h-5 w-5" />
         Trending Dream Garage
       </h2>

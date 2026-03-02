@@ -92,7 +92,18 @@ export default async function AuctionsPage({
           auctions.map((a, i) => (
             <AuctionCard
               key={a.id}
-              auction={a}
+              auction={{
+                id: a.id,
+                title: a.title,
+                year: a.year,
+                make: a.make,
+                model: a.model,
+                endAt: a.endAt.toISOString(),
+                status: a.status,
+                reservePriceCents: a.reservePriceCents,
+                images: a.images,
+                seller: a.seller,
+              }}
               highBidCents={a.bids[0]?.amountCents ?? 0}
               bidCount={a._count.bids}
               index={i}

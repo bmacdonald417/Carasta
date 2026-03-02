@@ -15,7 +15,7 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-[#0a0a0f]">
       <div className="border-b border-white/10 bg-[#0a0a0f]/95 backdrop-blur-xl">
         <div className="carasta-container py-4">
-          <h1 className="font-display text-xl font-semibold uppercase tracking-[0.15em] text-[#00E5FF]">
+          <h1 className="font-display text-xl font-semibold uppercase tracking-[0.15em] text-[#ff3b5c]">
             Admin Dashboard
           </h1>
           <p className="mt-1 text-sm text-neutral-400">

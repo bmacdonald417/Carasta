@@ -173,7 +173,7 @@ export function SettingsForm({
       <Button
         type="submit"
         disabled={loading}
-        className="bg-[#00E5FF] text-[#0a0a0f] hover:bg-[#00E5FF]/90"
+        className="bg-[#ff3b5c] text-[#0a0a0f] hover:bg-[#ff3b5c]/90"
       >
         {loading ? "Saving…" : "Save"}
       </Button>

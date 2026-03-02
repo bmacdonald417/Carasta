@@ -32,7 +32,7 @@ export function AuctionCard({
     year: number;
     make: string;
     model: string;
-    endAt: Date;
+    endAt: string;
     status: string;
     reservePriceCents: number | null;
     images: { url: string }[];
@@ -63,7 +63,7 @@ export function AuctionCard({
         initial="hidden"
         animate="visible"
       >
-        <Card className="group overflow-hidden border-white/10 bg-white/5 transition-all duration-300 hover:border-[#00E5FF]/30 hover:shadow-lg hover:shadow-[#00E5FF]/5">
+        <Card className="group overflow-hidden border-white/10 bg-white/5 transition-all duration-300 hover:border-[#ff3b5c]/30 hover:shadow-lg hover:shadow-[#ff3b5c]/5">
           <div className="relative aspect-video w-full overflow-hidden bg-neutral-900">
             <Image
               src={img}
@@ -112,7 +112,7 @@ export function AuctionCard({
             <h2 className="mt-1 font-display text-lg font-semibold tracking-tight line-clamp-1 text-neutral-100">
               {auction.title}
             </h2>
-            <p className="mt-2 text-lg font-semibold text-[#00E5FF]">
+            <p className="mt-2 text-lg font-semibold text-[#ff3b5c]">
               {formatCurrency(highBidCents)}
               <span className="ml-1 text-sm font-normal text-neutral-500">
                 high bid

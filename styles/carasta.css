@@ -1,6 +1,6 @@
 /**
  * Carasta Cyber-Luxury theme — Futuristic design system.
- * Deep charcoal/black, neon accents (Electric Blue #00E5FF, Cyber Lime #CCFF00).
+ * Deep charcoal/black, red and gray accents.
  */
 
 :root {
@@ -14,20 +14,20 @@
   --carasta-muted: #a1a1aa;
   --carasta-muted-dark: #71717a;
 
-  /* Borders — subtle with neon glow potential */
+  /* Borders — subtle with red glow potential */
   --carasta-border: rgba(255, 255, 255, 0.08);
-  --carasta-border-glow: rgba(0, 229, 255, 0.3);
+  --carasta-border-glow: rgba(255, 59, 92, 0.3);
 
-  /* Neon accents */
-  --carasta-neon-blue: #00E5FF;
+  /* Accent colors — red and gray */
+  --carasta-neon-blue: #ff3b5c;
   --carasta-neon-lime: #CCFF00;
-  --carasta-blue: #00E5FF;
+  --carasta-blue: #ff3b5c;
   --carasta-red: #ff3b5c;
 
   /* Glassmorphism */
   --carasta-glass-bg: rgba(10, 10, 15, 0.8);
   --carasta-glass-border: rgba(255, 255, 255, 0.06);
-  --carasta-glass-border-glow: rgba(0, 229, 255, 0.15);
+  --carasta-glass-border-glow: rgba(255, 59, 92, 0.15);
 
   /* Typography */
   --carasta-font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
@@ -71,7 +71,7 @@ body.carasta-theme .carasta-body {
 
 .carasta-card:hover {
   border-color: var(--carasta-border-glow);
-  box-shadow: 0 4px 32px rgba(0, 229, 255, 0.08);
+  box-shadow: 0 4px 32px rgba(255, 59, 92, 0.08);
 }
 
 /* Glassmorphism header/nav */
@@ -85,7 +85,7 @@ body.carasta-theme .carasta-body {
 .carasta-glass-scrolled {
   background: rgba(10, 10, 15, 0.95);
   box-shadow: 0 1px 20px rgba(0, 0, 0, 0.3),
-    0 0 40px rgba(0, 229, 255, 0.03);
+    0 0 40px rgba(255, 59, 92, 0.03);
 }
 
 /* Container */
@@ -106,7 +106,7 @@ body.carasta-theme .carasta-body {
 
 /* Neon glow utilities */
 .neon-glow-blue {
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+  box-shadow: 0 0 20px rgba(255, 59, 92, 0.3);
 }
 
 .neon-glow-lime {
@@ -115,7 +115,7 @@ body.carasta-theme .carasta-body {
 
 .neon-text-blue {
   color: var(--carasta-neon-blue);
-  text-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+  text-shadow: 0 0 20px rgba(255, 59, 92, 0.5);
 }
 
 .neon-text-lime {

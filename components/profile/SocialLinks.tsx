@@ -72,7 +72,7 @@ export function SocialLinks({
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm transition hover:border-[#00E5FF]/30 hover:bg-white/10 ${color}`}
+            className={`flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm transition hover:border-[#ff3b5c]/30 hover:bg-white/10 ${color}`}
             aria-label={label}
           >
             <Icon className="h-4 w-4" />
