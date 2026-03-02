@@ -82,10 +82,16 @@ export async function POST(req: Request) {
       code === "P1001" ||
       code === "P1002" ||
       code === "P1003" ||
-      code === "P1011"
+      code === "P1011" ||
+      code === "P2021"
     ) {
       return NextResponse.json(
-        { message: "Service temporarily unavailable. Please try again later." },
+        {
+          message:
+            code === "P2021"
+              ? "Database schema not applied. Deployer: run prisma db push and db seed with Railway DATABASE_URL."
+              : "Service temporarily unavailable. Please try again later.",
+        },
         { status: 503 }
       );
     }

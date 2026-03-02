@@ -19,22 +19,17 @@ Add these variables to the **Carasta** web service:
    - `NEXTAUTH_URL` = `https://your-app.railway.app`
    - `NEXTAUTH_SECRET` = generate with `openssl rand -base64 32`
 
-## Step 3: Run Database Migration
+## Step 3: Database Schema and Seed
 
-After Postgres is running, either:
+**Schema is applied automatically** — The build runs `prisma db push`, so tables are created on every deploy. Ensure `DATABASE_URL` is set on the Carasta service (link it from your Postgres service: Variables → Add Variable Reference → `${{Postgres.DATABASE_URL}}`).
 
-**Option A — From your local machine** (with `DATABASE_URL` pointing to Railway Postgres):
+**Run seed once** — From your local machine with `DATABASE_URL` pointing to Railway Postgres (use the **public** URL from Postgres → Connect → `DATABASE_PUBLIC_URL`):
 
 ```bash
-npx prisma db push
 npx prisma db seed
 ```
 
-**Option B — Add a one-off deploy command** in Railway for the web service:
-
-```bash
-npx prisma db push && npx prisma db seed
-```
+Demo login: `tom@example.com` / `password123`
 
 ## Step 4: Create Pusher App (for real-time bids)
 
