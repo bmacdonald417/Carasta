@@ -8,6 +8,7 @@ export const authOptions: NextAuthOptions = {
   adapter: require("@auth/prisma-adapter").PrismaAdapter(prisma) as any,
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
   pages: { signIn: "/auth/sign-in" },
+  trustHost: true, // Required for Railway/reverse proxy deployments
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
