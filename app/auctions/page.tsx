@@ -2,14 +2,14 @@ import { prisma } from "@/lib/db";
 import { AuctionCard } from "./auction-card";
 import { AuctionFilters } from "./auction-filters";
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+type SearchParams = { [key: string]: string | string[] | undefined } | Promise<{ [key: string]: string | string[] | undefined }>;
 
 export default async function AuctionsPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const params = await searchParams;
+  const params = searchParams instanceof Promise ? await searchParams : searchParams;
   const make = typeof params.make === "string" ? params.make : undefined;
   const model = typeof params.model === "string" ? params.model : undefined;
   const yearMin = typeof params.yearMin === "string" ? parseInt(params.yearMin, 10) : undefined;
@@ -45,17 +45,23 @@ export default async function AuctionsPage({
         ? { createdAt: "desc" as const }
         : { endAt: "asc" as const };
 
-  const auctions = await prisma.auction.findMany({
-    where,
-    orderBy,
-    take: 50,
-    include: {
-      images: { orderBy: { sortOrder: "asc" }, take: 2 },
-      bids: { orderBy: { amountCents: "desc" }, take: 1 },
-      seller: { select: { handle: true } },
-      _count: { select: { bids: true } },
-    },
-  });
+  let auctions;
+  try {
+    auctions = await prisma.auction.findMany({
+      where,
+      orderBy,
+      take: 50,
+      include: {
+        images: { orderBy: { sortOrder: "asc" }, take: 2 },
+        bids: { orderBy: { amountCents: "desc" }, take: 1 },
+        seller: { select: { handle: true } },
+        _count: { select: { bids: true } },
+      },
+    });
+  } catch (err) {
+    console.error("[auctions] DB error:", err);
+    throw err;
+  }
 
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8">
