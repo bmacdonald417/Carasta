@@ -39,7 +39,8 @@ model User {
   likes        Like[]
   comments     Comment[]
   garageCars   GarageCar[]
-  auctions     Auction[] @relation("Seller")
+  auctions     Auction[]  @relation("Seller")
+  purchasedAuctions Auction[] @relation("Buyer")
   bids         Bid[]
   autoBids     AutoBid[]
   notifications Notification[]
@@ -167,6 +168,7 @@ model GarageCarImage {
 model Auction {
   id                String    @id @default(cuid())
   sellerId          String
+  buyerId           String?
   title             String
   description       String?
   year              Int
@@ -185,11 +187,13 @@ model Auction {
   updatedAt        DateTime  @updatedAt
 
   seller  User          @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
+  buyer   User?         @relation("Buyer", fields: [buyerId], references: [id], onDelete: SetNull)
   images  AuctionImage[]
   bids    Bid[]
   autoBids AutoBid[]
 
   @@index([sellerId])
+  @@index([buyerId])
   @@index([status])
   @@index([endAt])
   @@index([make, model, year])

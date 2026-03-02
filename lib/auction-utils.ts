@@ -162,7 +162,7 @@ export async function buyNow(auctionId: string, buyerId: string): Promise<{ ok: 
 
   await prisma.auction.update({
     where: { id: auctionId },
-    data: { status: "SOLD", endAt: now },
+    data: { status: "SOLD", endAt: now, buyerId },
   });
 
   return { ok: true };

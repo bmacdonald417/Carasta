@@ -31,6 +31,11 @@ export default async function AuctionDetailPage({
 
   if (!auction) notFound();
 
+  if (auction.status === "DRAFT") {
+    const currentUserId = (session?.user as any)?.id;
+    if (currentUserId !== auction.sellerId) notFound();
+  }
+
   const highBidCents = await getAuctionHighBid(id);
   const reserveMeterPercent = getReserveMeterPercent(
     highBidCents,
