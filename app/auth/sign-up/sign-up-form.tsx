@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function SignUpForm() {
+export function SignUpForm({ googleEnabled = false }: { googleEnabled?: boolean }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -103,23 +103,27 @@ export function SignUpForm() {
       <Button type="submit" className="w-full" variant="performance" disabled={loading}>
         {loading ? "Creating account…" : "Create account"}
       </Button>
-      <div className="relative my-4">
-        <span className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
-        </span>
-        <span className="relative flex justify-center text-xs uppercase text-muted-foreground">
-          Or
-        </span>
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        disabled={loading}
-        onClick={() => signIn("google", { callbackUrl: "/" })}
-      >
-        Continue with Google
-      </Button>
+      {googleEnabled && (
+        <>
+          <div className="relative my-4">
+            <span className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </span>
+            <span className="relative flex justify-center text-xs uppercase text-muted-foreground">
+              Or
+            </span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={loading}
+            onClick={() => signIn("google", { callbackUrl: "/" })}
+          >
+            Continue with Google
+          </Button>
+        </>
+      )}
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link href="/auth/sign-in" className="font-medium text-foreground underline-offset-4 hover:underline">

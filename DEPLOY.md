@@ -52,3 +52,18 @@ npx prisma db push && npx prisma db seed
    - `NEXT_PUBLIC_PUSHER_CLUSTER`
 
 Real-time bid updates will work once these are set.
+
+## Step 5: Google OAuth (optional)
+
+To enable "Continue with Google" on sign-in/sign-up:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials
+2. Create **OAuth 2.0 Client ID** (Web application)
+3. Add **Authorized redirect URIs**:
+   - Production: `https://your-app.railway.app/api/auth/callback/google`
+   - Local: `http://localhost:3000/api/auth/callback/google`
+4. Add to Railway variables:
+   - `GOOGLE_CLIENT_ID`
+   - `GOOGLE_CLIENT_SECRET`
+
+The Google button only appears when both variables are set.

@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Gavel, Users, Car, LayoutGrid } from "lucide-react";
+import { Gavel, Users, ShoppingBag, LayoutGrid } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Showroom", icon: LayoutGrid },
   { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/explore", label: "Community", icon: Users },
-  { href: "/merch", label: "Merch", icon: Car },
+  { href: "/merch", label: "Merch", icon: ShoppingBag },
 ];
 
 export function MobileBottomNav() {

@@ -6,7 +6,7 @@ export default function TermsPage() {
           Terms &amp; Conditions
         </h1>
         <p className="mt-4 text-carasta-muted">
-          Last updated: {new Date().toLocaleDateString("en-US")}
+          Last updated: March 2, 2025
         </p>
         <div className="mt-12 space-y-6 font-serif text-carasta-muted leading-relaxed">
           <p>

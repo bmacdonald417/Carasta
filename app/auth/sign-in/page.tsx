@@ -6,6 +6,8 @@ export default async function SignInPage() {
   const session = await getSession();
   if (session) redirect("/");
 
+  const googleEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+
   return (
     <div className="container mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-md flex-col justify-center px-4 py-12">
       <div className="space-y-6">
@@ -15,7 +17,7 @@ export default async function SignInPage() {
         <p className="text-muted-foreground">
           Sign in to your account to bid, sell, and connect with the community.
         </p>
-        <SignInForm />
+        <SignInForm googleEnabled={googleEnabled} />
       </div>
     </div>
   );

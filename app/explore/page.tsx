@@ -2,14 +2,14 @@ import { getSession } from "@/lib/auth";
 import { CommunityFeed } from "./community-feed";
 import { TrendingDreamGarage } from "./TrendingDreamGarage";
 
-type SearchParams = Promise<{ tab?: string }>;
+type SearchParams = { tab?: string } | Promise<{ tab?: string }>;
 
 export default async function ExplorePage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const params = await searchParams;
+  const params = searchParams instanceof Promise ? await searchParams : searchParams;
   const tab = typeof params.tab === "string" ? params.tab : "trending";
   const session = await getSession();
   const currentUserId = (session?.user as any)?.id;

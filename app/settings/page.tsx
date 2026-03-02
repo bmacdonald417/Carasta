@@ -29,12 +29,9 @@ export default async function SettingsPage() {
         Settings
       </h1>
       <p className="mt-1 text-neutral-400">
-        Update your profile. Checkout is simulated (demo).
+        Update your profile, bio, and social links.
       </p>
       <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-        <p className="text-xs text-neutral-500">
-          Secure checkout partner (demo). No real payments.
-        </p>
         <SettingsForm
           handle={user.handle}
           name={user.name ?? ""}

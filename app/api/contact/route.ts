@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     // Demo: log to console. Replace with email send (e.g. Resend, SendGrid) or DB store.
     console.log("[Contact]", { firstName, lastName, email, message });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, message: "Message sent" });
   } catch (e) {
     return NextResponse.json(
       { message: "Something went wrong." },

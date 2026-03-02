@@ -6,6 +6,8 @@ export default async function SignUpPage() {
   const session = await getSession();
   if (session) redirect("/");
 
+  const googleEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+
   return (
     <div className="container mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-md flex-col justify-center px-4 py-12">
       <div className="space-y-6">
@@ -16,7 +18,7 @@ export default async function SignUpPage() {
           Join the community. Bid on cars, build your garage, and connect with
           enthusiasts.
         </p>
-        <SignUpForm />
+        <SignUpForm googleEnabled={googleEnabled} />
       </div>
     </div>
   );
