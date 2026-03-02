@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ShowroomHero } from "@/components/home/ShowroomHero";
 import { AuctionCard } from "@/app/auctions/auction-card";
 import { AppStoreBadges } from "@/components/ui/app-store-badges";
+import { InstagramShowcase } from "@/components/carasta/InstagramShowcase";
 import { Gavel } from "lucide-react";
 
 async function getFeaturedAuctions() {
@@ -196,6 +197,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Social Command Center — Instagram showcase */}
+      <InstagramShowcase />
 
       {/* Value proposition + Download App */}
       <section className="border-t border-white/10 bg-white/[0.02] py-16 md:py-24">
