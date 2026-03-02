@@ -50,7 +50,11 @@ A premium collector car auction and community web app (Next.js 14 App Router, Ty
    pnpm dev
    ```
 
-   Open [http://localhost:3000](http://localhost:3000). Seed users (e.g. `tom@example.com`, `flat6@example.com`, `v8vince@example.com`) use password **password123**.
+   Open [http://localhost:3000](http://localhost:3000). All seed users use password **password123**.
+
+   **Demo accounts:** `tom@example.com` (admin), `flat6@example.com`, `v8vince@example.com`, `jdm@example.com`, `classic@example.com`, `rally@example.com`, `collector@example.com`, `dealer@example.com`
+
+   **App:** [App Store](https://apps.apple.com/us/app/carasta/id6740201534) · [Google Play](https://play.google.com/store/apps/details?id=com.hidden_cherry_45273)
 
 ## Deploy (Railway)
 
