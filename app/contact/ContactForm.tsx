@@ -50,7 +50,7 @@ export function ContactForm() {
             required
             value={form.firstName}
             onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))}
-            className="w-full rounded-full border border-carasta-white/40 bg-transparent px-4 py-3 text-carasta-white placeholder:text-carasta-white/50 focus:border-carasta-white focus:outline-none focus:ring-1 focus:ring-carasta-white"
+            className="w-full rounded-full border border-carasta-white/40 bg-transparent px-4 py-3 text-carasta-white placeholder:text-white focus:border-carasta-white focus:outline-none focus:ring-1 focus:ring-carasta-white"
             placeholder="First name"
           />
         </div>
@@ -64,7 +64,7 @@ export function ContactForm() {
             required
             value={form.lastName}
             onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
-            className="w-full rounded-full border border-carasta-white/40 bg-transparent px-4 py-3 text-carasta-white placeholder:text-carasta-white/50 focus:border-carasta-white focus:outline-none focus:ring-1 focus:ring-carasta-white"
+            className="w-full rounded-full border border-carasta-white/40 bg-transparent px-4 py-3 text-carasta-white placeholder:text-white focus:border-carasta-white focus:outline-none focus:ring-1 focus:ring-carasta-white"
             placeholder="Last name"
           />
         </div>
@@ -79,7 +79,7 @@ export function ContactForm() {
           required
           value={form.email}
           onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-          className="w-full rounded-full border border-carasta-white/40 bg-transparent px-4 py-3 text-carasta-white placeholder:text-carasta-white/50 focus:border-carasta-white focus:outline-none focus:ring-1 focus:ring-carasta-white"
+          className="w-full rounded-full border border-carasta-white/40 bg-transparent px-4 py-3 text-carasta-white placeholder:text-white focus:border-carasta-white focus:outline-none focus:ring-1 focus:ring-carasta-white"
           placeholder="you@example.com"
         />
       </div>
@@ -93,7 +93,7 @@ export function ContactForm() {
           rows={5}
           value={form.message}
           onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
-          className="w-full rounded-2xl border border-carasta-white/40 bg-transparent px-4 py-3 text-carasta-white placeholder:text-carasta-white/50 focus:border-carasta-white focus:outline-none focus:ring-1 focus:ring-carasta-white"
+          className="w-full rounded-2xl border border-carasta-white/40 bg-transparent px-4 py-3 text-carasta-white placeholder:text-white focus:border-carasta-white focus:outline-none focus:ring-1 focus:ring-carasta-white"
           placeholder="Your message..."
         />
       </div>
