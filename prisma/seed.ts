@@ -21,6 +21,12 @@ const CAR_IMAGES: Record<string, string> = {
 const USER_AVATAR = "https://placehold.co/100/2a2a2a/888?text=U";
 
 async function main() {
+  const existingCount = await prisma.auction.count();
+  if (existingCount > 0) {
+    console.log("Seed skipped — database already has", existingCount, "auctions.");
+    return;
+  }
+
   const passwordHash = await hash("password123", 12);
 
   const users = await Promise.all([

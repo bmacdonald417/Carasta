@@ -76,8 +76,9 @@ export default async function HomePage() {
       getRecentAuctions(),
       getSneakPeekAuctions(),
     ]);
-  } catch {
-    // DB may be unavailable at build time
+  } catch (err) {
+    console.error("[home] Failed to fetch auctions:", err);
+    // DB may be unavailable or not seeded — run: npx prisma db seed
   }
 
   const featuredForHero = featuredAuctions.map((a) => ({
