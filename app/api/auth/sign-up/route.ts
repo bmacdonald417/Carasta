@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
 
 const signUpSchema = z.object({
   email: z.string().email(),
@@ -43,18 +42,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const emailBase = sanitizeHandleBase(email.split("@")[0]);
+    const emailBase = sanitizeHandleBase(email.split("@")[0]) || "user";
     let finalHandle =
-      handle
+      handle && sanitizeHandleBase(handle).length >= 2
         ? sanitizeHandleBase(handle)
         : emailBase + Math.random().toString(36).slice(2, 6);
+    if (finalHandle.length < 2) finalHandle = "user" + Math.random().toString(36).slice(2, 8);
     let n = 0;
     while (await prisma.user.findUnique({ where: { handle: finalHandle } })) {
-      const base = handle ? sanitizeHandleBase(handle) : emailBase;
+      const base = handle && sanitizeHandleBase(handle).length >= 2 ? sanitizeHandleBase(handle) : emailBase;
       finalHandle = (base + (++n).toString()).slice(0, 30);
     }
 
-    const passwordHash = await hash(password, 12);
+    const passwordHash = await hash(password, 10);
     await prisma.user.create({
       data: {
         email,
@@ -66,23 +66,28 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[sign-up] Error:", e);
+    const code = (e as { code?: string })?.code;
 
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      if (e.code === "P2002") {
-        return NextResponse.json(
-          {
-            message:
-              "That email or handle is already taken. Try signing in or use a different email/handle.",
-          },
-          { status: 400 }
-        );
-      }
-      if (e.code === "P1001" || e.code === "P1002") {
-        return NextResponse.json(
-          { message: "Service temporarily unavailable. Please try again later." },
-          { status: 503 }
-        );
-      }
+    if (code === "P2002") {
+      return NextResponse.json(
+        {
+          message:
+            "That email or handle is already taken. Try signing in or use a different email/handle.",
+        },
+        { status: 400 }
+      );
+    }
+    if (
+      code === "P1000" ||
+      code === "P1001" ||
+      code === "P1002" ||
+      code === "P1003" ||
+      code === "P1011"
+    ) {
+      return NextResponse.json(
+        { message: "Service temporarily unavailable. Please try again later." },
+        { status: 503 }
+      );
     }
 
     return NextResponse.json(
