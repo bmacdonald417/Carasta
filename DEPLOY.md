@@ -26,8 +26,12 @@ Add these variables to the **Carasta** web service:
 **Run seed once** — From your local machine with `DATABASE_URL` pointing to Railway Postgres (use the **public** URL from Postgres → Connect → `DATABASE_PUBLIC_URL`):
 
 ```bash
-npx prisma db seed
+DATABASE_URL="postgresql://..." npx prisma db seed
 ```
+
+Or set `DATABASE_URL` in `.env` and run `npx prisma db seed`.
+
+> **Troubleshooting:** If you see "No auctions match your filters" or no listings on the home page, the database likely has no demo data. Run the seed command above. Also ensure year filters use full 4-digit years (e.g. 1990, 2024)—partial values like 199 or 202 are ignored.
 
 Demo login: `tom@example.com` / `password123`
 

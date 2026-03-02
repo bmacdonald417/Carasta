@@ -71,20 +71,24 @@ export function AuctionFilters({
           className="mt-1"
         />
       </div>
-      <div className="w-[70px]">
+      <div className="w-[80px]">
         <Label className="text-xs">Year min</Label>
         <Input
           type="number"
+          min={1900}
+          max={2100}
           placeholder="1990"
           defaultValue={yearMin}
           onBlur={(e) => update("yearMin", e.target.value || undefined)}
           className="mt-1"
         />
       </div>
-      <div className="w-[70px]">
+      <div className="w-[80px]">
         <Label className="text-xs">Year max</Label>
         <Input
           type="number"
+          min={1900}
+          max={2100}
           placeholder="2024"
           defaultValue={yearMax}
           onBlur={(e) => update("yearMax", e.target.value || undefined)}

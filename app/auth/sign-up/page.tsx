@@ -2,9 +2,15 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { SignUpForm } from "./sign-up-form";
 
-export default async function SignUpPage() {
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const session = await getSession();
-  if (session) redirect("/");
+  const sp = await searchParams;
+  const callbackUrl = typeof sp.callbackUrl === "string" ? sp.callbackUrl : undefined;
+  if (session) redirect(callbackUrl || "/");
 
   const googleEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
@@ -18,7 +24,7 @@ export default async function SignUpPage() {
           Join the community. Bid on cars, build your garage, and connect with
           enthusiasts.
         </p>
-        <SignUpForm googleEnabled={googleEnabled} />
+        <SignUpForm googleEnabled={googleEnabled} callbackUrl={callbackUrl} />
       </div>
     </div>
   );

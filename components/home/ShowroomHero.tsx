@@ -23,7 +23,7 @@ type FeaturedAuction = {
   images: { url: string }[];
 };
 
-export function ShowroomHero({ auctions }: { auctions: FeaturedAuction[] }) {
+export function ShowroomHero({ auctions, requireAuth = false }: { auctions: FeaturedAuction[]; requireAuth?: boolean }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
@@ -99,13 +99,14 @@ export function ShowroomHero({ auctions }: { auctions: FeaturedAuction[] }) {
               auction.reservePriceCents
             );
 
+            const auctionHref = requireAuth ? `/auth/sign-up?callbackUrl=${encodeURIComponent(`/auctions/${auction.id}`)}` : `/auctions/${auction.id}`;
             return (
               <div
                 key={auction.id}
                 className="embla__slide relative min-w-0 flex-[0_0_100%]"
               >
-                {/* Parallax-style background image */}
-                <div className="relative aspect-[16/9] min-h-[70vh] w-full overflow-hidden md:aspect-video">
+                {/* Parallax-style background image — clickable */}
+                <Link href={auctionHref} className="block relative aspect-[16/9] min-h-[70vh] w-full overflow-hidden md:aspect-video">
                   <Image
                     src={img}
                     alt={auction.title}
@@ -167,17 +168,16 @@ export function ShowroomHero({ auctions }: { auctions: FeaturedAuction[] }) {
                           </div>
                         )}
 
-                        <Link
-                          href={`/auctions/${auction.id}`}
+                        <span
                           className="mt-6 inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-neutral-900 transition hover:bg-neutral-100"
                         >
-                          Quick Bid
+                          {requireAuth ? "Sign up to bid" : "Quick Bid"}
                           <Gavel className="h-4 w-4" />
-                        </Link>
+                        </span>
                       </motion.div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </div>
             );
           })}

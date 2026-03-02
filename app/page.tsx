@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { ShowroomHero } from "@/components/home/ShowroomHero";
+import { AuctionImageStrip } from "@/components/home/AuctionImageStrip";
 import { AuctionCard } from "@/app/auctions/auction-card";
 import { AppStoreBadges } from "@/components/ui/app-store-badges";
 import { InstagramShowcase } from "@/components/carasta/InstagramShowcase";
@@ -62,6 +64,9 @@ async function getRecentAuctions() {
 }
 
 export default async function HomePage() {
+  const session = await getSession();
+  const requireAuth = !session?.user;
+
   let featuredAuctions: Awaited<ReturnType<typeof getFeaturedAuctions>> = [];
   let recentAuctions: Awaited<ReturnType<typeof getRecentAuctions>> = [];
   let sneakPeekAuctions: Awaited<ReturnType<typeof getSneakPeekAuctions>> = [];
@@ -87,10 +92,17 @@ export default async function HomePage() {
     images: a.images,
   }));
 
+  const stripAuctions = recentAuctions.length > 0 ? recentAuctions : featuredAuctions;
+
   return (
     <div className="bg-[#0a0a0f]">
+      {/* Scrolling auction image strip */}
+      <AuctionImageStrip
+        auctions={stripAuctions.map((a) => ({ id: a.id, title: a.title, images: a.images }))}
+        requireAuth={requireAuth}
+      />
       {/* The Showroom — hero carousel */}
-      <ShowroomHero auctions={featuredForHero} />
+      <ShowroomHero auctions={featuredForHero} requireAuth={requireAuth} />
 
       {/* Sneak Peek — closing soon */}
       {sneakPeekAuctions.length > 0 && (
@@ -103,7 +115,7 @@ export default async function HomePage() {
               These auctions end in the next 24 hours. Don&apos;t miss out.
             </p>
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {sneakPeekAuctions.map((a, i) => (
+              {              sneakPeekAuctions.map((a, i) => (
                 <AuctionCard
                   key={a.id}
                   auction={{
@@ -121,6 +133,7 @@ export default async function HomePage() {
                   highBidCents={a.bids[0]?.amountCents ?? 0}
                   bidCount={a._count.bids}
                   index={i}
+                  requireAuth={requireAuth}
                 />
               ))}
             </div>
@@ -182,6 +195,7 @@ export default async function HomePage() {
                   highBidCents={a.bids[0]?.amountCents ?? 0}
                   bidCount={a._count.bids}
                   index={i}
+                  requireAuth={requireAuth}
                 />
               ))
             )}

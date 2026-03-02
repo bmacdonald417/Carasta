@@ -25,6 +25,7 @@ export function AuctionCard({
   highBidCents,
   bidCount = 0,
   index = 0,
+  requireAuth = false,
 }: {
   auction: {
     id: string;
@@ -41,6 +42,7 @@ export function AuctionCard({
   highBidCents: number;
   bidCount?: number;
   index?: number;
+  requireAuth?: boolean;
 }) {
   const img =
     auction.images[0]?.url ??
@@ -55,8 +57,9 @@ export function AuctionCard({
     auction.reservePriceCents
   );
 
+  const href = requireAuth ? `/auth/sign-up?callbackUrl=${encodeURIComponent(`/auctions/${auction.id}`)}` : `/auctions/${auction.id}`;
   return (
-    <Link href={`/auctions/${auction.id}`}>
+    <Link href={href}>
       <motion.div
         custom={index}
         variants={containerVariants}

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function SignUpForm({ googleEnabled = false }: { googleEnabled?: boolean }) {
+export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabled?: boolean; callbackUrl?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,7 +43,7 @@ export function SignUpForm({ googleEnabled = false }: { googleEnabled?: boolean 
         setError("Account created but sign-in failed. Try signing in.");
         return;
       }
-      router.push("/");
+      router.push(callbackUrl || "/");
       router.refresh();
     } finally {
       setLoading(false);
