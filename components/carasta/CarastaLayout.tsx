@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { AppStoreBadges } from "@/components/ui/app-store-badges";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,23 +49,28 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
     pathname === "/privacy";
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Sticky glassmorphism header — transparent when at top, solid when scrolled */}
+    <div className="carasta-theme flex min-h-screen flex-col bg-[#0a0a0f]">
+      {/* Sticky glassmorphism header — cyber-luxury */}
       <motion.header
         className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
           scrolled
-            ? "border-neutral-200/80 bg-white/95 shadow-sm backdrop-blur-xl"
+            ? "border-white/10 bg-[#0a0a0f]/95 shadow-lg shadow-black/20 backdrop-blur-xl"
             : "border-transparent bg-transparent"
         }`}
         initial={false}
         animate={{
-          backgroundColor: scrolled ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0)",
-          backdropFilter: scrolled ? "blur(16px)" : "blur(0px)",
+          backgroundColor: scrolled
+            ? "rgba(10, 10, 15, 0.95)"
+            : "rgba(10, 10, 15, 0)",
+          backdropFilter: scrolled ? "blur(20px)" : "blur(0px)",
         }}
         transition={{ duration: 0.3 }}
       >
         <div className="carasta-container flex h-16 items-center justify-between md:h-20">
-          <Link href="/" className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="flex items-center gap-3 transition-opacity hover:opacity-90"
+          >
             {!logoError ? (
               <img
                 src="/brand/carasta/logo-circle.png"
@@ -75,8 +81,8 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 onError={() => setLogoError(true)}
               />
             ) : null}
-            <span className="font-display text-xl font-semibold tracking-tight text-neutral-900">
-              CARASTA
+            <span className="font-display text-xl font-semibold uppercase tracking-[0.2em] text-neutral-100">
+              Carasta
             </span>
           </Link>
           <nav className="flex items-center gap-6 text-sm">
@@ -86,8 +92,8 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 href={href}
                 className={`font-medium transition ${
                   pathname === href
-                    ? "text-neutral-900"
-                    : "text-neutral-500 hover:text-neutral-900"
+                    ? "text-[#00E5FF]"
+                    : "text-neutral-400 hover:text-neutral-100"
                 }`}
               >
                 {label}
@@ -97,24 +103,27 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={href}
                 href={href}
-                className="text-neutral-500 transition hover:text-neutral-900"
+                className="text-neutral-400 transition hover:text-neutral-100"
               >
                 {label}
               </Link>
             ))}
             {status === "loading" ? (
-              <span className="text-neutral-400">…</span>
+              <span className="text-neutral-500">…</span>
             ) : session ? (
               <DropdownMenu>
-                <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-white focus:ring-2 focus:ring-neutral-900">
-                  <Avatar className="h-8 w-8 border border-neutral-200">
+                <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-[#0a0a0f] focus:ring-2 focus:ring-[#00E5FF]">
+                  <Avatar className="h-8 w-8 border border-white/10">
                     <AvatarImage src={session.user?.image ?? undefined} />
-                    <AvatarFallback className="bg-neutral-100 text-neutral-700 text-xs">
+                    <AvatarFallback className="bg-neutral-800 text-xs text-neutral-300">
                       {(session.user?.name ?? "U").slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[160px]">
+                <DropdownMenuContent
+                  align="end"
+                  className="min-w-[160px] border-white/10 bg-[#121218]/95 backdrop-blur-xl"
+                >
                   <DropdownMenuItem asChild>
                     <Link
                       href={
@@ -129,6 +138,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuItem asChild>
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
+                  {(session.user as any)?.role === "ADMIN" && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin">Admin</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/api/auth/signout">Sign out</Link>
@@ -138,7 +152,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             ) : (
               <Link
                 href="/auth/sign-in"
-                className="font-medium text-neutral-600 transition hover:text-neutral-900"
+                className="font-medium text-neutral-400 transition hover:text-[#00E5FF]"
               >
                 Sign in
               </Link>
@@ -152,7 +166,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         <main
           className={`min-w-0 flex-1 pb-16 lg:pb-0 ${
             isMarketing
-              ? "bg-white text-neutral-900"
+              ? "bg-[#0a0a0f] text-neutral-100"
               : "bg-background text-foreground"
           }`}
         >
@@ -162,9 +176,9 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
       <MobileBottomNav />
 
-      {/* Footer — brand red + black wave */}
+      {/* Footer — cyber-luxury with neon accent */}
       <footer className="mt-auto">
-        <div className="relative bg-[#a41515] pt-16 pb-24 text-white md:pt-20 md:pb-28">
+        <div className="relative border-t border-white/10 bg-[#0a0a0f] pt-16 pb-24 md:pt-20 md:pb-28">
           <div className="carasta-container">
             <div className="flex flex-col items-center gap-10 md:flex-row md:items-start md:justify-between">
               <div className="flex items-center gap-2">
@@ -178,84 +192,47 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
                 />
-                <span className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
-                  CARASTA
+                <span className="font-display text-2xl font-semibold uppercase tracking-[0.15em] text-neutral-100 md:text-3xl">
+                  Carasta
                 </span>
               </div>
               <div className="flex flex-col items-center gap-4 md:flex-row md:gap-6">
-                <a
-                  href="https://apps.apple.com/us/app/carasta/id6740201534"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block overflow-hidden rounded-lg transition-opacity hover:opacity-90"
-                  aria-label="Download on the App Store"
-                >
-                  <div className="h-10 overflow-hidden rounded-md md:h-11">
-                    <img
-                      src="/brand/carasta/app-store-badges.png"
-                      alt="Download on the App Store"
-                      className="h-[88px] w-[140px] object-cover object-top"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  </div>
-                </a>
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.hidden_cherry_45273"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block overflow-hidden rounded-lg transition-opacity hover:opacity-90"
-                  aria-label="Get it on Google Play"
-                >
-                  <div className="h-10 overflow-hidden rounded-md md:h-11">
-                    <img
-                      src="/brand/carasta/app-store-badges.png"
-                      alt="Get it on Google Play"
-                      className="h-[88px] w-[140px] object-cover object-bottom"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  </div>
-                </a>
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-xs text-neutral-500">Download the app</p>
+                  <AppStoreBadges />
+                </div>
               </div>
               <div className="text-center md:text-right">
-                <p className="font-display text-lg font-semibold">Contact</p>
+                <p className="font-display text-lg font-semibold text-neutral-200">
+                  Contact
+                </p>
                 <a
                   href="mailto:info@carasta.com"
-                  className="text-white/95 hover:underline"
+                  className="text-[#00E5FF]/90 hover:text-[#00E5FF]"
                 >
                   info@carasta.com
                 </a>
               </div>
             </div>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-12 w-full overflow-hidden md:h-16">
-            <svg
-              viewBox="0 0 1440 64"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="absolute bottom-0 h-full w-full"
-              preserveAspectRatio="none"
-            >
-              <path
-                d="M0 64V0l120 16 120-16 120 16 120-16 120 16 120-16 120 16 120-16 120 16 120-16 120 16 120-16 120 16 120-16 120 16 120-16V64H0z"
-                fill="#0b0b0b"
-              />
-            </svg>
-          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00E5FF]/20 to-transparent" />
         </div>
-        <div className="border-t border-neutral-200 bg-white py-6">
+        <div className="border-t border-white/10 bg-[#0a0a0f] py-6">
           <div className="carasta-container flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
             <p className="text-sm text-neutral-500">
               © {new Date().getFullYear()} Carasta. All rights reserved.
             </p>
             <nav className="flex gap-6 text-sm">
-              <Link href="/terms" className="text-neutral-500 hover:text-neutral-900">
+              <Link
+                href="/terms"
+                className="text-neutral-500 transition hover:text-[#00E5FF]"
+              >
                 Terms &amp; Conditions
               </Link>
-              <Link href="/privacy" className="text-neutral-500 hover:text-neutral-900">
+              <Link
+                href="/privacy"
+                className="text-neutral-500 transition hover:text-[#00E5FF]"
+              >
                 Privacy Policy
               </Link>
             </nav>

@@ -127,6 +127,29 @@ export async function placeBidAndProcess(
   return { ok: true };
 }
 
+export async function getAuctionLiveData(auctionId: string) {
+  const auction = await prisma.auction.findUnique({
+    where: { id: auctionId },
+    include: {
+      bids: { orderBy: { amountCents: "desc" }, take: 1, include: { bidder: { select: { handle: true } } } },
+      _count: { select: { bids: true } },
+    },
+  });
+  if (!auction) return null;
+  const highBidCents = auction.bids[0]?.amountCents ?? 0;
+  const reservePercent = getReserveMeterPercent(highBidCents, auction.reservePriceCents);
+  return {
+    highBidCents,
+    highBidderHandle: auction.bids[0]?.bidder?.handle ?? null,
+    bidCount: auction._count.bids,
+    reserveMeterPercent: reservePercent,
+    status: auction.status,
+    endAt: auction.endAt.toISOString(),
+    buyNowPriceCents: auction.buyNowPriceCents,
+    buyNowExpiresAt: auction.buyNowExpiresAt?.toISOString() ?? null,
+  };
+}
+
 export async function buyNow(auctionId: string, buyerId: string): Promise<{ ok: boolean; error?: string }> {
   const auction = await prisma.auction.findUnique({
     where: { id: auctionId },

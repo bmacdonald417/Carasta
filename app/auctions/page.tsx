@@ -83,12 +83,13 @@ export default async function AuctionsPage({
             No auctions match your filters.
           </p>
         ) : (
-          auctions.map((a) => (
+          auctions.map((a, i) => (
             <AuctionCard
               key={a.id}
               auction={a}
               highBidCents={a.bids[0]?.amountCents ?? 0}
               bidCount={a._count.bids}
+              index={i}
             />
           ))
         )}

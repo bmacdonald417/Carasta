@@ -19,8 +19,9 @@ async function main() {
         name: "Tom",
         bio: "Track days and Porsches.",
         avatarUrl: USER_AVATAR,
+        role: "ADMIN",
       },
-      update: {},
+      update: { role: "ADMIN" },
     }),
     prisma.user.upsert({
       where: { email: "flat6@example.com" },

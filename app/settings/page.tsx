@@ -15,18 +15,24 @@ export default async function SettingsPage() {
       bio: true,
       location: true,
       avatarUrl: true,
+      instagramUrl: true,
+      facebookUrl: true,
+      twitterUrl: true,
+      tiktokUrl: true,
     },
   });
   if (!user) redirect("/auth/sign-in");
 
   return (
     <div className="container mx-auto max-w-xl px-4 py-8">
-      <h1 className="font-display text-2xl font-bold">Settings</h1>
-      <p className="mt-1 text-muted-foreground">
+      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
+        Settings
+      </h1>
+      <p className="mt-1 text-neutral-400">
         Update your profile. Checkout is simulated (demo).
       </p>
-      <div className="mt-6 rounded-2xl border border-border/50 bg-card/80 p-6">
-        <p className="text-xs text-muted-foreground">
+      <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <p className="text-xs text-neutral-500">
           Secure checkout partner (demo). No real payments.
         </p>
         <SettingsForm
@@ -35,6 +41,10 @@ export default async function SettingsPage() {
           bio={user.bio ?? ""}
           location={user.location ?? ""}
           avatarUrl={user.avatarUrl ?? ""}
+          instagramUrl={user.instagramUrl ?? ""}
+          facebookUrl={user.facebookUrl ?? ""}
+          twitterUrl={user.twitterUrl ?? ""}
+          tiktokUrl={user.tiktokUrl ?? ""}
         />
       </div>
     </div>

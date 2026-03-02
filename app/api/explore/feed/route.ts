@@ -44,8 +44,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ posts: withLiked });
   }
 
+  // Trending: sort by likes count (most liked first)
   const posts = await prisma.post.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { likes: { _count: "desc" } },
     take: 50,
     include: {
       author: {

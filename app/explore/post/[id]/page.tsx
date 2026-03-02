@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentForm } from "./comment-form";
+import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
 
 export default async function PostDetailPage({
@@ -89,9 +90,16 @@ export default async function PostDetailPage({
               />
             </div>
           )}
-          <p className="mt-2 text-sm text-muted-foreground">
-            {post._count.likes} like{post._count.likes !== 1 ? "s" : ""}
-          </p>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm text-muted-foreground">
+              {post._count.likes} like{post._count.likes !== 1 ? "s" : ""}
+            </p>
+            <ShareButtons
+              url={`/explore/post/${post.id}`}
+              title={`Post by @${post.author.handle}`}
+              description={post.content ?? undefined}
+            />
+          </div>
         </CardContent>
       </Card>
 

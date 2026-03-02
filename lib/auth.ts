@@ -34,6 +34,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.avatarUrl ?? user.image,
           handle: user.handle,
+          role: user.role,
         } as any;
       },
     }),
@@ -43,13 +44,17 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.handle = (user as any).handle;
+        token.role = (user as any).role;
       }
-      if (token.id && !token.handle) {
+      if (token.id && (!token.handle || !token.role)) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { handle: true },
+          select: { handle: true, role: true },
         });
-        if (dbUser) token.handle = dbUser.handle;
+        if (dbUser) {
+          token.handle = dbUser.handle;
+          token.role = dbUser.role;
+        }
       }
       if (trigger === "update" && session) {
         token.handle = (session as any).handle;
@@ -62,6 +67,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as any).id = token.id;
         (session.user as any).handle = token.handle;
+        (session.user as any).role = token.role;
       }
       return session;
     },

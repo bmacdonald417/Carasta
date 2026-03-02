@@ -32,7 +32,9 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         "performance-red": "hsl(var(--performance-red))",
         "reserve-emerald": "hsl(var(--reserve-emerald))",
-        /* Carasta marketing theme */
+        "neon-blue": "hsl(var(--neon-blue))",
+        "neon-lime": "hsl(var(--neon-lime))",
+        /* Carasta Cyber-Luxury theme */
         "carasta-bg": "var(--carasta-bg)",
         "carasta-ink": "var(--carasta-ink)",
         "carasta-muted": "var(--carasta-muted)",

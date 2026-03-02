@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { AuctionDetailClient } from "./auction-detail-client";
+import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
 
 export default async function AuctionDetailPage({
@@ -80,22 +81,28 @@ export default async function AuctionDetailPage({
               ))}
             </div>
           )}
-
-          <div className="mt-6">
-            <h1 className="font-display text-2xl font-bold md:text-3xl">
-              {auction.title}
-            </h1>
-            <p className="mt-1 text-muted-foreground">
-              {auction.year} {auction.make} {auction.model}
-              {auction.trim ? ` ${auction.trim}` : ""}
-              {auction.mileage != null ? ` · ${auction.mileage.toLocaleString()} mi` : ""}
-            </p>
-            {auction.description && (
-              <p className="mt-4 text-sm text-muted-foreground whitespace-pre-wrap">
-                {auction.description}
+          <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="font-display text-2xl font-bold md:text-3xl text-neutral-100">
+                {auction.title}
+              </h1>
+              <p className="mt-1 text-neutral-400">
+                {auction.year} {auction.make} {auction.model}
+                {auction.trim ? ` ${auction.trim}` : ""}
+                {auction.mileage != null ? ` · ${auction.mileage.toLocaleString()} mi` : ""}
               </p>
-            )}
+            </div>
+            <ShareButtons
+              url={`/auctions/${auction.id}`}
+              title={auction.title}
+              description={`${auction.year} ${auction.make} ${auction.model} — Bid on Carasta`}
+            />
           </div>
+          {auction.description && (
+            <p className="mt-4 text-sm text-neutral-400 whitespace-pre-wrap">
+              {auction.description}
+            </p>
+          )}
         </div>
 
         <div className="space-y-6">

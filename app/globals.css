@@ -6,28 +6,30 @@
 
 @layer base {
   :root {
-    /* Enterprise theme — white dominant, black text */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
+    /* Cyber-Luxury dark theme */
+    --background: 240 10% 4%;
+    --foreground: 240 5% 96%;
+    --card: 240 10% 6%;
+    --card-foreground: 240 5% 96%;
+    --popover: 240 10% 6%;
+    --popover-foreground: 240 5% 96%;
+    --primary: 187 100% 50%;
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 6% 10%;
+    --secondary-foreground: 240 5% 96%;
+    --muted: 240 6% 10%;
+    --muted-foreground: 240 5% 64%;
+    --accent: 72 100% 50%;
+    --accent-foreground: 240 10% 4%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 20%;
-    --performance-red: 0 72% 51%;
+    --border: 240 6% 16%;
+    --input: 240 6% 16%;
+    --ring: 187 100% 50%;
+    --performance-red: 348 100% 60%;
     --reserve-emerald: 160 84% 39%;
+    --neon-blue: 187 100% 50%;
+    --neon-lime: 72 100% 50%;
   }
 }
 
@@ -40,7 +42,7 @@
   }
 }
 
-/* Glass card effect */
+/* Glass card effect — cyber */
 .glass {
   @apply bg-card/80 backdrop-blur-xl border border-border/50;
 }
@@ -55,9 +57,10 @@
   );
 }
 
-/* Enterprise glassmorphism */
+/* Cyber glassmorphism */
 .glass-enterprise {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(18, 18, 24, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }

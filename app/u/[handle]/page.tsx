@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FollowButton } from "./follow-button";
+import { SocialLinks } from "@/components/profile/SocialLinks";
 
 export default async function ProfilePage({
   params,
@@ -84,6 +85,12 @@ export default async function ProfilePage({
             {user.bio && (
               <p className="mt-2 text-sm text-muted-foreground">{user.bio}</p>
             )}
+            <SocialLinks
+              instagramUrl={user.instagramUrl}
+              facebookUrl={user.facebookUrl}
+              twitterUrl={user.twitterUrl}
+              tiktokUrl={user.tiktokUrl}
+            />
             {!isOwnProfile && currentUserId && (
               <FollowButton
                 targetUserId={user.id}

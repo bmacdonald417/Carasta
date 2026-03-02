@@ -27,6 +27,10 @@ export async function placeBid(formData: FormData) {
     parsed.data.amountCents
   );
   if (result.ok) {
+    const { getAuctionLiveData } = await import("@/lib/auction-utils");
+    const { broadcastBidUpdate } = await import("@/lib/pusher");
+    const live = await getAuctionLiveData(parsed.data.auctionId);
+    if (live) broadcastBidUpdate(parsed.data.auctionId, live);
     revalidatePath(`/auctions/${parsed.data.auctionId}`);
     revalidatePath("/auctions");
   }
@@ -55,6 +59,10 @@ export async function quickBid(formData: FormData) {
     amountCents
   );
   if (result.ok) {
+    const { getAuctionLiveData } = await import("@/lib/auction-utils");
+    const { broadcastBidUpdate } = await import("@/lib/pusher");
+    const live = await getAuctionLiveData(parsed.data.auctionId);
+    if (live) broadcastBidUpdate(parsed.data.auctionId, live);
     revalidatePath(`/auctions/${parsed.data.auctionId}`);
     revalidatePath("/auctions");
   }
@@ -72,6 +80,10 @@ export async function executeBuyNow(formData: FormData) {
 
   const result = await buyNow(parsed.data.auctionId, (session.user as any).id);
   if (result.ok) {
+    const { getAuctionLiveData } = await import("@/lib/auction-utils");
+    const { broadcastBidUpdate } = await import("@/lib/pusher");
+    const live = await getAuctionLiveData(parsed.data.auctionId);
+    if (live) broadcastBidUpdate(parsed.data.auctionId, live);
     revalidatePath(`/auctions/${parsed.data.auctionId}`);
     revalidatePath("/auctions");
   }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Pusher from "pusher-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,6 +91,22 @@ export function AuctionDetailClient({
     const t = setInterval(tick, 1000);
     return () => clearInterval(t);
   }, [live.endAt]);
+
+  // Real-time bid updates via Pusher (when configured)
+  useEffect(() => {
+    if (status !== "LIVE" || !process.env.NEXT_PUBLIC_PUSHER_KEY) return;
+    const key = process.env.NEXT_PUBLIC_PUSHER_KEY;
+    const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER ?? "us2";
+    const pusher = new Pusher(key, { cluster });
+    const channel = pusher.subscribe(`auction-${auctionId}`);
+    channel.bind("bid-update", (data: Partial<LiveData>) => {
+      setLive((prev) => ({ ...prev, ...data }));
+    });
+    return () => {
+      channel.unbind_all();
+      pusher.unsubscribe(`auction-${auctionId}`);
+    };
+  }, [auctionId, status]);
 
   useEffect(() => {
     if (status !== "LIVE") return;

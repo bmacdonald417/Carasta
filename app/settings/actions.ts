@@ -12,10 +12,23 @@ export async function updateProfile(formData: FormData) {
   const bio = (formData.get("bio") as string)?.trim() ?? null;
   const location = (formData.get("location") as string)?.trim() ?? null;
   const avatarUrl = (formData.get("avatarUrl") as string)?.trim() ?? null;
+  const instagramUrl = (formData.get("instagramUrl") as string)?.trim() ?? null;
+  const facebookUrl = (formData.get("facebookUrl") as string)?.trim() ?? null;
+  const twitterUrl = (formData.get("twitterUrl") as string)?.trim() ?? null;
+  const tiktokUrl = (formData.get("tiktokUrl") as string)?.trim() ?? null;
 
   await prisma.user.update({
     where: { id: (session.user as any).id },
-    data: { name, bio, location, avatarUrl },
+    data: {
+      name,
+      bio,
+      location,
+      avatarUrl,
+      instagramUrl,
+      facebookUrl,
+      twitterUrl,
+      tiktokUrl,
+    },
   });
 
   revalidatePath("/settings");

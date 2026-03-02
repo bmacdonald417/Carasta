@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Gavel, Users, Car, LayoutGrid } from "lucide-react";
 
 const navItems = [
@@ -23,7 +24,7 @@ export function MobileBottomNav() {
   if (hideNav) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur-lg lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0a0a0f]/95 backdrop-blur-xl lg:hidden">
       <div className="flex justify-around py-2">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive =
@@ -34,8 +35,8 @@ export function MobileBottomNav() {
               href={href}
               className={`flex flex-col items-center gap-1 px-4 py-2 text-xs font-medium transition ${
                 isActive
-                  ? "text-[#1b238e]"
-                  : "text-neutral-500 hover:text-neutral-900"
+                  ? "text-[#00E5FF]"
+                  : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
               <Icon className="h-5 w-5" />

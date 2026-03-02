@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { GarageCard3D } from "@/components/garage/GarageCard3D";
 
 export default async function GaragePage({
   params,
@@ -48,41 +49,17 @@ export default async function GaragePage({
       </p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         {cars.length === 0 ? (
-          <p className="col-span-full py-8 text-center text-muted-foreground">
+          <p className="col-span-full py-8 text-center text-neutral-500">
             No cars in garage yet.
           </p>
         ) : (
-          cars.map((car) => (
-            <Card key={car.id} className="overflow-hidden">
-              <div className="relative aspect-video w-full bg-muted">
-                {car.images[0]?.url ? (
-                  <Image
-                    src={car.images[0].url}
-                    alt={`${car.year} ${car.make} ${car.model}`}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, 50vw"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
-                    No photo
-                  </div>
-                )}
-              </div>
-              <CardContent className="p-4">
-                <p className="font-display font-semibold">
-                  {car.year} {car.make} {car.model}
-                </p>
-                {car.trim && (
-                  <p className="text-sm text-muted-foreground">{car.trim}</p>
-                )}
-                {car.notes && (
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                    {car.notes}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+          cars.map((car, i) => (
+            <GarageCard3D
+              key={car.id}
+              car={{ ...car, images: car.images }}
+              ownerHandle={user.handle}
+              index={i}
+            />
           ))
         )}
       </div>

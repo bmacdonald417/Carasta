@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${oswald.variable} ${playfair.variable} min-h-screen font-sans antialiased`}
+        className={`carasta-theme ${inter.variable} ${oswald.variable} ${playfair.variable} min-h-screen font-sans antialiased bg-[#0a0a0f] text-neutral-100`}
       >
         <Providers>
           <CarastaLayout>{children}</CarastaLayout>

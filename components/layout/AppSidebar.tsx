@@ -25,20 +25,18 @@ export function AppSidebar() {
   const { data: session } = useSession();
 
   return (
-    <aside className="hidden w-56 shrink-0 border-r border-neutral-200 bg-white lg:block">
+    <aside className="hidden w-56 shrink-0 border-r border-white/10 bg-[#0a0a0f]/50 backdrop-blur-sm lg:block">
       <nav className="sticky top-20 space-y-1 p-4">
         {mainNav.map(({ href, label, icon: Icon }) => {
           const isActive =
-            href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(href);
+            href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
             <Link key={href} href={href}>
               <motion.div
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                   isActive
-                    ? "bg-[#1b238e] text-white"
-                    : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                    ? "bg-[#00E5FF]/90 text-[#0a0a0f] shadow-lg shadow-[#00E5FF]/20"
+                    : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -49,7 +47,7 @@ export function AppSidebar() {
             </Link>
           );
         })}
-        <div className="my-4 border-t border-neutral-200" />
+        <div className="my-4 border-t border-white/10" />
         <Link
           href={
             session?.user
@@ -60,8 +58,8 @@ export function AppSidebar() {
           <motion.div
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               pathname.includes("/garage")
-                ? "bg-[#1b238e] text-white"
-                : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                ? "bg-[#00E5FF]/90 text-[#0a0a0f] shadow-lg shadow-[#00E5FF]/20"
+                : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
             }`}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -74,8 +72,8 @@ export function AppSidebar() {
           <motion.div
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               pathname.startsWith("/merch")
-                ? "bg-[#1b238e] text-white"
-                : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                ? "bg-[#00E5FF]/90 text-[#0a0a0f] shadow-lg shadow-[#00E5FF]/20"
+                : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
             }`}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
