@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FollowButton } from "./follow-button";
 import { SocialLinks } from "@/components/profile/SocialLinks";
+import { TrustPanel } from "@/components/profile/TrustPanel";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 
 export default async function ProfilePage({
@@ -33,6 +34,10 @@ export default async function ProfilePage({
       twitterUrl: true,
       tiktokUrl: true,
       collectorTier: true,
+      reputationScore: true,
+      completedSalesCount: true,
+      completedPurchasesCount: true,
+      disputesLostCount: true,
       _count: {
         select: {
           followers: true,
@@ -149,6 +154,14 @@ export default async function ProfilePage({
             <p className="text-xs text-muted-foreground">Garage</p>
           </div>
         </div>
+
+        <TrustPanel
+          collectorTier={user.collectorTier}
+          reputationScore={user.reputationScore}
+          completedSalesCount={user.completedSalesCount}
+          completedPurchasesCount={user.completedPurchasesCount}
+          disputesLostCount={user.disputesLostCount}
+        />
 
         <div className="mt-6 flex flex-wrap gap-4">
           <Button variant="outline" size="sm" asChild>

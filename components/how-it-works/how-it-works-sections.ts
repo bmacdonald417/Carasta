@@ -9,6 +9,7 @@ import {
   Clock,
   CreditCard,
   Truck,
+  BadgeCheck,
 } from "lucide-react";
 
 export const HOW_IT_WORKS_SECTIONS: {
@@ -58,5 +59,12 @@ export const HOW_IT_WORKS_SECTIONS: {
     title: "Shipping & Handoff",
     description:
       "Coordinate pickup or shipping directly with the seller. You'll receive title, bill of sale, and condition documentation. We support the full handoff so you drive away—or ship away—with confidence and proper paperwork.",
+  },
+  {
+    id: "reputation",
+    icon: BadgeCheck,
+    title: "Reputation & Trust",
+    description:
+      "Collectors earn reputation through completed sales, purchases, and quality condition reports. Tiers (New, Verified, Elite, Apex) reflect experience and reliability. Disputes and policy violations affect standing. Check a seller's profile to see their track record before bidding.",
   },
 ];
