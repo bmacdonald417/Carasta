@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/utils";
 import { AuctionDetailClient } from "./auction-detail-client";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
+import { AuctionConditionReport } from "@/components/auction/AuctionConditionReport";
 
 export default async function AuctionDetailPage({
   params,
@@ -111,57 +112,12 @@ export default async function AuctionDetailPage({
               {auction.description}
             </p>
           )}
-          {(auction.conditionGrade || auction.conditionSummary || (auction.imperfections as string[] | null)?.length || auction.damageImages.length > 0) && (
-            <div className="mt-6 rounded-2xl border border-border/50 bg-card/80 p-4">
-              <h3 className="font-display font-semibold">Condition report</h3>
-              {auction.conditionGrade && (
-                <p className="mt-2 text-sm">
-                  <span className="text-muted-foreground">Grade:</span>{" "}
-                  {auction.conditionGrade.replace(/_/g, " ")}
-                </p>
-              )}
-              {auction.conditionSummary && (
-                <p className="mt-2 text-sm text-neutral-400 whitespace-pre-wrap">
-                  {auction.conditionSummary}
-                </p>
-              )}
-              {Array.isArray(auction.imperfections) && auction.imperfections.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-sm text-muted-foreground">Imperfections</p>
-                  <ul className="mt-1 list-inside list-disc text-sm text-neutral-400">
-                    {(auction.imperfections as string[]).map((imp, i) => (
-                      <li key={i}>{imp}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {auction.damageImages.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground">Damage images</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {auction.damageImages.map((d) => (
-                      <div
-                        key={d.id}
-                        className="relative h-24 w-32 shrink-0 overflow-hidden rounded-xl border border-border/50"
-                      >
-                        <Image
-                          src={d.imageUrl}
-                          alt={d.label}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                          sizes="128px"
-                        />
-                        <span className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1 text-xs text-white">
-                          {d.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          <AuctionConditionReport
+            conditionGrade={auction.conditionGrade}
+            conditionSummary={auction.conditionSummary}
+            imperfections={auction.imperfections}
+            damageImages={auction.damageImages}
+          />
         </div>
 
         <div className="space-y-6">
