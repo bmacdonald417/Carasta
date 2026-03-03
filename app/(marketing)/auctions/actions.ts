@@ -128,13 +128,14 @@ export async function executeBuyNow(formData: FormData) {
     });
     if (auction && auction.sellerId && auction.buyerId) {
       const salePriceCents = auction.buyNowPriceCents ?? auction.reservePriceCents ?? 0;
-      const meta = { auctionId: auction.id };
+      const metaBuyer = { auctionId: auction.id, counterpartyId: auction.sellerId };
+      const metaSeller = { auctionId: auction.id, counterpartyId: buyerId };
 
       await Promise.all([
-        applyReputationEvent({ userId: buyerId, type: "PAYMENT_VERIFIED", salePriceCents, meta }),
-        applyReputationEvent({ userId: auction.sellerId, type: "PAYMENT_VERIFIED", salePriceCents, meta }),
-        applyReputationEvent({ userId: buyerId, type: "PURCHASE_COMPLETED", salePriceCents, meta }),
-        applyReputationEvent({ userId: auction.sellerId, type: "SALE_COMPLETED", salePriceCents, meta }),
+        applyReputationEvent({ userId: buyerId, type: "PAYMENT_VERIFIED", salePriceCents, meta: metaBuyer }),
+        applyReputationEvent({ userId: auction.sellerId, type: "PAYMENT_VERIFIED", salePriceCents, meta: metaSeller }),
+        applyReputationEvent({ userId: buyerId, type: "PURCHASE_COMPLETED", salePriceCents, meta: metaBuyer }),
+        applyReputationEvent({ userId: auction.sellerId, type: "SALE_COMPLETED", salePriceCents, meta: metaSeller }),
       ]);
 
       const qualityPts = computeConditionQuality(auction);
@@ -143,7 +144,7 @@ export async function executeBuyNow(formData: FormData) {
           userId: auction.sellerId,
           type: "CONDITION_REPORT_QUALITY",
           basePoints: qualityPts,
-          meta: { auctionId: auction.id },
+          meta: metaSeller,
         });
       }
     }
@@ -265,7 +266,7 @@ export async function submitAuctionFeedback(formData: FormData) {
     userId: toUserId,
     type: eventType,
     salePriceCents,
-    meta: { auctionId: auction.id },
+    meta: { auctionId: auction.id, counterpartyId: userId },
   });
 
   revalidatePath(`/auctions/${parsed.data.auctionId}`);

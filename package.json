@@ -13,7 +13,8 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "sync-inventory": "ts-node -P tsconfig.scripts.json scripts/sync-inventory.ts",
-    "verify-metrics": "ts-node -P tsconfig.scripts.json scripts/verify-auction-metrics.ts"
+    "verify-metrics": "ts-node -P tsconfig.scripts.json scripts/verify-auction-metrics.ts",
+    "rep:sim": "ts-node -P tsconfig.scripts.json scripts/reputation-sim.ts"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

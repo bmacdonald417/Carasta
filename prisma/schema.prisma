@@ -92,6 +92,7 @@ model User {
   completedSalesCount   Int           @default(0)
   completedPurchasesCount Int         @default(0)
   disputesLostCount     Int           @default(0)
+  uniqueCounterpartyCount Int         @default(0)
 }
 
 model Account {

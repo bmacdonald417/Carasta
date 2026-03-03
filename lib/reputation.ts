@@ -9,13 +9,19 @@
  *
  * ANTI-ABUSE:
  * - Daily positive points cap: +80/day per user (penalties always apply)
+ * - Pair-repeat dampening: 1-2 tx/counterparty full, 3-5 = 50%, >5 = 10%
+ * - Unique counterparty requirement for tiering (VERIFIED 2+, ELITE 6+, APEX 12+)
  * - CONDITION_REPORT_QUALITY: one-time per auction (meta.auctionId dedup)
  */
 
 import { prisma } from "./db";
-import type { Prisma, ReputationEventType, CollectorTier } from "@prisma/client";
+import type { Prisma, ReputationEventType } from "@prisma/client";
+import {
+  computePairDampeningFactor,
+  determineTier as determineTierCore,
+} from "./reputation-core";
 
-export type { ReputationEventType, CollectorTier };
+export type { ReputationEventType, CollectorTier } from "@prisma/client";
 
 const SCORE_WEIGHTS: Record<ReputationEventType, number> = {
   PAYMENT_VERIFIED: 10,
@@ -87,33 +93,18 @@ export function computeConditionQuality(auction: AuctionForCondition): number {
   return Math.min(15, pts);
 }
 
-type UserForTier = {
+/** determineTier: delegates to reputation-core (VERIFIED 2+ counterparties, ELITE 6+, APEX 12+) */
+export function determineTier(user: {
   reputationScore: number;
   completedSalesCount: number;
   completedPurchasesCount: number;
   disputesLostCount: number;
-};
-
-/** determineTier: VERIFIED, ELITE, APEX, else NEW */
-export function determineTier(user: UserForTier): CollectorTier {
-  const total = user.completedSalesCount + user.completedPurchasesCount;
-  const disputeRate =
-    total > 0 ? user.disputesLostCount / total : 0;
-
-  if (
-    user.reputationScore >= 750 &&
-    total >= 25 &&
-    disputeRate < 0.02
-  )
-    return "APEX";
-  if (
-    user.reputationScore >= 500 &&
-    total >= 10 &&
-    disputeRate < 0.03
-  )
-    return "ELITE";
-  if (user.reputationScore >= 200 && total >= 2) return "VERIFIED";
-  return "NEW";
+  uniqueCounterpartyCount?: number;
+}) {
+  return determineTierCore({
+    ...user,
+    uniqueCounterpartyCount: user.uniqueCounterpartyCount ?? 0,
+  });
 }
 
 export type ApplyReputationEventInput = {
@@ -151,6 +142,7 @@ export async function applyReputationEvent(
       completedSalesCount: true,
       completedPurchasesCount: true,
       disputesLostCount: true,
+      uniqueCounterpartyCount: true,
     },
   });
   if (!user) return { ok: false, error: "User not found" };
@@ -167,6 +159,38 @@ export async function applyReputationEvent(
   let points = Math.round(basePoints * valMult * trustMult);
   if (isPositive && points < 0) points = 0;
   if (!isPositive && points > 0) points = -Math.abs(points);
+
+  // Pair-repeat dampening for positive transaction-like events (not penalties)
+  const counterpartyId = meta.counterpartyId as string | undefined;
+  const pairDampenedTypes = [
+    "PAYMENT_VERIFIED",
+    "PURCHASE_COMPLETED",
+    "SALE_COMPLETED",
+    "POSITIVE_FEEDBACK",
+    "CONDITION_REPORT_QUALITY",
+  ] as ReputationEventType[];
+  if (
+    isPositive &&
+    points > 0 &&
+    counterpartyId &&
+    auctionId &&
+    pairDampenedTypes.includes(type)
+  ) {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const pairCountRows = await prisma.$queryRaw<{ cnt: bigint }[]>`
+      SELECT COUNT(DISTINCT meta->>'auctionId')::bigint as cnt
+      FROM "ReputationEvent"
+      WHERE "userId" = ${userId}
+        AND meta->>'counterpartyId' = ${counterpartyId}
+        AND meta->>'auctionId' IS NOT NULL
+        AND "createdAt" >= ${thirtyDaysAgo}
+        AND type IN ('PAYMENT_VERIFIED', 'PURCHASE_COMPLETED', 'SALE_COMPLETED', 'POSITIVE_FEEDBACK', 'CONDITION_REPORT_QUALITY')
+    `;
+    const pairCount = Number(pairCountRows[0]?.cnt ?? 0) + 1;
+    const dampen = computePairDampeningFactor(pairCount);
+    points = Math.round(points * dampen);
+  }
 
   // Daily positive cap (penalties always apply)
   if (isPositive && points > 0) {
@@ -189,6 +213,21 @@ export async function applyReputationEvent(
     }
   }
 
+  let isNewCounterparty = false;
+  if (
+    (type === "SALE_COMPLETED" || type === "PURCHASE_COMPLETED") &&
+    counterpartyId
+  ) {
+    const priorRows = await prisma.$queryRaw<{ id: string }[]>`
+      SELECT id FROM "ReputationEvent"
+      WHERE "userId" = ${userId}
+        AND type IN ('SALE_COMPLETED', 'PURCHASE_COMPLETED')
+        AND meta->>'counterpartyId' = ${counterpartyId}
+      LIMIT 1
+    `;
+    isNewCounterparty = priorRows.length === 0;
+  }
+
   await prisma.$transaction(async (tx) => {
     await tx.reputationEvent.create({
       data: {
@@ -205,6 +244,7 @@ export async function applyReputationEvent(
       completedSalesCount?: { increment: number };
       completedPurchasesCount?: { increment: number };
       disputesLostCount?: { increment: number };
+      uniqueCounterpartyCount?: { increment: number };
     } = {};
 
     if (points !== 0) {
@@ -219,6 +259,9 @@ export async function applyReputationEvent(
     if (type === "DISPUTE_LOST") {
       updates.disputesLostCount = { increment: 1 };
     }
+    if (isNewCounterparty) {
+      updates.uniqueCounterpartyCount = { increment: 1 };
+    }
 
     if (Object.keys(updates).length > 0) {
       const updated = await tx.user.update({
@@ -232,6 +275,7 @@ export async function applyReputationEvent(
           completedSalesCount: true,
           completedPurchasesCount: true,
           disputesLostCount: true,
+          uniqueCounterpartyCount: true,
         },
       });
       const newTier = determineTier(updated);
