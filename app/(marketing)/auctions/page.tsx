@@ -3,8 +3,14 @@ import { getSession } from "@/lib/auth";
 import { computeCurrentBidCents } from "@/lib/auction-metrics";
 import { getZipCoords } from "@/lib/zip-geo";
 import { boundingBox, haversineMiles } from "@/lib/geo-utils";
+import dynamic from "next/dynamic";
 import { AuctionCard } from "./auction-card";
 import { AuctionFilters } from "./auction-filters";
+
+const AuctionsMapView = dynamic(
+  () => import("@/components/auctions/AuctionsMapView").then((m) => m.AuctionsMapView),
+  { ssr: false, loading: () => <div className="flex h-[500px] items-center justify-center rounded-2xl border border-border/50 bg-muted/30">Loading map…</div> }
+);
 
 type SearchParams = { [key: string]: string | string[] | undefined } | Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -43,6 +49,7 @@ export default async function AuctionsPage({
   const zip = typeof params.zip === "string" ? params.zip.trim().slice(0, 10) : undefined;
   const radiusRaw = typeof params.radius === "string" ? parseInt(params.radius, 10) : undefined;
   const radius = radiusRaw != null && RADIUS_OPTIONS.includes(radiusRaw as any) ? radiusRaw : undefined;
+  const view = typeof params.view === "string" && (params.view === "grid" || params.view === "map") ? params.view : "grid";
 
   const now = new Date();
   const where: Record<string, unknown> = { status };
@@ -193,43 +200,74 @@ export default async function AuctionsPage({
         q={q}
         zip={zip}
         radius={radius}
+        view={view}
       />
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {auctions.length === 0 ? (
-          <div className="col-span-full py-12 text-center">
-            <p className="text-muted-foreground">No auctions match your filters.</p>
-            <a
-              href="/auctions"
-              className="mt-3 inline-block text-sm font-medium text-[#ff3b5c] hover:underline"
-            >
-              Clear filters
-            </a>
-          </div>
-        ) : (
-          auctions.map((a, i) => (
-            <AuctionCard
-              key={a.id}
-              auction={{
+      {view === "map" ? (
+        <div className="mt-8">
+          <AuctionsMapView
+            auctions={auctions
+              .filter((a) => a.latitude != null && a.longitude != null)
+              .map((a) => ({
                 id: a.id,
                 title: a.title,
                 year: a.year,
                 make: a.make,
                 model: a.model,
-                endAt: a.endAt.toISOString(),
                 status: a.status,
                 reservePriceCents: a.reservePriceCents,
+                latitude: a.latitude!,
+                longitude: a.longitude!,
                 images: a.images,
                 seller: a.seller,
-              }}
-              highBidCents={computeCurrentBidCents(a.bids)}
-              bidCount={a._count.bids}
-              index={i}
-              requireAuth={requireAuth}
-            />
-          ))
-        )}
-      </div>
+                highBidCents: computeCurrentBidCents(a.bids),
+                bidCount: a._count.bids,
+              }))}
+            requireAuth={requireAuth}
+          />
+          {auctions.filter((a) => a.latitude != null && a.longitude != null).length === 0 && auctions.length > 0 && (
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              No auctions have location data. Add a zip when listing to see them on the map.
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {auctions.length === 0 ? (
+            <div className="col-span-full py-12 text-center">
+              <p className="text-muted-foreground">No auctions match your filters.</p>
+              <a
+                href="/auctions"
+                className="mt-3 inline-block text-sm font-medium text-[#ff3b5c] hover:underline"
+              >
+                Clear filters
+              </a>
+            </div>
+          ) : (
+            auctions.map((a, i) => (
+              <AuctionCard
+                key={a.id}
+                auction={{
+                  id: a.id,
+                  title: a.title,
+                  year: a.year,
+                  make: a.make,
+                  model: a.model,
+                  endAt: a.endAt.toISOString(),
+                  status: a.status,
+                  reservePriceCents: a.reservePriceCents,
+                  images: a.images,
+                  seller: a.seller,
+                }}
+                highBidCents={computeCurrentBidCents(a.bids)}
+                bidCount={a._count.bids}
+                index={i}
+                requireAuth={requireAuth}
+              />
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }

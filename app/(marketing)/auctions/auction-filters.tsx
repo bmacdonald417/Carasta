@@ -32,6 +32,7 @@ export function AuctionFilters({
   q,
   zip,
   radius,
+  view,
 }: {
   makes: string[];
   models: string[];
@@ -48,6 +49,7 @@ export function AuctionFilters({
   q?: string;
   zip?: string;
   radius?: number;
+  view?: "grid" | "map";
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -70,6 +72,7 @@ export function AuctionFilters({
       next.delete("zip");
       next.delete("radius");
     }
+    if (key === "view") next.delete("view");
     router.push(`/auctions?${next.toString()}`);
   }
 
@@ -87,6 +90,7 @@ export function AuctionFilters({
   if (sort && sort !== "ending") activePills.push({ key: "sort", label: `Sort: ${sort === "newest" ? "Newest" : sort === "highest" ? "Highest bid" : "Ending soon"}` });
   if (zip) activePills.push({ key: "zip", label: `Near ${zip}` });
   if (radius != null) activePills.push({ key: "radius", label: `Within ${radius} mi` });
+  if (view && view !== "grid") activePills.push({ key: "view", label: "Map view" });
 
   return (
     <div className="mt-6 space-y-4">
@@ -251,6 +255,33 @@ export function AuctionFilters({
             className="mt-1"
             maxLength={10}
           />
+        </div>
+        <div className="flex items-center gap-2">
+          <Label className="text-xs">View</Label>
+          <div className="flex rounded-lg border border-border/50 p-0.5">
+            <button
+              type="button"
+              onClick={() => update("view", undefined)}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                (view ?? "grid") === "grid"
+                  ? "bg-accent text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Grid
+            </button>
+            <button
+              type="button"
+              onClick={() => update("view", "map")}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                view === "map"
+                  ? "bg-accent text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Map
+            </button>
+          </div>
         </div>
         <div className="w-[100px]">
           <Label className="text-xs">Radius</Label>
