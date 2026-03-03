@@ -12,6 +12,13 @@ enum Role {
   ADMIN
 }
 
+enum AuctionStatus {
+  DRAFT
+  LIVE
+  SOLD
+  ENDED
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -134,6 +141,7 @@ model Comment {
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([postId])
+  @@index([authorId])
 }
 
 model GarageCar {
@@ -182,7 +190,7 @@ model Auction {
   buyNowExpiresAt   DateTime?
   startAt           DateTime
   endAt             DateTime
-  status            String    // DRAFT | LIVE | SOLD | ENDED
+  status            AuctionStatus @default(DRAFT)
   createdAt         DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -197,6 +205,8 @@ model Auction {
   @@index([status])
   @@index([endAt])
   @@index([make, model, year])
+  @@index([status, endAt])
+  @@index([status, createdAt])
 }
 
 model AuctionImage {
@@ -250,4 +260,5 @@ model Notification {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, readAt])
 }

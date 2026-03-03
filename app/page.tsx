@@ -21,14 +21,10 @@ async function getFeaturedAuctions() {
       seller: { select: { handle: true } },
     },
   });
-  const { getAuctionHighBid } = await import("@/lib/auction-utils");
-  const withHighBid = await Promise.all(
-    auctions.map(async (a) => ({
-      ...a,
-      highBidCents: await getAuctionHighBid(a.id),
-    }))
-  );
-  return withHighBid;
+  return auctions.map((a) => ({
+    ...a,
+    highBidCents: a.bids[0]?.amountCents ?? 0,
+  }));
 }
 
 async function getSneakPeekAuctions() {

@@ -23,24 +23,21 @@ export async function GET(req: Request) {
         _count: { select: { likes: true, comments: true } },
       },
     });
-    const withLiked = await Promise.all(
-      posts.map(async (p) => {
-        let liked = false;
-        if (userId) {
-          const like = await prisma.like.findUnique({
-            where: {
-              userId_postId: { userId, postId: p.id },
-            },
-          });
-          liked = !!like;
-        }
-        return {
-          ...p,
-          liked,
-          _count: p._count,
-        };
-      })
-    );
+    const likedPostIds = userId
+      ? new Set(
+          (
+            await prisma.like.findMany({
+              where: { userId, postId: { in: posts.map((p) => p.id) } },
+              select: { postId: true },
+            })
+          ).map((l) => l.postId)
+        )
+      : new Set<string>();
+    const withLiked = posts.map((p) => ({
+      ...p,
+      liked: likedPostIds.has(p.id),
+      _count: p._count,
+    }));
     return NextResponse.json({ posts: withLiked });
   }
 
@@ -55,23 +52,20 @@ export async function GET(req: Request) {
       _count: { select: { likes: true, comments: true } },
     },
   });
-  const withLiked = await Promise.all(
-    posts.map(async (p) => {
-      let liked = false;
-      if (userId) {
-        const like = await prisma.like.findUnique({
-          where: {
-            userId_postId: { userId, postId: p.id },
-          },
-        });
-        liked = !!like;
-      }
-      return {
-        ...p,
-        liked,
-        _count: p._count,
-      };
-    })
-  );
+  const likedPostIds = userId
+    ? new Set(
+        (
+          await prisma.like.findMany({
+            where: { userId, postId: { in: posts.map((p) => p.id) } },
+            select: { postId: true },
+          })
+        ).map((l) => l.postId)
+      )
+    : new Set<string>();
+  const withLiked = posts.map((p) => ({
+    ...p,
+    liked: likedPostIds.has(p.id),
+    _count: p._count,
+  }));
   return NextResponse.json({ posts: withLiked });
 }
