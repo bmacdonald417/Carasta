@@ -133,7 +133,8 @@ class SimEngine {
       userForTrust,
       { type, ...opts },
       existing,
-      asOfDate
+      asOfDate,
+      user.reputationScore
     );
 
     if (!shouldApply) return { points: 0, applied: false };

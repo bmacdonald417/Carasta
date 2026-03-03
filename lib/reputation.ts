@@ -20,6 +20,7 @@ import {
   computePairDampeningFactor,
   determineTier as determineTierCore,
   lowValueFarmingDampener,
+  scoreGainFactor,
 } from "./reputation-core";
 
 export type { ReputationEventType, CollectorTier } from "@prisma/client";
@@ -207,6 +208,12 @@ export async function applyReputationEvent(
     const pairCount = Number(pairCountRows[0]?.cnt ?? 0) + 1;
     const dampen = computePairDampeningFactor(pairCount);
     points = Math.round(points * dampen);
+  }
+
+  // Diminishing returns for positive gains (penalties always full strength)
+  if (isPositive && points > 0) {
+    const gainFactor = scoreGainFactor(user.reputationScore);
+    points = Math.round(points * gainFactor);
   }
 
   // Daily positive cap (penalties always apply)

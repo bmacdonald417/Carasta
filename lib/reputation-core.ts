@@ -61,6 +61,12 @@ export type AuctionForCondition = {
   damageImages?: { id: string }[];
 };
 
+/** Diminishing returns: clamp(1 - (currentScore/1000)*0.6, 0.4, 1.0). Only for positive gains. */
+export function scoreGainFactor(currentScore: number): number {
+  const raw = 1 - (currentScore / 1000) * 0.6;
+  return Math.max(0.4, Math.min(1, raw));
+}
+
 /** Low-value farming dampener: <$500 = 0.10, <$1000 = 0.25, else 1.0. Only for positive points. */
 export function lowValueFarmingDampener(salePriceCents: number): number {
   if (salePriceCents < 50_000) return 0.1;
@@ -166,13 +172,15 @@ export type ComputeEventInput = {
 /**
  * Pure compute: given user state and existing events, compute points for a new event.
  * Returns { points, shouldApply }. shouldApply=false if deduped (auctionId+type already exists).
+ * currentScore: user's reputationScore before this event (for diminishing returns).
  */
 export function computePointsForEvent(
   userId: string,
   user: UserForTrust,
   input: ComputeEventInput,
   existingEvents: SimEvent[],
-  asOfDate: Date
+  asOfDate: Date,
+  currentScore: number = 0
 ): { points: number; shouldApply: boolean } {
   const { type, meta = {} } = input;
   const auctionId = meta.auctionId as string | undefined;
@@ -233,6 +241,12 @@ export function computePointsForEvent(
     const pairCount = distinctAuctionsWithCounterparty.size + 1;
     const dampen = computePairDampeningFactor(pairCount);
     points = Math.round(points * dampen);
+  }
+
+  // Diminishing returns for positive gains (penalties always full strength)
+  if (isPositive && points > 0) {
+    const gainFactor = scoreGainFactor(currentScore);
+    points = Math.round(points * gainFactor);
   }
 
   if (isPositive && points > 0) {
