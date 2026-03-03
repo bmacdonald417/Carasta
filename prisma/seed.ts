@@ -254,10 +254,31 @@ async function main() {
         startAt: now,
         endAt: sevenDays,
         status: "LIVE",
+        conditionGrade: "EXCELLENT",
+        conditionSummary:
+          "Two-owner car with full Porsche service history. Paint is original with no resprays. Interior shows minimal wear. All fluids changed at 10k miles.",
+        imperfections: [
+          {
+            location: "Front bumper",
+            description: "Small stone chip cluster, paint intact",
+            severity: "minor",
+          },
+          {
+            location: "Driver seat bolster",
+            description: "Slight wear from entry/exit",
+            severity: "moderate",
+          },
+        ],
         images: {
           create: [
             { url: CAR_IMAGES.porsche911, sortOrder: 0 },
             { url: CAR_IMAGES.generic, sortOrder: 1 },
+          ],
+        },
+        damageImages: {
+          create: [
+            { label: "Front bumper chips", imageUrl: CAR_IMAGES.porsche911 },
+            { label: "Driver seat bolster", imageUrl: CAR_IMAGES.generic },
           ],
         },
       },

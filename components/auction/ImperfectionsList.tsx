@@ -44,9 +44,21 @@ function normalizeImperfections(
 }
 
 const SEVERITY_STYLES = {
-  minor: "border-l-emerald-500/70 text-emerald-400/90",
-  moderate: "border-l-amber-500/70 text-amber-400/90",
-  major: "border-l-red-500/70 text-red-400/90",
+  minor: {
+    border: "border-l-emerald-500/70",
+    text: "text-emerald-400/90",
+    badge: "bg-emerald-500/20 text-emerald-400",
+  },
+  moderate: {
+    border: "border-l-amber-500/70",
+    text: "text-amber-400/90",
+    badge: "bg-amber-500/20 text-amber-400",
+  },
+  major: {
+    border: "border-l-red-500/70",
+    text: "text-red-400/90",
+    badge: "bg-red-500/20 text-red-400",
+  },
 } as const;
 
 export function ImperfectionsList({ imperfections }: { imperfections: unknown }) {
@@ -78,20 +90,30 @@ export function ImperfectionsList({ imperfections }: { imperfections: unknown })
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="mt-2 space-y-2 overflow-hidden"
           >
-            {items.map((item, i) => (
-              <motion.li
-                key={i}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.2 }}
-                className={`rounded-r-lg border-l-2 bg-white/5 py-2 pl-3 pr-3 text-sm ${SEVERITY_STYLES[item.severity]}`}
-              >
-                {item.location && (
-                  <span className="font-medium">{item.location}: </span>
-                )}
-                {item.description}
-              </motion.li>
-            ))}
+            {items.map((item, i) => {
+              const style = SEVERITY_STYLES[item.severity];
+              return (
+                <motion.li
+                  key={i}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05, duration: 0.2 }}
+                  className={`rounded-r-lg border-l-2 bg-white/5 py-2 pl-3 pr-3 text-sm ${style.border} ${style.text}`}
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`shrink-0 rounded px-1.5 py-0.5 text-xs font-medium uppercase ${style.badge}`}
+                    >
+                      {item.severity}
+                    </span>
+                    {item.location && (
+                      <span className="font-medium">{item.location}:</span>
+                    )}
+                  </div>
+                  <p className="mt-0.5">{item.description}</p>
+                </motion.li>
+              );
+            })}
           </motion.ul>
         )}
       </AnimatePresence>
