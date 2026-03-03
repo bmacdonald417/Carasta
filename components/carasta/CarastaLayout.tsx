@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { AppStoreBadges } from "@/components/ui/app-store-badges";
 import {
   DropdownMenu,
@@ -113,7 +114,9 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             {status === "loading" ? (
               <span className="text-neutral-500">…</span>
             ) : session ? (
-              <DropdownMenu>
+              <>
+                <NotificationDropdown />
+                <DropdownMenu>
                 <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-[#0a0a0f] focus:ring-2 focus:ring-[#ff3b5c]">
                   <Avatar className="h-8 w-8 border border-white/10">
                     <AvatarImage src={session.user?.image ?? undefined} />
@@ -151,6 +154,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </>
             ) : (
               <Link
                 href="/auth/sign-in"
