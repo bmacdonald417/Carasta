@@ -85,25 +85,8 @@ export async function createAuction(input: CreateAuctionInput) {
     return a;
   });
 
-  // Reputation: CONDITION_REPORT_QUALITY when auction goes LIVE
-  const { applyReputationEvent, computeConditionQuality, hasConditionQualityEvent } = await import("@/lib/reputation");
-  const qualityPts = computeConditionQuality({
-    conditionGrade: data.conditionGrade ?? null,
-    conditionSummary: data.conditionSummary ?? null,
-    imperfections: data.imperfections ?? null,
-    damageImages: data.damageImages?.map((_, i) => ({ id: `d${i}` })) ?? [],
-  });
-  if (qualityPts > 0) {
-    const alreadyApplied = await hasConditionQualityEvent(sellerId, auction.id);
-    if (!alreadyApplied) {
-      await applyReputationEvent({
-        userId: sellerId,
-        type: "CONDITION_REPORT_QUALITY",
-        basePoints: qualityPts,
-        meta: { auctionId: auction.id },
-      });
-    }
-  }
+  // CONDITION_REPORT_QUALITY applied when auction transitions SOLD (see executeBuyNow)
+  // TODO: when bid-based auction ends SOLD, apply CONDITION_REPORT_QUALITY there
 
   revalidatePath("/auctions");
   return { ok: true, auctionId: auction.id };

@@ -75,7 +75,7 @@ export async function executeBuyNow(formData: FormData) {
   if (result.ok) {
     const buyerId = (session.user as any).id;
     const { prisma } = await import("@/lib/db");
-    const { applyReputationEvent, computeConditionQuality, hasConditionQualityEvent } = await import("@/lib/reputation");
+    const { applyReputationEvent, computeConditionQuality } = await import("@/lib/reputation");
 
     const auction = await prisma.auction.findUnique({
       where: { id: parsed.data.auctionId },
@@ -83,25 +83,23 @@ export async function executeBuyNow(formData: FormData) {
     });
     if (auction && auction.sellerId && auction.buyerId) {
       const salePriceCents = auction.buyNowPriceCents ?? auction.reservePriceCents ?? 0;
+      const meta = { auctionId: auction.id };
 
       await Promise.all([
-        applyReputationEvent({ userId: buyerId, type: "PAYMENT_VERIFIED", salePriceCents }),
-        applyReputationEvent({ userId: auction.sellerId, type: "PAYMENT_VERIFIED", salePriceCents }),
-        applyReputationEvent({ userId: buyerId, type: "PURCHASE_COMPLETED", salePriceCents }),
-        applyReputationEvent({ userId: auction.sellerId, type: "SALE_COMPLETED", salePriceCents }),
+        applyReputationEvent({ userId: buyerId, type: "PAYMENT_VERIFIED", salePriceCents, meta }),
+        applyReputationEvent({ userId: auction.sellerId, type: "PAYMENT_VERIFIED", salePriceCents, meta }),
+        applyReputationEvent({ userId: buyerId, type: "PURCHASE_COMPLETED", salePriceCents, meta }),
+        applyReputationEvent({ userId: auction.sellerId, type: "SALE_COMPLETED", salePriceCents, meta }),
       ]);
 
       const qualityPts = computeConditionQuality(auction);
       if (qualityPts > 0) {
-        const alreadyApplied = await hasConditionQualityEvent(auction.sellerId, auction.id);
-        if (!alreadyApplied) {
-          await applyReputationEvent({
-            userId: auction.sellerId,
-            type: "CONDITION_REPORT_QUALITY",
-            basePoints: qualityPts,
-            meta: { auctionId: auction.id },
-          });
-        }
+        await applyReputationEvent({
+          userId: auction.sellerId,
+          type: "CONDITION_REPORT_QUALITY",
+          basePoints: qualityPts,
+          meta: { auctionId: auction.id },
+        });
       }
     }
 

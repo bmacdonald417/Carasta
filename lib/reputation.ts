@@ -19,7 +19,7 @@ export type { ReputationEventType, CollectorTier };
 
 const SCORE_WEIGHTS: Record<ReputationEventType, number> = {
   PAYMENT_VERIFIED: 10,
-  DELIVERY_CONFIRMED: 10,
+  DELIVERY_CONFIRMED: 10, // TODO: wire when buyer confirms delivery flow exists
   PURCHASE_COMPLETED: 20,
   SALE_COMPLETED: 25,
   POSITIVE_FEEDBACK: 5,
@@ -130,6 +130,18 @@ export async function applyReputationEvent(
 ): Promise<{ ok: boolean; error?: string }> {
   const { userId, type, meta = {} } = input;
 
+  // Dedupe: prevent double-awards when meta.auctionId + type already exists
+  const auctionId = meta.auctionId as string | undefined;
+  if (auctionId) {
+    const rows = await prisma.$queryRaw<{ id: string }[]>`
+      SELECT id FROM "ReputationEvent"
+      WHERE "userId" = ${userId} AND type = ${type}
+      AND meta->>'auctionId' = ${auctionId}
+      LIMIT 1
+    `;
+    if (rows.length > 0) return { ok: true };
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -231,18 +243,4 @@ export async function applyReputationEvent(
   });
 
   return { ok: true };
-}
-
-/** Check if CONDITION_REPORT_QUALITY was already applied for this auction (seller). */
-export async function hasConditionQualityEvent(
-  userId: string,
-  auctionId: string
-): Promise<boolean> {
-  const rows = await prisma.$queryRaw<{ id: string }[]>`
-    SELECT id FROM "ReputationEvent"
-    WHERE "userId" = ${userId} AND type = 'CONDITION_REPORT_QUALITY'
-    AND meta->>'auctionId' = ${auctionId}
-    LIMIT 1
-  `;
-  return rows.length > 0;
 }
