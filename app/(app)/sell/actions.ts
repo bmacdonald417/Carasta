@@ -38,48 +38,52 @@ export async function createAuction(input: CreateAuctionInput) {
   const buyNowExpiresAt =
     data.buyNowPriceCents != null ? data.buyNowExpiresAt : null;
 
-  const auction = await prisma.auction.create({
-    data: {
-      sellerId,
-      title: data.title,
-      description: data.description ?? null,
-      year: data.year,
-      make: data.make,
-      model: data.model,
-      trim: data.trim ?? null,
-      mileage: data.mileage ?? null,
-      vin: data.vin ?? null,
-      reservePriceCents: data.reservePriceCents ?? null,
-      buyNowPriceCents: data.buyNowPriceCents ?? null,
-      buyNowExpiresAt,
-      startAt: data.startAt,
-      endAt: data.endAt,
-      status: "LIVE",
-      conditionGrade: data.conditionGrade ?? null,
-      conditionSummary: data.conditionSummary ?? null,
-      imperfections: toImperfectionsJson(data.imperfections as ImperfectionInput),
-    },
+  const auction = await prisma.$transaction(async (tx) => {
+    const a = await tx.auction.create({
+      data: {
+        sellerId,
+        title: data.title,
+        description: data.description ?? null,
+        year: data.year,
+        make: data.make,
+        model: data.model,
+        trim: data.trim ?? null,
+        mileage: data.mileage ?? null,
+        vin: data.vin ?? null,
+        reservePriceCents: data.reservePriceCents ?? null,
+        buyNowPriceCents: data.buyNowPriceCents ?? null,
+        buyNowExpiresAt,
+        startAt: data.startAt,
+        endAt: data.endAt,
+        status: "LIVE",
+        conditionGrade: data.conditionGrade ?? null,
+        conditionSummary: data.conditionSummary ?? null,
+        imperfections: toImperfectionsJson(data.imperfections as ImperfectionInput),
+      },
+    });
+
+    if (data.imageUrls.length > 0) {
+      await tx.auctionImage.createMany({
+        data: data.imageUrls.map((url, i) => ({
+          auctionId: a.id,
+          url,
+          sortOrder: i,
+        })),
+      });
+    }
+
+    if (data.damageImages?.length) {
+      await tx.auctionDamageImage.createMany({
+        data: data.damageImages.map((d) => ({
+          auctionId: a.id,
+          label: d.label,
+          imageUrl: d.imageUrl,
+        })),
+      });
+    }
+
+    return a;
   });
-
-  if (data.imageUrls.length > 0) {
-    await prisma.auctionImage.createMany({
-      data: data.imageUrls.map((url, i) => ({
-        auctionId: auction.id,
-        url,
-        sortOrder: i,
-      })),
-    });
-  }
-
-  if (data.damageImages?.length) {
-    await prisma.auctionDamageImage.createMany({
-      data: data.damageImages.map((d) => ({
-        auctionId: auction.id,
-        label: d.label,
-        imageUrl: d.imageUrl,
-      })),
-    });
-  }
 
   // Reputation: CONDITION_REPORT_QUALITY when auction goes LIVE
   const { applyReputationEvent, computeConditionQuality, hasConditionQualityEvent } = await import("@/lib/reputation");
@@ -124,48 +128,52 @@ export async function saveAuctionDraft(input: CreateAuctionDraftInput) {
       ? new Date(data.startAt.getTime() + 24 * 60 * 60 * 1000)
       : null;
 
-  const auction = await prisma.auction.create({
-    data: {
-      sellerId,
-      title: data.title.trim() || "Untitled listing",
-      description: data.description ?? null,
-      year: data.year,
-      make: data.make.trim() || "TBD",
-      model: data.model.trim() || "TBD",
-      trim: data.trim ?? null,
-      mileage: data.mileage ?? null,
-      vin: data.vin ?? null,
-      reservePriceCents: data.reservePriceCents ?? null,
-      buyNowPriceCents: data.buyNowPriceCents ?? null,
-      buyNowExpiresAt,
-      startAt,
-      endAt,
-      status: "DRAFT",
-      conditionGrade: data.conditionGrade ?? null,
-      conditionSummary: data.conditionSummary ?? null,
-      imperfections: toImperfectionsJson(data.imperfections as ImperfectionInput),
-    },
+  const auction = await prisma.$transaction(async (tx) => {
+    const a = await tx.auction.create({
+      data: {
+        sellerId,
+        title: data.title.trim() || "Untitled listing",
+        description: data.description ?? null,
+        year: data.year,
+        make: data.make.trim() || "TBD",
+        model: data.model.trim() || "TBD",
+        trim: data.trim ?? null,
+        mileage: data.mileage ?? null,
+        vin: data.vin ?? null,
+        reservePriceCents: data.reservePriceCents ?? null,
+        buyNowPriceCents: data.buyNowPriceCents ?? null,
+        buyNowExpiresAt,
+        startAt,
+        endAt,
+        status: "DRAFT",
+        conditionGrade: data.conditionGrade ?? null,
+        conditionSummary: data.conditionSummary ?? null,
+        imperfections: toImperfectionsJson(data.imperfections as ImperfectionInput),
+      },
+    });
+
+    if (data.imageUrls?.length) {
+      await tx.auctionImage.createMany({
+        data: data.imageUrls.map((url, i) => ({
+          auctionId: a.id,
+          url,
+          sortOrder: i,
+        })),
+      });
+    }
+
+    if (data.damageImages?.length) {
+      await tx.auctionDamageImage.createMany({
+        data: data.damageImages.map((d) => ({
+          auctionId: a.id,
+          label: d.label,
+          imageUrl: d.imageUrl,
+        })),
+      });
+    }
+
+    return a;
   });
-
-  if (data.imageUrls?.length) {
-    await prisma.auctionImage.createMany({
-      data: data.imageUrls.map((url, i) => ({
-        auctionId: auction.id,
-        url,
-        sortOrder: i,
-      })),
-    });
-  }
-
-  if (data.damageImages?.length) {
-    await prisma.auctionDamageImage.createMany({
-      data: data.damageImages.map((d) => ({
-        auctionId: auction.id,
-        label: d.label,
-        imageUrl: d.imageUrl,
-      })),
-    });
-  }
 
   revalidatePath("/sell");
   return { ok: true, auctionId: auction.id };
