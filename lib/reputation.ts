@@ -21,77 +21,16 @@ import {
   determineTier as determineTierCore,
   lowValueFarmingDampener,
   scoreGainFactor,
-  valueMultiplier as valueMultiplierCore,
+  valueMultiplier,
+  trustMultiplier,
+  computeConditionQuality,
+  SCORE_WEIGHTS,
   MAX_POSITIVE_POINTS_PER_EVENT,
+  DAILY_POSITIVE_CAP,
 } from "./reputation-core";
 
 export type { ReputationEventType, CollectorTier } from "@prisma/client";
-
-const SCORE_WEIGHTS: Record<ReputationEventType, number> = {
-  PAYMENT_VERIFIED: 10,
-  DELIVERY_CONFIRMED: 10, // TODO: wire when buyer confirms delivery flow exists
-  PURCHASE_COMPLETED: 20,
-  SALE_COMPLETED: 25,
-  POSITIVE_FEEDBACK: 5,
-  NEGATIVE_FEEDBACK: -10,
-  CONDITION_REPORT_QUALITY: 0, // variable 0..15
-  DISPUTE_OPENED: -10,
-  DISPUTE_LOST: -60,
-  CHARGEBACK: -120,
-  SELLER_CANCELLATION_AFTER_BID: -40,
-  BUYER_NONPAYMENT: -50,
-  POLICY_VIOLATION: -150,
-  SOCIAL_HELPFUL_UPVOTE: 0, // stub
-  SOCIAL_SPAM_FLAG: 0, // stub
-};
-
-const DAILY_POSITIVE_CAP = 80;
-
-/** valueMultiplier: delegates to reputation-core */
-export const valueMultiplier = valueMultiplierCore;
-
-type UserForTrust = {
-  emailVerified: Date | null;
-  createdAt: Date;
-};
-
-/** trustMultiplier: emailVerified +0.05, age>30 +0.10, age>180 +0.15. Cap 1.5. Only for positive points. */
-export function trustMultiplier(user: UserForTrust, isPositive: boolean): number {
-  if (!isPositive) return 1;
-  let m = 1;
-  if (user.emailVerified) m += 0.05;
-  const accountAgeDays =
-    (Date.now() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000);
-  if (accountAgeDays > 180) m += 0.15;
-  else if (accountAgeDays > 30) m += 0.1;
-  if (accountAgeDays < 14) return Math.min(1, m);
-  return Math.min(1.5, m);
-}
-
-type AuctionForCondition = {
-  conditionGrade: string | null;
-  conditionSummary: string | null;
-  imperfections: unknown;
-  damageImages?: { id: string }[];
-};
-
-/** computeConditionQuality: grade +2, summary>=200 +3, imperfections>=1 +3, damageImages>=3 +4. Cap +15. */
-export function computeConditionQuality(auction: AuctionForCondition): number {
-  let pts = 0;
-  if (auction.conditionGrade) pts += 2;
-  if (
-    auction.conditionSummary &&
-    typeof auction.conditionSummary === "string" &&
-    auction.conditionSummary.length >= 200
-  )
-    pts += 3;
-  const imp =
-    Array.isArray(auction.imperfections) && auction.imperfections.length >= 1;
-  if (imp) pts += 3;
-  const di = auction.damageImages?.length ?? 0;
-  if (di >= 3) pts += 4;
-  return Math.min(15, pts);
-}
+export { valueMultiplier, trustMultiplier, computeConditionQuality };
 
 /** determineTier: delegates to reputation-core (age gates, tx count, counterparties) */
 export function determineTier(user: {
@@ -151,7 +90,7 @@ export async function applyReputationEvent(
   });
   if (!user) return { ok: false, error: "User not found" };
 
-  let basePoints = input.basePoints ?? SCORE_WEIGHTS[type];
+  let basePoints = input.basePoints ?? SCORE_WEIGHTS[type as keyof typeof SCORE_WEIGHTS];
   if (type === "CONDITION_REPORT_QUALITY" && input.basePoints != null) {
     basePoints = input.basePoints;
   }
