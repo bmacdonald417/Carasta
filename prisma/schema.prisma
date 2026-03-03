@@ -235,6 +235,9 @@ model Auction {
   conditionGrade    ConditionGrade?
   conditionSummary  String?   @db.Text
   imperfections     Json?
+  latitude          Float?
+  longitude         Float?
+  locationZip       String?
   createdAt         DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -253,6 +256,7 @@ model Auction {
   @@index([make, model, year])
   @@index([status, endAt])
   @@index([status, createdAt])
+  @@index([latitude, longitude])
 }
 
 model AuctionImage {

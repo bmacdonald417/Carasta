@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,8 @@ export function AuctionFilters({
   status,
   sort,
   q,
+  zip,
+  radius,
 }: {
   makes: string[];
   models: string[];
@@ -43,9 +46,15 @@ export function AuctionFilters({
   status?: string;
   sort?: string;
   q?: string;
+  zip?: string;
+  radius?: number;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [localZip, setLocalZip] = useState(zip ?? "");
+  useEffect(() => {
+    setLocalZip(zip ?? "");
+  }, [zip]);
 
   function update(key: string, value: string | number | undefined) {
     const next = new URLSearchParams(searchParams.toString());
@@ -57,6 +66,10 @@ export function AuctionFilters({
   function removeFilter(key: string) {
     const next = new URLSearchParams(searchParams.toString());
     next.delete(key);
+    if (key === "zip" || key === "radius") {
+      next.delete("zip");
+      next.delete("radius");
+    }
     router.push(`/auctions?${next.toString()}`);
   }
 
@@ -72,6 +85,8 @@ export function AuctionFilters({
   if (endingSoon) activePills.push({ key: "endingSoon", label: "Ending in 24h" });
   if (status && status !== "LIVE") activePills.push({ key: "status", label: `Status: ${status}` });
   if (sort && sort !== "ending") activePills.push({ key: "sort", label: `Sort: ${sort === "newest" ? "Newest" : sort === "highest" ? "Highest bid" : "Ending soon"}` });
+  if (zip) activePills.push({ key: "zip", label: `Near ${zip}` });
+  if (radius != null) activePills.push({ key: "radius", label: `Within ${radius} mi` });
 
   return (
     <div className="mt-6 space-y-4">
@@ -219,6 +234,40 @@ export function AuctionFilters({
               <SelectItem value="ending">Ending soon</SelectItem>
               <SelectItem value="newest">Newest</SelectItem>
               <SelectItem value="highest">Highest bid</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="w-[100px]">
+          <Label className="text-xs">Zip</Label>
+          <Input
+            placeholder="90210"
+            value={localZip}
+            onChange={(e) =>
+              setLocalZip(e.target.value.replace(/\D/g, "").slice(0, 10))
+            }
+            onBlur={(e) =>
+              update("zip", e.target.value.trim() || undefined)
+            }
+            className="mt-1"
+            maxLength={10}
+          />
+        </div>
+        <div className="w-[100px]">
+          <Label className="text-xs">Radius</Label>
+          <Select
+            value={radius != null ? String(radius) : "__none__"}
+            onValueChange={(v) => update("radius", v === "__none__" ? undefined : v)}
+          >
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="Any" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none__">Any</SelectItem>
+              <SelectItem value="25">25 mi</SelectItem>
+              <SelectItem value="50">50 mi</SelectItem>
+              <SelectItem value="100">100 mi</SelectItem>
+              <SelectItem value="250">250 mi</SelectItem>
+              <SelectItem value="500">500 mi</SelectItem>
             </SelectContent>
           </Select>
         </div>

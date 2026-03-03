@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { computeCurrentBidCents } from "@/lib/auction-metrics";
+import { getZipCoords } from "@/lib/zip-geo";
+import { boundingBox, haversineMiles } from "@/lib/geo-utils";
 import { AuctionCard } from "./auction-card";
 import { AuctionFilters } from "./auction-filters";
 
@@ -8,6 +10,7 @@ type SearchParams = { [key: string]: string | string[] | undefined } | Promise<{
 
 const STATUS_OPTIONS = ["LIVE", "ENDED", "SOLD"] as const;
 const SORT_OPTIONS = ["ending", "newest", "highest"] as const;
+const RADIUS_OPTIONS = [25, 50, 100, 250, 500] as const;
 
 function parsePriceCents(
   val: string | string[] | undefined
@@ -37,6 +40,9 @@ export default async function AuctionsPage({
   const sort = typeof params.sort === "string" && SORT_OPTIONS.includes(params.sort as any) ? params.sort : "ending";
   const status = typeof params.status === "string" && STATUS_OPTIONS.includes(params.status as any) ? params.status : "LIVE";
   const q = typeof params.q === "string" ? params.q.trim() : undefined;
+  const zip = typeof params.zip === "string" ? params.zip.trim().slice(0, 10) : undefined;
+  const radiusRaw = typeof params.radius === "string" ? parseInt(params.radius, 10) : undefined;
+  const radius = radiusRaw != null && RADIUS_OPTIONS.includes(radiusRaw as any) ? radiusRaw : undefined;
 
   const now = new Date();
   const where: Record<string, unknown> = { status };
@@ -59,6 +65,24 @@ export default async function AuctionsPage({
       { make: { contains: q, mode: "insensitive" } },
       { model: { contains: q, mode: "insensitive" } },
     ];
+  }
+
+  let centerLat: number | null = null;
+  let centerLng: number | null = null;
+  if (zip && radius != null) {
+    const coords = getZipCoords(zip);
+    if (coords) {
+      centerLat = coords.lat;
+      centerLng = coords.lng;
+      const box = boundingBox(coords.lat, coords.lng, radius);
+      where.AND = where.AND ?? [];
+      (where.AND as object[]).push(
+        { latitude: { not: null } },
+        { longitude: { not: null } },
+        { latitude: { gte: box.latMin, lte: box.latMax } },
+        { longitude: { gte: box.lngMin, lte: box.lngMax } }
+      );
+    }
   }
 
   const priceAnds: Record<string, unknown>[] = [];
@@ -167,6 +191,8 @@ export default async function AuctionsPage({
         status={status}
         sort={sort}
         q={q}
+        zip={zip}
+        radius={radius}
       />
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
