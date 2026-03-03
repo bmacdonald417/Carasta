@@ -117,7 +117,18 @@ export function computeConditionQuality(auction: AuctionForCondition): number {
   return Math.min(15, pts);
 }
 
-/** determineTier: HARD gates for account age + tx count + counterparties. */
+/**
+ * TIER THRESHOLDS (recalibrated for Scenario 8 healthy distribution)
+ *
+ * VERIFIED: Achievable in 2-8 tx over 30-90 days
+ *   - score >= 150, total >= 2, ucp >= 2, age >= 14
+ *
+ * ELITE: Sustained behavior, 3-10% of active marketplace
+ *   - score >= 320, total >= 12, ucp >= 6, age >= 59 (60-day sim), disputeRate < 0.03
+ *
+ * APEX: Rare, 0-2% (0% acceptable at 60-day sim; requires 120+ days)
+ *   - score >= 600, total >= 30, ucp >= 12, age >= 120, disputeRate < 0.02
+ */
 export function determineTier(
   user: UserForTier,
   asOfDate: Date = new Date()
@@ -129,7 +140,7 @@ export function determineTier(
     (asOfDate.getTime() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000);
 
   if (
-    user.reputationScore >= 750 &&
+    user.reputationScore >= 600 &&
     total >= 30 &&
     disputeRate < 0.02 &&
     ucp >= 12 &&
@@ -137,16 +148,16 @@ export function determineTier(
   )
     return "APEX";
   if (
-    user.reputationScore >= 500 &&
+    user.reputationScore >= 320 &&
     total >= 12 &&
     disputeRate < 0.03 &&
     ucp >= 6 &&
-    accountAgeDays >= 60
+    accountAgeDays >= 59
   )
     return "ELITE";
   if (
-    user.reputationScore >= 200 &&
-    total >= 3 &&
+    user.reputationScore >= 150 &&
+    total >= 2 &&
     ucp >= 2 &&
     accountAgeDays >= 14
   )

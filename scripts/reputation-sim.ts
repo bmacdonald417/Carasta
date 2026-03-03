@@ -139,6 +139,21 @@ class SimEngine {
 
     if (!shouldApply) return { points: 0, applied: false };
 
+    // Update unique counterparty count BEFORE pushing (so priorExists excludes current event)
+    const counterpartyId = opts.meta?.counterpartyId as string | undefined;
+    if (
+      (type === "SALE_COMPLETED" || type === "PURCHASE_COMPLETED") &&
+      counterpartyId
+    ) {
+      const priorExists = this.events.some(
+        (e) =>
+          e.userId === userId &&
+          (e.type === "SALE_COMPLETED" || e.type === "PURCHASE_COMPLETED") &&
+          (e.meta?.counterpartyId as string) === counterpartyId
+      );
+      if (!priorExists) user.uniqueCounterpartyCount++;
+    }
+
     // Track daily cap activation
     if (points > 0 && existing.length > 0) {
       const todayStart = new Date(asOfDate);
@@ -162,19 +177,6 @@ class SimEngine {
     if (type === "SALE_COMPLETED") user.completedSalesCount++;
     if (type === "PURCHASE_COMPLETED") user.completedPurchasesCount++;
     if (type === "DISPUTE_LOST") user.disputesLostCount++;
-    const counterpartyId = opts.meta?.counterpartyId as string | undefined;
-    if (
-      (type === "SALE_COMPLETED" || type === "PURCHASE_COMPLETED") &&
-      counterpartyId
-    ) {
-      const priorExists = this.events.some(
-        (e) =>
-          e.userId === userId &&
-          (e.type === "SALE_COMPLETED" || e.type === "PURCHASE_COMPLETED") &&
-          (e.meta?.counterpartyId as string) === counterpartyId
-      );
-      if (!priorExists) user.uniqueCounterpartyCount++;
-    }
     user.collectorTier = determineTier(user, asOfDate);
 
     return { points, applied: true };
@@ -640,6 +642,27 @@ function printReport(reports: ScenarioReport[]): void {
     }
     if (r.takeaways.length > 0) {
       for (const t of r.takeaways) console.log("  →", t);
+    }
+    if (r.scenarioId === 8 && r.users.length > 0) {
+      const n = r.users.length;
+      const v = r.users.filter(
+        (u) => u.score >= 150 && u.sales + u.purchases >= 2 && u.uniqueCounterparties >= 2
+      ).length;
+      const e = r.users.filter(
+        (u) =>
+          u.score >= 320 &&
+          u.sales + u.purchases >= 12 &&
+          u.uniqueCounterparties >= 6
+      ).length;
+      const a = r.users.filter(
+        (u) =>
+          u.score >= 600 &&
+          u.sales + u.purchases >= 30 &&
+          u.uniqueCounterparties >= 12
+      ).length;
+      console.log(
+        `  Target comparison: would-be VERIFIED=${v} (${((v / n) * 100).toFixed(1)}%), ELITE=${e} (${((e / n) * 100).toFixed(1)}%), APEX=${a} (${((a / n) * 100).toFixed(1)}%) [ignoring age]`
+      );
     }
     console.log("");
   }
