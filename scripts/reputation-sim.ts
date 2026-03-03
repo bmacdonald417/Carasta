@@ -174,7 +174,7 @@ class SimEngine {
       );
       if (!priorExists) user.uniqueCounterpartyCount++;
     }
-    user.collectorTier = determineTier(user);
+    user.collectorTier = determineTier(user, asOfDate);
 
     return { points, applied: true };
   }

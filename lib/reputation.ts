@@ -19,6 +19,7 @@ import type { Prisma, ReputationEventType } from "@prisma/client";
 import {
   computePairDampeningFactor,
   determineTier as determineTierCore,
+  lowValueFarmingDampener,
 } from "./reputation-core";
 
 export type { ReputationEventType, CollectorTier } from "@prisma/client";
@@ -93,18 +94,22 @@ export function computeConditionQuality(auction: AuctionForCondition): number {
   return Math.min(15, pts);
 }
 
-/** determineTier: delegates to reputation-core (VERIFIED 2+ counterparties, ELITE 6+, APEX 12+) */
+/** determineTier: delegates to reputation-core (age gates, tx count, counterparties) */
 export function determineTier(user: {
   reputationScore: number;
   completedSalesCount: number;
   completedPurchasesCount: number;
   disputesLostCount: number;
   uniqueCounterpartyCount?: number;
+  createdAt: Date;
 }) {
-  return determineTierCore({
-    ...user,
-    uniqueCounterpartyCount: user.uniqueCounterpartyCount ?? 0,
-  });
+  return determineTierCore(
+    {
+      ...user,
+      uniqueCounterpartyCount: user.uniqueCounterpartyCount ?? 0,
+    },
+    new Date()
+  );
 }
 
 export type ApplyReputationEventInput = {
@@ -160,8 +165,6 @@ export async function applyReputationEvent(
   if (isPositive && points < 0) points = 0;
   if (!isPositive && points > 0) points = -Math.abs(points);
 
-  // Pair-repeat dampening for positive transaction-like events (not penalties)
-  const counterpartyId = meta.counterpartyId as string | undefined;
   const pairDampenedTypes = [
     "PAYMENT_VERIFIED",
     "PURCHASE_COMPLETED",
@@ -169,6 +172,20 @@ export async function applyReputationEvent(
     "POSITIVE_FEEDBACK",
     "CONDITION_REPORT_QUALITY",
   ] as ReputationEventType[];
+
+  // Low-value farming dampener for positive transaction-like events
+  if (
+    isPositive &&
+    points > 0 &&
+    salePriceCents > 0 &&
+    pairDampenedTypes.includes(type)
+  ) {
+    const lvDampen = lowValueFarmingDampener(salePriceCents);
+    points = Math.round(points * lvDampen);
+  }
+
+  // Pair-repeat dampening for positive transaction-like events (not penalties)
+  const counterpartyId = meta.counterpartyId as string | undefined;
   if (
     isPositive &&
     points > 0 &&
@@ -276,6 +293,7 @@ export async function applyReputationEvent(
           completedPurchasesCount: true,
           disputesLostCount: true,
           uniqueCounterpartyCount: true,
+          createdAt: true,
         },
       });
       const newTier = determineTier(updated);

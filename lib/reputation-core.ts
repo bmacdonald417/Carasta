@@ -51,6 +51,7 @@ export type UserForTier = {
   completedPurchasesCount: number;
   disputesLostCount: number;
   uniqueCounterpartyCount: number;
+  createdAt: Date;
 };
 
 export type AuctionForCondition = {
@@ -59,6 +60,13 @@ export type AuctionForCondition = {
   imperfections: unknown;
   damageImages?: { id: string }[];
 };
+
+/** Low-value farming dampener: <$500 = 0.10, <$1000 = 0.25, else 1.0. Only for positive points. */
+export function lowValueFarmingDampener(salePriceCents: number): number {
+  if (salePriceCents < 50_000) return 0.1;
+  if (salePriceCents < 100_000) return 0.25;
+  return 1;
+}
 
 /** valueMultiplier: clamp(log10(salePriceCents/10000)+1, 0.75, 1.75) */
 export function valueMultiplier(salePriceCents: number): number {
@@ -102,27 +110,40 @@ export function computeConditionQuality(auction: AuctionForCondition): number {
   return Math.min(15, pts);
 }
 
-/** determineTier: VERIFIED (2+ unique counterparties), ELITE (6+), APEX (12+), else NEW */
-export function determineTier(user: UserForTier): CollectorTier {
+/** determineTier: HARD gates for account age + tx count + counterparties. */
+export function determineTier(
+  user: UserForTier,
+  asOfDate: Date = new Date()
+): CollectorTier {
   const total = user.completedSalesCount + user.completedPurchasesCount;
   const disputeRate = total > 0 ? user.disputesLostCount / total : 0;
   const ucp = user.uniqueCounterpartyCount ?? 0;
+  const accountAgeDays =
+    (asOfDate.getTime() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000);
 
   if (
     user.reputationScore >= 750 &&
-    total >= 25 &&
+    total >= 30 &&
     disputeRate < 0.02 &&
-    ucp >= 12
+    ucp >= 12 &&
+    accountAgeDays >= 120
   )
     return "APEX";
   if (
     user.reputationScore >= 500 &&
-    total >= 10 &&
+    total >= 12 &&
     disputeRate < 0.03 &&
-    ucp >= 6
+    ucp >= 6 &&
+    accountAgeDays >= 60
   )
     return "ELITE";
-  if (user.reputationScore >= 200 && total >= 2 && ucp >= 2) return "VERIFIED";
+  if (
+    user.reputationScore >= 200 &&
+    total >= 3 &&
+    ucp >= 2 &&
+    accountAgeDays >= 14
+  )
+    return "VERIFIED";
   return "NEW";
 }
 
@@ -175,6 +196,17 @@ export function computePointsForEvent(
   let points = Math.round(basePoints * valMult * trustMult);
   if (isPositive && points < 0) points = 0;
   if (!isPositive && points > 0) points = -Math.abs(points);
+
+  // Low-value farming dampener for positive transaction-like events
+  if (
+    isPositive &&
+    points > 0 &&
+    salePriceCents > 0 &&
+    PAIR_DAMPENED_EVENT_TYPES.includes(type)
+  ) {
+    const lvDampen = lowValueFarmingDampener(salePriceCents);
+    points = Math.round(points * lvDampen);
+  }
 
   // Pair-repeat dampening for positive transaction-like events
   const counterpartyId = meta.counterpartyId as string | undefined;
