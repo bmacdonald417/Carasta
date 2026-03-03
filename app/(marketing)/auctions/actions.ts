@@ -9,6 +9,7 @@ import {
   quickBidSchema,
   buyNowSchema,
   autoBidSchema,
+  submitFeedbackSchema,
 } from "@/lib/validations/auction";
 
 export async function placeBid(formData: FormData) {
@@ -148,6 +149,79 @@ export async function setAutoBid(formData: FormData) {
       active: true,
     },
     update: { maxAmountCents: parsed.data.maxAmountCents, active: true },
+  });
+
+  revalidatePath(`/auctions/${parsed.data.auctionId}`);
+  return { ok: true };
+}
+
+export async function submitAuctionFeedback(formData: FormData) {
+  const session = await getSession();
+  if (!session?.user?.id) return { ok: false, error: "You must be signed in." };
+
+  const parsed = submitFeedbackSchema.safeParse({
+    auctionId: formData.get("auctionId"),
+    rating: formData.get("rating"),
+    note: formData.get("note") || undefined,
+  });
+  if (!parsed.success) return { ok: false, error: "Invalid input." };
+
+  const { prisma } = await import("@/lib/db");
+  const { applyReputationEvent } = await import("@/lib/reputation");
+  const userId = (session.user as any).id;
+
+  const auction = await prisma.auction.findUnique({
+    where: { id: parsed.data.auctionId },
+    select: {
+      id: true,
+      status: true,
+      sellerId: true,
+      buyerId: true,
+      buyNowPriceCents: true,
+      reservePriceCents: true,
+    },
+  });
+
+  if (!auction) return { ok: false, error: "Auction not found." };
+  if (auction.status !== "SOLD" || !auction.buyerId) {
+    return { ok: false, error: "Feedback is only allowed after a completed sale." };
+  }
+
+  const isBuyer = userId === auction.buyerId;
+  const isSeller = userId === auction.sellerId;
+  if (!isBuyer && !isSeller) {
+    return { ok: false, error: "Only the buyer or seller can leave feedback." };
+  }
+
+  const toUserId = isBuyer ? auction.sellerId : auction.buyerId;
+
+  const existing = await prisma.auctionFeedback.findUnique({
+    where: {
+      auctionId_fromUserId: {
+        auctionId: parsed.data.auctionId,
+        fromUserId: userId,
+      },
+    },
+  });
+  if (existing) return { ok: false, error: "You have already left feedback for this auction." };
+
+  await prisma.auctionFeedback.create({
+    data: {
+      auctionId: parsed.data.auctionId,
+      fromUserId: userId,
+      toUserId,
+      rating: parsed.data.rating as "POSITIVE" | "NEGATIVE",
+      note: parsed.data.note?.trim() || null,
+    },
+  });
+
+  const salePriceCents = auction.buyNowPriceCents ?? auction.reservePriceCents ?? 0;
+  const eventType = parsed.data.rating === "POSITIVE" ? "POSITIVE_FEEDBACK" : "NEGATIVE_FEEDBACK";
+  await applyReputationEvent({
+    userId: toUserId,
+    type: eventType,
+    salePriceCents,
+    meta: { auctionId: auction.id },
   });
 
   revalidatePath(`/auctions/${parsed.data.auctionId}`);

@@ -8,6 +8,7 @@ import { AuctionDetailClient } from "./auction-detail-client";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
 import { AuctionConditionReport } from "@/components/auction/AuctionConditionReport";
+import { AuctionFeedbackCard } from "@/components/auction/AuctionFeedbackCard";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 
 export default async function AuctionDetailPage({
@@ -18,17 +19,23 @@ export default async function AuctionDetailPage({
   const { id } = await params;
   const session = await getSession();
 
+  const currentUserId = (session?.user as any)?.id;
+
   const auction = await prisma.auction.findUnique({
     where: { id },
     include: {
       images: { orderBy: { sortOrder: "asc" } },
       damageImages: true,
       seller: { select: { id: true, handle: true, name: true, avatarUrl: true, collectorTier: true } },
+      buyer: { select: { handle: true } },
       bids: {
         orderBy: { amountCents: "desc" },
         take: 20,
         include: { bidder: { select: { handle: true, collectorTier: true } } },
       },
+      feedbacks: currentUserId
+        ? { where: { fromUserId: currentUserId }, select: { id: true } }
+        : { where: { fromUserId: "none" }, select: { id: true } },
     },
   });
 
@@ -171,6 +178,24 @@ export default async function AuctionDetailPage({
               </Link>
             </p>
           </div>
+
+          {auction.status === "SOLD" &&
+            auction.buyerId &&
+            currentUserId &&
+            (currentUserId === auction.sellerId || currentUserId === auction.buyerId) && (
+              <AuctionFeedbackCard
+                auctionId={auction.id}
+                counterpartyHandle={
+                  currentUserId === auction.buyerId
+                    ? auction.seller.handle
+                    : auction.buyer?.handle ?? "buyer"
+                }
+                userRole={currentUserId === auction.buyerId ? "buyer" : "seller"}
+                hasSubmitted={
+                  Array.isArray(auction.feedbacks) && auction.feedbacks.length > 0
+                }
+              />
+            )}
 
           <div className="rounded-2xl border border-border/50 bg-card/80 p-4">
             <h3 className="font-display font-semibold">Seller</h3>

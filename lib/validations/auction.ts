@@ -65,3 +65,9 @@ export const autoBidSchema = z.object({
   auctionId: z.string(),
   maxAmountCents: z.number().int().positive(),
 });
+
+export const submitFeedbackSchema = z.object({
+  auctionId: z.string(),
+  rating: z.enum(["POSITIVE", "NEGATIVE"]),
+  note: z.string().max(500).optional(),
+});

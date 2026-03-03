@@ -20,6 +20,11 @@ enum ConditionGrade {
   FAIR
 }
 
+enum FeedbackRating {
+  POSITIVE
+  NEGATIVE
+}
+
 enum CollectorTier {
   NEW
   VERIFIED
@@ -78,6 +83,8 @@ model User {
   autoBids     AutoBid[]
   notifications Notification[]
   reputationEvents ReputationEvent[]
+  feedbackGiven   AuctionFeedback[] @relation("FeedbackFrom")
+  feedbackReceived AuctionFeedback[] @relation("FeedbackTo")
 
   reputationScore       Int           @default(0)
   collectorTier         CollectorTier @default(NEW)
@@ -237,6 +244,7 @@ model Auction {
   damageImages AuctionDamageImage[]
   bids    Bid[]
   autoBids AutoBid[]
+  feedbacks AuctionFeedback[]
 
   @@index([sellerId])
   @@index([buyerId])
@@ -267,6 +275,24 @@ model AuctionDamageImage {
 
   auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
 
+  @@index([auctionId])
+}
+
+model AuctionFeedback {
+  id         String         @id @default(cuid())
+  auctionId  String
+  fromUserId String
+  toUserId   String
+  rating     FeedbackRating
+  note       String?        @db.VarChar(500)
+  createdAt  DateTime       @default(now())
+
+  auction  Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  fromUser User    @relation("FeedbackFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User    @relation("FeedbackTo", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@unique([auctionId, fromUserId])
+  @@index([toUserId])
   @@index([auctionId])
 }
 
