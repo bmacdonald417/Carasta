@@ -5,31 +5,31 @@ import { Button } from "@/components/ui/button";
 export const metadata = {
   title: "How It Works | Carasta",
   description:
-    "Discover, bid, and buy collector cars with confidence. Learn how Carasta's auction platform works—from browsing to secure checkout and delivery.",
+    "Discover, bid, and buy collector cars with confidence. Learn how Carasta's auction platform works—from browsing and bidding to checkout and delivery.",
 };
 
 export default function HowItWorksPage() {
   return (
-    <section className="min-h-screen px-4 py-16 md:py-24">
+    <section className="min-h-screen px-4 py-12 md:py-20">
       <div className="carasta-container max-w-3xl">
         <div className="text-center">
           <h1 className="font-display text-3xl font-bold tracking-tight text-neutral-100 md:text-4xl lg:text-5xl">
             How It Works
           </h1>
-          <p className="mt-4 text-lg text-neutral-400 md:text-xl">
-            From discovery to delivery—transparent, secure, and built for collectors.
+          <p className="mt-3 text-base text-neutral-400 md:mt-4 md:text-lg">
+            From discovery to delivery—transparent, fair, and built for collectors.
           </p>
         </div>
 
-        <div className="mt-16 md:mt-24">
+        <div className="mt-12 md:mt-20">
           <HowItWorksTimeline />
         </div>
 
-        <div className="mt-16 flex flex-col items-center gap-6 text-center">
+        <div className="mt-14 flex flex-col items-center gap-5 text-center md:mt-20">
           <p className="text-sm text-neutral-500">
             Ready to bid or list your collector car?
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-3">
             <Button asChild variant="outline" size="lg">
               <Link href="/auctions">Browse Auctions</Link>
             </Button>
