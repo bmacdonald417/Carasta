@@ -34,7 +34,7 @@ export function Nav() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 glass">
-      <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+      <div className="carasta-container flex h-14 max-w-6xl items-center justify-between">
         <Link
           href="/"
           className="font-display text-xl font-bold tracking-tight text-foreground"

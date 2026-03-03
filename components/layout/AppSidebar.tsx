@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
+import { hoverScale, tapScale } from "@/lib/motion";
 import {
   Gavel,
   Users,
@@ -38,8 +39,8 @@ export function AppSidebar() {
                     ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
                     : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                 }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={hoverScale}
+                whileTap={tapScale}
               >
                 <Icon className="h-5 w-5 shrink-0" />
                 {label}
@@ -61,8 +62,8 @@ export function AppSidebar() {
                 ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
                 : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
             }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={hoverScale}
+            whileTap={tapScale}
           >
             <Car className="h-5 w-5 shrink-0" />
             Garage
@@ -75,8 +76,8 @@ export function AppSidebar() {
                 ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
                 : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
             }`}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={hoverScale}
+            whileTap={tapScale}
           >
             <ShoppingBag className="h-5 w-5 shrink-0" />
             Merch Store

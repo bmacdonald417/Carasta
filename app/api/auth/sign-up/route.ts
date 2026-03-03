@@ -2,13 +2,7 @@ import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-
-const signUpSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  handle: z.string().min(2).max(30).regex(/^[a-z0-9_]+$/).optional(),
-  name: z.string().max(100).optional(),
-});
+import { signUpSchema } from "@/lib/validations/auth";
 
 function sanitizeHandleBase(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 28);
