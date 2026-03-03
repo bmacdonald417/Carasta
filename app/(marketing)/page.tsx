@@ -1,5 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { fetchLiveAuctionsForList } from "@/lib/auction-queries";
+import { getHomeStats } from "@/lib/home-stats";
+import { HomeStatsStrip } from "@/components/home/HomeStatsStrip";
 
 export const dynamic = "force-dynamic";
 import Link from "next/link";
@@ -85,13 +87,15 @@ export default async function HomePage() {
 
   let endingSoonAuctions: Awaited<ReturnType<typeof fetchLiveAuctionsForList>> = [];
   let recentAuctions: Awaited<ReturnType<typeof fetchLiveAuctionsForList>> = [];
+  let homeStats = { liveAuctions: 0, soldAuctions: 0, totalBids: 0, communityPosts: 0 };
   try {
-    [endingSoonAuctions, recentAuctions] = await Promise.all([
+    [endingSoonAuctions, recentAuctions, homeStats] = await Promise.all([
       fetchLiveAuctionsForList({ orderBy: "endAt", take: 6, imagesTake: 2 }),
       fetchLiveAuctionsForList({ orderBy: "createdAt", take: 6, imagesTake: 2 }),
+      getHomeStats(),
     ]);
   } catch (err) {
-    console.error("[home] Failed to fetch auctions:", err);
+    console.error("[home] Failed to fetch:", err);
   }
 
   const featuredForHero = endingSoonAuctions.slice(0, 5).map((a) => ({
@@ -122,6 +126,9 @@ export default async function HomePage() {
       />
       {/* Featured Live Auctions — hero carousel */}
       <ShowroomHero auctions={featuredForHero} requireAuth={requireAuth} />
+
+      {/* Carasta at a glance */}
+      <HomeStatsStrip stats={homeStats} />
 
       {/* Ending Soon */}
       <AuctionSection
