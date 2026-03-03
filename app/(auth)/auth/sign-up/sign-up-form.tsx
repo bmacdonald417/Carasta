@@ -131,7 +131,7 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
             variant="outline"
             className="w-full"
             disabled={loading}
-            onClick={() => signIn("google", { callbackUrl: "/" })}
+            onClick={() => signIn("google", { callbackUrl: callbackUrl || "/" })}
           >
             Continue with Google
           </Button>
@@ -139,7 +139,10 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
       )}
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/auth/sign-in" className="font-medium text-foreground underline-offset-4 hover:underline">
+        <Link
+          href={callbackUrl ? `/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/auth/sign-in"}
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
           Sign in
         </Link>
       </p>

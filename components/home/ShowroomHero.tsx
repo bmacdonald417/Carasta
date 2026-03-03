@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -24,6 +25,7 @@ type FeaturedAuction = {
 };
 
 export function ShowroomHero({ auctions, requireAuth = false }: { auctions: FeaturedAuction[]; requireAuth?: boolean }) {
+  const router = useRouter();
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
@@ -168,12 +170,44 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
                           </div>
                         )}
 
-                        <span
-                          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-neutral-900 transition hover:bg-neutral-100"
-                        >
-                          {requireAuth ? "Sign up to bid" : "Quick Bid"}
-                          <Gavel className="h-4 w-4" />
-                        </span>
+                        <div className="mt-6 flex flex-col gap-3">
+                          <span
+                            className="inline-flex w-fit items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-neutral-900 transition hover:bg-neutral-100"
+                          >
+                            {requireAuth ? "Sign up to bid" : "Quick Bid"}
+                            <Gavel className="h-4 w-4" />
+                          </span>
+                          {requireAuth && (
+                            <div
+                              className="max-w-sm space-y-2"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                            >
+                              <details className="group">
+                                <summary className="cursor-pointer text-xs font-medium uppercase tracking-wider text-white/70 hover:text-white/90">
+                                  Why register?
+                                </summary>
+                                <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-white/80">
+                                  <li>Place real-time bids + AutoBid</li>
+                                  <li>Track bids & alerts</li>
+                                  <li>Save vehicles to Garage</li>
+                                </ul>
+                              </details>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push("/how-it-works");
+                                }}
+                                className="text-xs text-white/70 underline underline-offset-2 hover:text-white/90"
+                              >
+                                Learn how bidding works
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </motion.div>
                     </div>
                   </div>

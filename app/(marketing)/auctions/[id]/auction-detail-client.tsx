@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Pusher from "pusher-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -140,9 +141,12 @@ export function AuctionDetailClient({
     live.buyNowExpiresAt != null &&
     new Date() < new Date(live.buyNowExpiresAt);
 
+  const signUpHref = `/auth/sign-up?callbackUrl=${encodeURIComponent(`/auctions/${auctionId}`)}`;
+  const signInHref = `/auth/sign-in?callbackUrl=${encodeURIComponent(`/auctions/${auctionId}`)}`;
+
   async function handleQuickBid() {
     if (!isLoggedIn) {
-      router.push("/auth/sign-in");
+      router.push(signInHref);
       return;
     }
     setLoading(true);
@@ -161,7 +165,7 @@ export function AuctionDetailClient({
 
   async function handleCustomBid() {
     if (!isLoggedIn) {
-      router.push("/auth/sign-in");
+      router.push(signInHref);
       return;
     }
     const cents = Math.round(parseFloat(customAmount) * 100);
@@ -190,7 +194,7 @@ export function AuctionDetailClient({
 
   async function handleBuyNow() {
     if (!isLoggedIn) {
-      router.push("/auth/sign-in");
+      router.push(signInHref);
       return;
     }
     setLoading(true);
@@ -208,7 +212,7 @@ export function AuctionDetailClient({
 
   async function handleSetAutoBid() {
     if (!isLoggedIn) {
-      router.push("/auth/sign-in");
+      router.push(signInHref);
       return;
     }
     const maxCents = Math.round(parseFloat(autoBidMax) * 100);
@@ -272,12 +276,36 @@ export function AuctionDetailClient({
 
       {!isEnded && (
         <>
+          {!isLoggedIn ? (
+            <div className="space-y-4 rounded-xl border border-border/50 bg-muted/30 p-4">
+              <Button asChild variant="performance" size="lg" className="w-full">
+                <Link href={signUpHref}>Sign up to bid</Link>
+              </Button>
+              <details className="group">
+                <summary className="cursor-pointer text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground">
+                  Why register?
+                </summary>
+                <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-muted-foreground">
+                  <li>Place real-time bids + AutoBid</li>
+                  <li>Track bids & alerts</li>
+                  <li>Save vehicles to Garage</li>
+                </ul>
+              </details>
+              <Link
+                href="/how-it-works"
+                className="block text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+              >
+                Learn how bidding works
+              </Link>
+            </div>
+          ) : (
+          <>
           <div className="flex flex-col gap-2">
             <Button
               variant="performance"
               size="lg"
               className="w-full"
-              disabled={!isLoggedIn || loading}
+              disabled={loading}
               onClick={handleQuickBid}
             >
               Bid {formatCurrency(nextMin)}
@@ -294,7 +322,7 @@ export function AuctionDetailClient({
               <Button
                 variant="outline"
                 onClick={handleCustomBid}
-                disabled={!isLoggedIn || loading}
+                disabled={loading}
               >
                 Bid
               </Button>
@@ -315,7 +343,7 @@ export function AuctionDetailClient({
               <Button
                 variant="secondary"
                 onClick={handleSetAutoBid}
-                disabled={!isLoggedIn || loading}
+                disabled={loading}
               >
                 Set
               </Button>
@@ -330,11 +358,13 @@ export function AuctionDetailClient({
               variant="emerald"
               size="lg"
               className="w-full"
-              disabled={!isLoggedIn || loading}
+              disabled={loading}
               onClick={handleBuyNow}
             >
               Buy now — {formatCurrency(live.buyNowPriceCents)}
             </Button>
+          )}
+          </>
           )}
         </>
       )}

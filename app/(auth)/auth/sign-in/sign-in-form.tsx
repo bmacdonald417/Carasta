@@ -103,7 +103,10 @@ export function SignInForm({ googleEnabled = false }: { googleEnabled?: boolean 
       )}
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
-        <Link href="/auth/sign-up" className="font-medium text-foreground underline-offset-4 hover:underline">
+        <Link
+          href={callbackUrl ? `/auth/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/auth/sign-up"}
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
           Sign up
         </Link>
       </p>
