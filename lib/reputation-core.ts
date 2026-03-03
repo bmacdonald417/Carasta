@@ -24,6 +24,7 @@ export const SCORE_WEIGHTS: Record<ReputationEventType, number> = {
 };
 
 export const DAILY_POSITIVE_CAP = 80;
+export const MAX_POSITIVE_POINTS_PER_EVENT = 90;
 
 /** Pair-repeat dampening: 1-2 tx = full, 3-5 = 50%, >5 = 10%. */
 export function computePairDampeningFactor(pairCount30d: number): 1 | 0.5 | 0.1 {
@@ -74,11 +75,11 @@ export function lowValueFarmingDampener(salePriceCents: number): number {
   return 1;
 }
 
-/** valueMultiplier: clamp(log10(salePriceCents/10000)+1, 0.75, 1.75) */
+/** valueMultiplier: clamp(log10(salePriceCents/20000)+1, 0.7, 1.5) */
 export function valueMultiplier(salePriceCents: number): number {
   if (salePriceCents <= 0) return 1;
-  const raw = Math.log10(salePriceCents / 10000) + 1;
-  return Math.max(0.75, Math.min(1.75, raw));
+  const raw = Math.log10(salePriceCents / 20000) + 1;
+  return Math.max(0.7, Math.min(1.5, raw));
 }
 
 /** trustMultiplier: emailVerified +0.05, age>30 +0.10, age>180 +0.15. Cap 1.5. New accounts (<14 days): cap 1.0. */
@@ -247,6 +248,11 @@ export function computePointsForEvent(
   if (isPositive && points > 0) {
     const gainFactor = scoreGainFactor(currentScore);
     points = Math.round(points * gainFactor);
+  }
+
+  // Per-event cap: max +90 points per single event (positive only)
+  if (isPositive && points > 0) {
+    points = Math.min(points, MAX_POSITIVE_POINTS_PER_EVENT);
   }
 
   if (isPositive && points > 0) {

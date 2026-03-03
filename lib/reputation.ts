@@ -3,7 +3,7 @@
  *
  * SCORING LOGIC:
  * - Base weights per event type (see SCORE_WEIGHTS)
- * - valueMultiplier: sale price affects points (log scale, 0.75–1.75)
+ * - valueMultiplier: sale price affects points (log scale, 0.7–1.5)
  * - trustMultiplier: email verified, account age (only for positive points, cap 1.5)
  * - New accounts (<14 days): positive multiplier capped at 1.0
  *
@@ -21,6 +21,8 @@ import {
   determineTier as determineTierCore,
   lowValueFarmingDampener,
   scoreGainFactor,
+  valueMultiplier as valueMultiplierCore,
+  MAX_POSITIVE_POINTS_PER_EVENT,
 } from "./reputation-core";
 
 export type { ReputationEventType, CollectorTier } from "@prisma/client";
@@ -45,12 +47,8 @@ const SCORE_WEIGHTS: Record<ReputationEventType, number> = {
 
 const DAILY_POSITIVE_CAP = 80;
 
-/** valueMultiplier: clamp(log10(salePriceCents/10000)+1, 0.75, 1.75) */
-export function valueMultiplier(salePriceCents: number): number {
-  if (salePriceCents <= 0) return 1;
-  const raw = Math.log10(salePriceCents / 10000) + 1;
-  return Math.max(0.75, Math.min(1.75, raw));
-}
+/** valueMultiplier: delegates to reputation-core */
+export const valueMultiplier = valueMultiplierCore;
 
 type UserForTrust = {
   emailVerified: Date | null;
@@ -214,6 +212,11 @@ export async function applyReputationEvent(
   if (isPositive && points > 0) {
     const gainFactor = scoreGainFactor(user.reputationScore);
     points = Math.round(points * gainFactor);
+  }
+
+  // Per-event cap: max +90 points per single event (positive only)
+  if (isPositive && points > 0) {
+    points = Math.min(points, MAX_POSITIVE_POINTS_PER_EVENT);
   }
 
   // Daily positive cap (penalties always apply)
