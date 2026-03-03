@@ -66,6 +66,13 @@ export async function addComment(postId: string, content: string) {
       content: content.trim(),
     },
   });
+  const { broadcastActivityEvent } = await import("@/lib/pusher");
+  broadcastActivityEvent({
+    type: "new_comment",
+    postId,
+    label: "New comment in community",
+    timestamp: new Date().toISOString(),
+  });
   revalidatePath("/explore");
   revalidatePath(`/explore/post/${postId}`);
   return { ok: true };

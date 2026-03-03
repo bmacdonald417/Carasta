@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth";
 import { fetchLiveAuctionsForList } from "@/lib/auction-queries";
 import { getHomeStats } from "@/lib/home-stats";
 import { HomeStatsStrip } from "@/components/home/HomeStatsStrip";
+import { LiveActivityFeed } from "@/components/home/LiveActivityFeed";
 
 export const dynamic = "force-dynamic";
 import Link from "next/link";
@@ -129,6 +130,15 @@ export default async function HomePage() {
 
       {/* Carasta at a glance */}
       <HomeStatsStrip stats={homeStats} />
+
+      {/* Live Activity Feed */}
+      <section className="border-t border-white/10 py-8">
+        <div className="carasta-container">
+          <div className="mx-auto max-w-sm">
+            <LiveActivityFeed />
+          </div>
+        </div>
+      </section>
 
       {/* Ending Soon */}
       <AuctionSection

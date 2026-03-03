@@ -29,9 +29,31 @@ export async function placeBid(formData: FormData) {
   );
   if (result.ok) {
     const { getAuctionLiveData } = await import("@/lib/auction-utils");
-    const { broadcastBidUpdate } = await import("@/lib/pusher");
+    const { broadcastBidUpdate, broadcastActivityEvent } = await import("@/lib/pusher");
     const live = await getAuctionLiveData(parsed.data.auctionId);
     if (live) broadcastBidUpdate(parsed.data.auctionId, live);
+    const { prisma } = await import("@/lib/db");
+    const auction = await prisma.auction.findUnique({
+      where: { id: parsed.data.auctionId },
+      select: { title: true, endAt: true },
+    });
+    if (auction) {
+      broadcastActivityEvent({
+        type: "new_bid",
+        auctionId: parsed.data.auctionId,
+        auctionTitle: auction.title,
+        timestamp: new Date().toISOString(),
+      });
+      const hoursLeft = (auction.endAt.getTime() - Date.now()) / (60 * 60 * 1000);
+      if (hoursLeft > 0 && hoursLeft < 24) {
+        broadcastActivityEvent({
+          type: "ending_soon",
+          auctionId: parsed.data.auctionId,
+          auctionTitle: auction.title,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
     revalidatePath(`/auctions/${parsed.data.auctionId}`);
     revalidatePath("/auctions");
   }
@@ -56,9 +78,31 @@ export async function quickBid(formData: FormData) {
   );
   if (result.ok) {
     const { getAuctionLiveData } = await import("@/lib/auction-utils");
-    const { broadcastBidUpdate } = await import("@/lib/pusher");
+    const { broadcastBidUpdate, broadcastActivityEvent } = await import("@/lib/pusher");
     const live = await getAuctionLiveData(parsed.data.auctionId);
     if (live) broadcastBidUpdate(parsed.data.auctionId, live);
+    const { prisma } = await import("@/lib/db");
+    const auction = await prisma.auction.findUnique({
+      where: { id: parsed.data.auctionId },
+      select: { title: true, endAt: true },
+    });
+    if (auction) {
+      broadcastActivityEvent({
+        type: "new_bid",
+        auctionId: parsed.data.auctionId,
+        auctionTitle: auction.title,
+        timestamp: new Date().toISOString(),
+      });
+      const hoursLeft = (auction.endAt.getTime() - Date.now()) / (60 * 60 * 1000);
+      if (hoursLeft > 0 && hoursLeft < 24) {
+        broadcastActivityEvent({
+          type: "ending_soon",
+          auctionId: parsed.data.auctionId,
+          auctionTitle: auction.title,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
     revalidatePath(`/auctions/${parsed.data.auctionId}`);
     revalidatePath("/auctions");
   }
