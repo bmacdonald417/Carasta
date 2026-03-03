@@ -4,24 +4,16 @@ import {
   ANTI_SNIPE_EXTEND_SECONDS,
   nextMinBidCents,
 } from "./utils";
+import { computeCurrentBidCents, computeReserveMetPercent } from "./auction-metrics";
 
 export type AuctionStatus = "DRAFT" | "LIVE" | "SOLD" | "ENDED";
 
+/** @deprecated Use computeReserveMetPercent from lib/auction-metrics. Kept for backward compat. */
 export function getReserveMeterPercent(
   currentHighCents: number,
   reserveCents: number | null
 ): number | null {
-  if (reserveCents == null || reserveCents <= 0) return null;
-  if (currentHighCents >= reserveCents) return 100;
-  return Math.min(100, Math.round((currentHighCents / reserveCents) * 100));
-}
-
-export async function getAuctionHighBid(auctionId: string): Promise<number> {
-  const top = await prisma.bid.findFirst({
-    where: { auctionId },
-    orderBy: { amountCents: "desc" },
-  });
-  return top?.amountCents ?? 0;
+  return computeReserveMetPercent(currentHighCents, reserveCents);
 }
 
 export async function processAutoBids(
@@ -136,8 +128,8 @@ export async function getAuctionLiveData(auctionId: string) {
     },
   });
   if (!auction) return null;
-  const highBidCents = auction.bids[0]?.amountCents ?? 0;
-  const reservePercent = getReserveMeterPercent(highBidCents, auction.reservePriceCents);
+  const highBidCents = computeCurrentBidCents(auction.bids);
+  const reservePercent = computeReserveMetPercent(highBidCents, auction.reservePriceCents);
   return {
     highBidCents,
     highBidderHandle: auction.bids[0]?.bidder?.handle ?? null,

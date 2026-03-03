@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getReserveMeterPercent } from "@/lib/auction-utils";
+import { computeCurrentBidCents, computeReserveMetPercent } from "@/lib/auction-metrics";
 
 export async function GET(
   _req: Request,
@@ -18,8 +18,8 @@ export async function GET(
   });
   if (!auction) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const highCents = auction.bids[0]?.amountCents ?? 0;
-  const reservePercent = getReserveMeterPercent(highCents, auction.reservePriceCents);
+  const highCents = computeCurrentBidCents(auction.bids);
+  const reservePercent = computeReserveMetPercent(highCents, auction.reservePriceCents);
 
   return NextResponse.json({
     id: auction.id,

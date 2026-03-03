@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { computeCurrentBidCents } from "@/lib/auction-metrics";
 
 export const dynamic = "force-dynamic";
 import Link from "next/link";
@@ -19,11 +20,12 @@ async function getFeaturedAuctions() {
       images: { orderBy: { sortOrder: "asc" }, take: 1 },
       bids: { orderBy: { amountCents: "desc" }, take: 1 },
       seller: { select: { handle: true } },
+      _count: { select: { bids: true } },
     },
   });
   return auctions.map((a) => ({
     ...a,
-    highBidCents: a.bids[0]?.amountCents ?? 0,
+    highBidCents: computeCurrentBidCents(a.bids),
   }));
 }
 
@@ -127,7 +129,7 @@ export default async function HomePage() {
                     images: a.images,
                     seller: a.seller,
                   }}
-                  highBidCents={a.bids[0]?.amountCents ?? 0}
+                  highBidCents={computeCurrentBidCents(a.bids)}
                   bidCount={a._count.bids}
                   index={i}
                   requireAuth={requireAuth}
@@ -189,7 +191,7 @@ export default async function HomePage() {
                     images: a.images,
                     seller: a.seller,
                   }}
-                  highBidCents={a.bids[0]?.amountCents ?? 0}
+                  highBidCents={computeCurrentBidCents(a.bids)}
                   bidCount={a._count.bids}
                   index={i}
                   requireAuth={requireAuth}

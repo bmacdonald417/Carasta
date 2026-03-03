@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { ReserveMeter } from "@/components/auction/ReserveMeter";
 import { CountdownTimer } from "@/components/auction/CountdownTimer";
-import { getReserveMeterPercent } from "@/lib/auction-utils";
+import { computeReserveMetPercent } from "@/lib/auction-metrics";
 import { containerVariants } from "@/lib/motion";
 
 const CLOSING_SOON_MS = 24 * 60 * 60 * 1000;
@@ -45,7 +45,7 @@ export function AuctionCard({
   const isLive = auction.status === "LIVE";
   const isClosingSoon =
     isLive && new Date(auction.endAt).getTime() - Date.now() < CLOSING_SOON_MS;
-  const reservePercent = getReserveMeterPercent(
+  const reservePercent = computeReserveMetPercent(
     highBidCents,
     auction.reservePriceCents
   );

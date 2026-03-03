@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { getReserveMeterPercent } from "@/lib/auction-utils";
+import { computeCurrentBidCents, computeReserveMetPercent } from "@/lib/auction-metrics";
 import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
@@ -39,8 +39,8 @@ export default async function AuctionDetailPage({
     if (currentUserId !== auction.sellerId) notFound();
   }
 
-  const highBidCents = auction.bids[0]?.amountCents ?? 0;
-  const reserveMeterPercent = getReserveMeterPercent(
+  const highBidCents = computeCurrentBidCents(auction.bids);
+  const reserveMeterPercent = computeReserveMetPercent(
     highBidCents,
     auction.reservePriceCents
   );

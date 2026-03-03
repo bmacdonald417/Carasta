@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight, Gavel } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { CountdownTimer } from "@/components/auction/CountdownTimer";
 import { ReserveMeter } from "@/components/auction/ReserveMeter";
-import { getReserveMeterPercent } from "@/lib/auction-utils";
+import { computeReserveMetPercent } from "@/lib/auction-metrics";
 
 type FeaturedAuction = {
   id: string;
@@ -94,7 +94,7 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
             const img =
               auction.images[0]?.url ??
               "https://placehold.co/1600x900/1a1a1a/666?text=No+image";
-            const reservePercent = getReserveMeterPercent(
+            const reservePercent = computeReserveMetPercent(
               auction.highBidCents,
               auction.reservePriceCents
             );

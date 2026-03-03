@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { computeCurrentBidCents } from "@/lib/auction-metrics";
 import { ListingsFilters } from "./listings-filters";
 
 const PAGE_SIZE = 20;
@@ -77,7 +78,9 @@ export default async function ListingsPage({
             No listings yet.
           </p>
         ) : (
-          items.map((a) => (
+          items.map((a) => {
+            const highBidCents = computeCurrentBidCents(a.bids);
+            return (
             <Link key={a.id} href={`/auctions/${a.id}`}>
               <Card className="overflow-hidden border-white/10 bg-white/5 transition-all hover:border-[#ff3b5c]/30">
                 <div className="relative aspect-video w-full overflow-hidden bg-neutral-900">
@@ -117,7 +120,7 @@ export default async function ListingsPage({
                   </h2>
                   {a.status === "LIVE" && (
                     <p className="mt-2 text-sm text-[#ff3b5c]">
-                      {formatCurrency(a.bids[0]?.amountCents ?? 0)} high bid
+                      {formatCurrency(highBidCents)} high bid
                       <span className="ml-1 text-neutral-500">
                         · {a._count.bids} bids
                       </span>
@@ -128,15 +131,16 @@ export default async function ListingsPage({
                       Sold
                       {a.buyerId
                         ? ` at ${formatCurrency(a.buyNowPriceCents ?? 0)}`
-                        : a.bids[0]
-                          ? ` at ${formatCurrency(a.bids[0].amountCents)}`
+                        : highBidCents > 0
+                          ? ` at ${formatCurrency(highBidCents)}`
                           : ""}
                     </p>
                   )}
                 </CardContent>
               </Card>
             </Link>
-          ))
+          );
+          })
         )}
       </div>
 

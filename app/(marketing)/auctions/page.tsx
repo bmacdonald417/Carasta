@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { computeCurrentBidCents } from "@/lib/auction-metrics";
 import { AuctionCard } from "./auction-card";
 import { AuctionFilters } from "./auction-filters";
 
@@ -117,7 +118,7 @@ export default async function AuctionsPage({
                 images: a.images,
                 seller: a.seller,
               }}
-              highBidCents={a.bids[0]?.amountCents ?? 0}
+              highBidCents={computeCurrentBidCents(a.bids)}
               bidCount={a._count.bids}
               index={i}
               requireAuth={requireAuth}
