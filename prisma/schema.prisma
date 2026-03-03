@@ -12,6 +12,14 @@ enum Role {
   ADMIN
 }
 
+enum ConditionGrade {
+  CONCOURS
+  EXCELLENT
+  VERY_GOOD
+  GOOD
+  FAIR
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -184,12 +192,16 @@ model Auction {
   startAt           DateTime
   endAt             DateTime
   status            String    // DRAFT | LIVE | SOLD | ENDED
+  conditionGrade    ConditionGrade?
+  conditionSummary  String?   @db.Text
+  imperfections     Json?
   createdAt         DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
   seller  User          @relation("Seller", fields: [sellerId], references: [id], onDelete: Cascade)
   buyer   User?         @relation("Buyer", fields: [buyerId], references: [id], onDelete: SetNull)
   images  AuctionImage[]
+  damageImages AuctionDamageImage[]
   bids    Bid[]
   autoBids AutoBid[]
 
@@ -207,6 +219,18 @@ model AuctionImage {
   auctionId String
   url       String
   sortOrder Int      @default(0)
+
+  auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@index([auctionId])
+}
+
+model AuctionDamageImage {
+  id        String   @id @default(cuid())
+  auctionId String
+  label     String
+  imageUrl  String
+  createdAt DateTime @default(now())
 
   auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
 

@@ -28,6 +28,7 @@ export function AuctionCard({
     endAt: string;
     status: string;
     reservePriceCents: number | null;
+    conditionGrade?: string | null;
     images: { url: string }[];
     seller: { handle: string } | null;
   };
@@ -97,6 +98,11 @@ export function AuctionCard({
                 <span className="rounded-xl border border-white/20 bg-neutral-900/90 px-4 py-2 font-display text-sm font-semibold uppercase text-neutral-300">
                   {auction.status}
                 </span>
+              </div>
+            )}
+            {isLive && auction.conditionGrade && (
+              <div className="absolute right-3 top-3 rounded-full border border-white/20 bg-black/60 px-3 py-1 text-xs font-medium text-neutral-300">
+                {auction.conditionGrade.replace(/_/g, " ")}
               </div>
             )}
           </div>

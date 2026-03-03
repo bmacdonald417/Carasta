@@ -3,6 +3,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import type { ConditionGrade } from "@prisma/client";
 
 type CreateInput = {
   title: string;
@@ -19,6 +20,10 @@ type CreateInput = {
   startAt: Date;
   endAt: Date;
   imageUrls: string[];
+  conditionGrade?: ConditionGrade;
+  conditionSummary?: string;
+  imperfections?: string[];
+  damageImages?: { label: string; imageUrl: string }[];
 };
 
 export async function createAuction(input: CreateInput) {
@@ -46,6 +51,9 @@ export async function createAuction(input: CreateInput) {
       startAt: input.startAt,
       endAt: input.endAt,
       status: "LIVE",
+      conditionGrade: input.conditionGrade ?? null,
+      conditionSummary: input.conditionSummary ?? null,
+      imperfections: input.imperfections?.length ? (input.imperfections as unknown) : null,
     },
   });
 
@@ -55,6 +63,16 @@ export async function createAuction(input: CreateInput) {
         auctionId: auction.id,
         url,
         sortOrder: i,
+      })),
+    });
+  }
+
+  if (input.damageImages?.length) {
+    await prisma.auctionDamageImage.createMany({
+      data: input.damageImages.map((d) => ({
+        auctionId: auction.id,
+        label: d.label,
+        imageUrl: d.imageUrl,
       })),
     });
   }
@@ -95,6 +113,9 @@ export async function saveAuctionDraft(
       startAt,
       endAt,
       status: "DRAFT",
+      conditionGrade: input.conditionGrade ?? null,
+      conditionSummary: input.conditionSummary ?? null,
+      imperfections: input.imperfections?.length ? (input.imperfections as unknown) : null,
     },
   });
 
@@ -104,6 +125,16 @@ export async function saveAuctionDraft(
         auctionId: auction.id,
         url,
         sortOrder: i,
+      })),
+    });
+  }
+
+  if (input.damageImages?.length) {
+    await prisma.auctionDamageImage.createMany({
+      data: input.damageImages.map((d) => ({
+        auctionId: auction.id,
+        label: d.label,
+        imageUrl: d.imageUrl,
       })),
     });
   }
