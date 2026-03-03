@@ -19,6 +19,7 @@ import {
 
 const marketingNav = [
   { href: "/", label: "Home" },
+  { href: "/how-it-works", label: "How It Works" },
   { href: "/contact", label: "Contact" },
   { href: "/terms", label: "Terms" },
   { href: "/privacy", label: "Privacy" },
@@ -44,6 +45,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
   const isMarketing =
     pathname === "/" ||
+    pathname === "/how-it-works" ||
     pathname === "/contact" ||
     pathname === "/terms" ||
     pathname === "/privacy";
