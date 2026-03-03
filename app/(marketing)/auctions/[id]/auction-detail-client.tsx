@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pusher from "pusher-js";
+import { CountdownTimer } from "@/components/auction/CountdownTimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,34 +65,9 @@ export function AuctionDetailClient({
     buyNowExpiresAt: initialBuyNowExpires,
     bidCount: 0,
   });
-  const [countdown, setCountdown] = useState("");
   const [customAmount, setCustomAmount] = useState("");
   const [autoBidMax, setAutoBidMax] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    function tick() {
-      const end = new Date(live.endAt);
-      const now = new Date();
-      if (now >= end) {
-        setCountdown("Ended");
-        return;
-      }
-      const d = Math.floor((end.getTime() - now.getTime()) / 1000);
-      const days = Math.floor(d / 86400);
-      const hours = Math.floor((d % 86400) / 3600);
-      const mins = Math.floor((d % 3600) / 60);
-      const secs = d % 60;
-      if (days > 0) {
-        setCountdown(`${days}d ${hours}h ${mins}m ${secs}s`);
-      } else {
-        setCountdown(`${hours}h ${mins}m ${secs}s`);
-      }
-    }
-    tick();
-    const t = setInterval(tick, 1000);
-    return () => clearInterval(t);
-  }, [live.endAt]);
 
   // Real-time bid updates via Pusher (when configured)
   useEffect(() => {
@@ -255,7 +231,10 @@ export function AuctionDetailClient({
 
       <div>
         <p className="text-sm text-muted-foreground">Time remaining</p>
-        <p className="font-display text-xl font-semibold">{countdown}</p>
+        <CountdownTimer
+          endAt={live.endAt}
+          className="font-display text-xl font-semibold"
+        />
       </div>
 
       {hasReserve ? (

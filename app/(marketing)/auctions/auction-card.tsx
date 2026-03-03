@@ -9,8 +9,8 @@ import { ReserveMeter } from "@/components/auction/ReserveMeter";
 import { CountdownTimer } from "@/components/auction/CountdownTimer";
 import { computeReserveMetPercent } from "@/lib/auction-metrics";
 import { containerVariants } from "@/lib/motion";
-
-const CLOSING_SOON_MS = 24 * 60 * 60 * 1000;
+import { useMounted } from "@/hooks";
+import { URGENCY_24H_MS } from "@/lib/time";
 
 export function AuctionCard({
   auction,
@@ -37,6 +37,7 @@ export function AuctionCard({
   index?: number;
   requireAuth?: boolean;
 }) {
+  const mounted = useMounted();
   const img =
     auction.images[0]?.url ??
     "https://placehold.co/600x400/1a1a1a/666?text=No+image";
@@ -44,7 +45,9 @@ export function AuctionCard({
   const end = new Date(auction.endAt);
   const isLive = auction.status === "LIVE";
   const isClosingSoon =
-    isLive && new Date(auction.endAt).getTime() - Date.now() < CLOSING_SOON_MS;
+    mounted &&
+    isLive &&
+    new Date(auction.endAt).getTime() - Date.now() < URGENCY_24H_MS;
   const reservePercent = computeReserveMetPercent(
     highBidCents,
     auction.reservePriceCents

@@ -1,52 +1,87 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  formatTimeLeft,
+  getUrgencyLevel,
+  type UrgencyLevel,
+} from "@/lib/time";
+import { useMounted } from "@/hooks";
 
 type CountdownTimerProps = {
-  endAt: Date;
+  endAt: Date | string;
   className?: string;
+  /** Dark overlay variant (e.g. hero) */
+  variant?: "default" | "dark";
 };
 
-function pad(n: number) {
-  return n.toString().padStart(2, "0");
-}
+const urgencyStyles: Record<
+  UrgencyLevel,
+  { default: string; dark: string; pulse?: boolean }
+> = {
+  normal: { default: "text-muted-foreground", dark: "text-white/80" },
+  subtle: { default: "text-[#ff3b5c]/80", dark: "text-[#ff3b5c]/90" },
+  elevated: {
+    default: "text-[#ff3b5c] font-semibold",
+    dark: "text-[#ff3b5c] font-semibold",
+    pulse: true,
+  },
+  ended: { default: "text-muted-foreground", dark: "text-white/60" },
+};
 
-export function CountdownTimer({ endAt, className = "" }: CountdownTimerProps) {
+export function CountdownTimer({
+  endAt,
+  className = "",
+  variant = "default",
+}: CountdownTimerProps) {
+  const mounted = useMounted();
   const [now, setNow] = useState(() => new Date());
-  const end = new Date(endAt);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
+  const end = typeof endAt === "string" ? new Date(endAt) : endAt;
   const diff = end.getTime() - now.getTime();
-  const isEnded = diff <= 0;
+  const urgency = getUrgencyLevel(diff);
+  const style = urgencyStyles[urgency];
+  const urgencyClass = variant === "dark" ? style.dark : style.default;
+  const pulse = style.pulse;
 
-  if (isEnded) {
+  const baseClass = "font-mono text-sm tabular-nums";
+  const combinedClass = `${baseClass} ${urgencyClass} ${className}`.trim();
+
+  if (!mounted) {
     return (
-      <span className={`font-medium text-muted-foreground ${className}`}>
+      <span className={`${baseClass} text-muted-foreground ${className}`.trim()} suppressHydrationWarning>
+        —
+      </span>
+    );
+  }
+
+  if (urgency === "ended") {
+    return (
+      <span className={`font-medium ${urgencyClass} ${className}`.trim()}>
         Ended
       </span>
     );
   }
 
-  const days = Math.floor(diff / (24 * 60 * 60 * 1000));
-  const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-  const mins = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
-  const secs = Math.floor((diff % (60 * 1000)) / 1000);
+  const content = formatTimeLeft(diff);
 
-  if (days > 0) {
+  if (pulse) {
     return (
-      <span className={`font-mono text-sm font-medium ${className}`}>
-        {days}d {pad(hours)}h {pad(mins)}m left
-      </span>
+      <motion.span
+        className={combinedClass}
+        animate={{ opacity: [1, 0.85, 1] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {content}
+      </motion.span>
     );
   }
 
-  return (
-    <span className={`font-mono text-sm font-medium tabular-nums ${className}`}>
-      {pad(hours)}:{pad(mins)}:{pad(secs)} left
-    </span>
-  );
+  return <span className={combinedClass}>{content}</span>;
 }

@@ -154,6 +154,7 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
                             </p>
                             <CountdownTimer
                               endAt={auction.endAt}
+                              variant="dark"
                               className="text-white"
                             />
                           </div>
