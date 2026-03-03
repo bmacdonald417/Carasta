@@ -129,7 +129,7 @@ export default async function AuctionDetailPage({
                 <div className="mt-2">
                   <p className="text-sm text-muted-foreground">Imperfections</p>
                   <ul className="mt-1 list-inside list-disc text-sm text-neutral-400">
-                    {auction.imperfections.map((imp: string, i: number) => (
+                    {(auction.imperfections as string[]).map((imp, i) => (
                       <li key={i}>{imp}</li>
                     ))}
                   </ul>

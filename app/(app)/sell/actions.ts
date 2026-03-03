@@ -3,7 +3,7 @@
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import type { ConditionGrade } from "@prisma/client";
+import type { ConditionGrade, Prisma } from "@prisma/client";
 
 type CreateInput = {
   title: string;
@@ -53,7 +53,7 @@ export async function createAuction(input: CreateInput) {
       status: "LIVE",
       conditionGrade: input.conditionGrade ?? null,
       conditionSummary: input.conditionSummary ?? null,
-      imperfections: input.imperfections?.length ? (input.imperfections as unknown) : null,
+      imperfections: input.imperfections?.length ? (input.imperfections as Prisma.InputJsonValue) : undefined,
     },
   });
 
@@ -115,7 +115,7 @@ export async function saveAuctionDraft(
       status: "DRAFT",
       conditionGrade: input.conditionGrade ?? null,
       conditionSummary: input.conditionSummary ?? null,
-      imperfections: input.imperfections?.length ? (input.imperfections as unknown) : null,
+      imperfections: input.imperfections?.length ? (input.imperfections as Prisma.InputJsonValue) : undefined,
     },
   });
 
