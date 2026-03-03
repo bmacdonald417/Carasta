@@ -81,6 +81,26 @@ export async function createAuction(input: CreateAuctionInput) {
     });
   }
 
+  // Reputation: CONDITION_REPORT_QUALITY when auction goes LIVE
+  const { applyReputationEvent, computeConditionQuality, hasConditionQualityEvent } = await import("@/lib/reputation");
+  const qualityPts = computeConditionQuality({
+    conditionGrade: data.conditionGrade ?? null,
+    conditionSummary: data.conditionSummary ?? null,
+    imperfections: data.imperfections ?? null,
+    damageImages: data.damageImages?.map((_, i) => ({ id: `d${i}` })) ?? [],
+  });
+  if (qualityPts > 0) {
+    const alreadyApplied = await hasConditionQualityEvent(sellerId, auction.id);
+    if (!alreadyApplied) {
+      await applyReputationEvent({
+        userId: sellerId,
+        type: "CONDITION_REPORT_QUALITY",
+        basePoints: qualityPts,
+        meta: { auctionId: auction.id },
+      });
+    }
+  }
+
   revalidatePath("/auctions");
   return { ok: true, auctionId: auction.id };
 }

@@ -104,6 +104,19 @@ export default async function AdminPage() {
         </div>
       </div>
 
+      {/* Reputation debug */}
+      <div className="mt-8">
+        <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-neutral-100">
+          Reputation Debug
+        </h2>
+        <p className="mt-1 text-sm text-neutral-500">
+          View reputation events by handle
+        </p>
+        <p className="mt-2 text-sm text-neutral-500">
+          Click a seller handle below to view their reputation events.
+        </p>
+      </div>
+
       {/* Live auctions table */}
       <div className="mt-8">
         <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-neutral-100">
@@ -148,7 +161,12 @@ export default async function AdminPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-neutral-400">
-                    @{a.seller.handle}
+                    <Link
+                      href={`/admin/reputation/${a.seller.handle}`}
+                      className="text-[#ff3b5c] hover:underline"
+                    >
+                      @{a.seller.handle}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 text-neutral-400">
                     {a._count.bids}

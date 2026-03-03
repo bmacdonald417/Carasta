@@ -20,6 +20,31 @@ enum ConditionGrade {
   FAIR
 }
 
+enum CollectorTier {
+  NEW
+  VERIFIED
+  ELITE
+  APEX
+}
+
+enum ReputationEventType {
+  PAYMENT_VERIFIED
+  DELIVERY_CONFIRMED
+  PURCHASE_COMPLETED
+  SALE_COMPLETED
+  POSITIVE_FEEDBACK
+  NEGATIVE_FEEDBACK
+  CONDITION_REPORT_QUALITY
+  DISPUTE_OPENED
+  DISPUTE_LOST
+  CHARGEBACK
+  SELLER_CANCELLATION_AFTER_BID
+  BUYER_NONPAYMENT
+  POLICY_VIOLATION
+  SOCIAL_HELPFUL_UPVOTE
+  SOCIAL_SPAM_FLAG
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -52,6 +77,14 @@ model User {
   bids         Bid[]
   autoBids     AutoBid[]
   notifications Notification[]
+  reputationEvents ReputationEvent[]
+
+  reputationScore       Int           @default(0)
+  collectorTier         CollectorTier @default(NEW)
+  reputationUpdatedAt   DateTime?
+  completedSalesCount   Int           @default(0)
+  completedPurchasesCount Int         @default(0)
+  disputesLostCount     Int           @default(0)
 }
 
 model Account {
@@ -278,4 +311,19 @@ model Notification {
 
   @@index([userId])
   @@index([userId, readAt])
+}
+
+model ReputationEvent {
+  id         String             @id @default(cuid())
+  userId     String
+  type       ReputationEventType
+  points     Int
+  basePoints Int
+  meta       Json?
+  createdAt  DateTime           @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, type])
 }

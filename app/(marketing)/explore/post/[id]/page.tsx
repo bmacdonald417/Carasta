@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentForm } from "./comment-form";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
+import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 
 export default async function PostDetailPage({
   params,
@@ -20,13 +21,13 @@ export default async function PostDetailPage({
     where: { id },
     include: {
       author: {
-        select: { id: true, handle: true, name: true, avatarUrl: true },
+        select: { id: true, handle: true, name: true, avatarUrl: true, collectorTier: true },
       },
       comments: {
         orderBy: { createdAt: "asc" },
         include: {
           author: {
-            select: { handle: true, name: true, avatarUrl: true },
+            select: { handle: true, name: true, avatarUrl: true, collectorTier: true },
           },
         },
       },
@@ -70,7 +71,10 @@ export default async function PostDetailPage({
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium">@{post.author.handle}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium">@{post.author.handle}</p>
+                <ReputationBadge tier={post.author.collectorTier} />
+              </div>
               <p className="text-xs text-muted-foreground">
                 {new Date(post.createdAt).toLocaleString()}
               </p>
@@ -124,12 +128,15 @@ export default async function PostDetailPage({
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <Link
-                    href={`/u/${c.author.handle}`}
-                    className="text-sm font-medium hover:underline"
-                  >
-                    @{c.author.handle}
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/u/${c.author.handle}`}
+                      className="text-sm font-medium hover:underline"
+                    >
+                      @{c.author.handle}
+                    </Link>
+                    <ReputationBadge tier={c.author.collectorTier} />
+                  </div>
                   <p className="text-sm text-muted-foreground">{c.content}</p>
                   <p className="text-xs text-muted-foreground">
                     {new Date(c.createdAt).toLocaleString()}

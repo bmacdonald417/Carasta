@@ -73,6 +73,38 @@ export async function executeBuyNow(formData: FormData) {
 
   const result = await buyNow(parsed.data.auctionId, (session.user as any).id);
   if (result.ok) {
+    const buyerId = (session.user as any).id;
+    const { prisma } = await import("@/lib/db");
+    const { applyReputationEvent, computeConditionQuality, hasConditionQualityEvent } = await import("@/lib/reputation");
+
+    const auction = await prisma.auction.findUnique({
+      where: { id: parsed.data.auctionId },
+      include: { damageImages: true },
+    });
+    if (auction && auction.sellerId && auction.buyerId) {
+      const salePriceCents = auction.buyNowPriceCents ?? auction.reservePriceCents ?? 0;
+
+      await Promise.all([
+        applyReputationEvent({ userId: buyerId, type: "PAYMENT_VERIFIED", salePriceCents }),
+        applyReputationEvent({ userId: auction.sellerId, type: "PAYMENT_VERIFIED", salePriceCents }),
+        applyReputationEvent({ userId: buyerId, type: "PURCHASE_COMPLETED", salePriceCents }),
+        applyReputationEvent({ userId: auction.sellerId, type: "SALE_COMPLETED", salePriceCents }),
+      ]);
+
+      const qualityPts = computeConditionQuality(auction);
+      if (qualityPts > 0) {
+        const alreadyApplied = await hasConditionQualityEvent(auction.sellerId, auction.id);
+        if (!alreadyApplied) {
+          await applyReputationEvent({
+            userId: auction.sellerId,
+            type: "CONDITION_REPORT_QUALITY",
+            basePoints: qualityPts,
+            meta: { auctionId: auction.id },
+          });
+        }
+      }
+    }
+
     const { getAuctionLiveData } = await import("@/lib/auction-utils");
     const { broadcastBidUpdate } = await import("@/lib/pusher");
     const live = await getAuctionLiveData(parsed.data.auctionId);

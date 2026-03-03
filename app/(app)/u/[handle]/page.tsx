@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FollowButton } from "./follow-button";
 import { SocialLinks } from "@/components/profile/SocialLinks";
+import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 
 export default async function ProfilePage({
   params,
@@ -19,7 +20,19 @@ export default async function ProfilePage({
 
   const user = await prisma.user.findUnique({
     where: { handle: handle.toLowerCase() },
-    include: {
+    select: {
+      id: true,
+      handle: true,
+      name: true,
+      avatarUrl: true,
+      image: true,
+      bio: true,
+      location: true,
+      instagramUrl: true,
+      facebookUrl: true,
+      twitterUrl: true,
+      tiktokUrl: true,
+      collectorTier: true,
       _count: {
         select: {
           followers: true,
@@ -81,7 +94,10 @@ export default async function ProfilePage({
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="font-display text-2xl font-bold">@{user.handle}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-display text-2xl font-bold">@{user.handle}</h1>
+              <ReputationBadge tier={user.collectorTier} />
+            </div>
             {user.name && (
               <p className="text-muted-foreground">{user.name}</p>
             )}

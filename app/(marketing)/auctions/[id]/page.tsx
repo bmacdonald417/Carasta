@@ -8,6 +8,7 @@ import { AuctionDetailClient } from "./auction-detail-client";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
 import { AuctionConditionReport } from "@/components/auction/AuctionConditionReport";
+import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 
 export default async function AuctionDetailPage({
   params,
@@ -22,11 +23,11 @@ export default async function AuctionDetailPage({
     include: {
       images: { orderBy: { sortOrder: "asc" } },
       damageImages: true,
-      seller: { select: { id: true, handle: true, name: true, avatarUrl: true } },
+      seller: { select: { id: true, handle: true, name: true, avatarUrl: true, collectorTier: true } },
       bids: {
         orderBy: { amountCents: "desc" },
         take: 20,
-        include: { bidder: { select: { handle: true } } },
+        include: { bidder: { select: { handle: true, collectorTier: true } } },
       },
     },
   });
@@ -154,7 +155,10 @@ export default async function AuctionDetailPage({
                 ) : null}
               </div>
               <div>
-                <p className="font-medium">@{auction.seller.handle}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">@{auction.seller.handle}</p>
+                  <ReputationBadge tier={auction.seller.collectorTier} />
+                </div>
                 <p className="text-sm text-muted-foreground">
                   {auction.seller.name ?? "Seller"}
                 </p>
@@ -175,7 +179,10 @@ export default async function AuctionDetailPage({
                 key={b.id}
                 className="flex items-center justify-between rounded-xl border border-border/50 px-4 py-2"
               >
-                <span className="text-sm">@{b.bidder.handle}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">@{b.bidder.handle}</span>
+                  <ReputationBadge tier={b.bidder.collectorTier} />
+                </div>
                 <span className="font-medium text-[hsl(var(--performance-red))]">
                   {formatCurrency(b.amountCents)}
                 </span>
