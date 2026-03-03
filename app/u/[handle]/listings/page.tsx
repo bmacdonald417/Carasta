@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { AuctionStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import Link from "next/link";
@@ -36,8 +35,8 @@ export default async function ListingsPage({
 
   if (!isOwn) notFound();
 
-  const where: { sellerId: string; status?: AuctionStatus } = { sellerId: user.id };
-  if (statusFilter) where.status = statusFilter as AuctionStatus;
+  const where: { sellerId: string; status?: string } = { sellerId: user.id };
+  if (statusFilter) where.status = statusFilter;
 
   const auctions = await prisma.auction.findMany({
     where,

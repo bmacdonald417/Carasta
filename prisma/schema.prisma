@@ -12,13 +12,6 @@ enum Role {
   ADMIN
 }
 
-enum AuctionStatus {
-  DRAFT
-  LIVE
-  SOLD
-  ENDED
-}
-
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -190,7 +183,7 @@ model Auction {
   buyNowExpiresAt   DateTime?
   startAt           DateTime
   endAt             DateTime
-  status            AuctionStatus @default(DRAFT)
+  status            String    // DRAFT | LIVE | SOLD | ENDED
   createdAt         DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
