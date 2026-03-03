@@ -80,8 +80,9 @@ export function HowItWorksTimeline() {
         {SECTIONS.map((section, i) => (
           <motion.div
             key={section.id}
+            id={section.id}
             variants={itemVariants}
-            className="relative flex gap-6 md:gap-8"
+            className="relative flex gap-6 md:gap-8 scroll-mt-24"
           >
             {/* Timeline dot */}
             <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-[#ff3b5c]/60 bg-black/60 shadow-[0_0_12px_rgba(255,59,92,0.3)] md:h-12 md:w-12">

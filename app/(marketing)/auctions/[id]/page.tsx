@@ -138,6 +138,41 @@ export default async function AuctionDetailPage({
           />
 
           <div className="rounded-2xl border border-border/50 bg-card/80 p-4">
+            <h3 className="font-display font-semibold">Buyer Protections</h3>
+            <ul className="mt-3 space-y-2.5 text-sm text-muted-foreground">
+              <li className="flex gap-2">
+                <span className="mt-0.5 shrink-0 text-[#ff3b5c]/80">•</span>
+                <span>
+                  <strong className="text-foreground">Anti-sniping.</strong>{" "}
+                  Last-minute bids extend the auction clock so everyone has a fair chance.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-0.5 shrink-0 text-[#ff3b5c]/80">•</span>
+                <span>
+                  <strong className="text-foreground">Checkout & delivery.</strong>{" "}
+                  Payment and delivery coordination handled through Carasta.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-0.5 shrink-0 text-[#ff3b5c]/80">•</span>
+                <span>
+                  <strong className="text-foreground">Seller ratings.</strong>{" "}
+                  Identity checks and verification coming soon.
+                </span>
+              </li>
+            </ul>
+            <p className="mt-3 text-xs text-muted-foreground">
+              <Link
+                href="/how-it-works#bid"
+                className="text-[#ff3b5c]/90 hover:text-[#ff3b5c] hover:underline"
+              >
+                How bidding works
+              </Link>
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-border/50 bg-card/80 p-4">
             <h3 className="font-display font-semibold">Seller</h3>
             <Link
               href={`/u/${auction.seller.handle}`}
