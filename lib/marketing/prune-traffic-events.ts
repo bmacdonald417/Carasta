@@ -19,6 +19,8 @@ export type PruneTrafficEventsResult = {
  * - `TRAFFIC_EVENT_PRUNE_DRY_RUN=true` — count only (or use `--dry-run`, which does not require the enable flag)
  *
  * This helper does **not** read env — callers pass `dryRun` so tests stay simple.
+ *
+ * @see `TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`
  */
 export async function pruneTrafficEventsOlderThan(
   olderThan: Date,

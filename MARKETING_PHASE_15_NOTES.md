@@ -106,6 +106,10 @@ Same logic as production; **`MARKETING_DIGEST_FORCE=1`** only affects the script
 
 **Admin observability JSON:** **`MARKETING_PHASE_18_NOTES.md`**.
 
-## PR 19 (next best step)
+## PR 19 (implemented)
 
-**TrafficEvent retention / privacy doc** or seller marketing polish — one PR.
+**TrafficEvent retention / privacy:** **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`**.
+
+## PR 20 (next best step)
+
+Seller marketing polish or next roadmap slice — one PR.

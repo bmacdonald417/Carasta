@@ -2,6 +2,8 @@ import { MarketingTrafficEventType } from "@prisma/client";
 
 /**
  * Per-field caps (chars). URLs/referrer may be long; everything else stays small.
+ *
+ * @see `TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md` — what may appear in persisted `TrafficEvent.metadata`
  */
 const MAX_LEN: Record<string, number> = {
   path: 512,

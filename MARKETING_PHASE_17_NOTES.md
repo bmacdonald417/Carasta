@@ -56,6 +56,10 @@ Single line, grep-friendly prefix:
 
 **Protected admin JSON:** **`MARKETING_PHASE_18_NOTES.md`**, **`getMarketingTrackObservabilityReport()`**.
 
-## PR 19 (suggested next step)
+## PR 19 (implemented)
 
-**TrafficEvent retention / privacy operator doc** or **seller marketing polish** — one PR.
+**Retention / privacy:** **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`**.
+
+## PR 20 (suggested next step)
+
+**Seller marketing polish** or next roadmap slice — one PR.

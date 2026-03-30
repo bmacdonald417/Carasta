@@ -57,6 +57,10 @@ No IPs, user ids, auction ids, or payloads.
 
 ---
 
-## PR 19 (suggested next step)
+## PR 19 (implemented)
 
-**TrafficEvent retention / privacy operator doc** (align with prune script + compliance) **or** **seller marketing UX polish** — one PR, no core auction/community/bid changes.
+**Retention / privacy runbook:** **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`**, **`MARKETING_PHASE_19_NOTES.md`**.
+
+## PR 20 (suggested next step)
+
+**Seller marketing UX polish** or next roadmap slice — one PR.

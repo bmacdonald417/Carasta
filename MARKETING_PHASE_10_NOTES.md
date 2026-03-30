@@ -74,6 +74,8 @@ Allowed keys depend on **`eventType`**:
 
 **Never** runs on app startup. After large deletes, see Phase 6 notes on **AuctionAnalytics** alignment / backfill.
 
+**Operator runbook (Phase 19):** **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`**
+
 ---
 
 ## Known limitations

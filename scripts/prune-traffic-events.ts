@@ -16,6 +16,8 @@
  *
  * After pruning, re-run analytics backfill if rollups must match remaining raw
  * events only; see `MARKETING_PHASE_6_NOTES.md` and `MARKETING_PHASE_10_NOTES.md`.
+ *
+ * Retention / privacy handoff: `TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`
  */
 
 import { pruneTrafficEventsOlderThan } from "../lib/marketing/prune-traffic-events";

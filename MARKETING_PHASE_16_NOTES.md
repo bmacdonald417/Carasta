@@ -31,6 +31,10 @@
 
 **Admin JSON snapshot:** **`MARKETING_PHASE_18_NOTES.md`**.
 
-## PR 19 (suggested next step)
+## PR 19 (implemented)
 
-**TrafficEvent retention / privacy doc** or seller marketing polish — **one PR**.
+**Retention / privacy runbook:** **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`**.
+
+## PR 20 (suggested next step)
+
+Seller marketing polish or next roadmap slice — **one PR**.

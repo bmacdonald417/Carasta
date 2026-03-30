@@ -6,6 +6,10 @@ function stripUnsafeChars(s: string): string {
 /**
  * Normalize client-provided dedupe keys: trim, collapse internal ASCII whitespace,
  * lowercase (UUIDs / hex), max length, minimum entropy.
+ *
+ * Normalized values are merged into `TrafficEvent.metadata` server-side (not a DB column).
+ *
+ * @see `TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`
  */
 export function normalizeMarketingVisitorKey(
   key: string | null | undefined

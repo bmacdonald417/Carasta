@@ -201,3 +201,4 @@ Adjust **N** using §7.
 - `MARKETING_IMPLEMENTATION_PLAN.md` — §12q Phase 16, §12r Phase 17
 - `MARKETING_PHASE_17_NOTES.md` — in-app observability
 - `MARKETING_PHASE_18_NOTES.md` — protected admin JSON snapshot
+- `TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md` — raw event retention & privacy

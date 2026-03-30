@@ -616,7 +616,22 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_18_NOTES.md`.
 
-**Next recommended step (PR 19):** **TrafficEvent retention / privacy operator doc** or **seller marketing polish** — **one PR**, no auction/bid/buy-now/community core changes.
+**Next recommended step (PR 19):** Implemented as Phase 19 (below).
+
+---
+
+## 12t. Phase 19 — TrafficEvent retention & privacy operator runbook (implemented)
+
+**Goal:** **Operator-facing** retention, privacy, pruning, and rollup alignment for **`TrafficEvent`** — documentation-first handoff for ops/security/maintainers.
+
+**Implemented:**
+
+- **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`** — data stored/not stored, minimization, retention vs **`AuctionAnalytics`**, prune env/scripts, incidents (edge, logs, admin snapshot), compliance handoff, production checklist.
+- **JSDoc `@see`** on **`lib/marketing/prune-traffic-events.ts`**, **`sanitize-marketing-metadata.ts`**, **`visitor-key.ts`**.
+
+**Notes:** `MARKETING_PHASE_19_NOTES.md`.
+
+**Next recommended step (PR 20):** **Seller marketing UX polish** or next roadmap slice — **one PR**, no auction/bid/buy-now/community core changes unless explicitly scoped.
 
 ---
 
@@ -627,8 +642,8 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 3. **Watchlist** — referenced in UX copy but not in DB; marketing features should not assume watchlist counts until modeled.
 4. **Post ↔ Auction** — optional **`Post.auctionId`** (Phase 11) for Carmunity marketing promos; caption URLs remain for other cases.
 5. **Scale** — Phase 12 **app-layer** track limits + **TrafficEvent** prune; edge limits still recommended at volume.
-6. **Privacy / compliance** — define retention for `TrafficEvent` and whether IP/UA are stored (not recommended in clear text).
+6. **Privacy / compliance** — operator baseline: **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`** (retention/prune, what is stored; IP/UA not on `TrafficEvent`; legal review still required per jurisdiction).
 
 ---
 
-*Plan updated Marketing Phase 18; see §12b–§12s.*
+*Plan updated Marketing Phase 19; see §12b–§12t.*
