@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   CalendarDays,
   Clock,
+  Download,
   ExternalLink,
   Eye,
   Hand,
@@ -212,6 +213,15 @@ export default async function MarketingAuctionDetailPage({
             >
               {auction.status}
             </span>
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href={`/api/u/${user.handle}/marketing/export/auctions/${auction.id}`}
+                download
+              >
+                <Download className="mr-2 h-3.5 w-3.5" />
+                Export CSV
+              </a>
+            </Button>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
             Marketing activity for this listing: views, shares, and bid-button

@@ -110,6 +110,10 @@ Same logic as production; **`MARKETING_DIGEST_FORCE=1`** only affects the script
 
 **TrafficEvent retention / privacy:** **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`**.
 
-## PR 20 (next best step)
+## PR 20 (implemented)
+
+**Seller CSV exports:** **`MARKETING_PHASE_20_NOTES.md`**.
+
+## PR 21 (next best step)
 
 Seller marketing polish or next roadmap slice — one PR.

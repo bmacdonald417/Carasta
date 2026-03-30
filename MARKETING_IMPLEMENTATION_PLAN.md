@@ -631,7 +631,23 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_19_NOTES.md`.
 
-**Next recommended step (PR 20):** **Seller marketing UX polish** or next roadmap slice — **one PR**, no auction/bid/buy-now/community core changes unless explicitly scoped.
+**Next recommended step (PR 20):** Implemented as Phase 20 (below).
+
+---
+
+## 12u. Phase 20 — Seller marketing CSV export / reporting (implemented)
+
+**Goal:** **Seller-only** **CSV** exports for overview listings, per-auction marketing breakdown, and campaigns — **on-demand** **`GET`** routes + minimal UI links; **no** new persistence.
+
+**Implemented:**
+
+- **Routes:** **`/api/u/[handle]/marketing/export/auctions`**, **`.../export/campaigns`**, **`.../export/auctions/[auctionId]`** — session + handle ownership + **`MARKETING_ENABLED`**; UTF-8 BOM; attachment filenames.
+- **Helpers:** **`lib/marketing/csv-utils.ts`**, **`marketing-export-auth.ts`**, **`export-seller-marketing-overview-csv.ts`**, **`export-seller-auction-marketing-csv.ts`**, **`export-seller-campaigns-csv.ts`**; **`getSellerCampaignsForExport`**; optional **`limit`** on **`getSellerMarketingAuctionRows`** (cap **500**).
+- **UI:** Export buttons on **`/u/[handle]/marketing`** (listings + campaigns) and **`.../marketing/auctions/[auctionId]`**.
+
+**Notes:** `MARKETING_PHASE_20_NOTES.md`.
+
+**Next recommended step (PR 21):** **Seller marketing UX polish** or next roadmap slice — **one PR**, no auction/bid/buy-now/community core changes unless scoped.
 
 ---
 
@@ -646,4 +662,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 19; see §12b–§12t.*
+*Plan updated Marketing Phase 20; see §12b–§12u.*

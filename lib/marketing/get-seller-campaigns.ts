@@ -46,6 +46,34 @@ export async function getAllSellerCampaigns(
   return getRecentSellerCampaigns(sellerId, take);
 }
 
+const CAMPAIGN_EXPORT_CAP = 2000;
+
+/** Full campaign list for CSV export (newest first, capped). */
+export async function getSellerCampaignsForExport(
+  sellerId: string
+): Promise<SellerCampaignListRow[]> {
+  const rows = await prisma.campaign.findMany({
+    where: { userId: sellerId },
+    orderBy: { updatedAt: "desc" },
+    take: CAMPAIGN_EXPORT_CAP,
+    include: {
+      auction: { select: { id: true, title: true } },
+    },
+  });
+  return rows.map((c) => ({
+    id: c.id,
+    name: c.name,
+    type: c.type,
+    status: c.status,
+    startAt: c.startAt,
+    endAt: c.endAt,
+    createdAt: c.createdAt,
+    updatedAt: c.updatedAt,
+    auctionId: c.auctionId,
+    auctionTitle: c.auction.title,
+  }));
+}
+
 export async function getAuctionCampaignsForSeller(
   sellerId: string,
   auctionId: string

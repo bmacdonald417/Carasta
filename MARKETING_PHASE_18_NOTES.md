@@ -61,6 +61,10 @@ No IPs, user ids, auction ids, or payloads.
 
 **Retention / privacy runbook:** **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`**, **`MARKETING_PHASE_19_NOTES.md`**.
 
-## PR 20 (suggested next step)
+## PR 20 (implemented)
+
+**Seller CSV exports:** **`MARKETING_PHASE_20_NOTES.md`**.
+
+## PR 21 (suggested next step)
 
 **Seller marketing UX polish** or next roadmap slice — one PR.

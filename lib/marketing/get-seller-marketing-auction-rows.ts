@@ -4,6 +4,8 @@ import { getViewShareTotalsForAuctionIds } from "@/lib/marketing/get-view-share-
 import { MarketingTrafficEventType } from "@prisma/client";
 
 const ROW_LIMIT = 100;
+/** Upper bound for CSV export (overview); also max `limit` passed to {@link getSellerMarketingAuctionRows}. */
+export const SELLER_MARKETING_AUCTION_EXPORT_LIMIT = 500;
 
 export type SellerMarketingAuctionRow = {
   id: string;
@@ -25,12 +27,17 @@ export type SellerMarketingAuctionRow = {
 
 /** Per-listing traffic summaries for the seller marketing overview (read-only). */
 export async function getSellerMarketingAuctionRows(
-  sellerId: string
+  sellerId: string,
+  options?: { limit?: number }
 ): Promise<SellerMarketingAuctionRow[]> {
+  const take = Math.min(
+    Math.max(1, options?.limit ?? ROW_LIMIT),
+    SELLER_MARKETING_AUCTION_EXPORT_LIMIT
+  );
   const auctions = await prisma.auction.findMany({
     where: { sellerId },
     orderBy: { createdAt: "desc" },
-    take: ROW_LIMIT,
+    take,
     include: {
       images: { orderBy: { sortOrder: "asc" }, take: 1 },
       bids: { orderBy: { amountCents: "desc" }, take: 1 },

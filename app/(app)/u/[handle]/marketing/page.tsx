@@ -1,7 +1,16 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, Hand, Megaphone, Gavel, Radio, Share2, Target } from "lucide-react";
+import {
+  Download,
+  Eye,
+  Hand,
+  Megaphone,
+  Gavel,
+  Radio,
+  Share2,
+  Target,
+} from "lucide-react";
 import { MarketingCampaignStatus } from "@prisma/client";
 import { getRecentSellerCampaigns } from "@/lib/marketing/get-seller-campaigns";
 import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
@@ -162,11 +171,22 @@ export default async function MarketingPage({
               Group promotion work by listing — manual tracking only.
             </p>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/u/${user.handle}/marketing/campaigns`}>
-              Manage campaigns
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href={`/api/u/${user.handle}/marketing/export/campaigns`}
+                download
+              >
+                <Download className="mr-2 h-3.5 w-3.5" />
+                Export CSV
+              </a>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/u/${user.handle}/marketing/campaigns`}>
+                Manage campaigns
+              </Link>
+            </Button>
+          </div>
         </div>
         {recentCampaigns.length === 0 ? (
           <div className="mt-4 rounded-xl border border-dashed border-white/15 bg-white/[0.03] px-5 py-10 text-center">
@@ -229,13 +249,28 @@ export default async function MarketingPage({
       </div>
 
       <div className="mt-10">
-        <h2 className="font-display text-lg font-semibold text-neutral-100">
-          Your Listings
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-            Views, share clicks, and bid intent are shown per listing. Open View
-            marketing for sources, timelines, and recent events.
-        </p>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-lg font-semibold text-neutral-100">
+              Your Listings
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Views, share clicks, and bid intent are shown per listing. Open View
+              marketing for sources, timelines, and recent events.
+            </p>
+          </div>
+          {rows.length > 0 ? (
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href={`/api/u/${user.handle}/marketing/export/auctions`}
+                download
+              >
+                <Download className="mr-2 h-3.5 w-3.5" />
+                Export listings CSV
+              </a>
+            </Button>
+          ) : null}
+        </div>
 
         {rows.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-6 py-14 text-center">

@@ -19,6 +19,10 @@
 
 Read **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`** §2 (what is stored) and §5 (prune commands), then §8 (production checklist).
 
-## PR 20 (suggested next step)
+## PR 20 (implemented)
 
-**Seller marketing UX polish** or another **small product slice** from the roadmap—**one PR**, no core commerce engine changes unless explicitly scoped.
+**Seller CSV exports:** **`MARKETING_PHASE_20_NOTES.md`**.
+
+## PR 21 (suggested next step)
+
+**Seller marketing UX polish** or another roadmap slice — **one PR**.
