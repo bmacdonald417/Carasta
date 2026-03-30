@@ -73,3 +73,7 @@ Both can apply: a burst may be dropped at the route; accepted events still dedup
 ## Edge / WAF (Phase 16)
 
 Production runbook: **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** (complements this in-app limiter).
+
+## Observability (Phase 17)
+
+Outcome counters + logs: **`lib/marketing/marketing-track-observability.ts`**, **`MARKETING_PHASE_17_NOTES.md`**.

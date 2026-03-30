@@ -98,6 +98,10 @@ Same logic as production; **`MARKETING_DIGEST_FORCE=1`** only affects the script
 
 **Edge / WAF runbook:** **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** (+ **`MARKETING_PHASE_16_NOTES.md`**). Complements in-app **`marketing-track-rate-limit`** and Phase 10 dedupe.
 
-## PR 17 (next best step)
+## PR 17 (implemented)
 
-**Optional observability** for **`/api/marketing/track`** (logs/metrics by status) without changing the JSON contract, **or** the next roadmap slice — one PR.
+**Observability:** **`MARKETING_PHASE_17_NOTES.md`**, **`lib/marketing/marketing-track-observability.ts`**.
+
+## PR 18 (next best step)
+
+**TrafficEvent retention / privacy doc**, seller marketing polish, or optional **protected admin** counter snapshot — one PR.

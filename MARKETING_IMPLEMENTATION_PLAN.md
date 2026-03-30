@@ -585,7 +585,22 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_16_NOTES.md`.
 
-**Next recommended step (PR 17):** **Optional observability** for **`/api/marketing/track`** (structured logs or metrics by HTTP outcome; no contract change) **or** the next product/marketing slice from roadmap — **one PR**.
+**Next recommended step (PR 17):** Implemented as Phase 17 (below).
+
+---
+
+## 12r. Phase 17 — Observability for marketing track (implemented)
+
+**Goal:** **Lightweight** operational visibility for **`POST /api/marketing/track`**: outcome labels, event type + coarse auth + optional source — **no** JSON contract change, **no** seller UI.
+
+**Implemented:**
+
+- **`lib/marketing/marketing-track-observability.ts`** — bounded in-memory counters (`outcome|eventType|authMode`); **`console.info`** for anomaly outcomes by default; **`MARKETING_TRACK_OBSERVABILITY_VERBOSE`** for per-request logs on hot paths; **`getMarketingTrackObservabilitySnapshot()`** for in-process inspection.
+- **`app/api/marketing/track/route.ts`** — observes all paths; uses **`recordTrafficEvent`** **`skipped`** for **`event_deduped`** vs **`event_inserted`**.
+
+**Notes:** `MARKETING_PHASE_17_NOTES.md`.
+
+**Next recommended step (PR 18):** **TrafficEvent retention / privacy operator doc**, **seller marketing polish**, or **optional protected admin snapshot** of track counters — **one PR**, no auction/bid/buy-now/community core changes.
 
 ---
 
@@ -600,4 +615,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 16; see §12b–§12q.*
+*Plan updated Marketing Phase 17; see §12b–§12r.*

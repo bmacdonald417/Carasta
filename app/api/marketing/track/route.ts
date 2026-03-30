@@ -3,6 +3,8 @@
  *
  * Edge / WAF guidance (path limits, POST-only, body size, trusted `X-Forwarded-For`):
  * **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`**
+ *
+ * In-app observability (counters + structured logs): **`MARKETING_PHASE_17_NOTES.md`**
  */
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
@@ -15,13 +17,22 @@ import {
   getMarketingTrackClientIp,
 } from "@/lib/marketing/marketing-track-rate-limit";
 import { marketingTrackBodySchema } from "@/lib/validations/marketing";
+import { observeMarketingTrackRequest } from "@/lib/marketing/marketing-track-observability";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  let eventLabel: "VIEW" | "SHARE_CLICK" | "BID_CLICK" | undefined;
+  let authMode: "authenticated" | "anonymous" | "unknown" = "unknown";
+  let sourceLabel: string | undefined;
+
   try {
     if (!isMarketingEnabled()) {
+      observeMarketingTrackRequest({
+        outcome: "feature_disabled",
+        authMode: "unknown",
+      });
       return new NextResponse(null, { status: 204 });
     }
 
@@ -29,20 +40,36 @@ export async function POST(req: NextRequest) {
     try {
       json = await req.json();
     } catch {
+      const tokenEarly = await getToken({
+        req,
+        secret: process.env.NEXTAUTH_SECRET,
+      });
+      observeMarketingTrackRequest({
+        outcome: "body_parse_failed",
+        authMode: tokenEarly?.sub ? "authenticated" : "anonymous",
+      });
       return NextResponse.json({ ok: false }, { status: 400 });
     }
 
-    const parsed = marketingTrackBodySchema.safeParse(json);
-    if (!parsed.success) {
-      return NextResponse.json({ ok: false }, { status: 400 });
-    }
-
-    const body = parsed.data;
     const token = await getToken({
       req,
       secret: process.env.NEXTAUTH_SECRET,
     });
+    authMode = token?.sub ? "authenticated" : "anonymous";
+
+    const parsed = marketingTrackBodySchema.safeParse(json);
+    if (!parsed.success) {
+      observeMarketingTrackRequest({
+        outcome: "validation_failed",
+        authMode,
+      });
+      return NextResponse.json({ ok: false }, { status: 400 });
+    }
+
+    const body = parsed.data;
     const userId = token?.sub ?? null;
+    eventLabel = body.eventType;
+    sourceLabel = body.source;
 
     const clientIp = getMarketingTrackClientIp(req);
     const rl = checkMarketingTrackRateLimit(
@@ -51,6 +78,12 @@ export async function POST(req: NextRequest) {
       body.eventType
     );
     if (!rl.allowed) {
+      observeMarketingTrackRequest({
+        outcome: "route_rate_limited",
+        eventType: eventLabel,
+        authMode,
+        ...(sourceLabel ? { source: sourceLabel } : {}),
+      });
       return NextResponse.json({ ok: true });
     }
 
@@ -59,6 +92,12 @@ export async function POST(req: NextRequest) {
       select: { id: true },
     });
     if (!auction) {
+      observeMarketingTrackRequest({
+        outcome: "auction_not_found",
+        eventType: eventLabel,
+        authMode,
+        ...(sourceLabel ? { source: sourceLabel } : {}),
+      });
       return NextResponse.json({ ok: false }, { status: 400 });
     }
 
@@ -69,7 +108,7 @@ export async function POST(req: NextRequest) {
           ? MarketingTrafficEventType.SHARE_CLICK
           : MarketingTrafficEventType.BID_CLICK;
 
-    await recordTrafficEvent({
+    const recorded = await recordTrafficEvent({
       auctionId: body.auctionId,
       eventType,
       userId,
@@ -78,8 +117,21 @@ export async function POST(req: NextRequest) {
       metadata: body.metadata as Record<string, unknown> | undefined,
     });
 
+    observeMarketingTrackRequest({
+      outcome: recorded.skipped ? "event_deduped" : "event_inserted",
+      eventType: eventLabel,
+      authMode,
+      ...(sourceLabel ? { source: sourceLabel } : {}),
+    });
+
     return NextResponse.json({ ok: true });
   } catch {
+    observeMarketingTrackRequest({
+      outcome: "server_error",
+      eventType: eventLabel,
+      authMode,
+      ...(sourceLabel ? { source: sourceLabel } : {}),
+    });
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

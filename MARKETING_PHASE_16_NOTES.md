@@ -23,6 +23,10 @@
 2. Ensure **`X-Forwarded-For`** / trusted proxy behavior matches §9 (IP bucket correctness).
 3. Roll out **observe → challenge → enforce** per §7; validate seller metrics after changes.
 
-## PR 17 (suggested next step)
+## PR 17 (implemented)
 
-**Optional observability slice:** structured logs or metrics for **`/api/marketing/track`** (counts by status: 200/204/400/500, and optionally “limiter short-circuit” if you add a diagnostic hook **without** changing the JSON contract)—**one PR**, still no seller-facing UI requirement. Alternative product slices can replace this if roadmap dictates.
+**Observability:** **`lib/marketing/marketing-track-observability.ts`** + **`app/api/marketing/track/route.ts`**. See **`MARKETING_PHASE_17_NOTES.md`**.
+
+## PR 18 (suggested next step)
+
+**TrafficEvent retention / privacy operator doc**, seller marketing polish, or optional **protected admin** JSON snapshot of track counters — **one PR**.

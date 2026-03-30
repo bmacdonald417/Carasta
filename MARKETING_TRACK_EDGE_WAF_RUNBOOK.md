@@ -146,6 +146,7 @@ Adjust **N** using §7.
 | **Origin 5xx** on same path | App/database issues (distinct from WAF) |
 | **`TrafficEvent` insert rate** (DB/metrics) | Spikes after marketing pushes or abuse |
 | **AuctionAnalytics drift** | If inserts lag rollups (operational; see Phase 6 notes) |
+| **App logs** prefix **`[marketing-track]`** | Phase 17 structured outcomes (anomalies by default); see **`MARKETING_PHASE_17_NOTES.md`** |
 
 ### Abuse / noise indicators
 
@@ -196,4 +197,5 @@ Adjust **N** using §7.
 
 - `MARKETING_PHASE_10_NOTES.md` — dedupe + metadata
 - `MARKETING_PHASE_12_NOTES.md` — in-app rate limiter
-- `MARKETING_IMPLEMENTATION_PLAN.md` — §12q Phase 16
+- `MARKETING_IMPLEMENTATION_PLAN.md` — §12q Phase 16, §12r Phase 17
+- `MARKETING_PHASE_17_NOTES.md` — in-app observability
