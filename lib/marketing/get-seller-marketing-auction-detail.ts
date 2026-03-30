@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { computeCurrentBidCents } from "@/lib/auction-metrics";
 import {
   MarketingTrafficEventType,
   MarketingTrafficSource,
@@ -17,6 +18,12 @@ export type SellerMarketingAuctionDetail = {
     status: string;
     endAt: Date;
     createdAt: Date;
+    year: number;
+    make: string;
+    model: string;
+    trim: string | null;
+    mileage: number | null;
+    highBidCents: number;
   };
   totalViews: number;
   totalShareClicks: number;
@@ -47,9 +54,30 @@ export async function getSellerMarketingAuctionDetail(
       status: true,
       endAt: true,
       createdAt: true,
+      year: true,
+      make: true,
+      model: true,
+      trim: true,
+      mileage: true,
+      bids: { orderBy: { amountCents: "desc" }, take: 1 },
     },
   });
   if (!auction) return null;
+
+  const highBidCents = computeCurrentBidCents(auction.bids);
+  const auctionRow = {
+    id: auction.id,
+    title: auction.title,
+    status: auction.status,
+    endAt: auction.endAt,
+    createdAt: auction.createdAt,
+    year: auction.year,
+    make: auction.make,
+    model: auction.model,
+    trim: auction.trim,
+    mileage: auction.mileage,
+    highBidCents,
+  };
 
   const now = new Date();
   const cutoff24 = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -168,7 +196,7 @@ export async function getSellerMarketingAuctionDetail(
   }));
 
   return {
-    auction,
+    auction: auctionRow,
     totalViews,
     totalShareClicks,
     viewsLast24h,

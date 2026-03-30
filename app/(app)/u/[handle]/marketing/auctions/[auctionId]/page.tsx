@@ -19,6 +19,10 @@ import {
   marketingSourceLabel,
   shareTargetLabel,
 } from "@/lib/marketing/marketing-display";
+import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
+import { buildMarketingLinkKit } from "@/lib/marketing/build-marketing-links";
+import { generateSellerShareCopy } from "@/lib/marketing/generate-share-copy";
+import { ShareAndPromotePanel } from "@/components/marketing/share-and-promote-panel";
 
 function ProportionBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -67,6 +71,32 @@ export default async function MarketingAuctionDetailPage({
         : auction.status === "DRAFT"
           ? "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400"
           : "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400";
+
+  const origin = getPublicSiteOrigin();
+  const linkKit = buildMarketingLinkKit(auction.id, origin);
+  const shareCopy = generateSellerShareCopy(
+    {
+      title: auction.title,
+      year: auction.year,
+      make: auction.make,
+      model: auction.model,
+      trim: auction.trim,
+      mileage: auction.mileage,
+      status: auction.status,
+      endAt: auction.endAt,
+      highBidCents: auction.highBidCents,
+    },
+    linkKit
+  );
+
+  const linkRows = [
+    { label: "Public listing", url: linkKit.default },
+    { label: "Instagram", url: linkKit.instagram },
+    { label: "Facebook", url: linkKit.facebook },
+    { label: "LinkedIn", url: linkKit.linkedin },
+    { label: "Email", url: linkKit.email },
+    { label: "Carmunity", url: linkKit.carmunity },
+  ];
 
   const kpi = [
     {
@@ -153,6 +183,10 @@ export default async function MarketingAuctionDetailPage({
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-10">
+        <ShareAndPromotePanel linkRows={linkRows} copyPack={shareCopy} />
       </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-2">

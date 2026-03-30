@@ -347,7 +347,29 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_3_NOTES.md`.
 
-**Next recommended step (PR 4):** **Campaign** CRUD (optional), **AuctionAnalytics** / daily rollups or scheduled aggregation, stronger **rate limits**, optional client **BID_CLICK** only, retention policy for `TrafficEvent`.
+**Next step after Phase 3:** Implemented as Phase 4 (below) for share tools; rollups/campaigns remain a later phase.
+
+---
+
+## 12e. Phase 4 — Share & Promote tools (implemented)
+
+**Goal:** Seller-only **Share & Promote** kit on the auction marketing drill-down: deterministic copy, **UTM-tracked** public links aligned with Phase 2 inference, copy-to-clipboard UX — **no** persistence, **no** campaign CRUD, **no** social automation.
+
+**Implemented:**
+
+- **`lib/marketing/site-origin.ts`** — `getPublicSiteOrigin()` from `NEXT_PUBLIC_SITE_URL`, `NEXTAUTH_URL`, `VERCEL_URL`, or localhost fallback.
+- **`lib/marketing/build-marketing-links.ts`** — `buildMarketingLinkKit(auctionId)` / `buildTrackedAuctionUrl` with `utm_source` ∈ `instagram` | `facebook` | `linkedin` | `email` | `carmunity`, `utm_medium` (`social` | `email` | `community`), `utm_campaign=listing_{id}`. Default listing URL has **no** query string.
+- **`lib/marketing/generate-share-copy.ts`** — `generateSellerShareCopy` → short/long/ending-soon captions, email subject/body, hashtags line, keywords line (from title, Y/M/M, trim, mileage, end date, **LIVE** high bid when bids exist).
+- **`get-seller-marketing-auction-detail.ts`** — extended auction payload: `year`, `make`, `model`, `trim`, `mileage`, `highBidCents` (from top bid) for copy generation only.
+- **UI:** `components/marketing/share-and-promote-panel.tsx`, `marketing-link-copy-row.tsx`, `marketing-text-copy-block.tsx`, `marketing-copy-button.tsx` (toasts via existing `useToast`).
+- **Page:** `app/(app)/u/[handle]/marketing/auctions/[auctionId]/page.tsx` — **Share & Promote** section after KPIs.
+- **`.env.example`** — optional `NEXT_PUBLIC_SITE_URL`.
+
+**Limitations:** `utm_source=linkedin` is **not** mapped to a dedicated enum value in `MarketingTrafficSource` today (inference may show as **Unknown** until schema/parser extend). Copy is **generated on read**, not stored.
+
+**Notes:** `MARKETING_PHASE_4_NOTES.md`.
+
+**Next recommended step (PR 5):** **Campaign** CRUD / saved UTM presets, **AuctionAnalytics** rollups, **rate limits** & **TrafficEvent** retention, optional **BID_CLICK**, Carmunity one-click promote draft.
 
 ---
 
@@ -362,4 +384,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 3; see §12b–§12d.*
+*Plan updated through Marketing Phase 4; see §12b–§12e.*

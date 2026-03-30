@@ -39,9 +39,13 @@ Empty states when there are no `TrafficEvent` rows.
 - Share-target totals are approximate if an auction has more than **3,000** share events stored.  
 - **BID_CLICK** / **EXTERNAL_REFERRAL** appear in type breakdown if present in DB; Phase 2 instrumentation does not emit them yet.
 
-## PR 4 suggestions
+## PR 4 (done)
 
-- Campaign management and UTM link helpers  
-- Nightly or incremental **AuctionAnalytics** (daily buckets)  
-- API rate limits and row retention for `TrafficEvent`  
+See **`MARKETING_PHASE_4_NOTES.md`** — Share & Promote on the auction drill-down (links + copy kit).
+
+## PR 5 suggestions
+
+- Campaign CRUD / saved UTM presets  
+- **AuctionAnalytics** rollups, API rate limits, `TrafficEvent` retention  
 - Optional **BID_CLICK** UI-only tracking  
+- Extend `MarketingTrafficSource` or UTM map for LinkedIn if needed  
