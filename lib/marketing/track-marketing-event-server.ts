@@ -4,8 +4,10 @@ import {
   Prisma,
 } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { tryIncrementAuctionAnalyticsRollup } from "@/lib/marketing/increment-auction-analytics-rollup";
 import { inferMarketingSourceFromSignals } from "@/lib/marketing/resolve-marketing-source";
 import { sanitizeMarketingMetadata } from "@/lib/marketing/sanitize-marketing-metadata";
+import { normalizeMarketingVisitorKey } from "@/lib/marketing/visitor-key";
 
 const VIEW_DEDUPE_MS = 60_000;
 const SHARE_DEDUPE_MS = 5_000;
@@ -19,6 +21,8 @@ export async function recordTrafficEvent(input: {
   visitorKey?: string | null;
 }): Promise<{ ok: boolean; skipped?: boolean }> {
   const userId = input.userId ?? null;
+  const visitorKey = normalizeMarketingVisitorKey(input.visitorKey);
+  const recordedAt = new Date();
   const metaRaw = sanitizeMarketingMetadata(input.metadata) ?? undefined;
   const shareTarget =
     typeof metaRaw?.shareTarget === "string" ? metaRaw.shareTarget : null;
@@ -26,10 +30,10 @@ export async function recordTrafficEvent(input: {
   const mergedMeta: Record<string, unknown> | undefined = metaRaw
     ? {
         ...metaRaw,
-        ...(input.visitorKey ? { visitorKey: input.visitorKey } : {}),
+        ...(visitorKey ? { visitorKey } : {}),
       }
-    : input.visitorKey
-      ? { visitorKey: input.visitorKey }
+    : visitorKey
+      ? { visitorKey }
       : undefined;
 
   const source = inferMarketingSourceFromSignals({
@@ -44,7 +48,7 @@ export async function recordTrafficEvent(input: {
     const dup = await findRecentViewDuplicate({
       auctionId: input.auctionId,
       userId,
-      visitorKey: input.visitorKey ?? null,
+      visitorKey,
       windowMs: VIEW_DEDUPE_MS,
     });
     if (dup) return { ok: true, skipped: true };
@@ -54,7 +58,7 @@ export async function recordTrafficEvent(input: {
     const dup = await findRecentShareDuplicate({
       auctionId: input.auctionId,
       userId,
-      visitorKey: input.visitorKey ?? null,
+      visitorKey,
       shareTarget,
       windowMs: SHARE_DEDUPE_MS,
     });
@@ -72,6 +76,12 @@ export async function recordTrafficEvent(input: {
           ? (mergedMeta as Prisma.InputJsonValue)
           : undefined,
     },
+  });
+
+  await tryIncrementAuctionAnalyticsRollup({
+    auctionId: input.auctionId,
+    eventType: input.eventType,
+    recordedAt,
   });
 
   return { ok: true };
@@ -99,20 +109,20 @@ async function findRecentViewDuplicate(params: {
   }
 
   if (params.visitorKey) {
-    const rows = await prisma.trafficEvent.findMany({
+    const row = await prisma.trafficEvent.findFirst({
       where: {
         auctionId: params.auctionId,
         eventType: MarketingTrafficEventType.VIEW,
         userId: null,
         createdAt: { gte: since },
+        metadata: {
+          path: ["visitorKey"],
+          equals: params.visitorKey,
+        },
       },
-      select: { metadata: true },
-      take: 25,
+      select: { id: true },
     });
-    return rows.some((r) => {
-      const m = r.metadata as Record<string, unknown> | null;
-      return m?.visitorKey === params.visitorKey;
-    });
+    return !!row;
   }
 
   return false;
@@ -128,24 +138,39 @@ async function findRecentShareDuplicate(params: {
   const since = new Date(Date.now() - params.windowMs);
   const target = params.shareTarget ?? "";
 
-  const rows = await prisma.trafficEvent.findMany({
-    where: {
-      auctionId: params.auctionId,
-      eventType: MarketingTrafficEventType.SHARE_CLICK,
-      createdAt: { gte: since },
-      ...(params.userId
-        ? { userId: params.userId }
-        : { userId: null }),
-    },
-    select: { metadata: true },
-    take: 25,
-  });
+  if (params.userId) {
+    const row = await prisma.trafficEvent.findFirst({
+      where: {
+        auctionId: params.auctionId,
+        eventType: MarketingTrafficEventType.SHARE_CLICK,
+        userId: params.userId,
+        createdAt: { gte: since },
+        metadata: {
+          path: ["shareTarget"],
+          equals: target,
+        },
+      },
+      select: { id: true },
+    });
+    return !!row;
+  }
 
-  return rows.some((r) => {
-    const m = r.metadata as Record<string, unknown> | null;
-    if (!m || (m.shareTarget ?? "") !== target) return false;
-    if (params.userId) return true;
-    if (params.visitorKey) return m.visitorKey === params.visitorKey;
-    return false;
-  });
+  if (params.visitorKey) {
+    const row = await prisma.trafficEvent.findFirst({
+      where: {
+        auctionId: params.auctionId,
+        eventType: MarketingTrafficEventType.SHARE_CLICK,
+        userId: null,
+        createdAt: { gte: since },
+        AND: [
+          { metadata: { path: ["shareTarget"], equals: target } },
+          { metadata: { path: ["visitorKey"], equals: params.visitorKey } },
+        ],
+      },
+      select: { id: true },
+    });
+    return !!row;
+  }
+
+  return false;
 }

@@ -38,6 +38,9 @@ export function inferMarketingSourceFromSignals(input: {
       if (host.includes("tiktok.com")) {
         return MarketingTrafficSource.TIKTOK;
       }
+      if (host.includes("linkedin.com") || host.includes("lnkd.in")) {
+        return MarketingTrafficSource.LINKEDIN;
+      }
       if (
         host.includes("t.co") ||
         host.includes("twitter.com") ||
@@ -62,6 +65,9 @@ function mapUtmFragment(
   }
   if (raw.includes("instagram") || raw === "ig") {
     return MarketingTrafficSource.INSTAGRAM;
+  }
+  if (raw.includes("linkedin")) {
+    return MarketingTrafficSource.LINKEDIN;
   }
   if (raw.includes("tiktok")) {
     return MarketingTrafficSource.TIKTOK;

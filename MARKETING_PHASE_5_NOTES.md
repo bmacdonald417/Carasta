@@ -53,13 +53,6 @@ Failures use `notFound()` on pages; actions return `{ ok: false, error: string }
 
 ---
 
-## Next best step (PR 6)
+## Next best step (PR 7)
 
-From `MARKETING_IMPLEMENTATION_PLAN.md` §12f suggestions:
-
-- **AuctionAnalytics** rollups and seller-visible metrics that do not require new ingestion paths, **or**
-- **TrafficEvent** retention / rate limits and hygiene for scale, **or**
-- Saved **UTM presets** linked to campaigns (still manual copy), **or**
-- Optional **BID_CLICK** if product wants bid funnel from marketing links.
-
-Choose one narrow PR; avoid coupling campaigns to automation until explicitly required.
+Phase 6 shipped rollups + retention groundwork; see `MARKETING_PHASE_6_NOTES.md`. PR 7 candidates: saved **UTM presets**, **BID_CLICK**, Carmunity draft promote, or stronger throttles/sampling — one slice per PR.

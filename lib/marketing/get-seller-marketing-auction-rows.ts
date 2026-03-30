@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { computeCurrentBidCents } from "@/lib/auction-metrics";
-import { MarketingTrafficEventType } from "@prisma/client";
+import { getViewShareTotalsForAuctionIds } from "@/lib/marketing/get-view-share-totals";
 
 const ROW_LIMIT = 100;
 
@@ -40,12 +40,8 @@ export async function getSellerMarketingAuctionRows(
 
   const auctionIds = auctions.map((a) => a.id);
 
-  const [eventCounts, lastActivity] = await Promise.all([
-    prisma.trafficEvent.groupBy({
-      by: ["auctionId", "eventType"],
-      where: { auctionId: { in: auctionIds } },
-      _count: { _all: true },
-    }),
+  const [viewShareByAuction, lastActivity] = await Promise.all([
+    getViewShareTotalsForAuctionIds(auctionIds),
     prisma.trafficEvent.groupBy({
       by: ["auctionId"],
       where: { auctionId: { in: auctionIds } },
@@ -53,30 +49,16 @@ export async function getSellerMarketingAuctionRows(
     }),
   ]);
 
-  const viewShareByAuction = new Map<
-    string,
-    { views: number; shares: number }
-  >();
-  for (const row of eventCounts) {
-    const cur = viewShareByAuction.get(row.auctionId) ?? {
-      views: 0,
-      shares: 0,
-    };
-    if (row.eventType === MarketingTrafficEventType.VIEW) {
-      cur.views += row._count._all;
-    } else if (row.eventType === MarketingTrafficEventType.SHARE_CLICK) {
-      cur.shares += row._count._all;
-    }
-    viewShareByAuction.set(row.auctionId, cur);
-  }
-
   const lastByAuction = new Map<string, Date | null>();
   for (const row of lastActivity) {
     lastByAuction.set(row.auctionId, row._max.createdAt ?? null);
   }
 
   return auctions.map((a) => {
-    const vs = viewShareByAuction.get(a.id) ?? { views: 0, shares: 0 };
+    const vs = viewShareByAuction.get(a.id) ?? {
+      views: 0,
+      shareClicks: 0,
+    };
     return {
       id: a.id,
       title: a.title,
@@ -90,7 +72,7 @@ export async function getSellerMarketingAuctionRows(
       highBidCents: computeCurrentBidCents(a.bids),
       bidCount: a._count.bids,
       totalViews: vs.views,
-      totalShareClicks: vs.shares,
+      totalShareClicks: vs.shareClicks,
       lastMarketingActivityAt: lastByAuction.get(a.id) ?? null,
     };
   });

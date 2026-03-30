@@ -26,6 +26,8 @@ export function marketingSourceLabel(source: MarketingTrafficSource): string {
       return "Instagram";
     case MarketingTrafficSource.FACEBOOK:
       return "Facebook";
+    case MarketingTrafficSource.LINKEDIN:
+      return "LinkedIn";
     case MarketingTrafficSource.TIKTOK:
       return "TikTok";
     case MarketingTrafficSource.EMAIL:

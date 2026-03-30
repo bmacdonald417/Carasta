@@ -365,7 +365,7 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 - **Page:** `app/(app)/u/[handle]/marketing/auctions/[auctionId]/page.tsx` — **Share & Promote** section after KPIs.
 - **`.env.example`** — optional `NEXT_PUBLIC_SITE_URL`.
 
-**Limitations:** `utm_source=linkedin` is **not** mapped to a dedicated enum value in `MarketingTrafficSource` today (inference may show as **Unknown** until schema/parser extend). Copy is **generated on read**, not stored.
+**Limitations (historical):** LinkedIn UTM/referrer was Unknown until **Phase 6** added `LINKEDIN` + parsing. Copy is **generated on read**, not stored.
 
 **Notes:** `MARKETING_PHASE_4_NOTES.md`.
 
@@ -389,7 +389,27 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_5_NOTES.md`.
 
-**Next recommended step (PR 6):** **AuctionAnalytics** rollups, **TrafficEvent** rate limits / retention, saved **UTM presets** (manual), optional **BID_CLICK**, Carmunity promote draft — **one** narrow slice per PR; still no campaign automation.
+**Next recommended step (PR 6):** Implemented as Phase 6 (below).
+
+---
+
+## 12g. Phase 6 — Analytics rollups + hardening (implemented)
+
+**Goal:** **AuctionAnalytics** daily rollups for **VIEW** / **SHARE_CLICK**, incremental updates on ingest, idempotent SQL backfill, hybrid reads (rollups for headline totals; **TrafficEvent** for breakdowns, recent activity, time-window counts). Conservative **retention/prune** helpers (manual, gated). **LinkedIn** `MarketingTrafficSource` + UTM/referrer mapping. Dedupe uses JSON path filters + trimmed **visitorKey**. No cron, no auction/bid/campaign UI rewrites.
+
+**Implemented:**
+
+- **Schema:** `AuctionAnalytics` (`@@unique([auctionId, day])`, UTC calendar `day` `@db.Date`); enum `MarketingTrafficSource.LINKEDIN`.
+- **Migration:** `20260330200000_marketing_auction_analytics_rollup`.
+- **Rollups:** `lib/marketing/increment-auction-analytics-rollup.ts` (after each persisted VIEW/SHARE_CLICK; failures logged, ingest succeeds), `lib/marketing/backfill-auction-analytics.ts`, `lib/marketing/utc-marketing-day.ts`.
+- **Reads:** `lib/marketing/get-view-share-totals.ts` — prefers rollup sums when any rollup row exists for an auction else raw counts; used by overview KPIs, auction table rows, drill-down headline totals. `viewsLast24h` / `viewsLast7d` still from **TrafficEvent**.
+- **Retention:** `lib/marketing/prune-traffic-events.ts`, `scripts/prune-traffic-events.ts` (`TRAFFIC_EVENT_PRUNE_ENABLED` gate; dry-run supported).
+- **Scripts:** `scripts/backfill-auction-analytics.ts`, npm **`marketing:backfill-analytics`** / **`marketing:prune-traffic-events`**.
+- **Dedupe / hygiene:** `lib/marketing/visitor-key.ts`; JSON `metadata` path matching in `track-marketing-event-server.ts`.
+
+**Notes:** `MARKETING_PHASE_6_NOTES.md`.
+
+**Next recommended step (PR 7):** Saved **UTM presets** (manual copy, optional campaign link), **BID_CLICK** instrumentation (if product wants funnel), Carmunity **draft-only** promote, or **IP-based** throttles / sampling — still no Redis requirement; keep slices small.
 
 ---
 
@@ -404,4 +424,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 5; see §12b–§12f.*
+*Plan updated through Marketing Phase 6; see §12b–§12g.*

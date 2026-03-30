@@ -61,6 +61,7 @@ enum MarketingTrafficSource {
   DIRECT
   INSTAGRAM
   FACEBOOK
+  LINKEDIN
   TIKTOK
   EMAIL
   CARMUNITY
@@ -278,6 +279,7 @@ model Auction {
   feedbacks AuctionFeedback[]
   trafficEvents      TrafficEvent[]
   marketingCampaigns Campaign[]
+  auctionAnalytics   AuctionAnalytics[]
 
   @@index([sellerId])
   @@index([buyerId])
@@ -403,6 +405,23 @@ model TrafficEvent {
   @@index([auctionId])
   @@index([auctionId, createdAt])
   @@index([userId])
+}
+
+/// Daily rollups for VIEW / SHARE_CLICK only (UTC calendar day). Rebuilt via backfill; incremented on ingest.
+model AuctionAnalytics {
+  id          String    @id @default(cuid())
+  auctionId   String
+  day         DateTime  @db.Date
+  views       Int       @default(0)
+  shareClicks Int       @default(0)
+  lastEventAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@unique([auctionId, day])
+  @@index([auctionId])
 }
 
 model Campaign {

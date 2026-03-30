@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { computeCurrentBidCents } from "@/lib/auction-metrics";
+import { getViewShareTotalsForAuctionIds } from "@/lib/marketing/get-view-share-totals";
 import {
   MarketingTrafficEventType,
   MarketingTrafficSource,
@@ -84,8 +85,7 @@ export async function getSellerMarketingAuctionDetail(
   const cutoff7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   const [
-    totalViews,
-    totalShareClicks,
+    viewShareTotals,
     viewsLast24h,
     viewsLast7d,
     bySourceRaw,
@@ -94,12 +94,7 @@ export async function getSellerMarketingAuctionDetail(
     shareRows,
     lastRow,
   ] = await Promise.all([
-    prisma.trafficEvent.count({
-      where: { auctionId, eventType: MarketingTrafficEventType.VIEW },
-    }),
-    prisma.trafficEvent.count({
-      where: { auctionId, eventType: MarketingTrafficEventType.SHARE_CLICK },
-    }),
+    getViewShareTotalsForAuctionIds([auctionId]),
     prisma.trafficEvent.count({
       where: {
         auctionId,
@@ -195,10 +190,15 @@ export async function getSellerMarketingAuctionDetail(
     count: eventTypeMap.get(eventType) ?? 0,
   }));
 
+  const totals = viewShareTotals.get(auctionId) ?? {
+    views: 0,
+    shareClicks: 0,
+  };
+
   return {
     auction: auctionRow,
-    totalViews,
-    totalShareClicks,
+    totalViews: totals.views,
+    totalShareClicks: totals.shareClicks,
     viewsLast24h,
     viewsLast7d,
     lastMarketingActivityAt: lastRow?.createdAt ?? null,
