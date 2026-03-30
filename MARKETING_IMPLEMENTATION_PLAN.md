@@ -369,7 +369,27 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_4_NOTES.md`.
 
-**Next recommended step (PR 5):** **Campaign** CRUD / saved UTM presets, **AuctionAnalytics** rollups, **rate limits** & **TrafficEvent** retention, optional **BID_CLICK**, Carmunity one-click promote draft.
+**Next recommended step (PR 5):** Implemented as Phase 5 (below).
+
+---
+
+## 12f. Phase 5 — Campaign management CRUD (implemented)
+
+**Goal:** Seller-only **Campaign** create/read/update/delete tied to **seller-owned auctions**, surfaced on marketing overview and auction drill-down — **manual** org layer only; no automation, no outbound messaging, no changes to bids/buy-now/community/share ingestion core.
+
+**Implemented:**
+
+- **`lib/validations/campaign.ts`** — type/status/form validation; optional `startAt`/`endAt` with `endAt > startAt` when both set.
+- **`lib/marketing/get-seller-campaigns.ts`** — recent campaigns, all campaigns, per-auction campaigns, auction options for forms, single campaign for edit (all ownership-scoped).
+- **`app/(app)/u/[handle]/marketing/campaigns/actions.ts`** — `createMarketingCampaign`, `updateMarketingCampaign`, `deleteMarketingCampaign` with `MARKETING_ENABLED` + handle owner + auction/campaign ownership checks.
+- **UI:** `components/marketing/campaign-form.tsx`, `campaign-status-badge.tsx`, `campaign-type-label.tsx`, `campaign-delete-button.tsx`.
+- **Routes:** `/u/[handle]/marketing/campaigns`, `/new`, `/[campaignId]/edit`; overview and auction drill-down show campaign summaries + links.
+
+**Schema:** Unchanged — existing `Campaign` + `MarketingCampaignStatus` (`DRAFT`, `ACTIVE`, `PAUSED`, `ENDED`); UI labels **ENDED** as **Completed**.
+
+**Notes:** `MARKETING_PHASE_5_NOTES.md`.
+
+**Next recommended step (PR 6):** **AuctionAnalytics** rollups, **TrafficEvent** rate limits / retention, saved **UTM presets** (manual), optional **BID_CLICK**, Carmunity promote draft — **one** narrow slice per PR; still no campaign automation.
 
 ---
 
@@ -384,4 +404,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 4; see §12b–§12e.*
+*Plan updated through Marketing Phase 5; see §12b–§12f.*

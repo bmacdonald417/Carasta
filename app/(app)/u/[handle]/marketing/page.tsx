@@ -2,6 +2,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, Megaphone, Gavel, Radio, Share2, Target } from "lucide-react";
+import { MarketingCampaignStatus } from "@prisma/client";
+import { getRecentSellerCampaigns } from "@/lib/marketing/get-seller-campaigns";
+import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
+import { campaignTypeLabel } from "@/components/marketing/campaign-type-label";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
@@ -30,6 +34,7 @@ export default async function MarketingPage({
 
   const overview = await getSellerMarketingOverview(user.id);
   const rows = await getSellerMarketingAuctionRows(user.id);
+  const recentCampaigns = await getRecentSellerCampaigns(user.id, 6);
 
   const statCards = [
     {
@@ -105,6 +110,82 @@ export default async function MarketingPage({
             ) : null}
           </div>
         ))}
+      </div>
+
+      <div className="mt-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-lg font-semibold text-neutral-100">
+              Campaigns
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Group promotion work by listing — manual tracking only.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/u/${user.handle}/marketing/campaigns`}>
+              Manage campaigns
+            </Link>
+          </Button>
+        </div>
+        {recentCampaigns.length === 0 ? (
+          <div className="mt-4 rounded-xl border border-dashed border-white/15 bg-white/[0.03] px-5 py-10 text-center">
+            <p className="text-sm text-neutral-400">No campaigns yet</p>
+            <Button className="mt-4" asChild variant="secondary" size="sm">
+              <Link href={`/u/${user.handle}/marketing/campaigns/new`}>
+                Create a campaign
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-white/10 bg-white/[0.04] text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Listing</th>
+                  <th className="px-4 py-2">Type</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {recentCampaigns.map((c) => (
+                  <tr key={c.id} className="text-neutral-300">
+                    <td className="px-4 py-3 font-medium text-neutral-100">
+                      {c.name}
+                    </td>
+                    <td className="max-w-[140px] truncate px-4 py-3 text-neutral-500">
+                      {c.auctionTitle}
+                    </td>
+                    <td className="px-4 py-3">{campaignTypeLabel(c.type)}</td>
+                    <td className="px-4 py-3">
+                      <CampaignStatusBadge
+                        status={c.status as MarketingCampaignStatus}
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link
+                          href={`/u/${user.handle}/marketing/campaigns/${c.id}/edit`}
+                        >
+                          Edit
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link
+                          href={`/u/${user.handle}/marketing/auctions/${c.auctionId}`}
+                        >
+                          Marketing
+                        </Link>
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <div className="mt-10">

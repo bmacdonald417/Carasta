@@ -23,6 +23,11 @@ import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 import { buildMarketingLinkKit } from "@/lib/marketing/build-marketing-links";
 import { generateSellerShareCopy } from "@/lib/marketing/generate-share-copy";
 import { ShareAndPromotePanel } from "@/components/marketing/share-and-promote-panel";
+import { getAuctionCampaignsForSeller } from "@/lib/marketing/get-seller-campaigns";
+import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
+import { campaignTypeLabel } from "@/components/marketing/campaign-type-label";
+import { Button } from "@/components/ui/button";
+import { MarketingCampaignStatus } from "@prisma/client";
 
 function ProportionBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -52,7 +57,10 @@ export default async function MarketingAuctionDetailPage({
   const isOwn = (session?.user as any)?.id === user.id;
   if (!isOwn) notFound();
 
-  const detail = await getSellerMarketingAuctionDetail(auctionId, user.id);
+  const [detail, auctionCampaigns] = await Promise.all([
+    getSellerMarketingAuctionDetail(auctionId, user.id),
+    getAuctionCampaignsForSeller(user.id, auctionId),
+  ]);
   if (!detail) notFound();
 
   const { auction } = detail;
@@ -187,6 +195,83 @@ export default async function MarketingAuctionDetailPage({
 
       <div className="mt-10">
         <ShareAndPromotePanel linkRows={linkRows} copyPack={shareCopy} />
+      </div>
+
+      <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 className="font-display text-lg font-semibold text-neutral-100">
+              Campaigns for this listing
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Track outreach efforts for this auction in one place.
+            </p>
+          </div>
+          <Button asChild size="sm" variant="secondary">
+            <Link
+              href={`/u/${user.handle}/marketing/campaigns/new?auctionId=${auction.id}`}
+            >
+              New campaign
+            </Link>
+          </Button>
+        </div>
+        {auctionCampaigns.length === 0 ? (
+          <div className="mt-6 rounded-xl border border-dashed border-white/15 px-5 py-10 text-center">
+            <p className="text-sm text-neutral-400">No campaigns for this listing</p>
+            <Button className="mt-4" asChild size="sm" variant="outline">
+              <Link
+                href={`/u/${user.handle}/marketing/campaigns/new?auctionId=${auction.id}`}
+              >
+                Create one
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <ul className="mt-4 space-y-3">
+            {auctionCampaigns.map((c) => (
+              <li
+                key={c.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+              >
+                <div className="min-w-0">
+                  <p className="font-medium text-neutral-100">{c.name}</p>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    {campaignTypeLabel(c.type)}
+                    {(c.startAt || c.endAt) && (
+                      <>
+                        {" · "}
+                        {c.startAt
+                          ? formatMarketingDate(c.startAt)
+                          : "—"} →{" "}
+                        {c.endAt ? formatMarketingDate(c.endAt) : "—"}
+                      </>
+                    )}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <CampaignStatusBadge
+                    status={c.status as MarketingCampaignStatus}
+                  />
+                  <Button variant="outline" size="sm" asChild>
+                    <Link
+                      href={`/u/${user.handle}/marketing/campaigns/${c.id}/edit`}
+                    >
+                      Edit
+                    </Link>
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-4 text-xs text-neutral-500">
+          <Link
+            href={`/u/${user.handle}/marketing/campaigns`}
+            className="text-[#ff3b5c]/90 hover:underline"
+          >
+            View all campaigns
+          </Link>
+        </p>
       </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-2">

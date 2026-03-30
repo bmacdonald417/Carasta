@@ -43,9 +43,11 @@ Nothing is **persisted**; refresh regenerates copy.
 - Copy buttons use **`useToast`** (“Copied” / error).
 - Client components: `ShareAndPromotePanel`, link rows, text blocks, `MarketingCopyButton`.
 
-## PR 5 ideas
+## Follow-ons (after Phase 5)
 
-- Saved campaigns / custom `utm_campaign`
+Phase 5 implemented **manual Campaign CRUD** (see `MARKETING_PHASE_5_NOTES.md`). Remaining ideas:
+
+- Saved **UTM presets** / custom `utm_campaign` tied to campaigns (still manual copy)
 - Rollups & retention
 - Rate limiting on `/api/marketing/track`
 - LinkedIn (and other) source enum mapping if product wants cleaner breakdowns
