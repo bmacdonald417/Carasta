@@ -16,17 +16,21 @@ export function AuctionLinkedPromoPostsSection({
   return (
     <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
       <h2 className="font-display text-lg font-semibold text-neutral-100">
-        Carmunity promo posts
+        Carmunity posts (linked)
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Posts you published to Carmunity from this listing&apos;s marketing page
-        (linked for your records).
+        Promo posts you published from this page, tied to this listing.
       </p>
       {posts.length === 0 ? (
-        <p className="mt-4 text-sm text-neutral-500">
-          None yet — use <strong className="text-neutral-400">Promote to Carmunity</strong>{" "}
-          above to publish a linked post.
-        </p>
+        <div className="mt-6 rounded-xl border border-dashed border-white/15 bg-black/20 px-5 py-8 text-center">
+          <p className="text-sm text-neutral-400">
+            No linked posts yet.
+          </p>
+          <p className="mt-2 text-xs text-neutral-500">
+            Use <span className="font-medium text-neutral-400">Promote to Carmunity</span>{" "}
+            above to publish.
+          </p>
+        </div>
       ) : null}
       {posts.length > 0 ? (
         <ul className="mt-4 space-y-3">

@@ -83,9 +83,7 @@ export function ShareAndPromotePanel({
           </div>
         </div>
         <Button asChild variant="outline" size="sm" className="shrink-0">
-          <Link href={managePresetsHref}>
-            {hasPresets ? "Manage presets" : "Saved presets"}
-          </Link>
+          <Link href={managePresetsHref}>Manage Presets</Link>
         </Button>
       </div>
 

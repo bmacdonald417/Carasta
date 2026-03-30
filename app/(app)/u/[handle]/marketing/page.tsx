@@ -52,43 +52,46 @@ export default async function MarketingPage({
     getSellerMarketingNotifications(user.id, 10),
   ]);
 
-  const statCards = [
+  const inventoryCards = [
     {
-      label: "Total Listings",
+      label: "Total listings",
       value: overview.totalListings,
       icon: Gavel,
     },
     {
-      label: "Live Auctions",
+      label: "Live auctions",
       value: overview.liveAuctions,
       icon: Radio,
     },
     {
-      label: "Marketing Events",
-      value: overview.marketingEvents,
-      icon: Megaphone,
-      hint: "Views, shares, bid intent, and other tracked events",
-    },
-    {
-      label: "Active Campaigns",
+      label: "Active campaigns",
       value: overview.activeCampaigns,
       icon: Target,
     },
+  ];
+
+  const engagementCards = [
     {
-      label: "Total Views",
+      label: "Marketing events",
+      value: overview.marketingEvents,
+      icon: Megaphone,
+      hint: "Views, shares, bid intent — all tracked events",
+    },
+    {
+      label: "Total views",
       value: overview.totalViews,
       icon: Eye,
     },
     {
-      label: "Share Clicks",
+      label: "Share clicks",
       value: overview.totalShareClicks,
       icon: Share2,
     },
     {
-      label: "Bid Clicks",
+      label: "Bid clicks",
       value: overview.totalBidClicks,
       icon: Hand,
-      hint: "Bid button intent (not successful bids)",
+      hint: "Bid button taps (not completed bids)",
     },
   ];
 
@@ -100,11 +103,11 @@ export default async function MarketingPage({
             Marketing
           </h1>
           <p className="mt-1 max-w-2xl text-muted-foreground">
-            See listing reach and promotion activity from tracked page views and
-            shares. Open a listing below for a detailed breakdown.
+            Reach and promotion signals across your listings — open one for
+            sources, timelines, and Share &amp; Promote.
           </p>
           <p className="mt-2 text-xs text-neutral-500">
-            Weekly email digest (opt-in):{" "}
+            Weekly digest (opt-in):{" "}
             <Link href="/settings" className="text-[#ff3b5c]/90 hover:underline">
               Settings → Email
             </Link>
@@ -112,63 +115,95 @@ export default async function MarketingPage({
         </div>
         <Link
           href={`/u/${user.handle}`}
-          className="text-sm text-muted-foreground hover:text-foreground"
+          className="shrink-0 text-sm text-muted-foreground transition hover:text-foreground"
         >
-          ← @{user.handle}
+          ← Profile
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {statCards.map(({ label, value, icon: Icon, hint }) => (
-          <div
-            key={label}
-            className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
-          >
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
-                <Icon className="h-5 w-5 text-[#ff3b5c]" />
+      <div className="mt-8 space-y-8">
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Inventory
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {inventoryCards.map(({ label, value, icon: Icon }) => (
+              <div
+                key={label}
+                className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
+                    <Icon className="h-5 w-5 text-[#ff3b5c]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-neutral-500">{label}</p>
+                    <p className="text-2xl font-semibold text-neutral-100">
+                      {value}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-neutral-500">{label}</p>
-                <p className="text-2xl font-semibold text-neutral-100">{value}</p>
-              </div>
-            </div>
-            {hint ? (
-              <p className="mt-3 text-xs text-neutral-500">{hint}</p>
-            ) : null}
+            ))}
           </div>
-        ))}
+        </div>
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Tracked engagement
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {engagementCards.map(({ label, value, icon: Icon, hint }) => (
+              <div
+                key={label}
+                className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
+                    <Icon className="h-5 w-5 text-[#ff3b5c]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-neutral-500">{label}</p>
+                    <p className="text-2xl font-semibold text-neutral-100">
+                      {value}
+                    </p>
+                  </div>
+                </div>
+                {hint ? (
+                  <p className="mt-3 text-xs text-neutral-500">{hint}</p>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-10">
         <MarketingAlertsPanel items={marketingAlerts} />
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4">
+      <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-5">
         <div>
-          <p className="font-medium text-neutral-200">
-            Share &amp; Promote presets
-          </p>
+          <p className="font-medium text-neutral-200">Share &amp; Promote</p>
           <p className="mt-0.5 text-sm text-neutral-500">
-            Save UTM campaign labels and copy options to reuse on listing
-            marketing pages.
+            Saved UTM labels and copy for listing marketing pages — nothing posts
+            automatically.
           </p>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href={`/u/${user.handle}/marketing/presets`}>
-            Manage presets
+            Manage Presets
           </Link>
         </Button>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-12 border-t border-white/5 pt-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="font-display text-lg font-semibold text-neutral-100">
               Campaigns
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Group promotion work by listing — manual tracking only.
+              Manual tracking per listing — no auto-posting from here.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -176,6 +211,7 @@ export default async function MarketingPage({
               <a
                 href={`/api/u/${user.handle}/marketing/export/campaigns`}
                 download
+                title="Download campaigns as CSV"
               >
                 <Download className="mr-2 h-3.5 w-3.5" />
                 Export CSV
@@ -183,17 +219,25 @@ export default async function MarketingPage({
             </Button>
             <Button asChild variant="outline" size="sm">
               <Link href={`/u/${user.handle}/marketing/campaigns`}>
-                Manage campaigns
+                Manage Campaigns
               </Link>
             </Button>
           </div>
         </div>
         {recentCampaigns.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-dashed border-white/15 bg-white/[0.03] px-5 py-10 text-center">
-            <p className="text-sm text-neutral-400">No campaigns yet</p>
-            <Button className="mt-4" asChild variant="secondary" size="sm">
+          <div className="mt-4 rounded-xl border border-dashed border-white/15 bg-white/[0.03] px-5 py-12 text-center">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-white/5">
+              <Target className="h-5 w-5 text-neutral-500" aria-hidden />
+            </div>
+            <p className="mt-3 text-sm font-medium text-neutral-300">
+              No campaigns yet
+            </p>
+            <p className="mt-1 text-xs text-neutral-500">
+              Track outreach alongside Share &amp; Promote on each listing.
+            </p>
+            <Button className="mt-5" asChild variant="secondary" size="sm">
               <Link href={`/u/${user.handle}/marketing/campaigns/new`}>
-                Create a campaign
+                New campaign
               </Link>
             </Button>
           </div>
@@ -201,7 +245,7 @@ export default async function MarketingPage({
           <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 bg-white/[0.04] text-xs font-medium uppercase tracking-wider text-neutral-500">
+                <tr className="border-b border-white/10 bg-white/[0.06] text-xs font-medium uppercase tracking-wider text-neutral-500">
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Listing</th>
                   <th className="px-4 py-2">Type</th>
@@ -236,7 +280,7 @@ export default async function MarketingPage({
                         <Link
                           href={`/u/${user.handle}/marketing/auctions/${c.auctionId}`}
                         >
-                          Marketing
+                          Open marketing
                         </Link>
                       </Button>
                     </td>
@@ -248,15 +292,15 @@ export default async function MarketingPage({
         )}
       </div>
 
-      <div className="mt-10">
+      <div className="mt-12 border-t border-white/5 pt-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="font-display text-lg font-semibold text-neutral-100">
-              Your Listings
+              Your listings
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Views, share clicks, and bid intent are shown per listing. Open View
-              marketing for sources, timelines, and recent events.
+              Per-listing views, shares, and bid intent. Open one for full
+              breakdown and exports.
             </p>
           </div>
           {rows.length > 0 ? (
@@ -264,9 +308,10 @@ export default async function MarketingPage({
               <a
                 href={`/api/u/${user.handle}/marketing/export/auctions`}
                 download
+                title="Download listings as CSV"
               >
                 <Download className="mr-2 h-3.5 w-3.5" />
-                Export listings CSV
+                Export CSV
               </a>
             </Button>
           ) : null}
@@ -274,13 +319,15 @@ export default async function MarketingPage({
 
         {rows.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-6 py-14 text-center">
-            <p className="font-medium text-neutral-200">No listings yet</p>
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-white/5">
+              <Gavel className="h-5 w-5 text-neutral-500" aria-hidden />
+            </div>
+            <p className="mt-3 font-medium text-neutral-200">No listings yet</p>
             <p className="mt-2 text-sm text-neutral-500">
-              Create your first auction from Sell — then you&apos;ll see metrics
-              here after visitors view or share your page.
+              List something from Sell — metrics show up after visitors engage.
             </p>
             <Button className="mt-6" asChild variant="secondary">
-              <Link href="/sell">Start selling</Link>
+              <Link href="/sell">Go to Sell</Link>
             </Button>
           </div>
         ) : (
@@ -353,7 +400,7 @@ export default async function MarketingPage({
                     </Button>
                     <Button variant="secondary" size="sm" asChild>
                       <Link href={`/u/${user.handle}/marketing/auctions/${a.id}`}>
-                        View marketing
+                        Open marketing
                       </Link>
                     </Button>
                   </div>

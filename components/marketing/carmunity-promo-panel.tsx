@@ -88,8 +88,7 @@ export function CarmunityPromoPanel({
             Promote to Carmunity
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Draft a community post from this listing, tweak the copy, then publish
-            manually. Nothing posts until you click Publish — no automation or
+            Draft from this listing, edit, then publish — manual only, no
             scheduling.
           </p>
         </div>

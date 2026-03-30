@@ -114,6 +114,10 @@ Same logic as production; **`MARKETING_DIGEST_FORCE=1`** only affects the script
 
 **Seller CSV exports:** **`MARKETING_PHASE_20_NOTES.md`**.
 
-## PR 21 (next best step)
+## PR 21 (implemented)
 
-Seller marketing polish or next roadmap slice — one PR.
+**UX polish:** **`MARKETING_PHASE_21_NOTES.md`**.
+
+## PR 22 (next best step)
+
+Next roadmap slice — one PR.

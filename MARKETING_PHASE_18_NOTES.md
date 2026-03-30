@@ -65,6 +65,10 @@ No IPs, user ids, auction ids, or payloads.
 
 **Seller CSV exports:** **`MARKETING_PHASE_20_NOTES.md`**.
 
-## PR 21 (suggested next step)
+## PR 21 (implemented)
 
-**Seller marketing UX polish** or next roadmap slice — one PR.
+**UX polish:** **`MARKETING_PHASE_21_NOTES.md`**.
+
+## PR 22 (suggested next step)
+
+Next roadmap slice — one PR.

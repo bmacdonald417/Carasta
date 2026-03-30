@@ -15,8 +15,8 @@ export function MarketingAlertsPanel({
 }) {
   const emptyCopy =
     context === "auction"
-      ? "No marketing alerts for this listing yet. All alerts still show on the main Marketing page and in the bell menu."
-      : "No marketing alerts right now. Check back after more traffic or when a listing is ending soon.";
+      ? "Nothing flagged for this listing yet. Full alerts stay on Marketing home and in the bell menu."
+      : "You’re caught up. Alerts appear when traffic shifts, listings wind down, or campaigns start.";
 
   return (
     <div
@@ -30,16 +30,16 @@ export function MarketingAlertsPanel({
           <h2
             className={`font-display font-semibold text-neutral-100 ${compact ? "text-base" : "text-lg"}`}
           >
-            Marketing alerts
+            Marketing Alerts
             {context === "auction" ? (
               <span className="ml-2 font-normal text-muted-foreground">
-                (this listing)
+                · this listing
               </span>
             ) : null}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            In-app only — based on your listing activity and campaigns. Also
-            appears in the bell menu.
+            In-app only (same items as the header bell). Driven by your traffic
+            and campaigns.
           </p>
         </div>
       </div>

@@ -149,7 +149,7 @@ export default async function MarketingAuctionDetailPage({
     primaryImageUrl: auction.primaryImageUrl,
   });
 
-  const kpi = [
+  const kpiTotals = [
     {
       label: "Total views",
       value: detail.totalViews,
@@ -165,6 +165,9 @@ export default async function MarketingAuctionDetailPage({
       value: detail.totalBidClicks,
       icon: Hand,
     },
+  ];
+
+  const kpiWindows = [
     {
       label: "Bid clicks (24h)",
       value: detail.bidClicksLast24h,
@@ -185,6 +188,9 @@ export default async function MarketingAuctionDetailPage({
       value: detail.viewsLast7d,
       icon: Radio,
     },
+  ];
+
+  const kpiActivity = [
     {
       label: "Last activity",
       value: formatMarketingDate(detail.lastMarketingActivityAt),
@@ -195,11 +201,11 @@ export default async function MarketingAuctionDetailPage({
 
   return (
     <div className="carasta-container max-w-6xl py-8">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-6">
+        <div className="min-w-0 flex-1">
           <Link
             href={`/u/${user.handle}/marketing`}
-            className="mb-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+            className="mb-3 inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Marketing
@@ -213,51 +219,113 @@ export default async function MarketingAuctionDetailPage({
             >
               {auction.status}
             </span>
+          </div>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Views, shares, and bid-button intent for this listing (not completed
+            bids).
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <Button variant="outline" size="sm" asChild>
               <a
                 href={`/api/u/${user.handle}/marketing/export/auctions/${auction.id}`}
                 download
+                title="Download this listing’s marketing data as CSV"
               >
                 <Download className="mr-2 h-3.5 w-3.5" />
                 Export CSV
               </a>
             </Button>
+            <Button variant="secondary" size="sm" asChild>
+              <Link
+                href={`/auctions/${auction.id}`}
+                className="inline-flex items-center gap-2"
+              >
+                View public listing
+                <ExternalLink className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Marketing activity for this listing: views, shares, and bid-button
-            intent (not successful bids).
-          </p>
         </div>
-        <Link
-          href={`/auctions/${auction.id}`}
-          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-neutral-200 transition hover:border-[#ff3b5c]/30 hover:text-neutral-50"
-        >
-          View public listing
-          <ExternalLink className="h-4 w-4" />
-        </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {kpi.map(({ label, value, icon: Icon, isText }) => (
-          <div
-            key={label}
-            className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
-          >
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
-                <Icon className="h-5 w-5 text-[#ff3b5c]" />
+      <div className="space-y-8">
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Totals
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {kpiTotals.map(({ label, value, icon: Icon }) => (
+              <div
+                key={label}
+                className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
+                    <Icon className="h-5 w-5 text-[#ff3b5c]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-neutral-500">{label}</p>
+                    <p className="text-2xl font-semibold text-neutral-100">
+                      {value}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-sm text-neutral-500">{label}</p>
-                <p
-                  className={`truncate font-semibold text-neutral-100 ${isText ? "text-base" : "text-2xl"}`}
-                >
-                  {value}
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Recent windows
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {kpiWindows.map(({ label, value, icon: Icon }) => (
+              <div
+                key={label}
+                className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
+                    <Icon className="h-5 w-5 text-[#ff3b5c]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-neutral-500">{label}</p>
+                    <p className="text-2xl font-semibold text-neutral-100">
+                      {value}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            Activity
+          </p>
+          <div className="grid max-w-md gap-4">
+            {kpiActivity.map(({ label, value, icon: Icon, isText }) => (
+              <div
+                key={label}
+                className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
+                    <Icon className="h-5 w-5 text-[#ff3b5c]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-neutral-500">{label}</p>
+                    <p
+                      className={`truncate font-semibold text-neutral-100 ${isText ? "text-base" : "text-2xl"}`}
+                    >
+                      {value}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="mt-8">
@@ -292,10 +360,10 @@ export default async function MarketingAuctionDetailPage({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="font-display text-lg font-semibold text-neutral-100">
-              Campaigns for this listing
+              Campaigns · this listing
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Track outreach efforts for this auction in one place.
+              Outreach notes tied to this auction.
             </p>
           </div>
           <Button asChild size="sm" variant="secondary">
@@ -307,13 +375,18 @@ export default async function MarketingAuctionDetailPage({
           </Button>
         </div>
         {auctionCampaigns.length === 0 ? (
-          <div className="mt-6 rounded-xl border border-dashed border-white/15 px-5 py-10 text-center">
-            <p className="text-sm text-neutral-400">No campaigns for this listing</p>
+          <div className="mt-6 rounded-xl border border-dashed border-white/15 bg-black/20 px-5 py-10 text-center">
+            <p className="text-sm text-neutral-400">
+              No campaigns for this listing
+            </p>
+            <p className="mt-1 text-xs text-neutral-500">
+              Add one to log dates and status alongside Share &amp; Promote.
+            </p>
             <Button className="mt-4" asChild size="sm" variant="outline">
               <Link
                 href={`/u/${user.handle}/marketing/campaigns/new?auctionId=${auction.id}`}
               >
-                Create one
+                New campaign
               </Link>
             </Button>
           </div>
@@ -358,9 +431,9 @@ export default async function MarketingAuctionDetailPage({
         <p className="mt-4 text-xs text-neutral-500">
           <Link
             href={`/u/${user.handle}/marketing/campaigns`}
-            className="text-[#ff3b5c]/90 hover:underline"
+            className="font-medium text-[#ff3b5c]/90 hover:underline"
           >
-            View all campaigns
+            Manage Campaigns
           </Link>
         </p>
       </div>
@@ -368,10 +441,10 @@ export default async function MarketingAuctionDetailPage({
       <div className="mt-10 grid gap-8 lg:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <h2 className="font-display text-lg font-semibold text-neutral-100">
-            Traffic source
+            Traffic sources
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            How visitors arrived (best-effort from UTM and referrer).
+            Best-effort from UTM and referrer signals.
           </p>
           <ul className="mt-4 space-y-4">
             {detail.bySource.map(({ source, count }) => (
@@ -392,10 +465,10 @@ export default async function MarketingAuctionDetailPage({
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <h2 className="font-display text-lg font-semibold text-neutral-100">
-            Event type
+            Event types
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Counts by recorded event type.
+            Volume by tracked event type.
           </p>
           <ul className="mt-4 space-y-4">
             {detail.byEventType.map(({ eventType, count }) => (
@@ -421,7 +494,7 @@ export default async function MarketingAuctionDetailPage({
             Share actions
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Which share paths were used (when tracked).
+            Share targets when we could record them.
           </p>
           <ul className="mt-4 max-w-xl space-y-3">
             {detail.shareTargetCounts.map(({ target, count }) => (
@@ -444,22 +517,21 @@ export default async function MarketingAuctionDetailPage({
           Recent activity
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Latest tracked events (newest first).
+          Newest events first (up to 50).
         </p>
         {detail.recentEvents.length === 0 ? (
-          <div className="mt-8 rounded-xl border border-dashed border-white/15 px-6 py-12 text-center">
+          <div className="mt-8 rounded-xl border border-dashed border-white/15 bg-black/20 px-6 py-12 text-center">
             <p className="font-medium text-neutral-200">No activity yet</p>
             <p className="mt-2 text-sm text-neutral-500">
-              Tracked views, shares, and bid-button intent will appear after
-              visitors interact with this listing (with marketing tracking
-              enabled).
+              Traffic will show here once visitors view, share, or tap bid on
+              the public listing.
             </p>
           </div>
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-xs font-medium uppercase tracking-wider text-neutral-500">
+                <tr className="border-b border-white/10 bg-white/[0.04] text-xs font-medium uppercase tracking-wider text-neutral-500">
                   <th className="pb-3 pr-4">Time</th>
                   <th className="pb-3 pr-4">Event</th>
                   <th className="pb-3 pr-4">Source</th>

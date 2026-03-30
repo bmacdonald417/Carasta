@@ -42,6 +42,10 @@
 | Campaign list helper | **`getSellerCampaignsForExport`** in **`get-seller-campaigns.ts`** |
 | Row limit hook | **`getSellerMarketingAuctionRows(..., { limit })`** in **`get-seller-marketing-auction-rows.ts`** |
 
-## PR 21 (suggested next step)
+## PR 21 (implemented)
 
-**Seller marketing UX polish** (non-export), **TrafficEvent analytics drill-down**, or roadmap item — **one PR**, no bid/buy-now/community core changes unless scoped.
+**UX polish:** **`MARKETING_PHASE_21_NOTES.md`**.
+
+## PR 22 (suggested next step)
+
+Next roadmap product slice — **one PR**.

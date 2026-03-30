@@ -647,7 +647,24 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_20_NOTES.md`.
 
-**Next recommended step (PR 21):** **Seller marketing UX polish** or next roadmap slice — **one PR**, no auction/bid/buy-now/community core changes unless scoped.
+**Next recommended step (PR 21):** Implemented as Phase 21 (below).
+
+---
+
+## 12v. Phase 21 — Seller marketing UX polish (implemented)
+
+**Goal:** **Cohesive** seller marketing UI: clearer hierarchy, standardized actions (**Export CSV**, **Manage Campaigns**, **Manage Presets**, **Share &amp; Promote**, **Promote to Carmunity**, **Marketing Alerts**), tighter copy and empty states — **no** logic, schema, or export API changes.
+
+**Implemented:**
+
+- **`/u/[handle]/marketing`** — KPIs grouped (**Inventory** vs **Tracked engagement**), section dividers, presets strip aligned with **Share &amp; Promote**, campaign/listing empty states + table polish, **Open marketing** / **Manage Campaigns** / **Export CSV** consistency.
+- **`.../marketing/auctions/[auctionId]`** — header + grouped actions (**Export CSV**, **View public listing**), KPI bands (**Totals** / **Recent windows** / **Activity**), **Traffic sources** / **Event types**, campaigns + activity copy, **Manage Campaigns** link.
+- **Campaigns &amp; Presets** index pages — **← Back to Marketing**, shorter descriptions; presets title **Presets**.
+- **Components:** **`marketing-alerts-panel`**, **`share-and-promote-panel`** (**Manage Presets**), **`auction-linked-promo-posts`**, **`carmunity-promo-panel`** (microcopy).
+
+**Notes:** `MARKETING_PHASE_21_NOTES.md`.
+
+**Next recommended step (PR 22):** Roadmap slice (e.g. marketing analytics depth) — **one PR**, no core auction/bid/buy-now/community engine changes unless scoped.
 
 ---
 
@@ -662,4 +679,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 20; see §12b–§12u.*
+*Plan updated Marketing Phase 21; see §12b–§12v.*

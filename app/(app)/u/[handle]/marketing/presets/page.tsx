@@ -28,18 +28,18 @@ export default async function MarketingPresetsPage({
     <div className="carasta-container max-w-3xl py-8">
       <Link
         href={`/u/${user.handle}/marketing`}
-        className="mb-4 inline-block text-sm text-muted-foreground hover:text-foreground"
+        className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
       >
-        ← Marketing
+        ← Back to Marketing
       </Link>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold text-neutral-100">
-            Marketing presets
+            Presets
           </h1>
           <p className="mt-1 text-sm text-neutral-400">
-            Reusable UTM campaign labels and copy options for Share &amp; Promote.
-            Nothing posts automatically.
+            For <span className="text-neutral-300">Share &amp; Promote</span> —
+            UTM labels and copy. Nothing posts automatically.
           </p>
         </div>
         <Button asChild variant="performance" size="sm">

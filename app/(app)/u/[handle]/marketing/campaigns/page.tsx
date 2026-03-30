@@ -34,16 +34,15 @@ export default async function MarketingCampaignsPage({
         <div>
           <Link
             href={`/u/${user.handle}/marketing`}
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
           >
-            ← Marketing
+            ← Back to Marketing
           </Link>
           <h1 className="mt-3 font-display text-2xl font-bold text-neutral-100">
             Campaigns
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Organize promotion around your listings — no automated posting or
-            emails from here yet.
+            Track promotion work per listing — no auto-post or email from here.
           </p>
         </div>
         <Button asChild className="bg-[#ff3b5c] hover:bg-[#ff3b5c]/90">
