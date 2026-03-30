@@ -516,7 +516,7 @@ function scenario7(engine: SimEngine): ScenarioReport {
 }
 
 function scenario8(engine: SimEngine): ScenarioReport {
-  return runScenario(engine, "Mixed realistic marketplace", 8, () => {
+  return runScenario(engine, "Mixed realistic marketplace (early-stage ~10 sales/mo)", 8, () => {
     const base = new Date("2025-01-01");
     const rng = createSeededRng(99999);
     const userIds: string[] = [];
@@ -536,10 +536,10 @@ function scenario8(engine: SimEngine): ScenarioReport {
       "10k-50k": { sum: 0, count: 0 },
       "50k-200k": { sum: 0, count: 0 },
     };
-    for (let d = 0; d < 60; d++) {
+    for (let d = 0; d < 90; d++) {
       const day = new Date(base);
       day.setDate(day.getDate() + d);
-      const nTx = Math.floor(5 + rng() * 15);
+      const nTx = rng() < 0.6 ? 1 : 0;
       for (let t = 0; t < nTx; t++) {
         const sellerId = sellers[Math.floor(rng() * sellers.length)];
         const buyerId = buyers[Math.floor(rng() * buyers.length)];
@@ -646,19 +646,19 @@ function printReport(reports: ScenarioReport[]): void {
     if (r.scenarioId === 8 && r.users.length > 0) {
       const n = r.users.length;
       const v = r.users.filter(
-        (u) => u.score >= 150 && u.sales + u.purchases >= 2 && u.uniqueCounterparties >= 2
+        (u) => u.score >= 200 && u.sales + u.purchases >= 2 && u.uniqueCounterparties >= 2
       ).length;
       const e = r.users.filter(
         (u) =>
-          u.score >= 320 &&
-          u.sales + u.purchases >= 12 &&
-          u.uniqueCounterparties >= 6
+          u.score >= 550 &&
+          u.sales + u.purchases >= 8 &&
+          u.uniqueCounterparties >= 5
       ).length;
       const a = r.users.filter(
         (u) =>
-          u.score >= 600 &&
-          u.sales + u.purchases >= 30 &&
-          u.uniqueCounterparties >= 12
+          u.score >= 800 &&
+          u.sales + u.purchases >= 18 &&
+          u.uniqueCounterparties >= 10
       ).length;
       console.log(
         `  Target comparison: would-be VERIFIED=${v} (${((v / n) * 100).toFixed(1)}%), ELITE=${e} (${((e / n) * 100).toFixed(1)}%), APEX=${a} (${((a / n) * 100).toFixed(1)}%) [ignoring age]`
@@ -698,6 +698,14 @@ function main() {
   const outPath = path.join(outDir, `reputation-sim-${stamp}.json`);
   fs.writeFileSync(outPath, JSON.stringify({ reports, timestamp: now.toISOString() }, null, 2));
   console.log(`Report written to ${outPath}`);
+
+  const r5 = reports.find((r) => r.scenarioId === 5)!;
+  const r6 = reports.find((r) => r.scenarioId === 6)!;
+  const r8 = reports.find((r) => r.scenarioId === 8)!;
+  console.log("\n--- Tier counts (deliverable) ---");
+  console.log(`Scenario 5: NEW=${r5.tierCounts.NEW} VERIFIED=${r5.tierCounts.VERIFIED} ELITE=${r5.tierCounts.ELITE} APEX=${r5.tierCounts.APEX}`);
+  console.log(`Scenario 6: NEW=${r6.tierCounts.NEW} VERIFIED=${r6.tierCounts.VERIFIED} ELITE=${r6.tierCounts.ELITE} APEX=${r6.tierCounts.APEX}`);
+  console.log(`Scenario 8: NEW=${r8.tierCounts.NEW} VERIFIED=${r8.tierCounts.VERIFIED} ELITE=${r8.tierCounts.ELITE} APEX=${r8.tierCounts.APEX}`);
 }
 
 main();

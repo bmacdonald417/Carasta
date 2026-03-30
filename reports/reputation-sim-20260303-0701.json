@@ -1,0 +1,2556 @@
+{
+  "reports": [
+    {
+      "scenarioId": 1,
+      "scenarioName": "New honest user, small volume",
+      "tierCounts": {
+        "NEW": 2,
+        "VERIFIED": 0,
+        "ELITE": 0,
+        "APEX": 0
+      },
+      "scoreStats": {
+        "min": 150,
+        "median": 150,
+        "p90": 181,
+        "p99": 181,
+        "max": 181
+      },
+      "dailyCapActivations": 0,
+      "takeaways": [],
+      "users": [
+        {
+          "id": "b1",
+          "score": 150,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "s1",
+          "score": 181,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        }
+      ]
+    },
+    {
+      "scenarioId": 2,
+      "scenarioName": "Serious collector",
+      "tierCounts": {
+        "NEW": 2,
+        "VERIFIED": 0,
+        "ELITE": 0,
+        "APEX": 0
+      },
+      "scoreStats": {
+        "min": 340,
+        "median": 340,
+        "p90": 381,
+        "p99": 381,
+        "max": 381
+      },
+      "dailyCapActivations": 0,
+      "takeaways": [],
+      "users": [
+        {
+          "id": "b2",
+          "score": 340,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 10,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "s2",
+          "score": 381,
+          "tier": "NEW",
+          "sales": 10,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        }
+      ]
+    },
+    {
+      "scenarioId": 3,
+      "scenarioName": "Power seller",
+      "tierCounts": {
+        "NEW": 31,
+        "VERIFIED": 0,
+        "ELITE": 0,
+        "APEX": 0
+      },
+      "scoreStats": {
+        "min": 53,
+        "median": 58,
+        "p90": 58,
+        "p99": 1328,
+        "max": 1328
+      },
+      "dailyCapActivations": 0,
+      "takeaways": [],
+      "users": [
+        {
+          "id": "s3",
+          "score": 1328,
+          "tier": "NEW",
+          "sales": 30,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-0",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-1",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-2",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-3",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-4",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-5",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-6",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-7",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-8",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-9",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-10",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-11",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-12",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-13",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-14",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-15",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-16",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-17",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-18",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-19",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-20",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-21",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-22",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-23",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-24",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-25",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-26",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-27",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-28",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b3-29",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        }
+      ]
+    },
+    {
+      "scenarioId": 4,
+      "scenarioName": "Dispute stress test",
+      "tierCounts": {
+        "NEW": 13,
+        "VERIFIED": 0,
+        "ELITE": 0,
+        "APEX": 0
+      },
+      "scoreStats": {
+        "min": 53,
+        "median": 53,
+        "p90": 58,
+        "p99": 417,
+        "max": 417
+      },
+      "dailyCapActivations": 0,
+      "takeaways": [],
+      "users": [
+        {
+          "id": "u4",
+          "score": 417,
+          "tier": "NEW",
+          "sales": 12,
+          "purchases": 0,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-0",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-1",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-2",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-3",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-4",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-5",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-6",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-7",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-8",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-9",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-10",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b4-11",
+          "score": 58,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        }
+      ],
+      "penaltyImpact": {
+        "before": 617,
+        "after": 417,
+        "delta": -200
+      }
+    },
+    {
+      "scenarioId": 5,
+      "scenarioName": "Sybil / new-account farming",
+      "tierCounts": {
+        "NEW": 10,
+        "VERIFIED": 0,
+        "ELITE": 0,
+        "APEX": 0
+      },
+      "scoreStats": {
+        "min": 19,
+        "median": 20,
+        "p90": 21,
+        "p99": 21,
+        "max": 21
+      },
+      "dailyCapActivations": 0,
+      "takeaways": [],
+      "users": [
+        {
+          "id": "sybil-0",
+          "score": 21,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-1",
+          "score": 20,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-2",
+          "score": 21,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-3",
+          "score": 21,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-4",
+          "score": 21,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-5",
+          "score": 20,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-6",
+          "score": 19,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-7",
+          "score": 20,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-8",
+          "score": 20,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "sybil-9",
+          "score": 20,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 14,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        }
+      ],
+      "gamingAttemptSuccess": {
+        "reachedVerified": 0,
+        "reachedElite": 0,
+        "total": 10
+      }
+    },
+    {
+      "scenarioId": 6,
+      "scenarioName": "Pair-repeat wash trading",
+      "tierCounts": {
+        "NEW": 2,
+        "VERIFIED": 0,
+        "ELITE": 0,
+        "APEX": 0
+      },
+      "scoreStats": {
+        "min": 229,
+        "median": 229,
+        "p90": 235,
+        "p99": 235,
+        "max": 235
+      },
+      "dailyCapActivations": 0,
+      "takeaways": [],
+      "users": [
+        {
+          "id": "b6",
+          "score": 229,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 20,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "s6",
+          "score": 235,
+          "tier": "NEW",
+          "sales": 20,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        }
+      ],
+      "pairRepeatDampening": "Pair dampening applied: seller score=235, buyer score=229. Transactions 3-5 at 50%, >5 at 10%."
+    },
+    {
+      "scenarioId": 7,
+      "scenarioName": "High-dollar outlier",
+      "tierCounts": {
+        "NEW": 3,
+        "VERIFIED": 0,
+        "ELITE": 0,
+        "APEX": 0
+      },
+      "scoreStats": {
+        "min": 53,
+        "median": 53,
+        "p90": 121,
+        "p99": 121,
+        "max": 121
+      },
+      "dailyCapActivations": 0,
+      "takeaways": [],
+      "users": [
+        {
+          "id": "s7",
+          "score": 121,
+          "tier": "NEW",
+          "sales": 2,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b7-1",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "b7-2",
+          "score": 53,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        }
+      ]
+    },
+    {
+      "scenarioId": 8,
+      "scenarioName": "Mixed realistic marketplace",
+      "tierCounts": {
+        "NEW": 200,
+        "VERIFIED": 0,
+        "ELITE": 0,
+        "APEX": 0
+      },
+      "scoreStats": {
+        "min": 0,
+        "median": 400,
+        "p90": 633,
+        "p99": 772,
+        "max": 812
+      },
+      "dailyCapActivations": 0,
+      "takeaways": [],
+      "users": [
+        {
+          "id": "u8-0",
+          "score": 349,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-1",
+          "score": 536,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-2",
+          "score": 459,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-3",
+          "score": 442,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-4",
+          "score": 793,
+          "tier": "NEW",
+          "sales": 14,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-5",
+          "score": 594,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-6",
+          "score": 763,
+          "tier": "NEW",
+          "sales": 12,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-7",
+          "score": 558,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-8",
+          "score": 213,
+          "tier": "NEW",
+          "sales": 2,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-9",
+          "score": 443,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-10",
+          "score": 605,
+          "tier": "NEW",
+          "sales": 10,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-11",
+          "score": 455,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-12",
+          "score": 278,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-13",
+          "score": 546,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-14",
+          "score": 663,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 9,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-15",
+          "score": 428,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-16",
+          "score": 611,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-17",
+          "score": 467,
+          "tier": "NEW",
+          "sales": 2,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-18",
+          "score": 546,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-19",
+          "score": 500,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-20",
+          "score": 551,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-21",
+          "score": 510,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-22",
+          "score": 662,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-23",
+          "score": 366,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-24",
+          "score": 544,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-25",
+          "score": 575,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-26",
+          "score": 684,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-27",
+          "score": 420,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-28",
+          "score": 563,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-29",
+          "score": 566,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-30",
+          "score": 695,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-31",
+          "score": 552,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-32",
+          "score": 665,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-33",
+          "score": 394,
+          "tier": "NEW",
+          "sales": 2,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-34",
+          "score": 633,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 9,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-35",
+          "score": 574,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-36",
+          "score": 432,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-37",
+          "score": 589,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-38",
+          "score": 400,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-39",
+          "score": 370,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 4,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-40",
+          "score": 333,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-41",
+          "score": 480,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-42",
+          "score": 288,
+          "tier": "NEW",
+          "sales": 2,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-43",
+          "score": 628,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-44",
+          "score": 306,
+          "tier": "NEW",
+          "sales": 2,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-45",
+          "score": 686,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-46",
+          "score": 681,
+          "tier": "NEW",
+          "sales": 12,
+          "purchases": 2,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-47",
+          "score": 584,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-48",
+          "score": 508,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-49",
+          "score": 363,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-50",
+          "score": 587,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-51",
+          "score": 451,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 3,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-52",
+          "score": 317,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-53",
+          "score": 517,
+          "tier": "NEW",
+          "sales": 10,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-54",
+          "score": 491,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-55",
+          "score": 411,
+          "tier": "NEW",
+          "sales": 1,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-56",
+          "score": 251,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-57",
+          "score": 641,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-58",
+          "score": 772,
+          "tier": "NEW",
+          "sales": 11,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-59",
+          "score": 453,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-60",
+          "score": 553,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-61",
+          "score": 562,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-62",
+          "score": 563,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-63",
+          "score": 730,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-64",
+          "score": 511,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-65",
+          "score": 660,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 10,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-66",
+          "score": 549,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-67",
+          "score": 610,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-68",
+          "score": 588,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 5,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-69",
+          "score": 628,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-70",
+          "score": 563,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-71",
+          "score": 644,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-72",
+          "score": 456,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-73",
+          "score": 219,
+          "tier": "NEW",
+          "sales": 1,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-74",
+          "score": 442,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-75",
+          "score": 445,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-76",
+          "score": 279,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-77",
+          "score": 402,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-78",
+          "score": 633,
+          "tier": "NEW",
+          "sales": 10,
+          "purchases": 5,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-79",
+          "score": 405,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-80",
+          "score": 452,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-81",
+          "score": 611,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-82",
+          "score": 682,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-83",
+          "score": 632,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 5,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-84",
+          "score": 584,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-85",
+          "score": 677,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-86",
+          "score": 541,
+          "tier": "NEW",
+          "sales": 8,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-87",
+          "score": 467,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-88",
+          "score": 503,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-89",
+          "score": 468,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-90",
+          "score": 523,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-91",
+          "score": 534,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-92",
+          "score": 671,
+          "tier": "NEW",
+          "sales": 11,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-93",
+          "score": 430,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-94",
+          "score": 728,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 9,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-95",
+          "score": 531,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-96",
+          "score": 586,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 3,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-97",
+          "score": 508,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-98",
+          "score": 458,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 1,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-99",
+          "score": 518,
+          "tier": "NEW",
+          "sales": 3,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-100",
+          "score": 461,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-101",
+          "score": 313,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-102",
+          "score": 629,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-103",
+          "score": 627,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-104",
+          "score": 487,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-105",
+          "score": 326,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-106",
+          "score": 363,
+          "tier": "NEW",
+          "sales": 2,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-107",
+          "score": 392,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-108",
+          "score": 812,
+          "tier": "NEW",
+          "sales": 9,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-109",
+          "score": 571,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-110",
+          "score": 406,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-111",
+          "score": 541,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 6,
+          "disputesLost": 1,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-112",
+          "score": 590,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-113",
+          "score": 533,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-114",
+          "score": 356,
+          "tier": "NEW",
+          "sales": 4,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-115",
+          "score": 584,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-116",
+          "score": 514,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-117",
+          "score": 409,
+          "tier": "NEW",
+          "sales": 7,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-118",
+          "score": 507,
+          "tier": "NEW",
+          "sales": 5,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-119",
+          "score": 536,
+          "tier": "NEW",
+          "sales": 6,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-120",
+          "score": 256,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-121",
+          "score": 257,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-122",
+          "score": 292,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-123",
+          "score": 235,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-124",
+          "score": 166,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-125",
+          "score": 257,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-126",
+          "score": 262,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-127",
+          "score": 353,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-128",
+          "score": 112,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-129",
+          "score": 161,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-130",
+          "score": 209,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-131",
+          "score": 300,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-132",
+          "score": 343,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-133",
+          "score": 104,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-134",
+          "score": 265,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-135",
+          "score": 110,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-136",
+          "score": 166,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-137",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-138",
+          "score": 336,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-139",
+          "score": 214,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-140",
+          "score": 377,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-141",
+          "score": 158,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 3,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-142",
+          "score": 215,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-143",
+          "score": 217,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-144",
+          "score": 108,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-145",
+          "score": 305,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-146",
+          "score": 107,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 2,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-147",
+          "score": 312,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-148",
+          "score": 256,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-149",
+          "score": 300,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-150",
+          "score": 205,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-151",
+          "score": 394,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 8,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-152",
+          "score": 242,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-153",
+          "score": 293,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-154",
+          "score": 351,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-155",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-156",
+          "score": 187,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 4,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-157",
+          "score": 288,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 6,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-158",
+          "score": 353,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 7,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-159",
+          "score": 260,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 5,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-160",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-161",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-162",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-163",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-164",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-165",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-166",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-167",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-168",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-169",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-170",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-171",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-172",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-173",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-174",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-175",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-176",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-177",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-178",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-179",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-180",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-181",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-182",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-183",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-184",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-185",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-186",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-187",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-188",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-189",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-190",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-191",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-192",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-193",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-194",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-195",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-196",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-197",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-198",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        },
+        {
+          "id": "u8-199",
+          "score": 0,
+          "tier": "NEW",
+          "sales": 0,
+          "purchases": 0,
+          "disputesLost": 0,
+          "uniqueCounterparties": 0
+        }
+      ],
+      "avgPointsPerTransactionByPriceBand": {
+        "1k-10k": 47.97,
+        "10k-50k": 48.55,
+        "50k-200k": 49.04
+      }
+    }
+  ],
+  "timestamp": "2026-03-03T12:01:18.757Z"
+}

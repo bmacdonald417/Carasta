@@ -118,48 +118,57 @@ export function computeConditionQuality(auction: AuctionForCondition): number {
 }
 
 /**
- * TIER THRESHOLDS (recalibrated for Scenario 8 healthy distribution)
+ * TIER THRESHOLDS (early-stage marketplace: ~10 completed sales/month)
  *
- * VERIFIED: Achievable in 2-8 tx over 30-90 days
- *   - score >= 150, total >= 2, ucp >= 2, age >= 14
+ * VERIFIED: 30-90 days, 2-3 legit tx, 2+ unique counterparties
+ *   - score >= 200, total >= 2, ucp >= 2, age >= 21, disputeRate <= 0.10
  *
- * ELITE: Sustained behavior, 3-10% of active marketplace
- *   - score >= 320, total >= 12, ucp >= 6, age >= 59 (60-day sim), disputeRate < 0.03
+ * ELITE: 6-12 months, very active users
+ *   - score >= 550, total >= 8, ucp >= 5, age >= 120, disputeRate < 0.03
  *
- * APEX: Rare, 0-2% (0% acceptable at 60-day sim; requires 120+ days)
- *   - score >= 600, total >= 30, ucp >= 12, age >= 120, disputeRate < 0.02
+ * APEX: Rare, 12+ months, sustained activity + excellent behavior
+ *   - score >= 800, total >= 18, ucp >= 10, age >= 240, disputeRate < 0.02
  */
 export function determineTier(
   user: UserForTier,
   asOfDate: Date = new Date()
 ): CollectorTier {
-  const total = user.completedSalesCount + user.completedPurchasesCount;
-  const disputeRate = total > 0 ? user.disputesLostCount / total : 0;
+  const totalCompletedTx = user.completedSalesCount + user.completedPurchasesCount;
   const ucp = user.uniqueCounterpartyCount ?? 0;
   const accountAgeDays =
     (asOfDate.getTime() - user.createdAt.getTime()) / (24 * 60 * 60 * 1000);
 
+  if (totalCompletedTx === 0) return "NEW";
+
+  const disputeRate =
+    totalCompletedTx > 0
+      ? user.disputesLostCount / totalCompletedTx
+      : 0;
+  const disputeRateVerification =
+    user.disputesLostCount / Math.max(totalCompletedTx, 1);
+
   if (
-    user.reputationScore >= 600 &&
-    total >= 30 &&
+    user.reputationScore >= 800 &&
+    totalCompletedTx >= 18 &&
     disputeRate < 0.02 &&
-    ucp >= 12 &&
-    accountAgeDays >= 120
+    ucp >= 10 &&
+    accountAgeDays >= 240
   )
     return "APEX";
   if (
-    user.reputationScore >= 320 &&
-    total >= 12 &&
+    user.reputationScore >= 550 &&
+    totalCompletedTx >= 8 &&
     disputeRate < 0.03 &&
-    ucp >= 6 &&
-    accountAgeDays >= 59
+    ucp >= 5 &&
+    accountAgeDays >= 120
   )
     return "ELITE";
   if (
-    user.reputationScore >= 150 &&
-    total >= 2 &&
+    user.reputationScore >= 200 &&
+    totalCompletedTx >= 2 &&
     ucp >= 2 &&
-    accountAgeDays >= 14
+    accountAgeDays >= 21 &&
+    disputeRateVerification <= 0.1
   )
     return "VERIFIED";
   return "NEW";
