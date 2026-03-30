@@ -21,7 +21,8 @@ const UTM_BY_VARIANT: Record<Exclude<MarketingLinkVariant, "default">, string> =
 export function buildTrackedAuctionUrl(
   origin: string,
   auctionId: string,
-  variant: MarketingLinkVariant
+  variant: MarketingLinkVariant,
+  utmCampaignOverride?: string | null
 ): string {
   const path = `/auctions/${auctionId}`;
   const base = `${origin.replace(/\/$/, "")}${path}`;
@@ -32,10 +33,13 @@ export function buildTrackedAuctionUrl(
   const utmMedium =
     variant === "email" ? "email" : variant === "carmunity" ? "community" : "social";
 
+  const utmCampaign =
+    utmCampaignOverride?.trim() || `listing_${auctionId}`;
+
   const params = new URLSearchParams({
     utm_source: utmSource,
     utm_medium: utmMedium,
-    utm_campaign: `listing_${auctionId}`,
+    utm_campaign: utmCampaign,
   });
 
   return `${base}?${params.toString()}`;
@@ -45,15 +49,17 @@ export type MarketingLinkKit = Record<MarketingLinkVariant, string>;
 
 export function buildMarketingLinkKit(
   auctionId: string,
-  origin?: string
+  origin?: string,
+  utmCampaignOverride?: string | null
 ): MarketingLinkKit {
   const o = origin ?? getPublicSiteOrigin();
+  const c = utmCampaignOverride ?? null;
   return {
     default: buildTrackedAuctionUrl(o, auctionId, "default"),
-    instagram: buildTrackedAuctionUrl(o, auctionId, "instagram"),
-    facebook: buildTrackedAuctionUrl(o, auctionId, "facebook"),
-    linkedin: buildTrackedAuctionUrl(o, auctionId, "linkedin"),
-    email: buildTrackedAuctionUrl(o, auctionId, "email"),
-    carmunity: buildTrackedAuctionUrl(o, auctionId, "carmunity"),
+    instagram: buildTrackedAuctionUrl(o, auctionId, "instagram", c),
+    facebook: buildTrackedAuctionUrl(o, auctionId, "facebook", c),
+    linkedin: buildTrackedAuctionUrl(o, auctionId, "linkedin", c),
+    email: buildTrackedAuctionUrl(o, auctionId, "email", c),
+    carmunity: buildTrackedAuctionUrl(o, auctionId, "carmunity", c),
   };
 }

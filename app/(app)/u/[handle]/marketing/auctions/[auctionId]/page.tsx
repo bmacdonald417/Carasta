@@ -25,8 +25,12 @@ import {
 } from "@/lib/marketing/marketing-display";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 import { buildMarketingLinkKit } from "@/lib/marketing/build-marketing-links";
-import { generateSellerShareCopy } from "@/lib/marketing/generate-share-copy";
 import { generateCarmunityDraft } from "@/lib/marketing/generate-carmunity-draft";
+import { getMarketingPresetsForUser } from "@/lib/marketing/get-seller-marketing-presets";
+import {
+  buildPresetBundlesForAuction,
+  buildSharePromoteBundle,
+} from "@/lib/marketing/build-share-promote-bundle";
 import { ShareAndPromotePanel } from "@/components/marketing/share-and-promote-panel";
 import { CarmunityPromoPanel } from "@/components/marketing/carmunity-promo-panel";
 import { getAuctionCampaignsForSeller } from "@/lib/marketing/get-seller-campaigns";
@@ -63,9 +67,10 @@ export default async function MarketingAuctionDetailPage({
   const isOwn = (session?.user as any)?.id === user.id;
   if (!isOwn) notFound();
 
-  const [detail, auctionCampaigns] = await Promise.all([
+  const [detail, auctionCampaigns, presets] = await Promise.all([
     getSellerMarketingAuctionDetail(auctionId, user.id),
     getAuctionCampaignsForSeller(user.id, auctionId),
+    getMarketingPresetsForUser(user.id),
   ]);
   if (!detail) notFound();
 
@@ -88,29 +93,31 @@ export default async function MarketingAuctionDetailPage({
 
   const origin = getPublicSiteOrigin();
   const linkKit = buildMarketingLinkKit(auction.id, origin);
-  const shareCopy = generateSellerShareCopy(
-    {
-      title: auction.title,
-      year: auction.year,
-      make: auction.make,
-      model: auction.model,
-      trim: auction.trim,
-      mileage: auction.mileage,
-      status: auction.status,
-      endAt: auction.endAt,
-      highBidCents: auction.highBidCents,
-    },
-    linkKit
-  );
 
-  const linkRows = [
-    { label: "Public listing", url: linkKit.default },
-    { label: "Instagram", url: linkKit.instagram },
-    { label: "Facebook", url: linkKit.facebook },
-    { label: "LinkedIn", url: linkKit.linkedin },
-    { label: "Email", url: linkKit.email },
-    { label: "Carmunity", url: linkKit.carmunity },
-  ];
+  const shareAuctionInput = {
+    title: auction.title,
+    year: auction.year,
+    make: auction.make,
+    model: auction.model,
+    trim: auction.trim,
+    mileage: auction.mileage,
+    status: auction.status,
+    endAt: auction.endAt,
+    highBidCents: auction.highBidCents,
+  };
+
+  const { linkRows: defaultLinkRows, copyPack: defaultCopyPack } =
+    buildSharePromoteBundle(auction.id, shareAuctionInput, origin, null);
+  const defaultBundle = {
+    linkRows: defaultLinkRows,
+    copyPack: defaultCopyPack,
+  };
+  const presetBundles = buildPresetBundlesForAuction(
+    auction.id,
+    shareAuctionInput,
+    origin,
+    presets
+  );
 
   const carmunityDraft = generateCarmunityDraft({
     auction: {
@@ -231,7 +238,11 @@ export default async function MarketingAuctionDetailPage({
       </div>
 
       <div className="mt-10">
-        <ShareAndPromotePanel linkRows={linkRows} copyPack={shareCopy} />
+        <ShareAndPromotePanel
+          defaultBundle={defaultBundle}
+          presetBundles={presetBundles}
+          managePresetsHref={`/u/${user.handle}/marketing/presets`}
+        />
       </div>
 
       <div className="mt-10">

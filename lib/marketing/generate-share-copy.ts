@@ -11,7 +11,7 @@ export type SellerShareCopyPack = {
   keywordsLine: string;
 };
 
-type AuctionCopyInput = {
+export type SellerShareAuctionInput = {
   title: string;
   year: number;
   make: string;
@@ -23,27 +23,36 @@ type AuctionCopyInput = {
   highBidCents: number;
 };
 
-function vehicleLine(a: AuctionCopyInput): string {
+function vehicleLine(a: SellerShareAuctionInput): string {
   const t = a.trim?.trim();
   return [a.year, a.make, a.model, t].filter(Boolean).join(" ");
 }
 
-function formatEnd(a: AuctionCopyInput): string {
+function formatEnd(a: SellerShareAuctionInput): string {
   return a.endAt.toLocaleString(undefined, {
     dateStyle: "medium",
     timeStyle: "short",
   });
 }
 
+export type SellerShareCopyLinkOptions = {
+  /** URL in short / long / ending-soon captions (defaults to `links.default`). */
+  captionBaseUrl?: string;
+  /** URL in the email body block (defaults to `links.email`). */
+  emailBodyUrl?: string;
+};
+
 /**
  * Deterministic seller-safe copy. Uses only passed auction fields + URLs.
  */
 export function generateSellerShareCopy(
-  auction: AuctionCopyInput,
-  links: MarketingLinkKit
+  auction: SellerShareAuctionInput,
+  links: MarketingLinkKit,
+  options?: SellerShareCopyLinkOptions
 ): SellerShareCopyPack {
   const vehicle = vehicleLine(auction);
-  const primaryUrl = links.default;
+  const primaryUrl = options?.captionBaseUrl ?? links.default;
+  const emailLinkUrl = options?.emailBodyUrl ?? links.email;
   const mileageBit =
     auction.mileage != null
       ? `Showing ${auction.mileage.toLocaleString()} miles. `
@@ -71,7 +80,7 @@ I’m listing ${vehicle} on Carasta — a curated platform for enthusiast cars.
 ${mileageBit.trim()}${bidBit.trim()}
 
 View the auction here:
-${links.email}
+${emailLinkUrl}
 
 Ends: ${formatEnd(auction)}
 

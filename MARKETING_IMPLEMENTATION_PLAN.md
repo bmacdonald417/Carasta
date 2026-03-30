@@ -448,7 +448,25 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_8_NOTES.md`.
 
-**Next recommended step (PR 9):** Saved **UTM presets**, ingest **throttle**/sampling, optional **`Post.auctionId`** FK — one slice per PR.
+**Next recommended step (PR 9):** Implemented as Phase 9 (below).
+
+---
+
+## 12j. Phase 9 — Saved marketing presets (implemented)
+
+**Goal:** Seller-only **saved presets** for Share & Promote: reusable **UTM campaign** label, **primary channel** (caption URL), **caption variant** emphasis, **hashtags/keywords** inclusion; CRUD at `/u/[handle]/marketing/presets`; auction drill-down **applies** presets without automation or new external APIs.
+
+**Implemented:**
+
+- **Schema:** `MarketingPreset` (+ `User.marketingPresets`); migration **`20260331120000_marketing_preset`**.
+- **Validation / reads:** `lib/validations/marketing-preset.ts`, `lib/marketing/get-seller-marketing-presets.ts`.
+- **Actions:** `app/(app)/u/[handle]/marketing/presets/actions.ts` — create / update / delete; single **default** per seller.
+- **Bundle helpers:** `lib/marketing/build-share-promote-bundle.ts` (uses `build-marketing-links` + `generate-share-copy`); optional `utmCampaignOverride` on link kit builder.
+- **UI:** preset list / new / edit + `marketing-preset-form.tsx`, `marketing-preset-delete-button.tsx`; marketing overview **Manage presets**; `ShareAndPromotePanel` preset selector + **Manage presets** on auction marketing page.
+
+**Notes:** `MARKETING_PHASE_9_NOTES.md`.
+
+**Next recommended step (PR 10):** **Ingest throttle / sampling** for marketing track endpoint (or edge limits) + retention guidance; *or* optional **`Post.auctionId`** if structured Carmunity linkage is prioritized — **one slice per PR**.
 
 ---
 
@@ -463,4 +481,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 8; see §12b–§12i.*
+*Plan updated through Marketing Phase 9; see §12b–§12j.*

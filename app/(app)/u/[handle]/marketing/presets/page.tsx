@@ -1,0 +1,94 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
+import { getMarketingPresetsForUser } from "@/lib/marketing/get-seller-marketing-presets";
+import { Button } from "@/components/ui/button";
+import { MarketingPresetDeleteButton } from "@/components/marketing/marketing-preset-delete-button";
+
+export default async function MarketingPresetsPage({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}) {
+  if (!isMarketingEnabled()) notFound();
+
+  const { handle } = await params;
+  const session = await getSession();
+  const user = await prisma.user.findUnique({
+    where: { handle: handle.toLowerCase() },
+  });
+  if (!user) notFound();
+  if ((session?.user as { id?: string } | null)?.id !== user.id) notFound();
+
+  const presets = await getMarketingPresetsForUser(user.id);
+
+  return (
+    <div className="carasta-container max-w-3xl py-8">
+      <Link
+        href={`/u/${user.handle}/marketing`}
+        className="mb-4 inline-block text-sm text-muted-foreground hover:text-foreground"
+      >
+        ← Marketing
+      </Link>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-neutral-100">
+            Marketing presets
+          </h1>
+          <p className="mt-1 text-sm text-neutral-400">
+            Reusable UTM campaign labels and copy options for Share &amp; Promote.
+            Nothing posts automatically.
+          </p>
+        </div>
+        <Button asChild variant="performance" size="sm">
+          <Link href={`/u/${user.handle}/marketing/presets/new`}>
+            New preset
+          </Link>
+        </Button>
+      </div>
+
+      {presets.length === 0 ? (
+        <div className="mt-10 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-6 py-14 text-center">
+          <p className="font-medium text-neutral-200">No presets yet</p>
+          <p className="mt-2 text-sm text-neutral-500">
+            Create one to reuse the same campaign tag and caption preferences
+            across listings.
+          </p>
+          <Button className="mt-6" asChild variant="secondary">
+            <Link href={`/u/${user.handle}/marketing/presets/new`}>
+              Create preset
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <ul className="mt-8 space-y-3">
+          {presets.map((p) => (
+            <li
+              key={p.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-4"
+            >
+              <div>
+                <p className="font-medium text-neutral-100">{p.name}</p>
+                <p className="mt-1 text-xs text-neutral-500">
+                  {p.source} · {p.medium} · {p.copyVariant.replace("_", " ")}
+                  {p.campaignLabel ? ` · campaign: ${p.campaignLabel}` : ""}
+                  {p.isDefault ? " · default" : ""}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/u/${user.handle}/marketing/presets/${p.id}/edit`}>
+                    Edit
+                  </Link>
+                </Button>
+                <MarketingPresetDeleteButton handle={user.handle} presetId={p.id} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

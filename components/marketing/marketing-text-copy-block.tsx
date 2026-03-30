@@ -7,14 +7,21 @@ export function MarketingTextCopyBlock({
   description,
   body,
   copyLabel,
+  highlight,
 }: {
   title: string;
   description?: string;
   body: string;
   copyLabel: string;
+  /** Emphasize block when a saved preset names this copy variant. */
+  highlight?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+    <div
+      className={`rounded-xl border border-white/10 bg-black/20 p-4 ${
+        highlight ? "ring-2 ring-[#ff3b5c]/50 ring-offset-2 ring-offset-[#0a0a0f]" : ""
+      }`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h4 className="font-medium text-neutral-200">{title}</h4>

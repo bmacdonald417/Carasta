@@ -118,6 +118,23 @@ export default async function MarketingPage({
         ))}
       </div>
 
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4">
+        <div>
+          <p className="font-medium text-neutral-200">
+            Share &amp; Promote presets
+          </p>
+          <p className="mt-0.5 text-sm text-neutral-500">
+            Save UTM campaign labels and copy options to reuse on listing
+            marketing pages.
+          </p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/u/${user.handle}/marketing/presets`}>
+            Manage presets
+          </Link>
+        </Button>
+      </div>
+
       <div className="mt-10">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>

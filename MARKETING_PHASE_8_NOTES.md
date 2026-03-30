@@ -51,9 +51,12 @@ Instrumentation uses **`sendMarketingTrack`** (`sendBeacon` / `fetch keepalive`)
 
 ---
 
-## PR 9 ideas
+## PR 9 / Phase 9
 
-- Saved **UTM presets** (manual).
+**Implemented:** Saved **marketing presets** (manual Share & Promote defaults). See **`MARKETING_PHASE_9_NOTES.md`**.
+
+## PR 10 ideas
+
 - **Ingest throttle** / sampling (edge or app).
 - Optional **`Post.auctionId`** or structured promo linkage.
 - Optional **BID_CLICK** rollup column if daily aggregates need parity with views/shares.
