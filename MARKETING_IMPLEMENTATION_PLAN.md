@@ -503,7 +503,22 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_11_NOTES.md`.
 
-**Next recommended step (PR 12):** **Edge / WAF rate limits** (or in-app IP ceiling) for `POST /api/marketing/track`, **or** seller **marketing digest / notifications** — **one slice per PR**.
+**Next recommended step (PR 12):** Implemented as Phase 12 (below).
+
+---
+
+## 12m. Phase 12 — Application-level rate limiting for marketing track (implemented)
+
+**Goal:** In-process **burst guard** on **`POST /api/marketing/track`** (IP + optional auth identity, **event-aware** windows), **soft success** when limited so clients stay calm; **no** Redis; **no** change to dedupe semantics inside **`recordTrafficEvent`**.
+
+**Implemented:**
+
+- **`lib/marketing/marketing-track-rate-limit.ts`** — **10s** fixed windows; per-key caps: **VIEW 45**, **SHARE_CLICK 18**, **BID_CLICK 18**; key = `clientIp + userId + window`; IP from **`X-Forwarded-For`** (first hop) or **`X-Real-IP`**; map pruning when large.
+- **`app/api/marketing/track/route.ts`** — after Zod + JWT, before auction lookup / insert; if limited → **`{ ok: true }`** HTTP **200** (same shape as success, no write).
+
+**Notes:** `MARKETING_PHASE_12_NOTES.md`.
+
+**Next recommended step (PR 13):** **Edge / WAF** limits + runbook for ops, **or** seller **marketing digest / notifications** using `Notification` — **one slice per PR**.
 
 ---
 
@@ -518,4 +533,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 11; see §12b–§12l.*
+*Plan updated through Marketing Phase 12; see §12b–§12m.*

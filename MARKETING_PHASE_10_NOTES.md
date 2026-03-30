@@ -88,6 +88,10 @@ Allowed keys depend on **`eventType`**:
 
 **Implemented:** Optional **`Post.auctionId`** + seller linked-promo list. See **`MARKETING_PHASE_11_NOTES.md`**.
 
-## PR 12 (next best step)
+## PR 12 / Phase 12
 
-**Edge / WAF rate limiting** (or app-layer) for **`POST /api/marketing/track`**, **or** seller **marketing notifications** — one slice per PR.
+**Implemented:** App-layer **marketing track** rate limiter. See **`MARKETING_PHASE_12_NOTES.md`**.
+
+## PR 13 (next best step)
+
+**Edge / WAF** + runbook, **or** seller **marketing notifications**.

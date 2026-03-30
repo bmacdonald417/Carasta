@@ -4,6 +4,10 @@ import { MarketingTrafficEventType } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { recordTrafficEvent } from "@/lib/marketing/track-marketing-event-server";
+import {
+  checkMarketingTrackRateLimit,
+  getMarketingTrackClientIp,
+} from "@/lib/marketing/marketing-track-rate-limit";
 import { marketingTrackBodySchema } from "@/lib/validations/marketing";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +37,16 @@ export async function POST(req: NextRequest) {
       secret: process.env.NEXTAUTH_SECRET,
     });
     const userId = token?.sub ?? null;
+
+    const clientIp = getMarketingTrackClientIp(req);
+    const rl = checkMarketingTrackRateLimit(
+      clientIp,
+      userId,
+      body.eventType
+    );
+    if (!rl.allowed) {
+      return NextResponse.json({ ok: true });
+    }
 
     const auction = await prisma.auction.findUnique({
       where: { id: body.auctionId },
