@@ -102,6 +102,10 @@ Same logic as production; **`MARKETING_DIGEST_FORCE=1`** only affects the script
 
 **Observability:** **`MARKETING_PHASE_17_NOTES.md`**, **`lib/marketing/marketing-track-observability.ts`**.
 
-## PR 18 (next best step)
+## PR 18 (implemented)
 
-**TrafficEvent retention / privacy doc**, seller marketing polish, or optional **protected admin** counter snapshot — one PR.
+**Admin observability JSON:** **`MARKETING_PHASE_18_NOTES.md`**.
+
+## PR 19 (next best step)
+
+**TrafficEvent retention / privacy doc** or seller marketing polish — one PR.

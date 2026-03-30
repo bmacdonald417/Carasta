@@ -27,6 +27,10 @@
 
 **Observability:** **`lib/marketing/marketing-track-observability.ts`** + **`app/api/marketing/track/route.ts`**. See **`MARKETING_PHASE_17_NOTES.md`**.
 
-## PR 18 (suggested next step)
+## PR 18 (implemented)
 
-**TrafficEvent retention / privacy operator doc**, seller marketing polish, or optional **protected admin** JSON snapshot of track counters — **one PR**.
+**Admin JSON snapshot:** **`MARKETING_PHASE_18_NOTES.md`**.
+
+## PR 19 (suggested next step)
+
+**TrafficEvent retention / privacy doc** or seller marketing polish — **one PR**.

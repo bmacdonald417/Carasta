@@ -147,6 +147,7 @@ Adjust **N** using §7.
 | **`TrafficEvent` insert rate** (DB/metrics) | Spikes after marketing pushes or abuse |
 | **AuctionAnalytics drift** | If inserts lag rollups (operational; see Phase 6 notes) |
 | **App logs** prefix **`[marketing-track]`** | Phase 17 structured outcomes (anomalies by default); see **`MARKETING_PHASE_17_NOTES.md`** |
+| **Admin JSON** **`GET /api/admin/marketing-track-observability`** | Phase 18 per-instance counter snapshot (ADMIN or bearer secret); see **`MARKETING_PHASE_18_NOTES.md`** |
 
 ### Abuse / noise indicators
 
@@ -199,3 +200,4 @@ Adjust **N** using §7.
 - `MARKETING_PHASE_12_NOTES.md` — in-app rate limiter
 - `MARKETING_IMPLEMENTATION_PLAN.md` — §12q Phase 16, §12r Phase 17
 - `MARKETING_PHASE_17_NOTES.md` — in-app observability
+- `MARKETING_PHASE_18_NOTES.md` — protected admin JSON snapshot

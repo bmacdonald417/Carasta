@@ -33,7 +33,9 @@
 |----------|--------|
 | **`MARKETING_TRACK_OBSERVABILITY_VERBOSE=1`** (or `true` / `yes`) | Emit **`console.info`** for **every** outcome (including inserts, dedupe, rate limit). **High volume** — use staging or short windows. |
 
-If unset, hot paths stay **counter-only** for logs; aggregate by reading **`getMarketingTrackObservabilitySnapshot()`** in-process (debugging / future wiring — not exposed as an HTTP route in this PR).
+If unset, hot paths stay **counter-only** for logs.
+
+**HTTP snapshot (Phase 18):** **`GET /api/admin/marketing-track-observability`** returns **`getMarketingTrackObservabilityReport()`** (ADMIN session or optional bearer secret). See **`MARKETING_PHASE_18_NOTES.md`**.
 
 ## Log format
 
@@ -50,6 +52,10 @@ Single line, grep-friendly prefix:
 - **No** IPs, user ids, auction ids, or `visitorKey` in logs (by design).
 - **`insert_failed`** is not distinct from **`server_error`** here (Prisma errors surface as **500** + `server_error`).
 
-## PR 18 (suggested next step)
+## PR 18 (implemented)
 
-**Product or ops slice:** e.g. **seller marketing dashboard refinements**, **TrafficEvent retention / privacy operator doc**, or a **small protected admin read-only** metrics route that returns JSON from **`getMarketingTrackObservabilitySnapshot()`** — **one PR**, still no auction/bid/community core changes.
+**Protected admin JSON:** **`MARKETING_PHASE_18_NOTES.md`**, **`getMarketingTrackObservabilityReport()`**.
+
+## PR 19 (suggested next step)
+
+**TrafficEvent retention / privacy operator doc** or **seller marketing polish** — one PR.

@@ -77,3 +77,7 @@ Production runbook: **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** (complements this 
 ## Observability (Phase 17)
 
 Outcome counters + logs: **`lib/marketing/marketing-track-observability.ts`**, **`MARKETING_PHASE_17_NOTES.md`**.
+
+## Admin snapshot (Phase 18)
+
+**`GET /api/admin/marketing-track-observability`** — **`MARKETING_PHASE_18_NOTES.md`**.

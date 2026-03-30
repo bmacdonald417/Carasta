@@ -600,7 +600,23 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_17_NOTES.md`.
 
-**Next recommended step (PR 18):** **TrafficEvent retention / privacy operator doc**, **seller marketing polish**, or **optional protected admin snapshot** of track counters — **one PR**, no auction/bid/buy-now/community core changes.
+**Next recommended step (PR 18):** Implemented as Phase 18 (below).
+
+---
+
+## 12s. Phase 18 — Protected admin JSON snapshot for marketing track observability (implemented)
+
+**Goal:** **Internal** **`GET`** JSON for **`getMarketingTrackObservabilityReport()`** so ops can inspect **this instance’s** counters without seller UI or public exposure.
+
+**Implemented:**
+
+- **`app/api/admin/marketing-track-observability/route.ts`** — **401** `{ ok: false }` if unauthorized; **200** `{ ok: true, generatedAt, totalRequests, counters, totalsByOutcome, totalsByEventType, totalsByAuthMode, scope }`.
+- **Auth:** NextAuth JWT **`role === ADMIN`**, **or** optional **`MARKETING_TRACK_OBSERVABILITY_SECRET`** (min 16) via **`Authorization: Bearer …`**.
+- **`lib/marketing/marketing-track-observability.ts`** — **`getMarketingTrackObservabilityReport()`** aggregates snapshot keys.
+
+**Notes:** `MARKETING_PHASE_18_NOTES.md`.
+
+**Next recommended step (PR 19):** **TrafficEvent retention / privacy operator doc** or **seller marketing polish** — **one PR**, no auction/bid/buy-now/community core changes.
 
 ---
 
@@ -615,4 +631,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 17; see §12b–§12r.*
+*Plan updated Marketing Phase 18; see §12b–§12s.*

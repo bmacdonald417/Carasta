@@ -9,6 +9,7 @@
  * is the normalized enum string from the validated body only.
  *
  * @see `MARKETING_PHASE_17_NOTES.md`
+ * @see `MARKETING_PHASE_18_NOTES.md` — protected admin JSON snapshot
  */
 
 export type MarketingTrackObserveOutcome =
@@ -92,4 +93,57 @@ export function getMarketingTrackObservabilitySnapshot(): Record<string, number>
     out[k] = counter.get(k) ?? 0;
   }
   return out;
+}
+
+export type MarketingTrackObservabilityReport = {
+  generatedAt: string;
+  /** Sum of all counter values — total track requests seen by this process. */
+  totalRequests: number;
+  /** Raw keys: `outcome|eventType|authMode` (`eventType` `_` when unknown). */
+  counters: Record<string, number>;
+  totalsByOutcome: Record<string, number>;
+  /** Includes `unknown` for rows where event type was not set (e.g. early validation failure). */
+  totalsByEventType: Record<string, number>;
+  totalsByAuthMode: Record<string, number>;
+  scope: {
+    note: string;
+  };
+};
+
+/**
+ * Snapshot plus rolled-up totals for operators (e.g. admin JSON route).
+ * **Per-process only** — same limitations as {@link getMarketingTrackObservabilitySnapshot}.
+ */
+export function getMarketingTrackObservabilityReport(): MarketingTrackObservabilityReport {
+  const counters = getMarketingTrackObservabilitySnapshot();
+  const totalsByOutcome: Record<string, number> = {};
+  const totalsByEventType: Record<string, number> = {};
+  const totalsByAuthMode: Record<string, number> = {};
+  let totalRequests = 0;
+
+  for (const [key, count] of Object.entries(counters)) {
+    totalRequests += count;
+    const parts = key.split("|");
+    const outcome = parts[0] ?? "";
+    const eventType = parts[1] === "_" || !parts[1] ? "unknown" : parts[1];
+    const authMode = parts[2] ?? "unknown";
+    if (outcome) {
+      totalsByOutcome[outcome] = (totalsByOutcome[outcome] ?? 0) + count;
+    }
+    totalsByEventType[eventType] = (totalsByEventType[eventType] ?? 0) + count;
+    totalsByAuthMode[authMode] = (totalsByAuthMode[authMode] ?? 0) + count;
+  }
+
+  return {
+    generatedAt: new Date().toISOString(),
+    totalRequests,
+    counters,
+    totalsByOutcome,
+    totalsByEventType,
+    totalsByAuthMode,
+    scope: {
+      note:
+        "In-memory counters for this Node.js process only; reset on deploy/restart; not aggregated across horizontal instances. Complement with logs and edge/WAF metrics.",
+    },
+  };
 }
