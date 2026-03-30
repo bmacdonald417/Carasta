@@ -118,6 +118,8 @@ model User {
   completedPurchasesCount Int         @default(0)
   disputesLostCount     Int           @default(0)
   uniqueCounterpartyCount Int         @default(0)
+  weeklyMarketingDigestOptIn Boolean @default(false)
+  lastMarketingDigestSentAt DateTime?
 
   trafficEventsAsViewer TrafficEvent[]
   marketingCampaigns    Campaign[]

@@ -94,6 +94,12 @@ export default async function MarketingPage({
             See listing reach and promotion activity from tracked page views and
             shares. Open a listing below for a detailed breakdown.
           </p>
+          <p className="mt-2 text-xs text-neutral-500">
+            Weekly email digest (opt-in):{" "}
+            <Link href="/settings" className="text-[#ff3b5c]/90 hover:underline">
+              Settings → Email
+            </Link>
+          </p>
         </div>
         <Link
           href={`/u/${user.handle}`}

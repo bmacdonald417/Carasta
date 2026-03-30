@@ -65,6 +65,10 @@ JSON string with at least **`title`**, usually:
 
 ---
 
-## PR 14 (next best step)
+## PR 14 / Phase 14
 
-**Edge / WAF** runbook for **`POST /api/marketing/track`**, **or** optional **email digest** (opt-in) summarizing marketing KPIs — **one slice per PR**.
+**Implemented:** Opt-in **weekly marketing digest** + Resend + manual script. See **`MARKETING_PHASE_14_NOTES.md`**.
+
+## PR 15 (next best step)
+
+**Edge / WAF runbook** or **hosted cron** for weekly digest — one slice per PR.

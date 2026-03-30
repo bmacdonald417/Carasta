@@ -535,7 +535,26 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_13_NOTES.md`.
 
-**Next recommended step (PR 14):** **Edge / WAF** limits + short **ops runbook** for **`/api/marketing/track`**, **or** **email digest** (opt-in) for marketing summaries — **one slice per PR**.
+**Next recommended step (PR 14):** Implemented as Phase 14 (below).
+
+---
+
+## 12o. Phase 14 — Weekly marketing email digest (opt-in) (implemented)
+
+**Goal:** **Opt-in** weekly seller digest via **`User.weeklyMarketingDigestOptIn`** + **`lastMarketingDigestSentAt`**; **HTML email** built from existing marketing rows/metrics; **manual** `npm run marketing:send-digest` with **Resend** (`RESEND_API_KEY`, `MARKETING_DIGEST_FROM`); **no** cron, **no** per-event email.
+
+**Implemented:**
+
+- **Schema:** optional digest fields on **`User`**; migration **`20260402120000_user_weekly_marketing_digest`**.
+- **Data:** **`lib/marketing/generate-marketing-digest.ts`** — snapshot (overview, **`MARKETING_*`** alerts, top views / bid clicks / ending soon / low-signal live listings, active campaigns).
+- **Template:** **`lib/marketing/render-marketing-digest-email.ts`** — HTML + plaintext, links to **`/u/[handle]/marketing`** and listing marketing URLs.
+- **Send:** **`lib/email/send-marketing-digest-email.ts`** — Resend HTTP API (`fetch` only).
+- **Script:** **`scripts/send-marketing-digest.ts`** — `--dry-run`; send requires **`MARKETING_DIGEST_SEND_ENABLED=true`**; **~6.5 day** min spacing (**`MARKETING_DIGEST_FORCE=1`** overrides).
+- **UI:** **Settings → Email** checkbox; marketing overview links to Settings.
+
+**Notes:** `MARKETING_PHASE_14_NOTES.md`.
+
+**Next recommended step (PR 15):** **Edge / WAF runbook** for **`POST /api/marketing/track`**, **or** optional **scheduled** digest (hosted cron / Vercel cron) wired to the same script — **one slice per PR**.
 
 ---
 
@@ -550,4 +569,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 13; see §12b–§12n.*
+*Plan updated Marketing Phase 14; see §12b–§12o.*

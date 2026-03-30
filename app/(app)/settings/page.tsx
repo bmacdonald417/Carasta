@@ -11,6 +11,7 @@ export default async function SettingsPage() {
     where: { id: (session.user as any).id },
     select: {
       handle: true,
+      email: true,
       name: true,
       bio: true,
       location: true,
@@ -19,6 +20,7 @@ export default async function SettingsPage() {
       facebookUrl: true,
       twitterUrl: true,
       tiktokUrl: true,
+      weeklyMarketingDigestOptIn: true,
     },
   });
   if (!user) redirect("/auth/sign-in");
@@ -34,6 +36,7 @@ export default async function SettingsPage() {
       <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
         <SettingsForm
           handle={user.handle}
+          accountEmail={user.email}
           name={user.name ?? ""}
           bio={user.bio ?? ""}
           location={user.location ?? ""}
@@ -42,6 +45,7 @@ export default async function SettingsPage() {
           facebookUrl={user.facebookUrl ?? ""}
           twitterUrl={user.twitterUrl ?? ""}
           tiktokUrl={user.tiktokUrl ?? ""}
+          weeklyMarketingDigestOptIn={user.weeklyMarketingDigestOptIn}
         />
       </div>
     </div>

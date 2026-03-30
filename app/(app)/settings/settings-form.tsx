@@ -12,6 +12,7 @@ import { Instagram, Facebook, Twitter, Music2 } from "lucide-react";
 
 export function SettingsForm({
   handle,
+  accountEmail,
   name,
   bio,
   location,
@@ -20,8 +21,10 @@ export function SettingsForm({
   facebookUrl,
   twitterUrl,
   tiktokUrl,
+  weeklyMarketingDigestOptIn,
 }: {
   handle: string;
+  accountEmail: string;
   name: string;
   bio: string;
   location: string;
@@ -30,6 +33,7 @@ export function SettingsForm({
   facebookUrl?: string;
   twitterUrl?: string;
   tiktokUrl?: string;
+  weeklyMarketingDigestOptIn: boolean;
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -41,6 +45,7 @@ export function SettingsForm({
   const [fb, setFb] = useState(facebookUrl ?? "");
   const [tw, setTw] = useState(twitterUrl ?? "");
   const [tk, setTk] = useState(tiktokUrl ?? "");
+  const [digest, setDigest] = useState(weeklyMarketingDigestOptIn);
   const [loading, setLoading] = useState(false);
 
   async function submit(e: React.FormEvent) {
@@ -55,6 +60,7 @@ export function SettingsForm({
     formData.set("facebookUrl", fb);
     formData.set("twitterUrl", tw);
     formData.set("tiktokUrl", tk);
+    if (digest) formData.set("weeklyMarketingDigestOptIn", "on");
     const result = await updateProfile(formData);
     setLoading(false);
     if (result.ok) {
@@ -168,6 +174,29 @@ export function SettingsForm({
             />
           </div>
         </div>
+      </div>
+
+      <div className="border-t border-white/10 pt-6">
+        <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-200">
+          Email
+        </h3>
+        <p className="mt-1 text-xs text-neutral-500">
+          Weekly summary of your marketing metrics and alerts. Sent only when an
+          admin runs the digest job (not instant). Requires email provider setup
+          — see docs.
+        </p>
+        <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm text-neutral-300">
+          <input
+            type="checkbox"
+            checked={digest}
+            onChange={(e) => setDigest(e.target.checked)}
+            className="mt-1 rounded border-white/20 bg-black/40"
+          />
+          <span>
+            Send me a <strong className="text-neutral-200">weekly</strong>{" "}
+            marketing digest at <span className="text-neutral-200">{accountEmail}</span>
+          </span>
+        </label>
       </div>
 
       <Button

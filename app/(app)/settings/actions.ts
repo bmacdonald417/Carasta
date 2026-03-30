@@ -16,6 +16,8 @@ export async function updateProfile(formData: FormData) {
   const facebookUrl = (formData.get("facebookUrl") as string)?.trim() ?? null;
   const twitterUrl = (formData.get("twitterUrl") as string)?.trim() ?? null;
   const tiktokUrl = (formData.get("tiktokUrl") as string)?.trim() ?? null;
+  const weeklyMarketingDigestOptIn =
+    formData.get("weeklyMarketingDigestOptIn") === "on";
 
   await prisma.user.update({
     where: { id: (session.user as any).id },
@@ -28,6 +30,7 @@ export async function updateProfile(formData: FormData) {
       facebookUrl,
       twitterUrl,
       tiktokUrl,
+      weeklyMarketingDigestOptIn,
     },
   });
 
