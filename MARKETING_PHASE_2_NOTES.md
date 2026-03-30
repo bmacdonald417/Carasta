@@ -31,8 +31,10 @@ No IP throttling; high-traffic deployments should add edge rate limits in a late
 
 - Same as Phase 1: `MARKETING_ENABLED=true` enables API writes and client instrumentation on the auction detail page.
 
-## PR 3 suggestions
+## PR 3 (done)
 
-- Per-auction seller page under `/u/[handle]/marketing/auctions/[auctionId]` reading `TrafficEvent`.
-- Time-series or daily rollups if raw table grows large.
-- Optional client-only **BID_CLICK** on bid control taps (never coupled to `placeBid`).
+See **`MARKETING_PHASE_3_NOTES.md`** — overview metrics + `/u/[handle]/marketing/auctions/[auctionId]`.
+
+## PR 4 suggestions
+
+- Campaigns, rollups / retention, rate limits, optional **BID_CLICK** (client-only).

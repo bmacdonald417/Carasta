@@ -290,7 +290,7 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 - **Prisma (additive):** `TrafficEvent`, `Campaign`, `CampaignEvent` plus enums `MarketingTrafficEventType`, `MarketingTrafficSource`, `MarketingCampaignStatus`. Relations on `User` (`trafficEventsAsViewer`, `marketingCampaigns`) and `Auction` (`trafficEvents`, `marketingCampaigns`).
 - **Migration:** `20260330120000_add_marketing_foundation` (`prisma/migrations/20260330120000_add_marketing_foundation/migration.sql`).
 - **Route:** `app/(app)/u/[handle]/marketing/page.tsx` — `notFound()` if flag off, profile not found, or non-owner (same pattern as listings).
-- **Read layer:** `lib/marketing/get-seller-marketing-overview.ts`, `lib/marketing/get-seller-marketing-listings.ts`.
+- **Read layer:** `lib/marketing/get-seller-marketing-overview.ts`, auction row/detail helpers (see Phase 3).
 - **Navigation:** Marketing link on own profile (`app/(app)/u/[handle]/page.tsx`) and on My Listings header (`app/(app)/u/[handle]/listings/page.tsx`) when flag enabled; listings page remains owner-only so the link is seller-context only.
 
 **Deviations from earlier plan sketch:**
@@ -326,7 +326,28 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_2_NOTES.md`.
 
-**Next recommended step (PR 3):** Seller drill-down `/u/[handle]/marketing/auctions/[auctionId]` (charts/tables from `TrafficEvent`), optional **BID_CLICK** instrumentation on the client only (never in bid submission path), and production **rate limits** (edge/middleware or provider).
+**Next step after Phase 2:** Implemented as Phase 3 (below).
+
+---
+
+## 12d. Phase 3 — Seller metrics + auction drill-down (implemented)
+
+**Goal:** Read-only analytics for sellers from **`TrafficEvent`**, no rollups, no auction/bid/community logic changes.
+
+**Implemented:**
+
+- **Read layer:** `get-seller-marketing-overview.ts` — adds **totalViews**, **totalShareClicks** (seller-scoped). `get-seller-marketing-auction-rows.ts` — up to **100** listings with **totalViews**, **totalShareClicks**, **lastMarketingActivityAt** via Prisma `groupBy`. `get-seller-marketing-auction-detail.ts` — per-auction metrics, source/event breakdowns, **shareTarget** counts (capped sample), **50** recent events. `marketing-display.ts` — seller-facing labels and date formatting.
+- **Overview:** `app/(app)/u/[handle]/marketing/page.tsx` — six KPI cards (listings, live, events, campaigns, views, share clicks); listing cards show per-auction stats + **View marketing** → drill-down.
+- **Drill-down:** `app/(app)/u/[handle]/marketing/auctions/[auctionId]/page.tsx` — same owner + flag guards; verifies **auction.sellerId === user.id** in the read helper (page uses `notFound()` if null). KPIs, source & event-type bars (CSS), optional share-target breakdown, recent activity table.
+- **Removed:** `get-seller-marketing-listings.ts` (replaced by auction rows).
+
+**Ownership:** Both routes: `MARKETING_ENABLED`, session user **must** own `handle`; drill-down additionally requires auction belong to that seller (no cross-seller `auctionId` leakage).
+
+**Limitations:** Metrics are **live queries** on `TrafficEvent` (no materialized rollups). Share-target distribution uses the **latest 3,000** `SHARE_CLICK` rows per auction for aggregation. High volume may need PR4 rollups / archives.
+
+**Notes:** `MARKETING_PHASE_3_NOTES.md`.
+
+**Next recommended step (PR 4):** **Campaign** CRUD (optional), **AuctionAnalytics** / daily rollups or scheduled aggregation, stronger **rate limits**, optional client **BID_CLICK** only, retention policy for `TrafficEvent`.
 
 ---
 
@@ -341,4 +362,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 2; see §12b–§12c.*
+*Plan updated through Marketing Phase 3; see §12b–§12d.*

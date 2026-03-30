@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Megaphone, Gavel, Radio, Target } from "lucide-react";
+import { Eye, Megaphone, Gavel, Radio, Share2, Target } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { getSellerMarketingOverview } from "@/lib/marketing/get-seller-marketing-overview";
-import { getSellerMarketingListings } from "@/lib/marketing/get-seller-marketing-listings";
+import { getSellerMarketingAuctionRows } from "@/lib/marketing/get-seller-marketing-auction-rows";
+import { formatMarketingDate } from "@/lib/marketing/marketing-display";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
@@ -28,7 +29,7 @@ export default async function MarketingPage({
   if (!isOwn) notFound();
 
   const overview = await getSellerMarketingOverview(user.id);
-  const listings = await getSellerMarketingListings(user.id);
+  const rows = await getSellerMarketingAuctionRows(user.id);
 
   const statCards = [
     {
@@ -45,12 +46,22 @@ export default async function MarketingPage({
       label: "Marketing Events",
       value: overview.marketingEvents,
       icon: Megaphone,
-      hint: "Tracked impressions & actions (coming soon)",
+      hint: "All tracked views and share actions",
     },
     {
       label: "Active Campaigns",
       value: overview.activeCampaigns,
       icon: Target,
+    },
+    {
+      label: "Total Views",
+      value: overview.totalViews,
+      icon: Eye,
+    },
+    {
+      label: "Share Clicks",
+      value: overview.totalShareClicks,
+      icon: Share2,
     },
   ];
 
@@ -62,9 +73,8 @@ export default async function MarketingPage({
             Marketing
           </h1>
           <p className="mt-1 max-w-2xl text-muted-foreground">
-            Track auction reach, promotion performance, and campaign activity.
-            Detailed analytics and tracking will appear here as you promote
-            your listings.
+            See listing reach and promotion activity from tracked page views and
+            shares. Open a listing below for a detailed breakdown.
           </p>
         </div>
         <Link
@@ -75,7 +85,7 @@ export default async function MarketingPage({
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map(({ label, value, icon: Icon, hint }) => (
           <div
             key={label}
@@ -102,16 +112,16 @@ export default async function MarketingPage({
           Your Listings
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-            Per-listing marketing tools will roll out in the next phase. For now,
-            open any listing to share it from the auction page.
+          Views and share clicks are shown per listing. Use View marketing for
+          sources, timelines, and recent events.
         </p>
 
-        {listings.length === 0 ? (
+        {rows.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-6 py-14 text-center">
             <p className="font-medium text-neutral-200">No listings yet</p>
             <p className="mt-2 text-sm text-neutral-500">
-              Create your first auction from Sell — then you&apos;ll manage
-              promotion from here.
+              Create your first auction from Sell — then you&apos;ll see metrics
+              here after visitors view or share your page.
             </p>
             <Button className="mt-6" asChild variant="secondary">
               <Link href="/sell">Start selling</Link>
@@ -119,7 +129,7 @@ export default async function MarketingPage({
           </div>
         ) : (
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {listings.map((a) => (
+            {rows.map((a) => (
               <Card
                 key={a.id}
                 className="overflow-hidden border-white/10 bg-white/5 transition-all"
@@ -159,6 +169,18 @@ export default async function MarketingPage({
                   <h3 className="mt-1 font-display font-semibold line-clamp-1 text-neutral-100">
                     {a.title}
                   </h3>
+                  <p className="mt-2 text-xs text-neutral-500">
+                    <span className="text-neutral-300">{a.totalViews}</span>{" "}
+                    views ·{" "}
+                    <span className="text-neutral-300">
+                      {a.totalShareClicks}
+                    </span>{" "}
+                    share clicks
+                  </p>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    Last activity:{" "}
+                    {formatMarketingDate(a.lastMarketingActivityAt)}
+                  </p>
                   {a.status === "LIVE" && (
                     <p className="mt-2 text-sm text-[#ff3b5c]">
                       {formatCurrency(a.highBidCents)} high bid
@@ -171,8 +193,10 @@ export default async function MarketingPage({
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/auctions/${a.id}`}>View listing</Link>
                     </Button>
-                    <Button variant="secondary" size="sm" disabled title="Coming soon">
-                      View marketing
+                    <Button variant="secondary" size="sm" asChild>
+                      <Link href={`/u/${user.handle}/marketing/auctions/${a.id}`}>
+                        View marketing
+                      </Link>
                     </Button>
                   </div>
                 </CardContent>
