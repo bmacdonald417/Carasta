@@ -409,7 +409,26 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_6_NOTES.md`.
 
-**Next recommended step (PR 7):** Saved **UTM presets** (manual copy, optional campaign link), **BID_CLICK** instrumentation (if product wants funnel), Carmunity **draft-only** promote, or **IP-based** throttles / sampling — still no Redis requirement; keep slices small.
+**Next recommended step (PR 7):** Implemented as Phase 7 (below).
+
+---
+
+## 12h. Phase 7 — Carmunity draft promotion (implemented)
+
+**Goal:** Seller-only **Promote to Carmunity** on auction marketing drill-down: deterministic drafts from listing data + **`generateSellerShareCopy`**, templates (**New listing** / **Ending soon** / **Featured pick**), editable caption, image preview, live preview card, **manual** publish via **`Post`** (`prisma.post.create`) with strict ownership. No cron, no auto-post, no campaign triggers.
+
+**Implemented:**
+
+- **`lib/marketing/generate-carmunity-draft.ts`** — draft pack; listing URLs normalized to **`links.carmunity`**.
+- **`app/(app)/u/[handle]/marketing/auctions/carmunity-promo-actions.ts`** — `publishCarmunityPromoPost` (`MARKETING_ENABLED`, handle match, `sellerId` auction check, server-side image from `AuctionImage` only).
+- **UI:** `components/marketing/carmunity-promo-panel.tsx`, `carmunity-post-preview.tsx`; page section after Share & Promote.
+- **`getSellerMarketingAuctionDetail`** — `auction.primaryImageUrl` for draft/checkbox.
+
+**Schema:** Unchanged; auction link lives in caption text.
+
+**Notes:** `MARKETING_PHASE_7_NOTES.md`.
+
+**Next recommended step (PR 8):** Saved **UTM presets**, **BID_CLICK**, ingest **throttle**/sampling, optional **`Post.auctionId`** FK if product wants structured promo linkage — one slice per PR.
 
 ---
 
@@ -418,10 +437,10 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 1. **No `MANAGER` role** — clarify if “manager” means **seller**, **account manager**, or **ADMIN**; implementation assumes **seller (USER + owns listing)** unless requirements change.
 2. **Notification writes missing** — if marketing alerts depend on `Notification`, you need to introduce **centralized creation helpers** and define `type` + `payloadJson` conventions.
 3. **Watchlist** — referenced in UX copy but not in DB; marketing features should not assume watchlist counts until modeled.
-4. **Post ↔ Auction** — no FK today; “promote listing in Community” needs a product decision (link only vs schema link vs automated post).
+4. **Post ↔ Auction** — still no FK; Phase 7 uses **link in caption** only. Structured linkage remains a product decision.
 5. **Scale** — raw event ingestion needs a **rate-limit and retention** policy before high traffic.
 6. **Privacy / compliance** — define retention for `TrafficEvent` and whether IP/UA are stored (not recommended in clear text).
 
 ---
 
-*Plan updated through Marketing Phase 6; see §12b–§12g.*
+*Plan updated through Marketing Phase 7; see §12b–§12h.*

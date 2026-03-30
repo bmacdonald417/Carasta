@@ -25,6 +25,7 @@ export type SellerMarketingAuctionDetail = {
     trim: string | null;
     mileage: number | null;
     highBidCents: number;
+    primaryImageUrl: string | null;
   };
   totalViews: number;
   totalShareClicks: number;
@@ -61,6 +62,7 @@ export async function getSellerMarketingAuctionDetail(
       trim: true,
       mileage: true,
       bids: { orderBy: { amountCents: "desc" }, take: 1 },
+      images: { orderBy: { sortOrder: "asc" }, take: 1, select: { url: true } },
     },
   });
   if (!auction) return null;
@@ -78,6 +80,7 @@ export async function getSellerMarketingAuctionDetail(
     trim: auction.trim,
     mileage: auction.mileage,
     highBidCents,
+    primaryImageUrl: auction.images[0]?.url ?? null,
   };
 
   const now = new Date();

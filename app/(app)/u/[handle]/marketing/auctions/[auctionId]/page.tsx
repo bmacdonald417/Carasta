@@ -22,7 +22,9 @@ import {
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 import { buildMarketingLinkKit } from "@/lib/marketing/build-marketing-links";
 import { generateSellerShareCopy } from "@/lib/marketing/generate-share-copy";
+import { generateCarmunityDraft } from "@/lib/marketing/generate-carmunity-draft";
 import { ShareAndPromotePanel } from "@/components/marketing/share-and-promote-panel";
+import { CarmunityPromoPanel } from "@/components/marketing/carmunity-promo-panel";
 import { getAuctionCampaignsForSeller } from "@/lib/marketing/get-seller-campaigns";
 import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
 import { campaignTypeLabel } from "@/components/marketing/campaign-type-label";
@@ -105,6 +107,22 @@ export default async function MarketingAuctionDetailPage({
     { label: "Email", url: linkKit.email },
     { label: "Carmunity", url: linkKit.carmunity },
   ];
+
+  const carmunityDraft = generateCarmunityDraft({
+    auction: {
+      title: auction.title,
+      year: auction.year,
+      make: auction.make,
+      model: auction.model,
+      trim: auction.trim,
+      mileage: auction.mileage,
+      status: auction.status,
+      endAt: auction.endAt,
+      highBidCents: auction.highBidCents,
+    },
+    links: linkKit,
+    primaryImageUrl: auction.primaryImageUrl,
+  });
 
   const kpi = [
     {
@@ -195,6 +213,16 @@ export default async function MarketingAuctionDetailPage({
 
       <div className="mt-10">
         <ShareAndPromotePanel linkRows={linkRows} copyPack={shareCopy} />
+      </div>
+
+      <div className="mt-10">
+        <CarmunityPromoPanel
+          handle={user.handle}
+          auctionId={auction.id}
+          draft={carmunityDraft}
+          displayName={user.name}
+          avatarUrl={user.avatarUrl ?? user.image}
+        />
       </div>
 
       <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">

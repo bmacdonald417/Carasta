@@ -53,6 +53,6 @@ Failures use `notFound()` on pages; actions return `{ ok: false, error: string }
 
 ---
 
-## Next best step (PR 7)
+## Next best step (PR 8+)
 
-Phase 6 shipped rollups + retention groundwork; see `MARKETING_PHASE_6_NOTES.md`. PR 7 candidates: saved **UTM presets**, **BID_CLICK**, Carmunity draft promote, or stronger throttles/sampling — one slice per PR.
+Phase 7 shipped **Carmunity manual promote**; see `MARKETING_PHASE_7_NOTES.md`. Further candidates: **UTM presets**, **BID_CLICK**, throttles/sampling — one slice per PR.
