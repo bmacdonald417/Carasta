@@ -518,19 +518,36 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_12_NOTES.md`.
 
-**Next recommended step (PR 13):** **Edge / WAF** limits + runbook for ops, **or** seller **marketing digest / notifications** using `Notification` — **one slice per PR**.
+**Next recommended step (PR 13):** Implemented as Phase 13 (below).
+
+---
+
+## 12n. Phase 13 — Seller marketing notifications (in-app) (implemented)
+
+**Goal:** Deterministic **seller-only** marketing alerts via existing **`Notification`** (`type` prefix **`MARKETING_`**, JSON **`payloadJson`** with **`title`**, **`marketingHref`**, ids); **no** email/push; **no** cron — generation on **marketing overview + auction drill-down** load (**idempotent** + **dedupe**).
+
+**Implemented:**
+
+- **`lib/marketing/marketing-notification-types.ts`** — type constants + payload shape.
+- **`lib/marketing/generate-marketing-notifications.ts`** — **`ensureSellerMarketingNotifications(sellerId, handle)`**: rules (ending soon high/low interest, bid-click surge, no recent activity, campaign start); **72h** auction / **120h** campaign dedupe via **`payloadJson` contains** + `type`.
+- **`lib/marketing/get-seller-marketing-notifications.ts`** — recent **`MARKETING_*`** rows for UI.
+- **UI:** **`components/marketing/marketing-alerts-panel.tsx`** on **`/u/[handle]/marketing`** and filtered on **`.../marketing/auctions/[auctionId]`**; **`NotificationDropdown`** prefers **`marketingHref`** when present.
+
+**Notes:** `MARKETING_PHASE_13_NOTES.md`.
+
+**Next recommended step (PR 14):** **Edge / WAF** limits + short **ops runbook** for **`/api/marketing/track`**, **or** **email digest** (opt-in) for marketing summaries — **one slice per PR**.
 
 ---
 
 ## 13. Blockers & Ambiguities
 
 1. **No `MANAGER` role** — clarify if “manager” means **seller**, **account manager**, or **ADMIN**; implementation assumes **seller (USER + owns listing)** unless requirements change.
-2. **Notification writes missing** — if marketing alerts depend on `Notification`, you need to introduce **centralized creation helpers** and define `type` + `payloadJson` conventions.
+2. **Notifications** — marketing sellers use **`MARKETING_*`** `Notification` rows (Phase 13); other product notifications may still need centralized helpers.
 3. **Watchlist** — referenced in UX copy but not in DB; marketing features should not assume watchlist counts until modeled.
-4. **Post ↔ Auction** — still no FK; Phase 7 uses **link in caption** only. Structured linkage remains a product decision.
-5. **Scale** — raw event ingestion needs a **rate-limit and retention** policy before high traffic.
+4. **Post ↔ Auction** — optional **`Post.auctionId`** (Phase 11) for Carmunity marketing promos; caption URLs remain for other cases.
+5. **Scale** — Phase 12 **app-layer** track limits + **TrafficEvent** prune; edge limits still recommended at volume.
 6. **Privacy / compliance** — define retention for `TrafficEvent` and whether IP/UA are stored (not recommended in clear text).
 
 ---
 
-*Plan updated through Marketing Phase 12; see §12b–§12m.*
+*Plan updated Marketing Phase 13; see §12b–§12n.*

@@ -34,6 +34,9 @@ import {
 import { ShareAndPromotePanel } from "@/components/marketing/share-and-promote-panel";
 import { CarmunityPromoPanel } from "@/components/marketing/carmunity-promo-panel";
 import { AuctionLinkedPromoPostsSection } from "@/components/marketing/auction-linked-promo-posts";
+import { MarketingAlertsPanel } from "@/components/marketing/marketing-alerts-panel";
+import { ensureSellerMarketingNotifications } from "@/lib/marketing/generate-marketing-notifications";
+import { getSellerMarketingNotifications } from "@/lib/marketing/get-seller-marketing-notifications";
 import { getAuctionCampaignsForSeller } from "@/lib/marketing/get-seller-campaigns";
 import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
 import { campaignTypeLabel } from "@/components/marketing/campaign-type-label";
@@ -68,14 +71,23 @@ export default async function MarketingAuctionDetailPage({
   const isOwn = (session?.user as any)?.id === user.id;
   if (!isOwn) notFound();
 
-  const [detail, auctionCampaigns, presets] = await Promise.all([
-    getSellerMarketingAuctionDetail(auctionId, user.id),
-    getAuctionCampaignsForSeller(user.id, auctionId),
-    getMarketingPresetsForUser(user.id),
-  ]);
+  await ensureSellerMarketingNotifications(user.id, user.handle);
+
+  const [detail, auctionCampaigns, presets, marketingAlertRows] =
+    await Promise.all([
+      getSellerMarketingAuctionDetail(auctionId, user.id),
+      getAuctionCampaignsForSeller(user.id, auctionId),
+      getMarketingPresetsForUser(user.id),
+      getSellerMarketingNotifications(user.id, 24),
+    ]);
   if (!detail) notFound();
 
   const { auction } = detail;
+  const auctionMarketingAlerts = marketingAlertRows.filter(
+    (n) =>
+      n.auctionId === auctionId ||
+      (n.marketingHref?.includes(auctionId) ?? false)
+  );
   const maxSource = Math.max(...detail.bySource.map((s) => s.count), 1);
   const maxEvent = Math.max(...detail.byEventType.map((e) => e.count), 1);
   const maxShareTarget = Math.max(
@@ -236,6 +248,14 @@ export default async function MarketingAuctionDetailPage({
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-8">
+        <MarketingAlertsPanel
+          items={auctionMarketingAlerts.slice(0, 6)}
+          compact
+          context="auction"
+        />
       </div>
 
       <div className="mt-10">

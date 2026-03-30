@@ -44,6 +44,10 @@ Only **`publishCarmunityPromoPost`** in **`app/(app)/u/[handle]/marketing/auctio
 
 **Implemented:** In-app **`marketing-track-rate-limit`** on **`POST /api/marketing/track`**. See **`MARKETING_PHASE_12_NOTES.md`**.
 
-## PR 13 (next best step)
+## PR 13 / Phase 13
 
-**Edge / WAF** + runbook, **or** **seller marketing notifications** — one slice per PR.
+**Implemented:** In-app seller marketing **`Notification`**s. See **`MARKETING_PHASE_13_NOTES.md`**.
+
+## PR 14 (next best step)
+
+**Edge / WAF runbook** or opt-in **email digest** — one slice per PR.

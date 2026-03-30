@@ -115,11 +115,18 @@ export function NotificationDropdown() {
 }
 
 function NotificationRow({ item }: { item: NotificationItem }) {
-  const href = (item.payload as { auctionId?: string; postId?: string }).auctionId
-    ? `/auctions/${(item.payload as { auctionId: string }).auctionId}`
-    : (item.payload as { postId?: string }).postId
-      ? `/explore/post/${(item.payload as { postId: string }).postId}`
-      : null;
+  const payload = item.payload as {
+    auctionId?: string;
+    postId?: string;
+    marketingHref?: string;
+  };
+  const href = payload.marketingHref
+    ? payload.marketingHref
+    : payload.auctionId
+      ? `/auctions/${payload.auctionId}`
+      : payload.postId
+        ? `/explore/post/${payload.postId}`
+        : null;
   const title =
     (item.payload as { title?: string }).title ??
     (item.payload as { message?: string }).message ??

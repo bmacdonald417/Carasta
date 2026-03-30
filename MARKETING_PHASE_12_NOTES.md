@@ -66,6 +66,10 @@ Both can apply: a burst may be dropped at the route; accepted events still dedup
 
 ---
 
-## PR 13 (next best step)
+## PR 13 / Phase 13
 
-**Edge / WAF** config + short ops runbook for **`/api/marketing/track`**, **or** seller **marketing notifications** / digest (e.g. `Notification` model) — **one slice per PR**.
+**Implemented:** Seller **`MARKETING_*`** in-app notifications. See **`MARKETING_PHASE_13_NOTES.md`**.
+
+## PR 14 (next best step)
+
+**Edge / WAF** runbook for **`/api/marketing/track`**, **or** opt-in **email digest** — one slice per PR.

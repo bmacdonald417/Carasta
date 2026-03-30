@@ -92,6 +92,10 @@ Allowed keys depend on **`eventType`**:
 
 **Implemented:** App-layer **marketing track** rate limiter. See **`MARKETING_PHASE_12_NOTES.md`**.
 
-## PR 13 (next best step)
+## PR 13 / Phase 13
 
-**Edge / WAF** + runbook, **or** seller **marketing notifications**.
+**Implemented:** Seller marketing **`Notification`**s. See **`MARKETING_PHASE_13_NOTES.md`**.
+
+## PR 14 (next best step)
+
+**Edge / WAF runbook** or opt-in **email digest**.

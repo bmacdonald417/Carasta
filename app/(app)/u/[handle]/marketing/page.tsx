@@ -11,7 +11,10 @@ import { getSession } from "@/lib/auth";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { getSellerMarketingOverview } from "@/lib/marketing/get-seller-marketing-overview";
 import { getSellerMarketingAuctionRows } from "@/lib/marketing/get-seller-marketing-auction-rows";
+import { ensureSellerMarketingNotifications } from "@/lib/marketing/generate-marketing-notifications";
+import { getSellerMarketingNotifications } from "@/lib/marketing/get-seller-marketing-notifications";
 import { formatMarketingDate } from "@/lib/marketing/marketing-display";
+import { MarketingAlertsPanel } from "@/components/marketing/marketing-alerts-panel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
@@ -32,9 +35,13 @@ export default async function MarketingPage({
   const isOwn = (session?.user as any)?.id === user.id;
   if (!isOwn) notFound();
 
-  const overview = await getSellerMarketingOverview(user.id);
-  const rows = await getSellerMarketingAuctionRows(user.id);
-  const recentCampaigns = await getRecentSellerCampaigns(user.id, 6);
+  await ensureSellerMarketingNotifications(user.id, user.handle);
+  const [overview, rows, recentCampaigns, marketingAlerts] = await Promise.all([
+    getSellerMarketingOverview(user.id),
+    getSellerMarketingAuctionRows(user.id),
+    getRecentSellerCampaigns(user.id, 6),
+    getSellerMarketingNotifications(user.id, 10),
+  ]);
 
   const statCards = [
     {
@@ -116,6 +123,10 @@ export default async function MarketingPage({
             ) : null}
           </div>
         ))}
+      </div>
+
+      <div className="mt-8">
+        <MarketingAlertsPanel items={marketingAlerts} />
       </div>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-4">
