@@ -5,9 +5,9 @@
 
 ---
 
-## Schema
+## Schema (at Phase 7)
 
-**No schema change.** `Post` remains `authorId`, `content`, `imageUrl` (optional). Auction linkage is via **URL inside caption** (Carmunity-tracked link from `buildMarketingLinkKit`), not an FK.
+Originally **no FK** — linkage was caption URL only. **Phase 11** added optional **`Post.auctionId`** for promos published from this flow; caption URLs remain for attribution in text.
 
 ---
 
@@ -23,7 +23,7 @@
 - **`app/(app)/u/[handle]/marketing/auctions/carmunity-promo-actions.ts`** — server action **`publishCarmunityPromoPost`**:
   - Requires **`MARKETING_ENABLED`**, session, and **profile handle** match session user.
   - Loads auction with **`sellerId === session user`**; rejects otherwise.
-  - **`prisma.post.create`** with seller as **`authorId`**, edited **caption**, optional **first listing photo** (`includeAuctionImage`) — image URL taken **only** from DB (`AuctionImage`), never from raw client input.
+  - **`prisma.post.create`** with seller as **`authorId`**, **`auctionId`** set to the listing (Phase 11), edited **caption**, optional **first listing photo** (`includeAuctionImage`) — image URL taken **only** from DB (`AuctionImage`), never from raw client input.
   - **`revalidatePath("/explore")`** and marketing auction page.
 
 Does **not** reuse `createPost` from `explore/actions.ts` to keep auction ownership checks in one place; behavior mirrors it (`content` + optional `imageUrl`).
@@ -41,7 +41,7 @@ Does **not** reuse `createPost` from `explore/actions.ts` to keep auction owners
 
 ## Limitations
 
-- **No `Post` ↔ `Auction` FK** — deep links, analytics fusion, or “promoted listing” badges are future work.
+- **Structured FK** — added in **Phase 11** (`Post.auctionId`); “promoted listing” badges on public listing / feed are still optional future work.
 - **One primary photo** only (first by `sortOrder`); no gallery picker.
 - **Template switch** replaces caption (edits lost when changing tab); intentional for simplicity.
 - Historical community **`createPost`** flow on `/explore` unchanged.
@@ -50,8 +50,4 @@ Does **not** reuse `createPost` from `explore/actions.ts` to keep auction owners
 
 ## Follow-ons (after Phase 8)
 
-Phase 8 added **`BID_CLICK`** intent — see **`MARKETING_PHASE_8_NOTES.md`**. Further ideas:
-
-- Saved **UTM presets** (manual) tied to campaigns or share kit.
-- **IP-based** or sampled ingest throttles if volume grows.
-- Optional **`Post.auctionId`** FK if product wants structured linkage.
+Phase 8 added **`BID_CLICK`** intent — see **`MARKETING_PHASE_8_NOTES.md`**. Phase 9–11: presets, ingest hardening, **`Post.auctionId`** — see respective phase notes.

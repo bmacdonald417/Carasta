@@ -84,6 +84,10 @@ Allowed keys depend on **`eventType`**:
 
 ---
 
-## PR 11 (next best step)
+## PR 11 / Phase 11
 
-Choose **one** slice: **structured `Post.auctionId`** (optional FK) for Carmunity/listing linkage, **or** **edge / WAF rate limiting** documentation + config for `POST /api/marketing/track`, **or** optional **BID_CLICK** rollup column if daily aggregates should match raw intent volume.
+**Implemented:** Optional **`Post.auctionId`** + seller linked-promo list. See **`MARKETING_PHASE_11_NOTES.md`**.
+
+## PR 12 (next best step)
+
+**Edge / WAF rate limiting** (or app-layer) for **`POST /api/marketing/track`**, **or** seller **marketing notifications** — one slice per PR.

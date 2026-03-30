@@ -33,6 +33,7 @@ import {
 } from "@/lib/marketing/build-share-promote-bundle";
 import { ShareAndPromotePanel } from "@/components/marketing/share-and-promote-panel";
 import { CarmunityPromoPanel } from "@/components/marketing/carmunity-promo-panel";
+import { AuctionLinkedPromoPostsSection } from "@/components/marketing/auction-linked-promo-posts";
 import { getAuctionCampaignsForSeller } from "@/lib/marketing/get-seller-campaigns";
 import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
 import { campaignTypeLabel } from "@/components/marketing/campaign-type-label";
@@ -254,6 +255,8 @@ export default async function MarketingAuctionDetailPage({
           avatarUrl={user.avatarUrl ?? user.image}
         />
       </div>
+
+      <AuctionLinkedPromoPostsSection posts={detail.linkedPromoPosts} />
 
       <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">

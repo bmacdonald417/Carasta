@@ -11,6 +11,15 @@ import type {
 } from "@prisma/client";
 
 const SHARE_TARGET_SAMPLE_CAP = 3000;
+const LINKED_PROMO_POSTS_CAP = 20;
+const PROMO_PREVIEW_CHARS = 160;
+
+function previewPostContent(content: string | null): string | null {
+  if (content == null || !content.trim()) return null;
+  const oneLine = content.replace(/\s+/g, " ").trim();
+  if (oneLine.length <= PROMO_PREVIEW_CHARS) return oneLine;
+  return `${oneLine.slice(0, PROMO_PREVIEW_CHARS)}…`;
+}
 
 export type SellerMarketingAuctionDetail = {
   auction: {
@@ -45,6 +54,13 @@ export type SellerMarketingAuctionDetail = {
     source: MSource;
     shareTarget: string | null;
     bidUiSurface: string | null;
+  }[];
+  /** Carmunity posts published from marketing with this listing linked. */
+  linkedPromoPosts: {
+    id: string;
+    createdAt: Date;
+    contentPreview: string | null;
+    imageUrl: string | null;
   }[];
 };
 
@@ -103,6 +119,7 @@ export async function getSellerMarketingAuctionDetail(
     recentRows,
     shareRows,
     lastRow,
+    linkedPromoRows,
   ] = await Promise.all([
     getViewShareTotalsForAuctionIds([auctionId]),
     prisma.trafficEvent.count({
@@ -171,6 +188,17 @@ export async function getSellerMarketingAuctionDetail(
       orderBy: { createdAt: "desc" },
       select: { createdAt: true },
     }),
+    prisma.post.findMany({
+      where: { auctionId, authorId: sellerId },
+      orderBy: { createdAt: "desc" },
+      take: LINKED_PROMO_POSTS_CAP,
+      select: {
+        id: true,
+        createdAt: true,
+        content: true,
+        imageUrl: true,
+      },
+    }),
   ]);
 
   const shareTargetMap = new Map<string, number>();
@@ -225,6 +253,13 @@ export async function getSellerMarketingAuctionDetail(
     shareClicks: 0,
   };
 
+  const linkedPromoPosts = linkedPromoRows.map((p) => ({
+    id: p.id,
+    createdAt: p.createdAt,
+    contentPreview: previewPostContent(p.content),
+    imageUrl: p.imageUrl,
+  }));
+
   return {
     auction: auctionRow,
     totalViews: totals.views,
@@ -239,5 +274,6 @@ export async function getSellerMarketingAuctionDetail(
     byEventType,
     shareTargetCounts,
     recentEvents,
+    linkedPromoPosts,
   };
 }

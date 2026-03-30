@@ -62,6 +62,7 @@ export async function publishCarmunityPromoPost(input: {
   await prisma.post.create({
     data: {
       authorId: userId,
+      auctionId: auction.id,
       content: content || null,
       imageUrl,
     },

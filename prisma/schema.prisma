@@ -198,16 +198,20 @@ model Follow {
 model Post {
   id        String   @id @default(cuid())
   authorId  String
+  /// Optional listing promoted via seller marketing → Carmunity (nullable for ordinary posts).
+  auctionId String?
   content   String?
   imageUrl  String?
   createdAt DateTime @default(now())
 
-  author   User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  likes    Like[]
+  author  User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  auction Auction? @relation("AuctionPromoPosts", fields: [auctionId], references: [id], onDelete: SetNull)
+  likes   Like[]
   comments Comment[]
 
   @@index([authorId])
   @@index([createdAt])
+  @@index([auctionId])
 }
 
 model Like {
@@ -302,6 +306,7 @@ model Auction {
   trafficEvents      TrafficEvent[]
   marketingCampaigns Campaign[]
   auctionAnalytics   AuctionAnalytics[]
+  promoPosts         Post[]           @relation("AuctionPromoPosts")
 
   @@index([sellerId])
   @@index([buyerId])

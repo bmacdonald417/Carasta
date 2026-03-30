@@ -486,7 +486,24 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_10_NOTES.md`.
 
-**Next recommended step (PR 11):** Optional **`Post.auctionId`** FK for structured Carmunity ↔ listing linkage, **or** document/implement **edge / WAF rate limits** on `POST /api/marketing/track` — **one slice per PR**.
+**Next recommended step (PR 11):** Implemented as Phase 11 (below).
+
+---
+
+## 12l. Phase 11 — Structured Carmunity ↔ auction linkage (implemented)
+
+**Goal:** Optional **`Post.auctionId`** so Carmunity promo posts from seller marketing are structurally tied to listings; **`/explore` create flow** unchanged; seller auction marketing drill-down shows **linked promo posts** (read-only). No public auction page block in this PR.
+
+**Implemented:**
+
+- **Schema:** nullable **`Post.auctionId`** → **`Auction`** (`onDelete: SetNull`); **`Auction.promoPosts`**; migration **`20260401153000_post_auction_link`**.
+- **Publish:** **`publishCarmunityPromoPost`** sets **`auctionId`** on create (ownership unchanged).
+- **Reads:** **`getSellerMarketingAuctionDetail`** → **`linkedPromoPosts`** (seller + `authorId` match, newest first, cap 20).
+- **UI:** **`components/marketing/auction-linked-promo-posts.tsx`** on **`/u/[handle]/marketing/auctions/[auctionId]`** (empty + list states).
+
+**Notes:** `MARKETING_PHASE_11_NOTES.md`.
+
+**Next recommended step (PR 12):** **Edge / WAF rate limits** (or in-app IP ceiling) for `POST /api/marketing/track`, **or** seller **marketing digest / notifications** — **one slice per PR**.
 
 ---
 
@@ -501,4 +518,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 10; see §12b–§12k.*
+*Plan updated through Marketing Phase 11; see §12b–§12l.*
