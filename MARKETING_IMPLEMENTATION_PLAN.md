@@ -570,7 +570,22 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_15_NOTES.md` (deploy: **Railway** + external HTTPS cron; optional Vercel Cron example).
 
-**Next recommended step (PR 16):** **Edge / WAF runbook** for **`POST /api/marketing/track`** (rate-limit headers, provider dashboards, optional geographic rules) — **one slice per PR**, no digest/campaign changes.
+**Next recommended step (PR 16):** Implemented as Phase 16 (below).
+
+---
+
+## 12q. Phase 16 — Edge / WAF runbook for marketing track (implemented)
+
+**Goal:** **Operator-facing** guidance for protecting **`POST /api/marketing/track`** with **edge / WAF / proxy** controls that **complement** Phase 12 in-memory limits and Phase 10 dedupe—**documentation-first**, no behavior change.
+
+**Implemented:**
+
+- **Runbook:** **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** — purpose, in-app baseline (limiter + dedupe + validation), recommended path/method/body/rate/bot strategy, Railway + Cloudflare-style examples, monitoring, rollout, rollback, multi-instance / header-trust caveats.
+- **Code:** **JSDoc / comments only** — `app/api/marketing/track/route.ts`, `lib/marketing/marketing-track-rate-limit.ts` (pointers to runbook).
+
+**Notes:** `MARKETING_PHASE_16_NOTES.md`.
+
+**Next recommended step (PR 17):** **Optional observability** for **`/api/marketing/track`** (structured logs or metrics by HTTP outcome; no contract change) **or** the next product/marketing slice from roadmap — **one PR**.
 
 ---
 
@@ -585,4 +600,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 15; see §12b–§12p.*
+*Plan updated Marketing Phase 16; see §12b–§12q.*

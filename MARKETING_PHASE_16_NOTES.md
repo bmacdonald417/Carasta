@@ -1,0 +1,28 @@
+# Marketing Phase 16 — Edge / WAF runbook for `/api/marketing/track`
+
+**Date:** 2026-03-30  
+**Scope:** **Documentation-only** delivery of a production **operator runbook** for protecting **`POST /api/marketing/track`** at the edge, aligned with Phase 10 dedupe + Phase 12 in-app rate limiting. **No schema**, **no** seller UI changes, **no** auction/bid/buy-now/campaign/community logic changes.
+
+---
+
+## What was added
+
+| Deliverable | Path |
+|-------------|------|
+| Operator runbook | **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** |
+| Plan bump | **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12q Phase 16 |
+| This note | **`MARKETING_PHASE_16_NOTES.md`** |
+
+## Code changes
+
+**Minimal:** Comments / JSDoc only — **`app/api/marketing/track/route.ts`** (runbook pointer + `POST`-only note), **`lib/marketing/marketing-track-rate-limit.ts`** (link to runbook for operators). **No** behavioral or schema changes.
+
+## Where operators start
+
+1. Read **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** §3–§5 (rules + Railway / Cloudflare examples).
+2. Ensure **`X-Forwarded-For`** / trusted proxy behavior matches §9 (IP bucket correctness).
+3. Roll out **observe → challenge → enforce** per §7; validate seller metrics after changes.
+
+## PR 17 (suggested next step)
+
+**Optional observability slice:** structured logs or metrics for **`/api/marketing/track`** (counts by status: 200/204/400/500, and optionally “limiter short-circuit” if you add a diagnostic hook **without** changing the JSON contract)—**one PR**, still no seller-facing UI requirement. Alternative product slices can replace this if roadmap dictates.

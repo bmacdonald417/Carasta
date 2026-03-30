@@ -1,3 +1,9 @@
+/**
+ * Marketing ingestion beacon — **`POST` only**.
+ *
+ * Edge / WAF guidance (path limits, POST-only, body size, trusted `X-Forwarded-For`):
+ * **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`**
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { MarketingTrafficEventType } from "@prisma/client";

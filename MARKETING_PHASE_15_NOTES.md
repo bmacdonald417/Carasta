@@ -94,6 +94,10 @@ Same logic as production; **`MARKETING_DIGEST_FORCE=1`** only affects the script
 
 ---
 
-## PR 16 (next best step)
+## PR 16 (implemented)
 
-**Edge / WAF runbook** for **`POST /api/marketing/track`**: document provider-level limits, optional WAF rules, and alignment with in-app **`marketing-track-rate-limit`** — **no** changes to digest sending, campaigns, auctions, or community behavior.
+**Edge / WAF runbook:** **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** (+ **`MARKETING_PHASE_16_NOTES.md`**). Complements in-app **`marketing-track-rate-limit`** and Phase 10 dedupe.
+
+## PR 17 (next best step)
+
+**Optional observability** for **`/api/marketing/track`** (logs/metrics by status) without changing the JSON contract, **or** the next roadmap slice — one PR.

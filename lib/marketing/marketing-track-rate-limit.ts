@@ -6,7 +6,7 @@
  *
  * **Limits (per-instance only):** Not coordinated across serverless instances or horizontal
  * scale — each replica has its own counters. Still useful to cap per-node load and catch
- * runaway clients; production should also use edge/WAF limits (see phase notes).
+ * runaway clients; production should also use edge/WAF limits (**`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`**).
  *
  * **Key:** Client IP (from proxy headers when present) + optional authenticated `userId`
  * (JWT sub), so NAT’d browsers don’t all share one anonymous bucket when logged in.

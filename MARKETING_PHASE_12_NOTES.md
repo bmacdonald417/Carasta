@@ -70,6 +70,6 @@ Both can apply: a burst may be dropped at the route; accepted events still dedup
 
 **Implemented:** Seller **`MARKETING_*`** in-app notifications. See **`MARKETING_PHASE_13_NOTES.md`**.
 
-## PR 14 (next best step)
+## Edge / WAF (Phase 16)
 
-**Edge / WAF** runbook for **`/api/marketing/track`**, **or** opt-in **email digest** — one slice per PR.
+Production runbook: **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** (complements this in-app limiter).
