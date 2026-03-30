@@ -53,6 +53,6 @@ Failures use `notFound()` on pages; actions return `{ ok: false, error: string }
 
 ---
 
-## Next best step (PR 8+)
+## Next best step (PR 9+)
 
-Phase 7 shipped **Carmunity manual promote**; see `MARKETING_PHASE_7_NOTES.md`. Further candidates: **UTM presets**, **BID_CLICK**, throttles/sampling — one slice per PR.
+Phase 8 shipped **BID_CLICK** intent; see `MARKETING_PHASE_8_NOTES.md`. Further candidates: **UTM presets**, throttles/sampling — one slice per PR.

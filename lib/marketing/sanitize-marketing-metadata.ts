@@ -4,6 +4,8 @@ const ALLOWED_KEYS = [
   "shareTarget",
   "currentUrl",
   "visitorKey",
+  /** UI intent only, e.g. quick_bid, custom_bid, auto_bid, signup_cta */
+  "bidUiSurface",
 ] as const;
 
 const MAX_STRING = 2000;

@@ -29,6 +29,9 @@ export type SellerMarketingAuctionDetail = {
   };
   totalViews: number;
   totalShareClicks: number;
+  totalBidClicks: number;
+  bidClicksLast24h: number;
+  bidClicksLast7d: number;
   viewsLast24h: number;
   viewsLast7d: number;
   lastMarketingActivityAt: Date | null;
@@ -41,6 +44,7 @@ export type SellerMarketingAuctionDetail = {
     eventType: MEventType;
     source: MSource;
     shareTarget: string | null;
+    bidUiSurface: string | null;
   }[];
 };
 
@@ -89,6 +93,9 @@ export async function getSellerMarketingAuctionDetail(
 
   const [
     viewShareTotals,
+    totalBidClicks,
+    bidClicksLast24h,
+    bidClicksLast7d,
     viewsLast24h,
     viewsLast7d,
     bySourceRaw,
@@ -98,6 +105,23 @@ export async function getSellerMarketingAuctionDetail(
     lastRow,
   ] = await Promise.all([
     getViewShareTotalsForAuctionIds([auctionId]),
+    prisma.trafficEvent.count({
+      where: { auctionId, eventType: MarketingTrafficEventType.BID_CLICK },
+    }),
+    prisma.trafficEvent.count({
+      where: {
+        auctionId,
+        eventType: MarketingTrafficEventType.BID_CLICK,
+        createdAt: { gte: cutoff24 },
+      },
+    }),
+    prisma.trafficEvent.count({
+      where: {
+        auctionId,
+        eventType: MarketingTrafficEventType.BID_CLICK,
+        createdAt: { gte: cutoff7 },
+      },
+    }),
     prisma.trafficEvent.count({
       where: {
         auctionId,
@@ -175,12 +199,15 @@ export async function getSellerMarketingAuctionDetail(
     const m = r.metadata as Record<string, unknown> | null;
     const shareTarget =
       typeof m?.shareTarget === "string" ? m.shareTarget : null;
+    const bidUiSurface =
+      typeof m?.bidUiSurface === "string" ? m.bidUiSurface : null;
     return {
       id: r.id,
       createdAt: r.createdAt,
       eventType: r.eventType,
       source: r.source,
       shareTarget,
+      bidUiSurface,
     };
   });
 
@@ -202,6 +229,9 @@ export async function getSellerMarketingAuctionDetail(
     auction: auctionRow,
     totalViews: totals.views,
     totalShareClicks: totals.shareClicks,
+    totalBidClicks,
+    bidClicksLast24h,
+    bidClicksLast7d,
     viewsLast24h,
     viewsLast7d,
     lastMarketingActivityAt: lastRow?.createdAt ?? null,

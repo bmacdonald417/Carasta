@@ -63,10 +63,9 @@ Existing tracked links already use `utm_source=linkedin` in `build-marketing-lin
 
 ---
 
-## Follow-ons (after Phase 7)
+## Follow-ons (after Phase 8)
 
-Phase 7 added **manual Carmunity promote** from marketing drill-down — see `MARKETING_PHASE_7_NOTES.md`. Remaining ideas for **PR 8+**:
+Phase 7–8: Carmunity promote + **BID_CLICK** intent — see `MARKETING_PHASE_7_NOTES.md`, `MARKETING_PHASE_8_NOTES.md`. Remaining ideas for **PR 9+**:
 
 - Saved **UTM presets** (manual apply to copy/links).
-- **BID_CLICK** or funnel events (product-gated).
 - Optional ingestion **throttle** / sampling if volume grows.

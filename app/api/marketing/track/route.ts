@@ -46,7 +46,9 @@ export async function POST(req: NextRequest) {
     const eventType =
       body.eventType === "VIEW"
         ? MarketingTrafficEventType.VIEW
-        : MarketingTrafficEventType.SHARE_CLICK;
+        : body.eventType === "SHARE_CLICK"
+          ? MarketingTrafficEventType.SHARE_CLICK
+          : MarketingTrafficEventType.BID_CLICK;
 
     const meta = sanitizeMarketingMetadata({
       ...(body.metadata as Record<string, unknown> | undefined),

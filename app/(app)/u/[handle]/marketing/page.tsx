@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, Megaphone, Gavel, Radio, Share2, Target } from "lucide-react";
+import { Eye, Hand, Megaphone, Gavel, Radio, Share2, Target } from "lucide-react";
 import { MarketingCampaignStatus } from "@prisma/client";
 import { getRecentSellerCampaigns } from "@/lib/marketing/get-seller-campaigns";
 import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
@@ -51,7 +51,7 @@ export default async function MarketingPage({
       label: "Marketing Events",
       value: overview.marketingEvents,
       icon: Megaphone,
-      hint: "All tracked views and share actions",
+      hint: "Views, shares, bid intent, and other tracked events",
     },
     {
       label: "Active Campaigns",
@@ -67,6 +67,12 @@ export default async function MarketingPage({
       label: "Share Clicks",
       value: overview.totalShareClicks,
       icon: Share2,
+    },
+    {
+      label: "Bid Clicks",
+      value: overview.totalBidClicks,
+      icon: Hand,
+      hint: "Bid button intent (not successful bids)",
     },
   ];
 
@@ -90,7 +96,7 @@ export default async function MarketingPage({
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {statCards.map(({ label, value, icon: Icon, hint }) => (
           <div
             key={label}
@@ -193,8 +199,8 @@ export default async function MarketingPage({
           Your Listings
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Views and share clicks are shown per listing. Use View marketing for
-          sources, timelines, and recent events.
+            Views, share clicks, and bid intent are shown per listing. Open View
+            marketing for sources, timelines, and recent events.
         </p>
 
         {rows.length === 0 ? (
@@ -256,7 +262,9 @@ export default async function MarketingPage({
                     <span className="text-neutral-300">
                       {a.totalShareClicks}
                     </span>{" "}
-                    share clicks
+                    shares ·{" "}
+                    <span className="text-neutral-300">{a.totalBidClicks}</span>{" "}
+                    bid clicks
                   </p>
                   <p className="mt-1 text-xs text-neutral-500">
                     Last activity:{" "}

@@ -2,11 +2,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
+  CalendarDays,
   Clock,
   ExternalLink,
   Eye,
+  Hand,
   MousePointerClick,
   Radio,
+  Timer,
 } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
@@ -15,6 +18,7 @@ import { getSellerMarketingAuctionDetail } from "@/lib/marketing/get-seller-mark
 import {
   formatMarketingDate,
   formatMarketingDateTime,
+  marketingBidUiSurfaceLabel,
   marketingEventTypeLabel,
   marketingSourceLabel,
   shareTargetLabel,
@@ -29,7 +33,7 @@ import { getAuctionCampaignsForSeller } from "@/lib/marketing/get-seller-campaig
 import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
 import { campaignTypeLabel } from "@/components/marketing/campaign-type-label";
 import { Button } from "@/components/ui/button";
-import { MarketingCampaignStatus } from "@prisma/client";
+import { MarketingCampaignStatus, MarketingTrafficEventType } from "@prisma/client";
 
 function ProportionBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -136,6 +140,21 @@ export default async function MarketingAuctionDetailPage({
       icon: MousePointerClick,
     },
     {
+      label: "Bid clicks",
+      value: detail.totalBidClicks,
+      icon: Hand,
+    },
+    {
+      label: "Bid clicks (24h)",
+      value: detail.bidClicksLast24h,
+      icon: Timer,
+    },
+    {
+      label: "Bid clicks (7d)",
+      value: detail.bidClicksLast7d,
+      icon: CalendarDays,
+    },
+    {
       label: "Views (24h)",
       value: detail.viewsLast24h,
       icon: Radio,
@@ -175,8 +194,8 @@ export default async function MarketingAuctionDetailPage({
             </span>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Marketing activity for this listing. Totals are from tracked page
-            views and share actions only.
+            Marketing activity for this listing: views, shares, and bid-button
+            intent (not successful bids).
           </p>
         </div>
         <Link
@@ -188,7 +207,7 @@ export default async function MarketingAuctionDetailPage({
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {kpi.map(({ label, value, icon: Icon, isText }) => (
           <div
             key={label}
@@ -387,8 +406,9 @@ export default async function MarketingAuctionDetailPage({
           <div className="mt-8 rounded-xl border border-dashed border-white/15 px-6 py-12 text-center">
             <p className="font-medium text-neutral-200">No activity yet</p>
             <p className="mt-2 text-sm text-neutral-500">
-              Views and shares will appear after visitors open or share this
-              listing (with marketing tracking enabled).
+              Tracked views, shares, and bid-button intent will appear after
+              visitors interact with this listing (with marketing tracking
+              enabled).
             </p>
           </div>
         ) : (
@@ -399,7 +419,7 @@ export default async function MarketingAuctionDetailPage({
                   <th className="pb-3 pr-4">Time</th>
                   <th className="pb-3 pr-4">Event</th>
                   <th className="pb-3 pr-4">Source</th>
-                  <th className="pb-3">Share</th>
+                  <th className="pb-3">Detail</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -415,9 +435,13 @@ export default async function MarketingAuctionDetailPage({
                       {marketingSourceLabel(row.source)}
                     </td>
                     <td className="py-3 text-neutral-500">
-                      {row.shareTarget
+                      {row.eventType === MarketingTrafficEventType.SHARE_CLICK &&
+                      row.shareTarget
                         ? shareTargetLabel(row.shareTarget)
-                        : "—"}
+                        : row.eventType === MarketingTrafficEventType.BID_CLICK &&
+                            row.bidUiSurface
+                          ? marketingBidUiSurfaceLabel(row.bidUiSurface)
+                          : "—"}
                     </td>
                   </tr>
                 ))}

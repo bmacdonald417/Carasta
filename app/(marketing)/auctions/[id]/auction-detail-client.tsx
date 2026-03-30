@@ -12,6 +12,21 @@ import { Progress } from "@/components/ui/progress";
 import { formatCurrency, nextMinBidCents } from "@/lib/utils";
 import { placeBid, quickBid, executeBuyNow, setAutoBid } from "../actions";
 import { useToast } from "@/components/ui/use-toast";
+import { sendMarketingTrack } from "@/lib/marketing/send-marketing-track";
+
+function trackBidClickIntent(auctionId: string, bidUiSurface: string): void {
+  sendMarketingTrack({
+    auctionId,
+    eventType: "BID_CLICK",
+    metadata: {
+      bidUiSurface,
+      path:
+        typeof window !== "undefined" ? window.location.pathname : undefined,
+      currentUrl:
+        typeof window !== "undefined" ? window.location.href : undefined,
+    },
+  });
+}
 
 const POLL_INTERVAL_MS = 4000;
 
@@ -125,6 +140,7 @@ export function AuctionDetailClient({
       router.push(signInHref);
       return;
     }
+    trackBidClickIntent(auctionId, "quick_bid");
     setLoading(true);
     const formData = new FormData();
     formData.set("auctionId", auctionId);
@@ -153,6 +169,7 @@ export function AuctionDetailClient({
       });
       return;
     }
+    trackBidClickIntent(auctionId, "custom_bid");
     setLoading(true);
     const formData = new FormData();
     formData.set("auctionId", auctionId);
@@ -200,6 +217,7 @@ export function AuctionDetailClient({
       });
       return;
     }
+    trackBidClickIntent(auctionId, "auto_bid");
     setLoading(true);
     const formData = new FormData();
     formData.set("auctionId", auctionId);
@@ -258,7 +276,12 @@ export function AuctionDetailClient({
           {!isLoggedIn ? (
             <div className="space-y-4 rounded-xl border border-border/50 bg-muted/30 p-4">
               <Button asChild variant="performance" size="lg" className="w-full">
-                <Link href={signUpHref}>Sign up to bid</Link>
+                <Link
+                  href={signUpHref}
+                  onClick={() => trackBidClickIntent(auctionId, "signup_cta")}
+                >
+                  Sign up to bid
+                </Link>
               </Button>
               <details className="group">
                 <summary className="cursor-pointer text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground">

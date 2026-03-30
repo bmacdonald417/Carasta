@@ -3,7 +3,7 @@ import { MarketingTrafficSource } from "@prisma/client";
 
 export const marketingTrackBodySchema = z.object({
   auctionId: z.string().min(1).max(128),
-  eventType: z.enum(["VIEW", "SHARE_CLICK"]),
+  eventType: z.enum(["VIEW", "SHARE_CLICK", "BID_CLICK"]),
   source: z.nativeEnum(MarketingTrafficSource).optional(),
   visitorKey: z.string().min(8).max(128).optional(),
   metadata: z

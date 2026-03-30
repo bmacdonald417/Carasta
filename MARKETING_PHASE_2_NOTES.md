@@ -4,7 +4,7 @@
 
 - **Route:** `POST /api/marketing/track`
 - **Flag off:** `204 No Content` (no DB work).
-- **Body (JSON):** `auctionId`, `eventType` (`VIEW` | `SHARE_CLICK`), optional `source` (`MarketingTrafficSource` enum), optional `visitorKey` (≥8 chars), optional `metadata` (string values only after sanitization).
+- **Body (JSON):** `auctionId`, `eventType` (`VIEW` | `SHARE_CLICK` | `BID_CLICK`), optional `source` (`MarketingTrafficSource` enum), optional `visitorKey` (≥8 chars), optional `metadata` (string values only after sanitization; **BID_CLICK** may include `bidUiSurface`, `path`, `currentUrl`).
 
 ## Event types (this PR)
 
@@ -19,6 +19,7 @@
 
 - **VIEW:** No second row within **60s** for the same `auctionId` and authenticated `userId`, **or** the same `auctionId` and `visitorKey` (stored in JSON metadata) when anonymous.
 - **SHARE_CLICK:** No second row within **5s** for the same `auctionId`, `userId`, and `metadata.shareTarget` (or anonymous + `visitorKey` match).
+- **BID_CLICK:** No second row within **12s** for the same `auctionId`, `metadata.bidUiSurface`, and `userId` (or anonymous + `visitorKey` match).
 
 No IP throttling; high-traffic deployments should add edge rate limits in a later PR.
 

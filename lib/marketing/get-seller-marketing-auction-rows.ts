@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { computeCurrentBidCents } from "@/lib/auction-metrics";
 import { getViewShareTotalsForAuctionIds } from "@/lib/marketing/get-view-share-totals";
+import { MarketingTrafficEventType } from "@prisma/client";
 
 const ROW_LIMIT = 100;
 
@@ -18,6 +19,7 @@ export type SellerMarketingAuctionRow = {
   bidCount: number;
   totalViews: number;
   totalShareClicks: number;
+  totalBidClicks: number;
   lastMarketingActivityAt: Date | null;
 };
 
@@ -40,14 +42,26 @@ export async function getSellerMarketingAuctionRows(
 
   const auctionIds = auctions.map((a) => a.id);
 
-  const [viewShareByAuction, lastActivity] = await Promise.all([
+  const [viewShareByAuction, bidClickByAuction, lastActivity] = await Promise.all([
     getViewShareTotalsForAuctionIds(auctionIds),
+    prisma.trafficEvent.groupBy({
+      by: ["auctionId"],
+      where: {
+        auctionId: { in: auctionIds },
+        eventType: MarketingTrafficEventType.BID_CLICK,
+      },
+      _count: { _all: true },
+    }),
     prisma.trafficEvent.groupBy({
       by: ["auctionId"],
       where: { auctionId: { in: auctionIds } },
       _max: { createdAt: true },
     }),
   ]);
+
+  const bidMap = new Map(
+    bidClickByAuction.map((r) => [r.auctionId, r._count._all])
+  );
 
   const lastByAuction = new Map<string, Date | null>();
   for (const row of lastActivity) {
@@ -73,6 +87,7 @@ export async function getSellerMarketingAuctionRows(
       bidCount: a._count.bids,
       totalViews: vs.views,
       totalShareClicks: vs.shareClicks,
+      totalBidClicks: bidMap.get(a.id) ?? 0,
       lastMarketingActivityAt: lastByAuction.get(a.id) ?? null,
     };
   });

@@ -428,7 +428,27 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_7_NOTES.md`.
 
-**Next recommended step (PR 8):** Saved **UTM presets**, **BID_CLICK**, ingest **throttle**/sampling, optional **`Post.auctionId`** FK if product wants structured promo linkage — one slice per PR.
+**Next recommended step (PR 8):** Implemented as Phase 8 (below).
+
+---
+
+## 12i. Phase 8 — BID_CLICK intent tracking (implemented)
+
+**Goal:** **Non-transactional** bid-intent via **`BID_CLICK`** `TrafficEvent` rows from **auction detail client** only (quick bid, custom bid, auto-bid CTAs, sign-up CTA); **fire-and-forget** `sendMarketingTrack`; server dedupe per **surface** (~12s); seller analytics show totals and windows; **no** `AuctionAnalytics` rollup extension; **no** bid/buy-now mutation changes.
+
+**Implemented:**
+
+- **API / validation:** `BID_CLICK` on **`POST /api/marketing/track`**; `marketingTrackBodySchema`, `track-payload-types`, **`bidUiSurface`** in **`sanitize-marketing-metadata`**.
+- **Server:** `findRecentBidClickDuplicate` in **`track-marketing-event-server.ts`** (authenticated `userId` **or** anonymous `visitorKey` + same `bidUiSurface` within **12s**).
+- **Client:** **`auction-detail-client.tsx`** — `trackBidClickIntent` before bid actions (after validation where applicable); **not inline** in `placeBid` / `quickBid` server actions.
+- **Reads:** `getSellerMarketingOverview` **totalBidClicks**; `getSellerMarketingAuctionRows` **totalBidClicks**; `getSellerMarketingAuctionDetail` **totalBidClicks**, **bidClicksLast24h**, **bidClicksLast7d**, recent table **Detail** column for bid surface labels (**`marketingBidUiSurfaceLabel`**).
+- **UI:** Marketing overview KPI + listing cards; drill-down KPI row + copy updates.
+
+**Schema:** Unchanged — `BID_CLICK` already existed on **`MarketingTrafficEventType`**.
+
+**Notes:** `MARKETING_PHASE_8_NOTES.md`.
+
+**Next recommended step (PR 9):** Saved **UTM presets**, ingest **throttle**/sampling, optional **`Post.auctionId`** FK — one slice per PR.
 
 ---
 
@@ -443,4 +463,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 7; see §12b–§12h.*
+*Plan updated through Marketing Phase 8; see §12b–§12i.*

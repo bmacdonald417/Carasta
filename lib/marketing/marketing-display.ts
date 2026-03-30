@@ -58,6 +58,22 @@ export function marketingEventTypeLabel(
   }
 }
 
+/** Human label for bid-intent metadata from the auction detail client. */
+export function marketingBidUiSurfaceLabel(surface: string): string {
+  switch (surface) {
+    case "quick_bid":
+      return "Quick bid";
+    case "custom_bid":
+      return "Custom bid";
+    case "auto_bid":
+      return "Auto-bid";
+    case "signup_cta":
+      return "Sign up to bid";
+    default:
+      return surface || "—";
+  }
+}
+
 export function shareTargetLabel(target: string): string {
   switch (target) {
     case "twitter":

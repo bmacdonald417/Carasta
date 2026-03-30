@@ -11,6 +11,8 @@ import { normalizeMarketingVisitorKey } from "@/lib/marketing/visitor-key";
 
 const VIEW_DEDUPE_MS = 60_000;
 const SHARE_DEDUPE_MS = 5_000;
+/** Per-surface bid intent: suppress rapid double-fires on the same CTA (~12s). */
+const BID_CLICK_DEDUPE_MS = 12_000;
 
 export async function recordTrafficEvent(input: {
   auctionId: string;
@@ -61,6 +63,19 @@ export async function recordTrafficEvent(input: {
       visitorKey,
       shareTarget,
       windowMs: SHARE_DEDUPE_MS,
+    });
+    if (dup) return { ok: true, skipped: true };
+  }
+
+  if (input.eventType === MarketingTrafficEventType.BID_CLICK) {
+    const surface =
+      typeof metaRaw?.bidUiSurface === "string" ? metaRaw.bidUiSurface : "";
+    const dup = await findRecentBidClickDuplicate({
+      auctionId: input.auctionId,
+      userId,
+      visitorKey,
+      bidUiSurface: surface,
+      windowMs: BID_CLICK_DEDUPE_MS,
     });
     if (dup) return { ok: true, skipped: true };
   }
@@ -164,6 +179,53 @@ async function findRecentShareDuplicate(params: {
         createdAt: { gte: since },
         AND: [
           { metadata: { path: ["shareTarget"], equals: target } },
+          { metadata: { path: ["visitorKey"], equals: params.visitorKey } },
+        ],
+      },
+      select: { id: true },
+    });
+    return !!row;
+  }
+
+  return false;
+}
+
+async function findRecentBidClickDuplicate(params: {
+  auctionId: string;
+  userId: string | null;
+  visitorKey: string | null;
+  bidUiSurface: string;
+  windowMs: number;
+}): Promise<boolean> {
+  const since = new Date(Date.now() - params.windowMs);
+  const surface = params.bidUiSurface;
+
+  if (params.userId) {
+    const row = await prisma.trafficEvent.findFirst({
+      where: {
+        auctionId: params.auctionId,
+        eventType: MarketingTrafficEventType.BID_CLICK,
+        userId: params.userId,
+        createdAt: { gte: since },
+        metadata: {
+          path: ["bidUiSurface"],
+          equals: surface,
+        },
+      },
+      select: { id: true },
+    });
+    return !!row;
+  }
+
+  if (params.visitorKey) {
+    const row = await prisma.trafficEvent.findFirst({
+      where: {
+        auctionId: params.auctionId,
+        eventType: MarketingTrafficEventType.BID_CLICK,
+        userId: null,
+        createdAt: { gte: since },
+        AND: [
+          { metadata: { path: ["bidUiSurface"], equals: surface } },
           { metadata: { path: ["visitorKey"], equals: params.visitorKey } },
         ],
       },

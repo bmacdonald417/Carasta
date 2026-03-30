@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { MarketingCampaignStatus } from "@prisma/client";
+import { MarketingCampaignStatus, MarketingTrafficEventType } from "@prisma/client";
 import { sumViewShareTotalsForSellerAuctions } from "@/lib/marketing/get-view-share-totals";
 
 export type SellerMarketingOverview = {
@@ -9,6 +9,7 @@ export type SellerMarketingOverview = {
   activeCampaigns: number;
   totalViews: number;
   totalShareClicks: number;
+  totalBidClicks: number;
 };
 
 export async function getSellerMarketingOverview(
@@ -20,6 +21,7 @@ export async function getSellerMarketingOverview(
     marketingEvents,
     activeCampaigns,
     shareTotals,
+    totalBidClicks,
   ] = await Promise.all([
     prisma.auction.count({ where: { sellerId } }),
     prisma.auction.count({ where: { sellerId, status: "LIVE" } }),
@@ -33,6 +35,12 @@ export async function getSellerMarketingOverview(
       },
     }),
     sumViewShareTotalsForSellerAuctions(sellerId),
+    prisma.trafficEvent.count({
+      where: {
+        auction: { sellerId },
+        eventType: MarketingTrafficEventType.BID_CLICK,
+      },
+    }),
   ]);
 
   return {
@@ -42,5 +50,6 @@ export async function getSellerMarketingOverview(
     activeCampaigns,
     totalViews: shareTotals.views,
     totalShareClicks: shareTotals.shareClicks,
+    totalBidClicks,
   };
 }

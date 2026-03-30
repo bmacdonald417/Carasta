@@ -48,9 +48,10 @@ Does **not** reuse `createPost` from `explore/actions.ts` to keep auction owners
 
 ---
 
-## PR 8 suggestions
+## Follow-ons (after Phase 8)
+
+Phase 8 added **`BID_CLICK`** intent — see **`MARKETING_PHASE_8_NOTES.md`**. Further ideas:
 
 - Saved **UTM presets** (manual) tied to campaigns or share kit.
-- **`BID_CLICK`** or funnel events (product decision).
 - **IP-based** or sampled ingest throttles if volume grows.
-- Optional **Post** optional `auctionId` FK (migration + moderation story) if product wants structured linkage.
+- Optional **`Post.auctionId`** FK if product wants structured linkage.
