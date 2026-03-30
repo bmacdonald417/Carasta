@@ -32,8 +32,11 @@
 - Marketing UI and dashboard: **owner-only**, same ID check as `/u/[handle]/listings`.
 - No new roles; **seller** = authenticated user who owns the handle/auctions.
 
-## PR 2 suggestion
+## PR 2 (done)
 
-1. Public or authenticated **track** endpoint with validation + rate limits.
-2. Client: fire-and-forget from auction detail / share control (no blocking render).
-3. Optional: `/u/[handle]/marketing/auctions/[auctionId]` drill-down once reads are useful.
+See **`MARKETING_PHASE_2_NOTES.md`** — `POST /api/marketing/track`, VIEW + SHARE_CLICK ingestion.
+
+## PR 3 suggestion
+
+1. `/u/[handle]/marketing/auctions/[auctionId]` drill-down and charts.
+2. Heavier rate limiting / rollups as traffic grows.

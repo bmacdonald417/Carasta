@@ -10,6 +10,8 @@ import { getSession } from "@/lib/auth";
 import { AuctionConditionReport } from "@/components/auction/AuctionConditionReport";
 import { AuctionFeedbackCard } from "@/components/auction/AuctionFeedbackCard";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
+import { AuctionViewTracker } from "@/components/marketing/auction-view-tracker";
+import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 
 export default async function AuctionDetailPage({
   params,
@@ -58,8 +60,11 @@ export default async function AuctionDetailPage({
     auction.buyNowExpiresAt != null &&
     new Date() < auction.buyNowExpiresAt;
 
+  const marketingTrackingOn = isMarketingEnabled();
+
   return (
     <div className="carasta-container max-w-6xl py-8">
+      <AuctionViewTracker auctionId={auction.id} enabled={marketingTrackingOn} />
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-muted">
@@ -113,6 +118,8 @@ export default async function AuctionDetailPage({
               url={`/auctions/${auction.id}`}
               title={auction.title}
               description={`${auction.year} ${auction.make} ${auction.model} — Bid on Carasta`}
+              auctionId={auction.id}
+              trackMarketing={marketingTrackingOn}
             />
           </div>
           {auction.description && (

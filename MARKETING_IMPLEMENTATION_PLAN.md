@@ -301,7 +301,32 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Lightweight notes:** `MARKETING_PHASE_1_NOTES.md` (env, deploy, PR2 hint).
 
-**Next recommended step (PR 2):** Server-side **traffic/event ingestion** (e.g. `POST /api/marketing/track` or auction-scoped route), rate limiting, write `TrafficEvent` from auction detail page views and share actions; then enable **per-auction marketing subpage** `/u/[handle]/marketing/auctions/[auctionId]` with seller ownership checks.
+**Next step after Phase 1:** Implemented as Phase 2 (below).
+
+---
+
+## 12c. Phase 2 — Passive marketing ingestion (implemented)
+
+**Goal:** `TrafficEvent` writes for **VIEW** and **SHARE_CLICK** only, isolated **POST** API, client **sendBeacon** / **fetch keepalive**, **no** changes to bid/buy-now/community server actions.
+
+**Implemented:**
+
+- **Endpoint:** `POST /api/marketing/track` (`app/api/marketing/track/route.ts`) — gated by `MARKETING_ENABLED` (returns **204** with no body when disabled). Validates body with Zod (`lib/validations/marketing.ts`); requires known `auctionId` (invalid/unknown id returns **400** `{ ok: false }` to avoid enumeration). Resolves `userId` from JWT when present; supports anonymous events. Generic error responses only.
+- **Server insert + dedupe:** `lib/marketing/track-marketing-event-server.ts` — **VIEW:** skip if duplicate within **60s** for same `(auctionId, userId)` or same `(auctionId, visitorKey)` in metadata for anonymous. **SHARE_CLICK:** skip within **5s** for same `(auctionId, userId, shareTarget)` or anonymous with matching `visitorKey` in metadata.
+- **Source inference:** `lib/marketing/resolve-marketing-source.ts` — optional `utm_source` / referrer host mapping into `MarketingTrafficSource`; otherwise **UNKNOWN**.
+- **Metadata:** `lib/marketing/sanitize-marketing-metadata.ts` — only small string keys (`path`, `referrer`, `shareTarget`, `currentUrl`, `visitorKey`).
+- **Client:** `lib/marketing/send-marketing-track.ts` + `getOrCreateMarketingVisitorKey()` (sessionStorage). `components/marketing/auction-view-tracker.tsx` — one **VIEW** per mount when flag on. `components/ui/share-buttons.tsx` — optional `auctionId` + `trackMarketing`; emits **SHARE_CLICK** for twitter / facebook / linkedin / copy_link on deliberate action only.
+- **Wiring:** `app/(marketing)/auctions/[id]/page.tsx` — mounts tracker and passes share props only when `isMarketingEnabled()`.
+
+**Limitations (documented):**
+
+- Dedupe is **database-window** scoped (not distributed Redis); adequate for current scale.
+- Anonymous users without `visitorKey` get **no VIEW dedupe** on server (client still sends key when storage works).
+- No IP-based rate limiting in this PR.
+
+**Notes:** `MARKETING_PHASE_2_NOTES.md`.
+
+**Next recommended step (PR 3):** Seller drill-down `/u/[handle]/marketing/auctions/[auctionId]` (charts/tables from `TrafficEvent`), optional **BID_CLICK** instrumentation on the client only (never in bid submission path), and production **rate limits** (edge/middleware or provider).
 
 ---
 
@@ -316,4 +341,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 1; see §12b for implemented foundation and PR2 scope.*
+*Plan updated through Marketing Phase 2; see §12b–§12c.*
