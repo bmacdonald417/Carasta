@@ -1,0 +1,319 @@
+# Marketing Management — Implementation Plan (Audit)
+
+This document records a **read-only audit** of the Carasta repo and a **safe, incremental** path to add Marketing Management. No subsystem was built during this phase; **no code or schema migrations were applied** as part of this audit.
+
+---
+
+## 1. Executive Summary
+
+Carasta is a **Next.js App Router** app with a **global shell** (`CarastaLayout` + `AppSidebar` + `MobileBottomNav`), **Prisma/PostgreSQL**, and **NextAuth** (JWT sessions). Auctions and bids are the core commerce domain; **“Community”** in the UI is the explore feed built on `Post` / `Like` / `Comment`. There is **no separate “manager” role**—only `Role.USER` and `Role.ADMIN`; seller-facing tools should follow **ownership checks** (same pattern as `/u/[handle]/listings`).
+
+**Recommended approach:** Add Marketing as **seller-scoped routes** under `app/(app)/u/[handle]/marketing/*`, link from the **profile** (owner-only) and optionally from **auction detail** for the listing owner. Persist **additive** Prisma models for traffic and rollups/campaigns; ingest via **new API route(s)** or **server actions**, keeping **existing auction bid/sell paths untouched**. Align new model naming with existing conventions (`PascalCase` models, `camelCase` fields, `cuid()` IDs, `Json?` for flexible payloads where appropriate).
+
+---
+
+## 2. Current Architecture Summary
+
+### 2.1 App / router structure
+
+| Area | Path / pattern | Notes |
+|------|----------------|--------|
+| Route groups | `app/(marketing/*)`, `app/(app/*)`, `app/(auth/*)`, `app/(admin/*)` | Groups do not affect URLs; they organize layouts and concerns. |
+| Root layout | `app/layout.tsx` | Wraps everything in `Providers` + `CarastaLayout`. |
+| Public marketing | `/`, `/how-it-works`, `/contact`, `/terms`, `/privacy`, `/merch`, `/auctions`, `/auctions/[id]`, `/explore`, `/community/leaderboard` | Auction detail and explore are under `(marketing)` but are core product surfaces. |
+| Authenticated “app” | `/settings`, `/sell`, `/u/[handle]`, `/u/[handle]/garage`, `/dream`, `/garage`, listings | Seller listing management: `/u/[handle]/listings` (owner-only via server check). |
+| Admin | `/admin`, `/admin/reputation/[handle]` | Protected by `middleware.ts` (`role === ADMIN`). |
+| API | `app/api/*` | e.g. `auth`, `auctions/[id]`, `notifications`, `activity-feed`, `explore/*`, `contact`. |
+
+### 2.2 Dashboard / user account structure
+
+- **There is no dedicated “dashboard” route tree.** The closest equivalents:
+  - **Profile hub:** `app/(app)/u/[handle]/page.tsx` — stats, links to Garage, Dream, Listings.
+  - **Listings management:** `app/(app)/u/[handle]/listings/page.tsx` — filters, cards linking to `/auctions/[id]`.
+  - **Settings:** `app/(app)/settings/page.tsx` — profile and social URLs; protected by middleware.
+- **Header account menu** (`components/carasta/CarastaLayout.tsx`): Profile (`/u/{handle}`), Settings, Admin (if `ADMIN`), Sign out.
+- **Sidebar** (`components/layout/AppSidebar.tsx`): Showroom, Auctions, Community, Sell, Garage (to user garage or sign-in), Merch.
+
+### 2.3 Auction domain
+
+- **Model:** `Auction` in `prisma/schema.prisma` — `status` is a **string** (`DRAFT` | `LIVE` | `SOLD` | `ENDED`), relations to `Bid`, `AutoBid`, `AuctionImage`, `AuctionDamageImage`, `AuctionFeedback`, seller/buyer `User`.
+- **Listing creation:** `app/(app)/sell/actions.ts` — `createAuction`, `saveAuctionDraft` (transactions).
+- **Bidding / buy-now / auto-bid / feedback:** `app/(marketing)/auctions/actions.ts` — delegates to `lib/auction-utils.ts` and reputation helpers.
+- **Detail page:** `app/(marketing)/auctions/[id]/page.tsx` — server component; loads auction; **DRAFT** hidden except to seller; uses `AuctionDetailClient` for live bidding UI.
+- **Public auction JSON:** `app/api/auctions/[id]/route.ts` — bid/high/reserve/buy-now fields for polling.
+
+### 2.4 Community / “Carmunity” / social posts
+
+- **UI label:** “Community” → `/explore`.
+- **Models:** `Post`, `Like`, `Comment`, `Follow` (see schema).
+- **Mutations:** `app/(marketing)/explore/actions.ts` — `createPost`, `likePost`, `unlikePost`, `addComment` (also triggers `broadcastActivityEvent` for `new_comment`).
+- **Feed API:** `app/api/explore/feed/route.ts` (referenced in codebase layout).
+- **Posts today** are not linked to `auctionId`; any “promote this listing to the feed” feature would be an **additive** extension (optional FK or `meta` JSON), not assumed existing.
+
+### 2.5 Authentication and roles / permissions
+
+- **Config:** `lib/auth.ts` — NextAuth with Prisma adapter, JWT strategy; Google + credentials; `handle` and `role` on JWT/session.
+- **Roles:** `enum Role { USER, ADMIN }` only.
+- **Middleware:** `middleware.ts` — `withAuth`; `/admin/*` requires `ADMIN`; `/settings` requires auth; **all other routes pass through** (including `/sell`, `/u/*` — those rely on page-level `getSession()` / `redirect` / `notFound()`).
+- **Authorization pattern for sellers:** compare `(session.user as any).id` to `auction.sellerId` or `user.id` on listing pages.
+
+### 2.6 Database schema / Prisma models (relevant subset)
+
+- **User-centric:** `User`, `Account`, `Session`, `Follow`, social fields on `User`.
+- **Community:** `Post`, `Like`, `Comment`.
+- **Garage:** `GarageCar`, `GarageCarImage`.
+- **Auctions:** `Auction`, images, damage images, `Bid`, `AutoBid`, `AuctionFeedback`.
+- **Notifications:** `Notification` (`type` string + `payloadJson`); **list/unread API exists**; **no in-repo writers** were found in the audit grep—plan for marketing alerts may need **new writers** later.
+- **Reputation:** `ReputationEvent` and counters on `User` — **trust metrics**, not marketing analytics.
+
+### 2.7 API routes / server actions / service layer
+
+- **Server actions:** Colocated under routes (e.g. `explore/actions.ts`, `auctions/actions.ts`, `sell/actions.ts`, `settings/actions.ts`, `garage/actions.ts`) with `"use server"`.
+- **Services:** Logic concentrated in `lib/auction-utils.ts`, `lib/auction-metrics.ts`, `lib/reputation.ts`, `lib/pusher.ts`, etc. **No separate `services/` folder** — follow `lib/*` for new marketing logic.
+- **Real-time:** `lib/pusher.ts` + `lib/activity-emitter.ts` + SSE `app/api/activity-feed/route.ts` for **public activity feed** (`ActivityEvent` types in `lib/activity-types.ts`: `new_bid`, `new_comment`, `ending_soon`).
+
+### 2.8 Analytics, tracking, watchlist, favorites, notifications
+
+| Capability | Status in repo |
+|------------|----------------|
+| **Product analytics (seller)** | **Not present**; admin home aggregates counts/volume in `app/(admin)/admin/page.tsx` only. |
+| **Traffic / UTM / funnel** | **Not present** in schema or routes. |
+| **Watchlist / favorites** | **Not in Prisma**; copy on `/how-it-works` mentions watchlist—**no implemented model** found. |
+| **Notifications** | Model + `GET` list/count APIs + `NotificationDropdown` + `markAllNotificationsRead`; **creation paths not located** in this audit. |
+| **Share** | `components/ui/share-buttons.tsx` on auction detail — client-side share URLs + copy link; **no persistence** of share events. |
+
+### 2.9 UI component patterns
+
+- **Styling:** Tailwind; dark “cyber-luxury” shell; `font-display` headings; accent `#ff3b5c`; cards `rounded-2xl border border-white/10 bg-white/5` (common on profile/listings).
+- **Primitives:** `components/ui/*` (shadcn-style: `Button`, `Card`, `DropdownMenu`, `Input`, etc.).
+- **Motion:** `framer-motion` in layout/sidebar.
+- **Domain UI:** `components/auction/*`, `components/reputation/*`, `components/profile/*`.
+
+### 2.10 Layout / navigation / sidebar
+
+- **Global:** `CarastaLayout` — header links (marketing + app nav), `AppSidebar`, `main`, `MobileBottomNav`, footer.
+- **Nav sources of truth:** `mainNav` in `AppSidebar.tsx`, `navItems` in `MobileBottomNav.tsx`, parallel arrays in `CarastaLayout` (`marketingNav`, `appNav`). **Any new top-level nav item requires updating multiple files** if it should appear everywhere.
+
+---
+
+## 3. Safe Extension Points
+
+| Extension | Recommendation | Why it’s safe |
+|-----------|----------------|---------------|
+| **Seller marketing “home”** | `app/(app)/u/[handle]/marketing/page.tsx` (+ nested routes as needed) | Mirrors `listings/page.tsx`: `notFound()` unless `session` user matches profile; no change to auction engine. |
+| **Nav entry for owners** | `app/(app)/u/[handle]/page.tsx` — button row next to Garage / Listings | Conditional `isOwnProfile` already exists; single-page edit. |
+| **Optional header link** | `DropdownMenu` in `CarastaLayout.tsx`: “Marketing” → `/u/{handle}/marketing` | Additive; only for signed-in users with `handle`. |
+| **Auction-level entry** | `app/(marketing)/auctions/[id]/page.tsx`: when `currentUserId === auction.sellerId` and status allows, show link “Listing insights” or small tab strip | Server component already has `session` and `auction`; pass flag into a thin client wrapper if needed. |
+| **Persistence** | New Prisma models + `lib/marketing-*.ts` helpers | Additive migrations; no renames of existing models. |
+| **Ingestion** | `app/api/marketing/*` (e.g. `track` POST) or server action from a tiny client hook | Keeps bidding code paths isolated; rate-limit and validate `auctionId` + optional auth. |
+| **Rollups** | Cron/scheduled job or on-read aggregation (phase 2+) | Can start with **on-the-fly** queries from `TrafficEvent` for low volume; add `AuctionAnalytics` when needed. |
+
+**Reuse existing models:**
+
+- `Auction` (required FK for auction-scoped metrics).
+- `User` (seller `sellerId`; optional `userId` on events when viewer is logged in).
+- `Post` / `Comment` / `Like` — future “promote to community” can reference listing in copy or add optional FK later.
+
+---
+
+## 4. Risks / Fragile Areas To Avoid (Unless Necessary)
+
+| Area | Risk | Guidance |
+|------|------|----------|
+| `lib/auction-utils.ts` / `placeBidAndProcess` | **High** — core money/bid logic | Do not inject tracking or marketing side effects here until design is explicit; prefer separate API called from UI. |
+| `app/(marketing)/auctions/actions.ts` | **High** — same | Avoid adding nonessential DB writes to bid/buy-now paths. |
+| `prisma/schema.prisma` + migrations | **Medium/high** if rushed | Additive only; review indexes; avoid changing `Auction` columns without strong reason. |
+| `middleware.ts` | **Medium** | Narrow matcher; over-broad auth on `/u/*` could break public profile intent (profiles are public today). Prefer page-level guards for seller-only marketing. |
+| `CarastaLayout.tsx` / `AppSidebar.tsx` | **Medium** | Easy to over-clutter global nav; prefer profile + owner dropdown first. |
+| `ShareButtons` | **Low** | Extend with optional `onShare` callback or wrapper component rather than breaking props contract. |
+| **High-write traffic table** | **Operational** | Raw `TrafficEvent` inserts can explode; plan sampling, batched rollups, or edge pipeline before production scale. |
+
+---
+
+## 5. Proposed New Routes
+
+All routes are **proposed**; none exist yet.
+
+| Route | Purpose | Access |
+|-------|---------|--------|
+| `/u/[handle]/marketing` | Seller marketing dashboard (overview, links to listing tools) | Owner only (`session.user.id === user.id`), same as listings. |
+| `/u/[handle]/marketing/auctions/[auctionId]` | Auction-level marketing detail (traffic, shares, campaign attribution) | Owner + owns `auctionId`. |
+| `/u/[handle]/marketing/campaigns` | Campaign list / create (phase 2+) | Owner only. |
+| `/u/[handle]/marketing/campaigns/[campaignId]` | Campaign detail | Owner only. |
+
+**Optional** (if you prefer flatter URLs): `/marketing` redirecting to `/u/{session.handle}/marketing` — adds redirect logic and duplicate SEO surface; **nested under `/u/[handle]` is consistent with existing listings/garage.**
+
+---
+
+## 6. Proposed New Prisma Models (Additive — Not Migrated Yet)
+
+Align with existing style: **`@id @default(cuid())`**, **`DateTime`**, **`Json?`** for flexible metadata, **`@@index`** for query paths. `Auction.status` uses **strings**; new enums are optional—using **string `status`** on `Campaign` matches `Auction` flexibility.
+
+### 6.1 `TrafficEvent` (proposed)
+
+Raw events for **views, share clicks, outbound referrals** (Privacy: avoid storing raw PII; use hashed `visitorKey` or session id).
+
+- `id`, `auctionId`, `eventType` (e.g. `PAGE_VIEW`, `SHARE_COPY`, `SHARE_PLATFORM`)
+- `visitorKey` (optional string), `userId` (optional)
+- UTM: `utmSource`, `utmMedium`, `utmCampaign` (nullable strings) or single `referrer` + `meta` Json
+- `createdAt`
+- Relations: `Auction`, optional `User`
+- Indexes: `[auctionId, createdAt]`, `[auctionId, eventType]`
+
+### 6.2 `AuctionAnalytics` (proposed rollup)
+
+Optional **materialized daily (or hourly) bucket** per auction to avoid scanning raw events in UI.
+
+- `id`, `auctionId`, `bucketDate` (`DateTime` date-only UTC)
+- Counters: e.g. `viewCount`, `uniqueVisitorEstimate`, `shareActionCount` (names can match your product language)
+- `updatedAt`
+- `@@unique([auctionId, bucketDate])`
+
+**Note:** Phase 1 can **omit** this table and aggregate from `TrafficEvent` until volume demands rollups.
+
+### 6.3 `Campaign` (proposed)
+
+- `id`, `sellerId`, `name`, `status` (`DRAFT` | `ACTIVE` | `PAUSED` | `ENDED`)
+- `auctionId` optional (primary listing)
+- `utmCampaign` optional (align with inbound tracking)
+- `startsAt`, `endsAt` optional
+- `createdAt`, `updatedAt`
+- Relations: `User`, optional `Auction`
+
+### 6.4 `CampaignEvent` (proposed audit log)
+
+- `id`, `campaignId`, `type` (e.g. `CREATED`, `LINK_COPIED`, `NOTES_UPDATED`)
+- `meta` `Json?`, `createdAt`
+- Relation: `Campaign`
+
+### 6.5 Optional: `MarketingAsset` (defer)
+
+Use only if you need **DB-backed** creative (image URLs, copy variants). Otherwise store assets in blob storage + URL on `Campaign.meta` for v1.
+
+### 6.6 Naming alignment
+
+The schema uses names like `AuctionDamageImage`, `ReputationEvent`. **`TrafficEvent`** is clear; if “traffic” is too narrow later, **`MarketingEvent`** is an alternative—pick one to avoid rename migrations.
+
+---
+
+## 7. Proposed New Services / API Endpoints
+
+| Piece | Responsibility |
+|-------|----------------|
+| `lib/marketing-tracking.ts` (or similar) | Validate auction ownership for seller endpoints; normalize UTM params; hashing helper for `visitorKey`. |
+| `lib/marketing-analytics.ts` | Read paths: summarize per auction, date range; optionally refresh rollups. |
+| `POST /api/marketing/track` (or `/api/auctions/[id]/track`) | Accept event type + auction id + optional UTM; **public** for `PAGE_VIEW` with bot filtering later; rate limit. |
+| `GET /api/marketing/auctions/[auctionId]/summary` | Seller-only: aggregates for dashboard (or use server components + prisma directly). |
+| Server actions `app/(app)/u/[handle]/marketing/actions.ts` | Create/pause campaign, fetch dashboard data (keeps pattern with rest of app). |
+
+**Attribution:** When `Campaign` exists, generated links can append `utm_*` matching `Campaign.utmCampaign`; `TrafficEvent` stores parsed params.
+
+---
+
+## 8. Proposed UI Components
+
+| Component | Role |
+|-----------|------|
+| `MarketingDashboardShell` | Layout under `/u/[handle]/marketing` — title, tabs (Overview, Listings, Campaigns). |
+| `MarketingOverviewCards` | Reuse stat card pattern from admin page (`border-white/10 bg-white/5`). |
+| `AuctionMarketingSummary` | Embeddable strip on auction detail for sellers or full subpage. |
+| `SellerAuctionInsightsLink` | Small CTA linking to `/u/[handle]/marketing/auctions/[id]`. |
+| Extend or wrap `ShareButtons` | Fire `track` on copy/share (client-side) with debounce. |
+
+Use existing **`Card`**, **`Button`**, **`Tabs`** (if present in `components/ui`) — verify `tabs` exists before importing.
+
+---
+
+## 9. Recommended Build Order
+
+1. **Schema (additive)** — `TrafficEvent` (+ optional `AuctionAnalytics`, `Campaign`, `CampaignEvent`); migrate in staging; generate client.
+2. **Read path proof** — owner-only page at `/u/[handle]/marketing` with **stub stats** (zeros) and listing table reusing queries similar to listings page.
+3. **Write path** — `POST` track endpoint + minimal client call from auction detail page view (respect privacy; document behavior).
+4. **Seller UX** — profile button + optional auction detail CTA; optional header dropdown link.
+5. **Campaigns** — CRUD after events prove stable; link UTM generation to `ShareButtons` or dedicated “Copy tracking link”.
+6. **Carmunity hooks** — optional `Post` association or “suggested copy” modal; **after** core tracking works.
+7. **Rollups / performance** — `AuctionAnalytics` + nightly job or incremental updater when row counts hurt queries.
+
+---
+
+## 10. Rollback / Safety Notes
+
+- **Feature flag** (env e.g. `MARKETING_V1_ENABLED`) around nav links and tracking script—**optional** but helpful for staged rollout.
+- **Migrations:** keep new tables **isolated**; rollback = drop new tables via down migration in dev/staging only (coordinate with any data you care about).
+- **API:** abusive traffic to `track` can be mitigated with rate limits (middleware or edge config)—plan before exposing publicly.
+- **Do not** block page render on tracking failures; use `sendBeacon` / fire-and-forget patterns client-side.
+- **Admin vs seller:** marketing dashboards belong **seller-side** under `/u/...`; avoid widening `/admin` unless building platform-wide marketing ops.
+
+---
+
+## 11. File-by-File Change Map (Future Work)
+
+### Files to **create** (estimated risk: **low** unless noted)
+
+| File | Why | Risk |
+|------|-----|------|
+| `app/(app)/u/[handle]/marketing/page.tsx` | Dashboard entry | Low |
+| `app/(app)/u/[handle]/marketing/auctions/[auctionId]/page.tsx` | Auction insights | Low |
+| `app/(app)/u/[handle]/marketing/actions.ts` | Server actions for campaigns/summary | Low–medium |
+| `lib/marketing-tracking.ts`, `lib/marketing-analytics.ts` | Shared logic | Low |
+| `app/api/marketing/track/route.ts` (or under `api/auctions/...`) | Ingest | Medium (abuse, validation) |
+| `components/marketing/*` | UI | Low |
+| `prisma/migrations/*` | New tables | Medium (DB) |
+
+### Files to **modify** (risk noted)
+
+| File | Why | Risk |
+|------|-----|------|
+| `prisma/schema.prisma` | New models + relations | Medium |
+| `app/(app)/u/[handle]/page.tsx` | Add “Marketing” button for `isOwnProfile` | Low |
+| `app/(marketing)/auctions/[id]/page.tsx` | Seller CTA / pass props for insights | Low |
+| `components/ui/share-buttons.tsx` or wrapper | Optional tracking callback | Low |
+| `components/carasta/CarastaLayout.tsx` | Optional nav item in user dropdown | Low–medium (UX clutter) |
+| `components/layout/AppSidebar.tsx` | **Avoid** unless product requires global entry | Medium |
+| `middleware.ts` | **Avoid** extending matcher for `/u/*` marketing | Medium–high |
+
+---
+
+## 12. Phase 0 (Audit) — Setup Changes Made
+
+Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
+
+---
+
+## 12b. Phase 1 — Marketing Foundation (implemented)
+
+**Goal:** Feature flag, additive Prisma models, owner-only marketing dashboard shell, read-only lib helpers, contextual nav — **no** tracking ingestion, **no** auction/bid/community logic changes.
+
+**Implemented:**
+
+- **Feature flag:** `MARKETING_ENABLED` — must be exactly `"true"` to expose UI and the marketing route (see `lib/marketing/feature-flag.ts`). Documented in `.env.example`.
+- **Prisma (additive):** `TrafficEvent`, `Campaign`, `CampaignEvent` plus enums `MarketingTrafficEventType`, `MarketingTrafficSource`, `MarketingCampaignStatus`. Relations on `User` (`trafficEventsAsViewer`, `marketingCampaigns`) and `Auction` (`trafficEvents`, `marketingCampaigns`).
+- **Migration:** `20260330120000_add_marketing_foundation` (`prisma/migrations/20260330120000_add_marketing_foundation/migration.sql`).
+- **Route:** `app/(app)/u/[handle]/marketing/page.tsx` — `notFound()` if flag off, profile not found, or non-owner (same pattern as listings).
+- **Read layer:** `lib/marketing/get-seller-marketing-overview.ts`, `lib/marketing/get-seller-marketing-listings.ts`.
+- **Navigation:** Marketing link on own profile (`app/(app)/u/[handle]/page.tsx`) and on My Listings header (`app/(app)/u/[handle]/listings/page.tsx`) when flag enabled; listings page remains owner-only so the link is seller-context only.
+
+**Deviations from earlier plan sketch:**
+
+- No `AuctionAnalytics` rollup table in this PR (explicitly out of scope for foundation).
+- `Campaign.type` is **String** (flexible, consistent with `Auction.status` string style for product iteration).
+- **`migration_lock.toml`** added under `prisma/migrations/` so Prisma can resolve the migrations provider (folder had SQL migrations but no lock file).
+
+**Lightweight notes:** `MARKETING_PHASE_1_NOTES.md` (env, deploy, PR2 hint).
+
+**Next recommended step (PR 2):** Server-side **traffic/event ingestion** (e.g. `POST /api/marketing/track` or auction-scoped route), rate limiting, write `TrafficEvent` from auction detail page views and share actions; then enable **per-auction marketing subpage** `/u/[handle]/marketing/auctions/[auctionId]` with seller ownership checks.
+
+---
+
+## 13. Blockers & Ambiguities
+
+1. **No `MANAGER` role** — clarify if “manager” means **seller**, **account manager**, or **ADMIN**; implementation assumes **seller (USER + owns listing)** unless requirements change.
+2. **Notification writes missing** — if marketing alerts depend on `Notification`, you need to introduce **centralized creation helpers** and define `type` + `payloadJson` conventions.
+3. **Watchlist** — referenced in UX copy but not in DB; marketing features should not assume watchlist counts until modeled.
+4. **Post ↔ Auction** — no FK today; “promote listing in Community” needs a product decision (link only vs schema link vs automated post).
+5. **Scale** — raw event ingestion needs a **rate-limit and retention** policy before high traffic.
+6. **Privacy / compliance** — define retention for `TrafficEvent` and whether IP/UA are stored (not recommended in clear text).
+
+---
+
+*Plan updated through Marketing Phase 1; see §12b for implemented foundation and PR2 scope.*

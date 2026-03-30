@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { computeCurrentBidCents } from "@/lib/auction-metrics";
 import { ListingsFilters } from "./listings-filters";
+import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 
 const PAGE_SIZE = 20;
 const STATUSES = ["LIVE", "DRAFT", "SOLD", "ENDED"] as const;
@@ -59,12 +60,22 @@ export default async function ListingsPage({
     <div className="carasta-container max-w-6xl py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-2xl font-bold">My Listings</h1>
-        <Link
-          href={`/u/${user.handle}`}
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          ← @{user.handle}
-        </Link>
+        <div className="flex items-center gap-4">
+          {isMarketingEnabled() ? (
+            <Link
+              href={`/u/${user.handle}/marketing`}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Marketing
+            </Link>
+          ) : null}
+          <Link
+            href={`/u/${user.handle}`}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            ← @{user.handle}
+          </Link>
+        </div>
       </div>
       <p className="text-muted-foreground">
         Auctions you&apos;ve created. Filter by status.

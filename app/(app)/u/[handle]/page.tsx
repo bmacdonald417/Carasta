@@ -9,6 +9,7 @@ import { FollowButton } from "./follow-button";
 import { SocialLinks } from "@/components/profile/SocialLinks";
 import { TrustPanel } from "@/components/profile/TrustPanel";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
+import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 
 export default async function ProfilePage({
   params,
@@ -173,6 +174,11 @@ export default async function ProfilePage({
           <Button variant="outline" size="sm" asChild>
             <Link href={`/u/${user.handle}/listings`}>Listings</Link>
           </Button>
+          {isOwnProfile && isMarketingEnabled() ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/u/${user.handle}/marketing`}>Marketing</Link>
+            </Button>
+          ) : null}
         </div>
 
         {wonAuctionsFiltered.length > 0 && (

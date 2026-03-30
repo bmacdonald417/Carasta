@@ -50,6 +50,30 @@ enum ReputationEventType {
   SOCIAL_SPAM_FLAG
 }
 
+enum MarketingTrafficEventType {
+  VIEW
+  SHARE_CLICK
+  BID_CLICK
+  EXTERNAL_REFERRAL
+}
+
+enum MarketingTrafficSource {
+  DIRECT
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+  EMAIL
+  CARMUNITY
+  UNKNOWN
+}
+
+enum MarketingCampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -93,6 +117,9 @@ model User {
   completedPurchasesCount Int         @default(0)
   disputesLostCount     Int           @default(0)
   uniqueCounterpartyCount Int         @default(0)
+
+  trafficEventsAsViewer TrafficEvent[]
+  marketingCampaigns    Campaign[]
 }
 
 model Account {
@@ -249,6 +276,8 @@ model Auction {
   bids    Bid[]
   autoBids AutoBid[]
   feedbacks AuctionFeedback[]
+  trafficEvents      TrafficEvent[]
+  marketingCampaigns Campaign[]
 
   @@index([sellerId])
   @@index([buyerId])
@@ -357,4 +386,55 @@ model ReputationEvent {
 
   @@index([userId, createdAt])
   @@index([userId, type])
+}
+
+model TrafficEvent {
+  id        String                  @id @default(cuid())
+  auctionId String
+  userId    String?
+  eventType MarketingTrafficEventType
+  source    MarketingTrafficSource  @default(UNKNOWN)
+  metadata  Json?
+  createdAt DateTime                @default(now())
+
+  auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([auctionId])
+  @@index([auctionId, createdAt])
+  @@index([userId])
+}
+
+model Campaign {
+  id        String                  @id @default(cuid())
+  auctionId String
+  userId    String
+  name      String
+  type      String
+  status    MarketingCampaignStatus   @default(DRAFT)
+  startAt   DateTime?
+  endAt     DateTime?
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+
+  auction Auction         @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events  CampaignEvent[]
+
+  @@index([userId])
+  @@index([auctionId])
+  @@index([userId, status])
+}
+
+model CampaignEvent {
+  id         String   @id @default(cuid())
+  campaignId String
+  eventType  String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@index([campaignId, createdAt])
 }
