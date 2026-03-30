@@ -10,29 +10,18 @@
  * ## Duplicate guard
  * Skips users who received a digest within the last ~6.5 days unless MARKETING_DIGEST_FORCE=1.
  *
- * Requires: MARKETING_ENABLED in env for the app flag check (same as runtime).
+ * Hosted weekly run: see `app/api/jobs/marketing-digest/route.ts` and `MARKETING_PHASE_15_NOTES.md`.
  *
  * See MARKETING_PHASE_14_NOTES.md
  */
 
 import { prisma } from "../lib/db";
-import { isMarketingEnabled } from "../lib/marketing/feature-flag";
-import { buildMarketingDigestSnapshot } from "../lib/marketing/generate-marketing-digest";
-import { renderMarketingDigestEmail } from "../lib/marketing/render-marketing-digest-email";
-import { sendMarketingDigestEmail } from "../lib/email/send-marketing-digest-email";
-
-const MIN_INTERVAL_MS = 6.5 * 24 * 60 * 60 * 1000;
+import { runMarketingDigestSend } from "../lib/marketing/run-marketing-digest-send";
 
 async function main() {
   const argv = process.argv.slice(2);
   const dryRun = argv.includes("--dry-run");
   const sendEnabled = process.env.MARKETING_DIGEST_SEND_ENABLED === "true";
-  const force = process.env.MARKETING_DIGEST_FORCE === "1";
-
-  if (!isMarketingEnabled()) {
-    console.log("MARKETING_ENABLED is off — aborting.");
-    process.exit(0);
-  }
 
   if (!dryRun && !sendEnabled) {
     console.error(
@@ -41,73 +30,36 @@ async function main() {
     process.exit(1);
   }
 
-  const users = await prisma.user.findMany({
-    where: { weeklyMarketingDigestOptIn: true },
-    select: {
-      id: true,
-      email: true,
-      handle: true,
-      lastMarketingDigestSentAt: true,
-    },
+  const result = await runMarketingDigestSend({
+    dryRun,
+    force: process.env.MARKETING_DIGEST_FORCE === "1",
+    onDryRunPreview: dryRun
+      ? (p) => {
+          console.log(`--- @${p.handle} <${p.email}> ---`);
+          console.log(p.subject);
+          console.log(p.textPreview);
+        }
+      : undefined,
   });
 
-  console.log(
-    `${dryRun ? "[dry-run] " : ""}Found ${users.length} opted-in seller(s).`
-  );
-
-  const now = Date.now();
-  let sent = 0;
-  let skipped = 0;
-
-  for (const u of users) {
-    if (
-      !force &&
-      u.lastMarketingDigestSentAt &&
-      now - u.lastMarketingDigestSentAt.getTime() < MIN_INTERVAL_MS
-    ) {
-      skipped++;
-      console.log(`Skip @${u.handle} — sent recently.`);
-      continue;
+  if (!result.ran) {
+    if (result.reason === "marketing_disabled") {
+      console.log("MARKETING_ENABLED is off — aborting.");
+    } else {
+      console.log("MARKETING_DIGEST_SEND_ENABLED is off — use --dry-run for preview.");
     }
-
-    const snap = await buildMarketingDigestSnapshot(u.id);
-    if (!snap) {
-      skipped++;
-      continue;
-    }
-
-    const { subject, html, text } = renderMarketingDigestEmail(snap);
-
-    if (dryRun) {
-      console.log(`--- @${u.handle} <${u.email}> ---`);
-      console.log(subject);
-      console.log(text.slice(0, 500) + (text.length > 500 ? "…" : ""));
-      continue;
-    }
-
-    const result = await sendMarketingDigestEmail({
-      to: u.email,
-      subject,
-      html,
-      text,
-    });
-
-    if (!result.ok) {
-      console.error(`@${u.handle}: ${result.error}`);
-      if (!result.skipped) process.exitCode = 1;
-      continue;
-    }
-
-    await prisma.user.update({
-      where: { id: u.id },
-      data: { lastMarketingDigestSentAt: new Date() },
-    });
-    sent++;
-    console.log(`Sent to @${u.handle} (${u.email})`);
+    process.exit(0);
   }
 
-  if (!dryRun) {
-    console.log(`Done. Sent: ${sent}, skipped (interval): ${skipped}.`);
+  console.log(
+    `${result.dryRun ? "[dry-run] " : ""}Opted-in: ${result.optedInCount}, ${result.dryRun ? "would send" : "sent"}: ${result.sent}, skipped (interval): ${result.skippedInterval}, skipped (no snapshot): ${result.skippedNoSnapshot}`
+  );
+
+  for (const e of result.errors) {
+    console.error(e);
+  }
+  if (result.errors.length > 0) {
+    process.exitCode = 1;
   }
 }
 

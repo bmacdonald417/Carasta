@@ -55,6 +55,10 @@ No send runs on app boot.
 
 ---
 
-## PR 15 (next best step)
+## Hosted trigger (PR 15)
 
-Document **edge/WAF** rules for **`/api/marketing/track`**, **or** wire **Vercel Cron** (or similar) to **`marketing:send-digest`** weekly — **one slice per PR**.
+**`GET` / `POST`** **`/api/jobs/marketing-digest`** — secret **`MARKETING_DIGEST_CRON_SECRET`**, optional **`?dryRun=1`**. Reuses **`lib/marketing/run-marketing-digest-send.ts`** (same as **`npm run marketing:send-digest`**). See **`MARKETING_PHASE_15_NOTES.md`**.
+
+## PR 16 (next best step)
+
+Document **edge/WAF** rules for **`POST /api/marketing/track`** — **one slice per PR** (no digest/campaign/auction/community core changes).

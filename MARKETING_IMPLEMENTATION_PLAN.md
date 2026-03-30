@@ -554,7 +554,23 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_14_NOTES.md`.
 
-**Next recommended step (PR 15):** **Edge / WAF runbook** for **`POST /api/marketing/track`**, **or** optional **scheduled** digest (hosted cron / Vercel cron) wired to the same script — **one slice per PR**.
+**Next recommended step (PR 15):** Implemented as Phase 15 (below).
+
+---
+
+## 12p. Phase 15 — Hosted weekly digest trigger (implemented)
+
+**Goal:** **Protected** **`GET` / `POST`** entrypoint so production can run the weekly digest without SSH/manual script; **reuse** the same batch logic as the CLI; **no** job queue, **no** extra cadences, **no** schema.
+
+**Implemented:**
+
+- **Shared runner:** **`lib/marketing/run-marketing-digest-send.ts`** — spacing (~6.5 days), snapshot build, render, Resend send, **`lastMarketingDigestSentAt`** updates; **`force`** is caller-defined (CLI maps **`MARKETING_DIGEST_FORCE=1`**; hosted handler always **`force: false`**).
+- **Route:** **`app/api/jobs/marketing-digest/route.ts`** — **`MARKETING_DIGEST_CRON_SECRET`** (min 16 chars); **`Authorization: Bearer <secret>`** or **`?secret=`** (weaker — may appear in logs); **`?dryRun=1`**; **503** if secret unset; **401** on mismatch (generic body); **noop** JSON when **`MARKETING_ENABLED`** off or real send off (**`MARKETING_DIGEST_SEND_ENABLED`** not `true`) unless dry-run.
+- **Script:** **`scripts/send-marketing-digest.ts`** — calls **`runMarketingDigestSend`** (+ optional **`onDryRunPreview`** for console).
+
+**Notes:** `MARKETING_PHASE_15_NOTES.md` (deploy: **Railway** + external HTTPS cron; optional Vercel Cron example).
+
+**Next recommended step (PR 16):** **Edge / WAF runbook** for **`POST /api/marketing/track`** (rate-limit headers, provider dashboards, optional geographic rules) — **one slice per PR**, no digest/campaign changes.
 
 ---
 
@@ -569,4 +585,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 14; see §12b–§12o.*
+*Plan updated Marketing Phase 15; see §12b–§12p.*
