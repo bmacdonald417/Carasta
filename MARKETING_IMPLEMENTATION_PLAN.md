@@ -312,9 +312,9 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 **Implemented:**
 
 - **Endpoint:** `POST /api/marketing/track` (`app/api/marketing/track/route.ts`) — gated by `MARKETING_ENABLED` (returns **204** with no body when disabled). Validates body with Zod (`lib/validations/marketing.ts`); requires known `auctionId` (invalid/unknown id returns **400** `{ ok: false }` to avoid enumeration). Resolves `userId` from JWT when present; supports anonymous events. Generic error responses only.
-- **Server insert + dedupe:** `lib/marketing/track-marketing-event-server.ts` — **VIEW:** skip if duplicate within **60s** for same `(auctionId, userId)` or same `(auctionId, visitorKey)` in metadata for anonymous. **SHARE_CLICK:** skip within **5s** for same `(auctionId, userId, shareTarget)` or anonymous with matching `visitorKey` in metadata.
+- **Server insert + dedupe:** `lib/marketing/track-marketing-event-server.ts` — windowed DB dedupe (see **Phase 10** for current constants and metadata rules).
 - **Source inference:** `lib/marketing/resolve-marketing-source.ts` — optional `utm_source` / referrer host mapping into `MarketingTrafficSource`; otherwise **UNKNOWN**.
-- **Metadata:** `lib/marketing/sanitize-marketing-metadata.ts` — only small string keys (`path`, `referrer`, `shareTarget`, `currentUrl`, `visitorKey`).
+- **Metadata:** `lib/marketing/sanitize-marketing-metadata.ts` — event-scoped string keys only; **Phase 10** removed client `visitorKey` from stored metadata except server-injected normalized key.
 - **Client:** `lib/marketing/send-marketing-track.ts` + `getOrCreateMarketingVisitorKey()` (sessionStorage). `components/marketing/auction-view-tracker.tsx` — one **VIEW** per mount when flag on. `components/ui/share-buttons.tsx` — optional `auctionId` + `trackMarketing`; emits **SHARE_CLICK** for twitter / facebook / linkedin / copy_link on deliberate action only.
 - **Wiring:** `app/(marketing)/auctions/[id]/page.tsx` — mounts tracker and passes share props only when `isMarketingEnabled()`.
 
@@ -466,7 +466,27 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_9_NOTES.md`.
 
-**Next recommended step (PR 10):** **Ingest throttle / sampling** for marketing track endpoint (or edge limits) + retention guidance; *or* optional **`Post.auctionId`** if structured Carmunity linkage is prioritized — **one slice per PR**.
+**Next recommended step (PR 10):** Implemented as Phase 10 (below).
+
+---
+
+## 12k. Phase 10 — Marketing ingestion hardening (implemented)
+
+**Goal:** Conservative **dedupe/throttle** clarity, **metadata guardrails**, **visitorKey** normalization, **retention/prune** ergonomics — **no** Redis, **no** seller UI redesign, **no** bid/buy-now/campaign/community core changes. **No** anonymous VIEW sampling (throttle-only model documented).
+
+**Implemented:**
+
+- **`lib/marketing/track-marketing-event-server.ts`** — exported dedupe windows: authenticated VIEW **60s**, anonymous VIEW **90s**, SHARE_CLICK **8s**, BID_CLICK **12s**; JSDoc dedupe key matrix; anonymous VIEW still **not** deduped without `userId` or `visitorKey`.
+- **`lib/marketing/sanitize-marketing-metadata.ts`** — per-`eventType` allowlists, per-field length caps, **4096** total string budget; **no** client `visitorKey` in stored metadata (server injects normalized key only).
+- **`lib/marketing/visitor-key.ts`** — trim, strip controls, collapse whitespace, **lowercase**, max 128 / min 8.
+- **`lib/validations/marketing.ts`** — metadata ≤ **12** keys, safe key names, string values only (max **4096** each).
+- **`lib/marketing/send-marketing-track.ts`** — stop duplicating `visitorKey` inside `metadata` JSON.
+- **`scripts/prune-traffic-events.ts`** — **`--dry-run`** and **`--days N`** without requiring `TRAFFIC_EVENT_PRUNE_ENABLED`; destructive prune still gated; npm **`marketing:prune-traffic-events:dry-run`**.
+- **`lib/marketing/prune-traffic-events.ts`** — JSDoc for env vars and behavior.
+
+**Notes:** `MARKETING_PHASE_10_NOTES.md`.
+
+**Next recommended step (PR 11):** Optional **`Post.auctionId`** FK for structured Carmunity ↔ listing linkage, **or** document/implement **edge / WAF rate limits** on `POST /api/marketing/track` — **one slice per PR**.
 
 ---
 
@@ -481,4 +501,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated through Marketing Phase 9; see §12b–§12j.*
+*Plan updated through Marketing Phase 10; see §12b–§12k.*

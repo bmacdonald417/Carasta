@@ -59,6 +59,10 @@ All preset routes and actions: **`isMarketingEnabled()`** → `notFound()`; sess
 
 ---
 
-## PR 10 (next best step)
+## PR 10 / Phase 10
 
-**Ingest throttle / sampling** for `POST /api/marketing/track` (or edge rate limiting) plus optional **retention policy** documentation — keeps traffic growth from overwhelming raw `TrafficEvent` storage without changing seller UX. Alternatively, optional **`Post.auctionId`** FK if product wants structured Carmunity ↔ listing linkage (separate from presets).
+**Implemented:** Ingestion hardening (dedupe/metadata/prune). See **`MARKETING_PHASE_10_NOTES.md`**.
+
+## PR 11 (next best step)
+
+Optional **`Post.auctionId`**, edge/WAF limits on `/api/marketing/track`, or **BID_CLICK** rollups — one slice per PR (see **`MARKETING_PHASE_10_NOTES.md`**).

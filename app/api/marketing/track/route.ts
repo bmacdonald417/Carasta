@@ -5,7 +5,6 @@ import { prisma } from "@/lib/db";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { recordTrafficEvent } from "@/lib/marketing/track-marketing-event-server";
 import { marketingTrackBodySchema } from "@/lib/validations/marketing";
-import { sanitizeMarketingMetadata } from "@/lib/marketing/sanitize-marketing-metadata";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -50,17 +49,13 @@ export async function POST(req: NextRequest) {
           ? MarketingTrafficEventType.SHARE_CLICK
           : MarketingTrafficEventType.BID_CLICK;
 
-    const meta = sanitizeMarketingMetadata({
-      ...(body.metadata as Record<string, unknown> | undefined),
-    });
-
     await recordTrafficEvent({
       auctionId: body.auctionId,
       eventType,
       userId,
       sourceOverride: body.source,
       visitorKey: body.visitorKey ?? null,
-      metadata: meta,
+      metadata: body.metadata as Record<string, unknown> | undefined,
     });
 
     return NextResponse.json({ ok: true });

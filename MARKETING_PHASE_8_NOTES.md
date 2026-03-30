@@ -30,7 +30,7 @@ Instrumentation uses **`sendMarketingTrack`** (`sendBeacon` / `fetch keepalive`)
 
 ## Dedupe (server)
 
-- **Window:** **12 seconds** (`BID_CLICK_DEDUPE_MS` in `track-marketing-event-server.ts`).
+- **Window:** **12 seconds** (`MARKETING_BID_CLICK_DEDUPE_MS` in `track-marketing-event-server.ts`; Phase 10 renamed export).
 - **Key:** Same **`auctionId`** + **`eventType` BID_CLICK** + **`bidUiSurface`** (from JSON metadata) + (**`userId`** if logged in **else** anonymous **`visitorKey`** in metadata).
 - Skipped duplicates return **`{ ok: true, skipped: true }`** (same as VIEW/SHARE pattern).
 

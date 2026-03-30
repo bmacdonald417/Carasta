@@ -1,42 +1,62 @@
 /**
- * Manual prune for old `TrafficEvent` rows (optional).
+ * Manual prune for old `TrafficEvent` rows (optional, operational).
  *
- * Requires:
- *   TRAFFIC_EVENT_PRUNE_ENABLED=true
- * Optional:
- *   TRAFFIC_EVENT_PRUNE_DRY_RUN=true  — only print counts
- *   TRAFFIC_EVENT_RETENTION_DAYS=365   — default 365
+ * ## Destructive run (deletes rows)
+ * Requires: `TRAFFIC_EVENT_PRUNE_ENABLED=true`
+ * Optional env:
+ *   `TRAFFIC_EVENT_RETENTION_DAYS` — default **365**
+ *   `TRAFFIC_EVENT_PRUNE_DRY_RUN=true` — same as `--dry-run` (count only)
  *
- * Run: npx ts-node -P tsconfig.scripts.json scripts/prune-traffic-events.ts
+ *   npx ts-node -P tsconfig.scripts.json scripts/prune-traffic-events.ts
  *
- * After pruning, re-run backfill if rollups must match remaining raw events only;
- * see MARKETING_PHASE_6_NOTES.md.
+ * ## Dry-run (count only, no env gate)
+ *   npm run marketing:prune-traffic-events:dry-run
+ *   — or —
+ *   npx ts-node -P tsconfig.scripts.json scripts/prune-traffic-events.ts --dry-run
+ *
+ * After pruning, re-run analytics backfill if rollups must match remaining raw
+ * events only; see `MARKETING_PHASE_6_NOTES.md` and `MARKETING_PHASE_10_NOTES.md`.
  */
 
 import { pruneTrafficEventsOlderThan } from "../lib/marketing/prune-traffic-events";
 
+function parseDays(argv: string[]): number {
+  const i = argv.indexOf("--days");
+  if (i >= 0 && argv[i + 1]) {
+    const n = Math.max(1, Number.parseInt(argv[i + 1], 10) || 365);
+    return n;
+  }
+  return Math.max(
+    1,
+    Number.parseInt(process.env.TRAFFIC_EVENT_RETENTION_DAYS ?? "365", 10) || 365
+  );
+}
+
 async function main() {
-  if (process.env.TRAFFIC_EVENT_PRUNE_ENABLED !== "true") {
+  const argv = process.argv.slice(2);
+  const isDryRun =
+    argv.includes("--dry-run") ||
+    process.env.TRAFFIC_EVENT_PRUNE_DRY_RUN === "true";
+
+  if (!isDryRun && process.env.TRAFFIC_EVENT_PRUNE_ENABLED !== "true") {
     console.error(
-      "Refusing to run: set TRAFFIC_EVENT_PRUNE_ENABLED=true (see script header)."
+      "Refusing to delete: set TRAFFIC_EVENT_PRUNE_ENABLED=true, or pass --dry-run to count rows only."
     );
     process.exit(1);
   }
 
-  const days = Math.max(
-    1,
-    Number.parseInt(process.env.TRAFFIC_EVENT_RETENTION_DAYS ?? "365", 10) || 365
-  );
-  const dryRun = process.env.TRAFFIC_EVENT_PRUNE_DRY_RUN === "true";
+  const days = parseDays(argv);
   const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
   console.log(
-    `${dryRun ? "[dry-run] " : ""}Pruning TrafficEvent with createdAt < ${cutoff.toISOString()} (${days} day retention)`
+    `${isDryRun ? "[dry-run] " : ""}TrafficEvent with createdAt < ${cutoff.toISOString()} (${days} day retention)`
   );
 
-  const result = await pruneTrafficEventsOlderThan(cutoff, { dryRun });
+  const result = await pruneTrafficEventsOlderThan(cutoff, { dryRun: isDryRun });
   console.log(
-    dryRun ? `Would delete ${result.deleted} rows.` : `Deleted ${result.deleted} rows.`
+    isDryRun
+      ? `Would delete ${result.deleted} row(s).`
+      : `Deleted ${result.deleted} row(s).`
   );
 }
 

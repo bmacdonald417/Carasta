@@ -30,10 +30,7 @@ export function sendMarketingTrack(payload: MarketingTrackPayload): void {
     auctionId: payload.auctionId,
     eventType: payload.eventType,
     visitorKey: visitorKey.length >= 8 ? visitorKey : undefined,
-    metadata: {
-      ...payload.metadata,
-      ...(visitorKey.length >= 8 ? { visitorKey } : {}),
-    },
+    metadata: payload.metadata ? { ...payload.metadata } : undefined,
   };
 
   try {

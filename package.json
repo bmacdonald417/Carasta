@@ -17,7 +17,8 @@
     "rep:sim": "ts-node -P tsconfig.scripts.json scripts/reputation-sim.ts",
     "rep:backfill": "ts-node -P tsconfig.scripts.json scripts/reputation-backfill.ts",
     "marketing:backfill-analytics": "ts-node -P tsconfig.scripts.json scripts/backfill-auction-analytics.ts",
-    "marketing:prune-traffic-events": "ts-node -P tsconfig.scripts.json scripts/prune-traffic-events.ts"
+    "marketing:prune-traffic-events": "ts-node -P tsconfig.scripts.json scripts/prune-traffic-events.ts",
+    "marketing:prune-traffic-events:dry-run": "ts-node -P tsconfig.scripts.json scripts/prune-traffic-events.ts --dry-run"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

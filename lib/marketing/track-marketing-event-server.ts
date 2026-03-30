@@ -9,11 +9,31 @@ import { inferMarketingSourceFromSignals } from "@/lib/marketing/resolve-marketi
 import { sanitizeMarketingMetadata } from "@/lib/marketing/sanitize-marketing-metadata";
 import { normalizeMarketingVisitorKey } from "@/lib/marketing/visitor-key";
 
-const VIEW_DEDUPE_MS = 60_000;
-const SHARE_DEDUPE_MS = 5_000;
-/** Per-surface bid intent: suppress rapid double-fires on the same CTA (~12s). */
-const BID_CLICK_DEDUPE_MS = 12_000;
+/**
+ * Dedupe windows (ms). Auth vs anonymous VIEW differ slightly: anonymous repeat
+ * traffic is more often refresh/spam, so the window is a bit longer.
+ */
+export const MARKETING_VIEW_DEDUPE_MS_AUTHENTICATED = 60_000;
+export const MARKETING_VIEW_DEDUPE_MS_ANONYMOUS = 90_000;
 
+/** Same share target + user/key within this window counts once (double-click / burst). */
+export const MARKETING_SHARE_CLICK_DEDUPE_MS = 8_000;
+
+/** Same bid UI surface + user/key within this window counts once. */
+export const MARKETING_BID_CLICK_DEDUPE_MS = 12_000;
+
+/**
+ * Keys used for duplicate detection (documented for operators):
+ *
+ * - VIEW + logged-in: (auctionId, eventType=VIEW, userId)
+ * - VIEW + anonymous: (auctionId, eventType=VIEW, userId=null, metadata.visitorKey)
+ * - SHARE_CLICK + logged-in: (auctionId, eventType, userId, metadata.shareTarget)
+ * - SHARE_CLICK + anonymous: above + metadata.visitorKey
+ * - BID_CLICK + logged-in: (auctionId, eventType, userId, metadata.bidUiSurface)
+ * - BID_CLICK + anonymous: above + metadata.visitorKey
+ *
+ * No visitorKey and no userId: VIEW is not deduped (cannot attribute safely).
+ */
 export async function recordTrafficEvent(input: {
   auctionId: string;
   eventType: MarketingTrafficEventType;
@@ -25,7 +45,8 @@ export async function recordTrafficEvent(input: {
   const userId = input.userId ?? null;
   const visitorKey = normalizeMarketingVisitorKey(input.visitorKey);
   const recordedAt = new Date();
-  const metaRaw = sanitizeMarketingMetadata(input.metadata) ?? undefined;
+  const metaRaw =
+    sanitizeMarketingMetadata(input.eventType, input.metadata) ?? undefined;
   const shareTarget =
     typeof metaRaw?.shareTarget === "string" ? metaRaw.shareTarget : null;
 
@@ -47,11 +68,14 @@ export async function recordTrafficEvent(input: {
   });
 
   if (input.eventType === MarketingTrafficEventType.VIEW) {
+    const windowMs = userId
+      ? MARKETING_VIEW_DEDUPE_MS_AUTHENTICATED
+      : MARKETING_VIEW_DEDUPE_MS_ANONYMOUS;
     const dup = await findRecentViewDuplicate({
       auctionId: input.auctionId,
       userId,
       visitorKey,
-      windowMs: VIEW_DEDUPE_MS,
+      windowMs,
     });
     if (dup) return { ok: true, skipped: true };
   }
@@ -62,7 +86,7 @@ export async function recordTrafficEvent(input: {
       userId,
       visitorKey,
       shareTarget,
-      windowMs: SHARE_DEDUPE_MS,
+      windowMs: MARKETING_SHARE_CLICK_DEDUPE_MS,
     });
     if (dup) return { ok: true, skipped: true };
   }
@@ -75,7 +99,7 @@ export async function recordTrafficEvent(input: {
       userId,
       visitorKey,
       bidUiSurface: surface,
-      windowMs: BID_CLICK_DEDUPE_MS,
+      windowMs: MARKETING_BID_CLICK_DEDUPE_MS,
     });
     if (dup) return { ok: true, skipped: true };
   }

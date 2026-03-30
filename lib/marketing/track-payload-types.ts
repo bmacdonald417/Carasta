@@ -6,9 +6,9 @@ export type MarketingTrackPayload = {
     referrer?: string;
     shareTarget?: string;
     currentUrl?: string;
-    visitorKey?: string;
     /** Bid-intent surface only; low-cardinality tokens from client */
     bidUiSurface?: string;
   };
+  /** Server normalizes; do not put a duplicate in `metadata`. */
   visitorKey?: string;
 };
