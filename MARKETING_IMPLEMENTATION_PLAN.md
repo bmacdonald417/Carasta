@@ -697,7 +697,24 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_23_NOTES.md`.
 
-**Next recommended step (PR 24):** **Admin CSV snapshot** of this dashboard (or selected aggregates) for support/offline review, or **read-only funnel** extras (e.g. **EXTERNAL_REFERRAL** in window stats) — **one PR**, still **admin-only** unless scoped otherwise.
+**Next recommended step (PR 24):** Implemented as Phase 24 (below).
+
+---
+
+## 12y. Phase 24 — Admin marketing CSV exports (implemented)
+
+**Goal:** **ADMIN**-only **`GET`** CSV downloads for the same aggregates as **`/admin/marketing`** — **no** schema changes, **no** seller or commerce changes.
+
+**Implemented:**
+
+- **Auth:** **`requireAdminMarketingCsvAccess()`** in **`lib/marketing/admin-marketing-export-auth.ts`** — **`getSession()`** + **`role === ADMIN`** ( **`/api/admin/*`** is outside **`middleware.ts`** matcher).
+- **CSV builders:** **`export-admin-marketing-summary-csv.ts`** (`scope`, `metric`, `value`: meta, all_time, last_7_days, last_30_days), **`export-admin-marketing-tops-last-7-csv.ts`** (two labeled blocks: top listings 7d, top sellers 7d); reuse **`csvRow`** from **`csv-utils.ts`**; UTF-8 BOM on responses.
+- **Routes:** **`GET /api/admin/marketing/export/summary`**, **`GET /api/admin/marketing/export/tops-last-7`** — timestamped **`Content-Disposition`** filenames.
+- **UI:** **`app/(admin)/admin/marketing/page.tsx`** — **Export summary CSV** / **Export tops (7d) CSV** outline buttons (same pattern as seller exports).
+
+**Notes:** `MARKETING_PHASE_24_NOTES.md`.
+
+**Next recommended step (PR 25):** **Read-only funnel completeness** — surface **EXTERNAL_REFERRAL** (and any new event types) in admin **window stats** + optional third CSV column set, or a compact **admin marketing JSON** mirror of the CSV for integrations — **one PR**, still **admin-only** unless scoped otherwise.
 
 ---
 
@@ -712,4 +729,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 23; see §12b–§12x.*
+*Plan updated Marketing Phase 24; see §12b–§12y.*

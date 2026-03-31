@@ -29,6 +29,10 @@ Lifetime totals and **all-time** top tables are unchanged in meaning; the summar
 
 ---
 
-## PR 24 (exact next best step)
+## PR 24
 
-**Admin CSV export** of the current dashboard aggregates (lifetime + 7d/30d windows + optional top tables) as a **`GET`** under **`/api/admin/...`** with **ADMIN** session only — no new tables, attachment download for support. Alternatively, add **EXTERNAL_REFERRAL** (and any future event types) to window panels for a fuller funnel picture.
+Implemented as **Phase 24** — **`MARKETING_PHASE_24_NOTES.md`**.
+
+## PR 25 (suggested next step)
+
+Add **EXTERNAL_REFERRAL** (and other event types) to admin window stats and CSV, or a small **admin marketing JSON** endpoint for integrations — still read-only and admin-only.

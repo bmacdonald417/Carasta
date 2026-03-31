@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   BarChart3,
   CalendarRange,
+  Download,
   Eye,
   Hand,
   Megaphone,
@@ -10,6 +11,7 @@ import {
   Share2,
   Target,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { getAdminMarketingPlatformSummary } from "@/lib/marketing/get-admin-marketing-platform-summary";
 import { campaignTypeLabel } from "@/components/marketing/campaign-type-label";
 import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badge";
@@ -113,7 +115,7 @@ export default async function AdminMarketingPage() {
   return (
     <div className="carasta-container max-w-6xl py-8">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0 flex-1">
           <Link
             href="/admin"
             className="text-sm text-neutral-500 transition hover:text-neutral-300"
@@ -133,6 +135,28 @@ export default async function AdminMarketingPage() {
               seller UI is hidden; historical rows may still exist below.
             </p>
           ) : null}
+        </div>
+        <div className="flex flex-shrink-0 flex-wrap gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href="/api/admin/marketing/export/summary"
+              download
+              title="Platform totals, 7d/30d windows, rollups, campaigns, notifications"
+            >
+              <Download className="mr-2 h-3.5 w-3.5" />
+              Export summary CSV
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href="/api/admin/marketing/export/tops-last-7"
+              download
+              title="Top listings and sellers in the last 7 days"
+            >
+              <Download className="mr-2 h-3.5 w-3.5" />
+              Export tops (7d) CSV
+            </a>
+          </Button>
         </div>
       </div>
 
