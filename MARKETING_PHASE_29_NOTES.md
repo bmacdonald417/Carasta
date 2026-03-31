@@ -41,8 +41,10 @@ Matching is **case-insensitive** on the query **key** only. Constants: **`EXTERN
 
 Admin snapshot route observability — **`MARKETING_PHASE_30_NOTES.md`**.
 
-## PR 31 (exact next best step)
+## PR 31
 
-**Option A:** **`GET /api/admin/marketing-track-observability`** (or a sibling route) includes **`getAdminMarketingSnapshotObservabilitySnapshot()`** so ops can read **this instance’s** snapshot counters without log scraping — same **ADMIN** / secret pattern as track observability.
+Implemented — **`GET /api/admin/marketing-snapshot-observability`** — **`MARKETING_PHASE_31_NOTES.md`**.
 
-**Option B:** Conservative click-id allowlist expansion (**`twclid`**, etc.) with documented privacy review — **one** narrow PR.
+## PR 32 (exact next best step)
+
+**`twclid`** (or similar) **EXTERNAL_REFERRAL** allowlist expansion with runbook + privacy notes — **one** narrow PR.

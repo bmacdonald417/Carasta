@@ -42,6 +42,10 @@ Implemented as **Phase 29** — **`MARKETING_PHASE_29_NOTES.md`**.
 
 Implemented — **`MARKETING_PHASE_30_NOTES.md`**.
 
-## PR 31 (suggested next step)
+## PR 31
 
-Admin JSON exposure of snapshot counters (mirror track observability route) **or** click-id allowlist expansion with privacy notes.
+Implemented — **`MARKETING_PHASE_31_NOTES.md`**.
+
+## PR 32 (suggested next step)
+
+Click-id allowlist expansion (**`twclid`**, etc.) with privacy notes.

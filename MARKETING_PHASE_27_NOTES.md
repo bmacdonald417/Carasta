@@ -37,6 +37,10 @@ Implemented as **Phase 29** — **`MARKETING_PHASE_29_NOTES.md`**.
 
 Implemented — **`MARKETING_PHASE_30_NOTES.md`**.
 
-## PR 31 (suggested next step)
+## PR 31
 
-Snapshot counter **HTTP** readout for admins **or** click-id allowlist expansion with sign-off — narrow scope.
+Implemented — **`MARKETING_PHASE_31_NOTES.md`**.
+
+## PR 32 (suggested next step)
+
+Click-id allowlist expansion with sign-off — narrow scope.

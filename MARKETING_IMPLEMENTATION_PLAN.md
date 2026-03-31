@@ -814,7 +814,21 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_30_NOTES.md`.
 
-**Next recommended step (PR 31):** Expose snapshot counters via a **protected admin** JSON route (same auth pattern as **`GET /api/admin/marketing-track-observability`**) **or** a **second** conservative click-id allowlist step (**`twclid`**, etc.) with privacy sign-off — **one PR**, still narrow.
+**Next recommended step (PR 31):** Implemented as Phase 31 (below).
+
+---
+
+## 12zf. Phase 31 — Protected admin snapshot observability JSON (implemented)
+
+**Goal:** Expose **`getAdminMarketingSnapshotObservabilitySnapshot()`** via a **protected** **`GET`** JSON route so ops can read **this instance’s** snapshot-route counters without log scraping.
+
+**Implemented:**
+
+- **`app/api/admin/marketing-snapshot-observability/route.ts`** — **401** **`{ ok: false }`** if neither **ADMIN** JWT nor **`Authorization: Bearer <MARKETING_TRACK_OBSERVABILITY_SECRET>`** (same env + rules as track observability, min 16 chars). **200** returns **`ok`**, **`generatedAt`**, **`counters`**, **`totals.observedRequests`**, and a short **`note`** on per-process limits.
+
+**Notes:** `MARKETING_PHASE_31_NOTES.md`.
+
+**Next recommended step (PR 32):** Conservative **EXTERNAL_REFERRAL** click-id allowlist expansion (**`twclid`**, etc.) with privacy/compliance notes — **one** narrow PR (**no** schema).
 
 ---
 
@@ -829,4 +843,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 30; see §12b–§12ze.*
+*Plan updated Marketing Phase 31; see §12b–§12zf.*
