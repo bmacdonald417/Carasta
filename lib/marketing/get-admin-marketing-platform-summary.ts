@@ -25,6 +25,7 @@ export type AdminMarketingTopAuctionRow = {
   views: number;
   shareClicks: number;
   bidClicks: number;
+  externalReferrals: number;
 };
 
 /** Top listings in a time window — TrafficEvent counts only (not rollups). */
@@ -38,6 +39,7 @@ export type AdminMarketingTopAuctionWindowRow = {
   viewEvents: number;
   shareClickEvents: number;
   bidClickEvents: number;
+  externalReferralEvents: number;
 };
 
 export type AdminMarketingTopSellerRow = {
@@ -63,6 +65,7 @@ export type AdminMarketingRecentWindow = {
   viewEvents: number;
   shareClickEvents: number;
   bidClickEvents: number;
+  externalReferralEvents: number;
   campaignsUpdated: number;
   campaignsCreated: number;
   marketingNotificationsCreated: number;
@@ -75,6 +78,7 @@ export type AdminMarketingPlatformSummary = {
     viewEvents: number;
     shareClickEvents: number;
     bidClickEvents: number;
+    externalReferralEvents: number;
     rollupViewsSum: number;
     rollupShareClicksSum: number;
     auctionAnalyticsDayRows: number;
@@ -127,6 +131,9 @@ async function loadRecentWindow(cutoff: Date): Promise<AdminMarketingRecentWindo
     viewEvents: countFor(MarketingTrafficEventType.VIEW),
     shareClickEvents: countFor(MarketingTrafficEventType.SHARE_CLICK),
     bidClickEvents: countFor(MarketingTrafficEventType.BID_CLICK),
+    externalReferralEvents: countFor(
+      MarketingTrafficEventType.EXTERNAL_REFERRAL
+    ),
     campaignsUpdated,
     campaignsCreated,
     marketingNotificationsCreated,
@@ -222,7 +229,7 @@ export async function getAdminMarketingPlatformSummary(): Promise<AdminMarketing
     byEventType.find((r) => r.eventType === t)?._count._all ?? 0;
 
   const auctionIds = topAuctionRaw.map((g) => g.auctionId);
-  const [auctions, viewShareMap, bidGroups] = await Promise.all([
+  const [auctions, viewShareMap, bidGroups, extRefGroups] = await Promise.all([
     auctionIds.length
       ? prisma.auction.findMany({
           where: { id: { in: auctionIds } },
@@ -246,10 +253,23 @@ export async function getAdminMarketingPlatformSummary(): Promise<AdminMarketing
           _count: { _all: true },
         })
       : Promise.resolve([]),
+    auctionIds.length
+      ? prisma.trafficEvent.groupBy({
+          by: ["auctionId"],
+          where: {
+            auctionId: { in: auctionIds },
+            eventType: MarketingTrafficEventType.EXTERNAL_REFERRAL,
+          },
+          _count: { _all: true },
+        })
+      : Promise.resolve([]),
   ]);
 
   const bidByAuction = new Map(
     bidGroups.map((b) => [b.auctionId, b._count._all])
+  );
+  const extRefByAuction = new Map(
+    extRefGroups.map((b) => [b.auctionId, b._count._all])
   );
   const auctionById = new Map(auctions.map((a) => [a.id, a]));
 
@@ -271,6 +291,7 @@ export async function getAdminMarketingPlatformSummary(): Promise<AdminMarketing
         views: vs.views,
         shareClicks: vs.shareClicks,
         bidClicks: bidByAuction.get(g.auctionId) ?? 0,
+        externalReferrals: extRefByAuction.get(g.auctionId) ?? 0,
       };
     })
     .filter((x): x is AdminMarketingTopAuctionRow => x != null);
@@ -348,6 +369,8 @@ export async function getAdminMarketingPlatformSummary(): Promise<AdminMarketing
           viewEvents: m[MarketingTrafficEventType.VIEW] ?? 0,
           shareClickEvents: m[MarketingTrafficEventType.SHARE_CLICK] ?? 0,
           bidClickEvents: m[MarketingTrafficEventType.BID_CLICK] ?? 0,
+          externalReferralEvents:
+            m[MarketingTrafficEventType.EXTERNAL_REFERRAL] ?? 0,
         };
       })
       .filter((x): x is AdminMarketingTopAuctionWindowRow => x != null);
@@ -392,6 +415,9 @@ export async function getAdminMarketingPlatformSummary(): Promise<AdminMarketing
       viewEvents: countFor(MarketingTrafficEventType.VIEW),
       shareClickEvents: countFor(MarketingTrafficEventType.SHARE_CLICK),
       bidClickEvents: countFor(MarketingTrafficEventType.BID_CLICK),
+      externalReferralEvents: countFor(
+        MarketingTrafficEventType.EXTERNAL_REFERRAL
+      ),
       rollupViewsSum: rollupAgg._sum.views ?? 0,
       rollupShareClicksSum: rollupAgg._sum.shareClicks ?? 0,
       auctionAnalyticsDayRows: analyticsRowCount,

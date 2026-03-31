@@ -44,6 +44,10 @@ Data source: **`getAdminMarketingPlatformSummary()`** (fresh query per download)
 
 ---
 
-## PR 25 (exact next best step)
+## PR 25
 
-Extend **`AdminMarketingRecentWindow`** and **`loadRecentWindow`** with **EXTERNAL_REFERRAL** counts (and document in CSV summary), or add **`GET /api/admin/marketing/snapshot.json`** returning the same payload shape for dashboards — one PR, admin-only.
+Implemented as **Phase 25** — **`MARKETING_PHASE_25_NOTES.md`**.
+
+## PR 26 (suggested next step)
+
+**`GET /api/admin/marketing/snapshot.json`** (ADMIN session) mirroring **`getAdminMarketingPlatformSummary`**, or documented client beacon for **EXTERNAL_REFERRAL** on listing landings — still read-only / low-risk.

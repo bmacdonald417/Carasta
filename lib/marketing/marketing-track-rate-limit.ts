@@ -12,7 +12,11 @@
  * (JWT sub), so NAT’d browsers don’t all share one anonymous bucket when logged in.
  */
 
-export type MarketingTrackEventType = "VIEW" | "SHARE_CLICK" | "BID_CLICK";
+export type MarketingTrackEventType =
+  | "VIEW"
+  | "SHARE_CLICK"
+  | "BID_CLICK"
+  | "EXTERNAL_REFERRAL";
 
 /** Fixed windows aligned to wall clock (simple eviction). */
 const WINDOW_MS = 10_000;
@@ -21,12 +25,14 @@ const LIMITS: Record<MarketingTrackEventType, number> = {
   VIEW: 45,
   SHARE_CLICK: 18,
   BID_CLICK: 18,
+  EXTERNAL_REFERRAL: 30,
 };
 
 type WindowCounts = {
   view: number;
   share: number;
   bid: number;
+  externalReferral: number;
 };
 
 const store = new Map<string, WindowCounts>();
@@ -45,6 +51,8 @@ function fieldForEvent(
       return "share";
     case "BID_CLICK":
       return "bid";
+    case "EXTERNAL_REFERRAL":
+      return "externalReferral";
   }
 }
 
@@ -99,7 +107,7 @@ export function checkMarketingTrackRateLimit(
 
   let entry = store.get(mapKey);
   if (!entry) {
-    entry = { view: 0, share: 0, bid: 0 };
+    entry = { view: 0, share: 0, bid: 0, externalReferral: 0 };
     store.set(mapKey, entry);
   }
 

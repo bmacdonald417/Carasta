@@ -714,7 +714,25 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_24_NOTES.md`.
 
-**Next recommended step (PR 25):** **Read-only funnel completeness** — surface **EXTERNAL_REFERRAL** (and any new event types) in admin **window stats** + optional third CSV column set, or a compact **admin marketing JSON** mirror of the CSV for integrations — **one PR**, still **admin-only** unless scoped otherwise.
+**Next recommended step (PR 25):** Implemented as Phase 25 (below).
+
+---
+
+## 12z. Phase 25 — EXTERNAL_REFERRAL support for admin analytics (implemented)
+
+**Goal:** Treat **EXTERNAL_REFERRAL** as a first-class marketing traffic signal: **ingest** via existing **`POST /api/marketing/track`**, **dedupe** like VIEW, **admin** totals/windows/CSV/tables — **no** Prisma migration (enum already present).
+
+**Implemented:**
+
+- **Validation:** **`marketingTrackBodySchema`** — **`EXTERNAL_REFERRAL`** in **`eventType`** enum.
+- **Ingest:** **`app/api/marketing/track/route.ts`** maps to **`MarketingTrafficEventType.EXTERNAL_REFERRAL`**; **rate limit** + **observability** labels extended.
+- **Persistence:** **`sanitize-marketing-metadata`** — same allowed keys as VIEW (**path**, **referrer**, **currentUrl**). **`recordTrafficEvent`** — **`findRecentUserOrVisitorKeyedDuplicate`** for VIEW + EXTERNAL_REFERRAL (separate windows constants); rollups still **VIEW / SHARE_CLICK** only.
+- **Admin:** **`getAdminMarketingPlatformSummary`** — **`externalReferralEvents`** on **`totals`** and **`AdminMarketingRecentWindow`**; lifetime + 7d top listing rows include **Ext ref** counts; **CSV** summary + tops export columns updated.
+- **UI:** **`/admin/marketing`** — recent-activity panels, all-time KPI, listing tables **Ext ref** column.
+
+**Notes:** `MARKETING_PHASE_25_NOTES.md`.
+
+**Next recommended step (PR 26):** **`GET /api/admin/marketing/snapshot.json`** (or similar) returning the same shape as the summary helper for integrations/dashboards — **read-only**, **ADMIN** session, **no** seller UI — or client **`track`** helper + docs for **`EXTERNAL_REFERRAL`** beacons on listing landings.
 
 ---
 
@@ -729,4 +747,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 24; see §12b–§12y.*
+*Plan updated Marketing Phase 25; see §12b–§12z.*

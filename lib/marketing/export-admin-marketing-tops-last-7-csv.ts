@@ -23,6 +23,7 @@ export function buildAdminMarketingTopsLast7Csv(
     "view_events",
     "share_click_events",
     "bid_click_events",
+    "external_referral_events",
   ]);
   for (const a of s.topAuctionsLast7Days) {
     push([
@@ -35,6 +36,7 @@ export function buildAdminMarketingTopsLast7Csv(
       a.viewEvents,
       a.shareClickEvents,
       a.bidClickEvents,
+      a.externalReferralEvents,
     ]);
   }
 

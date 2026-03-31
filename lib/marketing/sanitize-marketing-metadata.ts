@@ -24,6 +24,8 @@ function keysForEvent(eventType: MarketingTrafficEventType): readonly string[] {
       return ["path", "referrer", "currentUrl", "shareTarget"];
     case MarketingTrafficEventType.BID_CLICK:
       return ["path", "referrer", "currentUrl", "bidUiSurface"];
+    case MarketingTrafficEventType.EXTERNAL_REFERRAL:
+      return ["path", "referrer", "currentUrl"];
     default:
       return [];
   }

@@ -3,6 +3,7 @@ import {
   BarChart3,
   CalendarRange,
   Download,
+  ExternalLink,
   Eye,
   Hand,
   Megaphone,
@@ -32,6 +33,10 @@ function WindowStatsPanel({
     { label: "View events", value: stats.viewEvents },
     { label: "Share click events", value: stats.shareClickEvents },
     { label: "Bid click events", value: stats.bidClickEvents },
+    {
+      label: "External referral events",
+      value: stats.externalReferralEvents,
+    },
     {
       label: "Campaigns updated",
       value: stats.campaignsUpdated,
@@ -87,6 +92,12 @@ export default async function AdminMarketingPage() {
       value: s.totals.bidClickEvents,
       icon: Hand,
       hint: "Intent taps, not completed bids",
+    },
+    {
+      label: "External referral events",
+      value: s.totals.externalReferralEvents,
+      icon: ExternalLink,
+      hint: "TrafficEvent EXTERNAL_REFERRAL (all time)",
     },
     {
       label: "Rollup views (sum)",
@@ -236,13 +247,14 @@ export default async function AdminMarketingPage() {
                   <th className="px-3 py-2 text-right">Views</th>
                   <th className="px-3 py-2 text-right">Shares</th>
                   <th className="px-3 py-2 text-right">Bid clk</th>
+                  <th className="px-3 py-2 text-right">Ext ref</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {s.topAuctionsLast7Days.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-4 py-8 text-center text-neutral-500"
                     >
                       No traffic in the last 7 days.
@@ -281,6 +293,9 @@ export default async function AdminMarketingPage() {
                       </td>
                       <td className="px-3 py-2 text-right tabular-nums">
                         {a.bidClickEvents}
+                      </td>
+                      <td className="px-3 py-2 text-right tabular-nums">
+                        {a.externalReferralEvents}
                       </td>
                     </tr>
                   ))
@@ -363,13 +378,14 @@ export default async function AdminMarketingPage() {
                   <th className="px-3 py-2 text-right">Views</th>
                   <th className="px-3 py-2 text-right">Shares</th>
                   <th className="px-3 py-2 text-right">Bid clk</th>
+                  <th className="px-3 py-2 text-right">Ext ref</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {s.topAuctions.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-4 py-8 text-center text-neutral-500"
                     >
                       No traffic events yet.
@@ -408,6 +424,9 @@ export default async function AdminMarketingPage() {
                       </td>
                       <td className="px-3 py-2 text-right tabular-nums">
                         {a.bidClicks}
+                      </td>
+                      <td className="px-3 py-2 text-right tabular-nums">
+                        {a.externalReferrals}
                       </td>
                     </tr>
                   ))

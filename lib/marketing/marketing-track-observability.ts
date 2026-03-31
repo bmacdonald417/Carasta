@@ -22,7 +22,11 @@ export type MarketingTrackObserveOutcome =
   | "event_inserted"
   | "server_error";
 
-export type MarketingTrackEventLabel = "VIEW" | "SHARE_CLICK" | "BID_CLICK";
+export type MarketingTrackEventLabel =
+  | "VIEW"
+  | "SHARE_CLICK"
+  | "BID_CLICK"
+  | "EXTERNAL_REFERRAL";
 
 export type MarketingTrackAuthMode = "authenticated" | "anonymous" | "unknown";
 

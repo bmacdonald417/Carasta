@@ -22,6 +22,7 @@ export function buildAdminMarketingSummaryCsv(
   push(["all_time", "view_events", t.viewEvents]);
   push(["all_time", "share_click_events", t.shareClickEvents]);
   push(["all_time", "bid_click_events", t.bidClickEvents]);
+  push(["all_time", "external_referral_events", t.externalReferralEvents]);
   push(["all_time", "rollup_views_sum", t.rollupViewsSum]);
   push(["all_time", "rollup_share_clicks_sum", t.rollupShareClicksSum]);
   push(["all_time", "auction_analytics_day_rows", t.auctionAnalyticsDayRows]);
@@ -34,6 +35,7 @@ export function buildAdminMarketingSummaryCsv(
   push(["last_7_days", "view_events", w7.viewEvents]);
   push(["last_7_days", "share_click_events", w7.shareClickEvents]);
   push(["last_7_days", "bid_click_events", w7.bidClickEvents]);
+  push(["last_7_days", "external_referral_events", w7.externalReferralEvents]);
   push(["last_7_days", "campaigns_updated", w7.campaignsUpdated]);
   push(["last_7_days", "campaigns_created", w7.campaignsCreated]);
   push([
@@ -47,6 +49,11 @@ export function buildAdminMarketingSummaryCsv(
   push(["last_30_days", "view_events", w30.viewEvents]);
   push(["last_30_days", "share_click_events", w30.shareClickEvents]);
   push(["last_30_days", "bid_click_events", w30.bidClickEvents]);
+  push([
+    "last_30_days",
+    "external_referral_events",
+    w30.externalReferralEvents,
+  ]);
   push(["last_30_days", "campaigns_updated", w30.campaignsUpdated]);
   push(["last_30_days", "campaigns_created", w30.campaignsCreated]);
   push([

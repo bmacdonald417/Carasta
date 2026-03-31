@@ -23,7 +23,12 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  let eventLabel: "VIEW" | "SHARE_CLICK" | "BID_CLICK" | undefined;
+  let eventLabel:
+    | "VIEW"
+    | "SHARE_CLICK"
+    | "BID_CLICK"
+    | "EXTERNAL_REFERRAL"
+    | undefined;
   let authMode: "authenticated" | "anonymous" | "unknown" = "unknown";
   let sourceLabel: string | undefined;
 
@@ -106,7 +111,9 @@ export async function POST(req: NextRequest) {
         ? MarketingTrafficEventType.VIEW
         : body.eventType === "SHARE_CLICK"
           ? MarketingTrafficEventType.SHARE_CLICK
-          : MarketingTrafficEventType.BID_CLICK;
+          : body.eventType === "EXTERNAL_REFERRAL"
+            ? MarketingTrafficEventType.EXTERNAL_REFERRAL
+            : MarketingTrafficEventType.BID_CLICK;
 
     const recorded = await recordTrafficEvent({
       auctionId: body.auctionId,

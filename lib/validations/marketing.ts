@@ -5,7 +5,12 @@ const METADATA_KEY_RE = /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/;
 
 export const marketingTrackBodySchema = z.object({
   auctionId: z.string().min(1).max(128),
-  eventType: z.enum(["VIEW", "SHARE_CLICK", "BID_CLICK"]),
+  eventType: z.enum([
+    "VIEW",
+    "SHARE_CLICK",
+    "BID_CLICK",
+    "EXTERNAL_REFERRAL",
+  ]),
   source: z.nativeEnum(MarketingTrafficSource).optional(),
   visitorKey: z.string().min(8).max(128).optional(),
   metadata: z

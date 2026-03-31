@@ -23,6 +23,12 @@ export const MARKETING_SHARE_CLICK_DEDUPE_MS = 8_000;
 export const MARKETING_BID_CLICK_DEDUPE_MS = 12_000;
 
 /**
+ * External-referral landings: same dedupe shape as VIEW (user or visitorKey window).
+ */
+export const MARKETING_EXTERNAL_REFERRAL_DEDUPE_MS_AUTHENTICATED = 60_000;
+export const MARKETING_EXTERNAL_REFERRAL_DEDUPE_MS_ANONYMOUS = 90_000;
+
+/**
  * Keys used for duplicate detection (documented for operators):
  *
  * - VIEW + logged-in: (auctionId, eventType=VIEW, userId)
@@ -31,8 +37,9 @@ export const MARKETING_BID_CLICK_DEDUPE_MS = 12_000;
  * - SHARE_CLICK + anonymous: above + metadata.visitorKey
  * - BID_CLICK + logged-in: (auctionId, eventType, userId, metadata.bidUiSurface)
  * - BID_CLICK + anonymous: above + metadata.visitorKey
+ * - EXTERNAL_REFERRAL: same attribution rules as VIEW (userId or visitorKey window).
  *
- * No visitorKey and no userId: VIEW is not deduped (cannot attribute safely).
+ * No visitorKey and no userId: VIEW / EXTERNAL_REFERRAL are not deduped (cannot attribute safely).
  */
 export async function recordTrafficEvent(input: {
   auctionId: string;
@@ -71,8 +78,23 @@ export async function recordTrafficEvent(input: {
     const windowMs = userId
       ? MARKETING_VIEW_DEDUPE_MS_AUTHENTICATED
       : MARKETING_VIEW_DEDUPE_MS_ANONYMOUS;
-    const dup = await findRecentViewDuplicate({
+    const dup = await findRecentUserOrVisitorKeyedDuplicate({
       auctionId: input.auctionId,
+      eventType: MarketingTrafficEventType.VIEW,
+      userId,
+      visitorKey,
+      windowMs,
+    });
+    if (dup) return { ok: true, skipped: true };
+  }
+
+  if (input.eventType === MarketingTrafficEventType.EXTERNAL_REFERRAL) {
+    const windowMs = userId
+      ? MARKETING_EXTERNAL_REFERRAL_DEDUPE_MS_AUTHENTICATED
+      : MARKETING_EXTERNAL_REFERRAL_DEDUPE_MS_ANONYMOUS;
+    const dup = await findRecentUserOrVisitorKeyedDuplicate({
+      auctionId: input.auctionId,
+      eventType: MarketingTrafficEventType.EXTERNAL_REFERRAL,
       userId,
       visitorKey,
       windowMs,
@@ -126,8 +148,9 @@ export async function recordTrafficEvent(input: {
   return { ok: true };
 }
 
-async function findRecentViewDuplicate(params: {
+async function findRecentUserOrVisitorKeyedDuplicate(params: {
   auctionId: string;
+  eventType: MarketingTrafficEventType;
   userId: string | null;
   visitorKey: string | null;
   windowMs: number;
@@ -138,7 +161,7 @@ async function findRecentViewDuplicate(params: {
     const row = await prisma.trafficEvent.findFirst({
       where: {
         auctionId: params.auctionId,
-        eventType: MarketingTrafficEventType.VIEW,
+        eventType: params.eventType,
         userId: params.userId,
         createdAt: { gte: since },
       },
@@ -151,7 +174,7 @@ async function findRecentViewDuplicate(params: {
     const row = await prisma.trafficEvent.findFirst({
       where: {
         auctionId: params.auctionId,
-        eventType: MarketingTrafficEventType.VIEW,
+        eventType: params.eventType,
         userId: null,
         createdAt: { gte: since },
         metadata: {
