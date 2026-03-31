@@ -52,4 +52,4 @@ No new auth primitives; the marketing page inherits the admin layout.
 
 ## PR 23 (exact next best step)
 
-**Time-bounded platform metrics** — extend **`getAdminMarketingPlatformSummary`** (or a sibling helper) with optional filters for **`TrafficEvent.createdAt`** (e.g. last 7 / 30 days) and surface matching KPIs on **`/admin/marketing`**, still **read-only** and **admin-only**. Alternative: a **one-click CSV** of the same aggregates for support/offline review, without new DB tables.
+Implemented as **Phase 23** — see **`MARKETING_PHASE_23_NOTES.md`**. **PR 24:** optional **admin CSV snapshot** or extra read-only breakdowns (e.g. **EXTERNAL_REFERRAL** in windows).

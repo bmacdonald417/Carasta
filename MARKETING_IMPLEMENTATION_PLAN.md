@@ -681,7 +681,23 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_22_NOTES.md`.
 
-**Next recommended step (PR 23):** Optional **time-bounded** admin metrics (e.g. events in last 7/30 days), **CSV snapshot** export for support, or **deeper funnel** breakdowns — **one PR**, still **read-only** and **admin-only** unless product explicitly scopes seller-facing work.
+**Next recommended step (PR 23):** Implemented as Phase 23 (below).
+
+---
+
+## 12x. Phase 23 — Admin time-bounded marketing aggregates (implemented)
+
+**Goal:** **Rolling 7- and 30-day** read-only aggregates on **`/admin/marketing`** so staff see **recent momentum**, not only lifetime totals — **no** schema changes, **no** seller or commerce path changes.
+
+**Implemented:**
+
+- **`loadRecentWindow(cutoff)`** in **`lib/marketing/get-admin-marketing-platform-summary.ts`** — per window: **`TrafficEvent`** total + VIEW / SHARE_CLICK / BID_CLICK; **`Campaign`** rows with **`updatedAt`** or **`createdAt`** in range; marketing **`Notification`** rows by **`createdAt`** + **`MARKETING_NOTIFICATION_PREFIX`**.
+- **`recentActivity.last7Days` / `last30Days`** on the summary payload; **`topAuctionsLast7Days`** / **`topSellersLast7Days`** (raw SQL + enrichment, same patterns as lifetime tops).
+- **Page:** **`app/(admin)/admin/marketing/page.tsx`** — **Recent activity** band (7 vs 30 panels), **Last 7 days — leaders** tables, then **All-time** KPIs and lifetime leader tables (labels clarified).
+
+**Notes:** `MARKETING_PHASE_23_NOTES.md`.
+
+**Next recommended step (PR 24):** **Admin CSV snapshot** of this dashboard (or selected aggregates) for support/offline review, or **read-only funnel** extras (e.g. **EXTERNAL_REFERRAL** in window stats) — **one PR**, still **admin-only** unless scoped otherwise.
 
 ---
 
@@ -696,4 +712,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 22; see §12b–§12w.*
+*Plan updated Marketing Phase 23; see §12b–§12x.*
