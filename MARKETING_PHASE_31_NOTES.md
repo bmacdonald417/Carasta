@@ -49,12 +49,16 @@ Keys in **`counters`** are only those outcomes that have been **observed at leas
 - **Ephemeral** — process restart clears counts.
 - **Same bearer env as track observability** — intentional to keep ops configuration minimal; rotate **`MARKETING_TRACK_OBSERVABILITY_SECRET`** with care if both routes are exposed to the same operators.
 
-## PR 32 (exact next best step)
+## PR 32 (implemented)
 
-**Conservative** **`EXTERNAL_REFERRAL`** landing detection: add **`twclid`** (or another single param) to the allowlist **only** after privacy/compliance review, with updates to **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`** and **`MARKETING_PHASE_29_NOTES.md`** — **one** narrow PR, **no** Prisma/schema.
+**`twclid`** for **EXTERNAL_REFERRAL** — **`MARKETING_PHASE_32_NOTES.md`**.
+
+## PR 33 (exact next best step)
+
+Further single-param click-id expansion (**e.g.** **`ttclid`**) with runbook + sign-off — **or** defer and improve analytics/ops without new URL params.
 
 ## Related
 
-- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zf
+- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zf–§12zg
 - **`MARKETING_PHASE_30_NOTES.md`** — counter semantics
 - **`app/api/admin/marketing-track-observability/route.ts`** — parallel auth pattern

@@ -41,6 +41,10 @@ Implemented — **`MARKETING_PHASE_30_NOTES.md`**.
 
 Implemented — **`MARKETING_PHASE_31_NOTES.md`**.
 
-## PR 32 (suggested next step)
+## PR 32
 
-Click-id allowlist expansion with sign-off — narrow scope.
+Implemented — **`MARKETING_PHASE_32_NOTES.md`**.
+
+## PR 33 (suggested next step)
+
+Further click-id param or defer — narrow scope.

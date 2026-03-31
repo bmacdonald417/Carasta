@@ -22,7 +22,7 @@ Both can occur on the same load; they are **not** interchangeable. Admin and sel
 **In-app default** (`AuctionViewTracker`): one **`EXTERNAL_REFERRAL`** per mount when **`urlHasExternalMarketingAttributionParams()`** is true — **either**:
 
 1. **UTM:** any query key starting with **`utm_`** (case-insensitive), e.g. `utm_source`, `utm_campaign`.
-2. **Click IDs:** query key is one of (case-insensitive): **`gclid`** (Google), **`fbclid`** (Meta), **`msclkid`** (Microsoft Ads).
+2. **Click IDs:** query key is one of (case-insensitive): **`gclid`** (Google), **`fbclid`** (Meta), **`msclkid`** (Microsoft Ads), **`twclid`** (X / Twitter Ads).
 
 ### UTM vs click IDs
 
@@ -36,7 +36,7 @@ We **do not** persist click-id **values** in dedicated metadata fields — only 
 ### Limitations
 
 - Organic shares that copy a URL **with** UTM or click ids will also match.
-- Other params (**`twclid`**, etc.) are **not** enabled unless added in a future PR with docs.
+- Other platform click ids (**`ttclid`**, etc.) are **not** enabled unless added in a future PR with docs and privacy review.
 
 ---
 
@@ -112,5 +112,5 @@ All use **non-blocking** **`sendBeacon`** / **`fetch(..., keepalive: true)`**; e
 
 1. `/auctions/{id}` **no query** → only **`VIEW`**.
 2. `/auctions/{id}?utm_source=test` → **`VIEW`** + **`EXTERNAL_REFERRAL`**.
-3. `/auctions/{id}?gclid=dummy` (or **`fbclid`**, **`msclkid`**; key case-insensitive) → **`VIEW`** + **`EXTERNAL_REFERRAL`**.
+3. `/auctions/{id}?gclid=dummy` (or **`fbclid`**, **`msclkid`**, **`twclid`**; key case-insensitive) → **`VIEW`** + **`EXTERNAL_REFERRAL`**.
 4. **`MARKETING_ENABLED=0`** → tracker off; no client beacons.

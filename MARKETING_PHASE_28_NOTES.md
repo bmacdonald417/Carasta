@@ -46,6 +46,10 @@ Implemented — **`MARKETING_PHASE_30_NOTES.md`**.
 
 Implemented — **`MARKETING_PHASE_31_NOTES.md`**.
 
-## PR 32 (suggested next step)
+## PR 32
 
-Click-id allowlist expansion (**`twclid`**, etc.) with privacy notes.
+Implemented — **`MARKETING_PHASE_32_NOTES.md`**.
+
+## PR 33 (suggested next step)
+
+**`ttclid`** or defer; see **`MARKETING_IMPLEMENTATION_PLAN.md`** §12zg.

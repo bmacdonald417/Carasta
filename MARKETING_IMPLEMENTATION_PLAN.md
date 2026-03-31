@@ -828,7 +828,22 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_31_NOTES.md`.
 
-**Next recommended step (PR 32):** Conservative **EXTERNAL_REFERRAL** click-id allowlist expansion (**`twclid`**, etc.) with privacy/compliance notes — **one** narrow PR (**no** schema).
+**Next recommended step (PR 32):** Implemented as Phase 32 (below).
+
+---
+
+## 12zg. Phase 32 — Conservative **twclid** for EXTERNAL_REFERRAL (implemented)
+
+**Goal:** Treat **`twclid`** (X / Twitter Ads click id) like existing click-id keys: **query key only**, case-insensitive match, **no** new event type, **no** extra metadata fields — same **`AuctionViewTracker`** path and server dedupe.
+
+**Implemented:**
+
+- **`lib/marketing/track-external-referral-landing.ts`** — **`twclid`** added to **`EXTERNAL_MARKETING_CLICK_ID_PARAMS`** (extends **`urlHasClickIdAttributionParams`** / **`urlHasExternalMarketingAttributionParams`**).
+- **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`** — docs + QA.
+
+**Notes:** `MARKETING_PHASE_32_NOTES.md`.
+
+**Next recommended step (PR 33):** Further click-id expansion (**e.g.** **`ttclid`**) **only** with the same narrow allowlist + runbook pattern **and** explicit privacy/compliance sign-off — **or** defer additional params and focus on ops/analytics polish (**no** schema).
 
 ---
 
@@ -843,4 +858,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 31; see §12b–§12zf.*
+*Plan updated Marketing Phase 32; see §12b–§12zg.*

@@ -38,9 +38,13 @@ Add **lightweight** operational observability around **`GET /api/admin/marketing
 
 **`GET /api/admin/marketing-snapshot-observability`** — see **`MARKETING_PHASE_31_NOTES.md`**.
 
-## PR 32 (exact next best step)
+## PR 32 (implemented)
 
-Conservative **EXTERNAL_REFERRAL** click-id allowlist expansion (e.g. **`twclid`**) with privacy/compliance notes — **one** narrow PR.
+**`twclid`** — **`MARKETING_PHASE_32_NOTES.md`**.
+
+## PR 33 (exact next best step)
+
+Optional **`ttclid`** (etc.) or defer param expansion — see plan §12zg.
 
 ## Related
 

@@ -9,6 +9,8 @@ export const EXTERNAL_MARKETING_CLICK_ID_PARAMS = [
   "gclid",
   "fbclid",
   "msclkid",
+  /** X / Twitter Ads click id — same conservative key-only detection as other entries. */
+  "twclid",
 ] as const;
 
 const CLICK_ID_SET = new Set<string>(EXTERNAL_MARKETING_CLICK_ID_PARAMS);

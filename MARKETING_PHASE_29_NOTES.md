@@ -12,6 +12,7 @@
 | **`gclid`** | Google Ads / Google |
 | **`fbclid`** | Meta (Facebook / Instagram) |
 | **`msclkid`** | Microsoft Advertising (Bing) |
+| **`twclid`** | X / Twitter Ads (Phase 32) |
 
 Matching is **case-insensitive** on the query **key** only. Constants: **`EXTERNAL_MARKETING_CLICK_ID_PARAMS`** in **`lib/marketing/track-external-referral-landing.ts`**.
 
@@ -45,6 +46,10 @@ Admin snapshot route observability — **`MARKETING_PHASE_30_NOTES.md`**.
 
 Implemented — **`GET /api/admin/marketing-snapshot-observability`** — **`MARKETING_PHASE_31_NOTES.md`**.
 
-## PR 32 (exact next best step)
+## PR 32 (implemented)
 
-**`twclid`** (or similar) **EXTERNAL_REFERRAL** allowlist expansion with runbook + privacy notes — **one** narrow PR.
+**`twclid`** — **`MARKETING_PHASE_32_NOTES.md`**.
+
+## PR 33 (exact next best step)
+
+Optional **`ttclid`** (or one other platform id) with the same allowlist + runbook pattern and sign-off — **or** no further click-id expansion.
