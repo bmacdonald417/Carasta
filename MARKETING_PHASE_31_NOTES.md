@@ -53,12 +53,17 @@ Keys in **`counters`** are only those outcomes that have been **observed at leas
 
 **`twclid`** for **EXTERNAL_REFERRAL** — **`MARKETING_PHASE_32_NOTES.md`**.
 
-## PR 33 (exact next best step)
+## PR Phase 33 (implemented)
 
-Further single-param click-id expansion (**e.g.** **`ttclid`**) with runbook + sign-off — **or** defer and improve analytics/ops without new URL params.
+**`MARKETING_HANDOFF_INDEX.md`** — **`MARKETING_PHASE_33_NOTES.md`**.
+
+## PR 34 (exact next best step)
+
+**`MARKETING_DEPLOYMENT_CHECKLIST.md`** or defer — see **`MARKETING_HANDOFF_INDEX.md`** §14.
 
 ## Related
 
-- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zf–§12zg
+- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zf–§12zh
+- **`MARKETING_HANDOFF_INDEX.md`**
 - **`MARKETING_PHASE_30_NOTES.md`** — counter semantics
 - **`app/api/admin/marketing-track-observability/route.ts`** — parallel auth pattern

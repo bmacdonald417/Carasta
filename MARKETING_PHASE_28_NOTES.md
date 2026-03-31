@@ -50,6 +50,10 @@ Implemented — **`MARKETING_PHASE_31_NOTES.md`**.
 
 Implemented — **`MARKETING_PHASE_32_NOTES.md`**.
 
-## PR 33 (suggested next step)
+## PR Phase 33 (implemented)
 
-**`ttclid`** or defer; see **`MARKETING_IMPLEMENTATION_PLAN.md`** §12zg.
+**`MARKETING_HANDOFF_INDEX.md`** — **`MARKETING_PHASE_33_NOTES.md`**.
+
+## PR 34 (suggested next step)
+
+Deployment checklist or defer; see plan §12zh.

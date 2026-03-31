@@ -15,11 +15,16 @@ X (Twitter) Ads appends **`twclid`** on outbound clicks in common campaign flows
 
 **Privacy posture:** Unchanged from Phase 29 — we still do **not** persist click-id **values** as separate metadata fields; **`currentUrl`** may contain the query string subject to existing sanitization/clipping.
 
-## PR 33 (exact next best step)
+## PR Phase 33 (implemented)
 
-Add another single param (**e.g.** **`ttclid`** for TikTok Ads) **only** with the same pattern + runbook + explicit sign-off — **or** stop expanding allowlists and invest in analytics/ops ergonomics without new query params.
+**`MARKETING_HANDOFF_INDEX.md`** — master subsystem map. See **`MARKETING_PHASE_33_NOTES.md`**.
+
+## PR 34 (exact next best step)
+
+**`MARKETING_DEPLOYMENT_CHECKLIST.md`** (env + digest cron) **or** handoff-frozen until product requests work.
 
 ## Related
 
 - **`MARKETING_PHASE_29_NOTES.md`** — original click-id batch
-- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zg
+- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zg–§12zh
+- **`MARKETING_HANDOFF_INDEX.md`**

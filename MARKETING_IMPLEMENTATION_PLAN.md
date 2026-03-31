@@ -10,6 +10,8 @@ Carasta is a **Next.js App Router** app with a **global shell** (`CarastaLayout`
 
 **Recommended approach:** Add Marketing as **seller-scoped routes** under `app/(app)/u/[handle]/marketing/*`, link from the **profile** (owner-only) and optionally from **auction detail** for the listing owner. Persist **additive** Prisma models for traffic and rollups/campaigns; ingest via **new API route(s)** or **server actions**, keeping **existing auction bid/sell paths untouched**. Align new model naming with existing conventions (`PascalCase` models, `camelCase` fields, `cuid()` IDs, `Json?` for flexible payloads where appropriate).
 
+**Master handoff map (Phase 33):** **`MARKETING_HANDOFF_INDEX.md`** — routes, scripts, env vars, models, exports, observability URLs, runbooks, and pointers to all **`MARKETING_PHASE_*_NOTES.md`**.
+
 ---
 
 ## 2. Current Architecture Summary
@@ -843,7 +845,21 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_32_NOTES.md`.
 
-**Next recommended step (PR 33):** Further click-id expansion (**e.g.** **`ttclid`**) **only** with the same narrow allowlist + runbook pattern **and** explicit privacy/compliance sign-off — **or** defer additional params and focus on ops/analytics polish (**no** schema).
+**Next recommended step (PR 33):** Implemented as Phase 33 (below).
+
+---
+
+## 12zh. Phase 33 — Final marketing handoff index (implemented)
+
+**Goal:** One **authoritative** map of the marketing subsystem for engineering, product, ops, and client delivery — **documentation only**.
+
+**Implemented:**
+
+- **`MARKETING_HANDOFF_INDEX.md`** — overview; seller/admin surfaces; API routes; scripts; env vars; Prisma models; exports; observability; runbooks; deployment summary; limitations; suggested post-handoff roadmap.
+
+**Notes:** `MARKETING_PHASE_33_NOTES.md`.
+
+**Next recommended step (PR 34):** Add **`MARKETING_DEPLOYMENT_CHECKLIST.md`** (host-specific env + digest cron URL verification) **or** treat subsystem as **handoff-frozen** and route new work through product intake — **documentation-only** preferred unless product requests code.
 
 ---
 
@@ -858,4 +874,6 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 32; see §12b–§12zg.*
+*Plan updated Marketing Phase 33; see §12b–§12zh.*
+
+**Handoff:** `MARKETING_HANDOFF_INDEX.md`

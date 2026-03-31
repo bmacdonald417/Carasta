@@ -48,5 +48,6 @@ Optional **`ttclid`** (etc.) or defer param expansion — see plan §12zg.
 
 ## Related
 
-- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12ze
+- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12ze–§12zh
+- **`MARKETING_HANDOFF_INDEX.md`** — observability URLs
 - Track observability pattern — **`lib/marketing/marketing-track-observability.ts`**, **`app/api/admin/marketing-track-observability/route.ts`**

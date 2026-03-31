@@ -50,6 +50,10 @@ Implemented — **`GET /api/admin/marketing-snapshot-observability`** — **`MAR
 
 **`twclid`** — **`MARKETING_PHASE_32_NOTES.md`**.
 
-## PR 33 (exact next best step)
+## PR Phase 33 (implemented)
 
-Optional **`ttclid`** (or one other platform id) with the same allowlist + runbook pattern and sign-off — **or** no further click-id expansion.
+**`MARKETING_HANDOFF_INDEX.md`** — **`MARKETING_PHASE_33_NOTES.md`**.
+
+## PR 34 (exact next best step)
+
+Deployment checklist doc **or** handoff-frozen; optional future **`ttclid`** only with sign-off.

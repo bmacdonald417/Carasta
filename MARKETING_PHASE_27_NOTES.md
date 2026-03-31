@@ -45,6 +45,10 @@ Implemented — **`MARKETING_PHASE_31_NOTES.md`**.
 
 Implemented — **`MARKETING_PHASE_32_NOTES.md`**.
 
-## PR 33 (suggested next step)
+## PR Phase 33 (implemented)
 
-Further click-id param or defer — narrow scope.
+**`MARKETING_HANDOFF_INDEX.md`** — **`MARKETING_PHASE_33_NOTES.md`**.
+
+## PR 34 (suggested next step)
+
+**`MARKETING_DEPLOYMENT_CHECKLIST.md`** or defer.
