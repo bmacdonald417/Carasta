@@ -38,6 +38,10 @@ Omitting **`generatedAt`** from the hash allows **304** when underlying aggregat
 
 Implemented as **Phase 29** — **`MARKETING_PHASE_29_NOTES.md`**.
 
-## PR 30 (suggested next step)
+## PR 30
 
-Snapshot **304**/**200** observability, or a reviewed expand of click-id allowlist (**`twclid`**, etc.) with privacy notes.
+Implemented — **`MARKETING_PHASE_30_NOTES.md`**.
+
+## PR 31 (suggested next step)
+
+Admin JSON exposure of snapshot counters (mirror track observability route) **or** click-id allowlist expansion with privacy notes.

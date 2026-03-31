@@ -799,7 +799,22 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_29_NOTES.md`.
 
-**Next recommended step (PR 30):** Admin snapshot **observability** (**304**/**200** counters or structured log sampling), or a **second** conservative param allowlist review (**`twclid`**, etc.) with legal/privacy sign-off — **one PR**, still narrow.
+**Next recommended step (PR 30):** Implemented as Phase 30 (below).
+
+---
+
+## 12ze. Phase 30 — Admin marketing snapshot observability (implemented)
+
+**Goal:** Lightweight operational visibility for **`GET /api/admin/marketing/snapshot`**: **200** vs **304** vs **401** vs **500** without changing response bodies, **ETag** semantics, or JSON shape.
+
+**Implemented:**
+
+- **`lib/marketing/admin-marketing-snapshot-observability.ts`** — in-memory counters per outcome; **`console.info`** for **401** / **500** by default; **`200`** / **`304`** when **`ADMIN_MARKETING_SNAPSHOT_OBSERVABILITY_VERBOSE`** is set; **`getAdminMarketingSnapshotObservabilitySnapshot()`** for in-process inspection.
+- **`app/api/admin/marketing/snapshot/route.ts`** — calls **`observeAdminMarketingSnapshot`** on each major branch (**401** before returning **`auth.response`**; **304** / **200** in success path; **500** in **`catch`** before rethrow so framework error handling is unchanged).
+
+**Notes:** `MARKETING_PHASE_30_NOTES.md`.
+
+**Next recommended step (PR 31):** Expose snapshot counters via a **protected admin** JSON route (same auth pattern as **`GET /api/admin/marketing-track-observability`**) **or** a **second** conservative click-id allowlist step (**`twclid`**, etc.) with privacy sign-off — **one PR**, still narrow.
 
 ---
 
@@ -814,4 +829,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 29; see §12b–§12zd.*
+*Plan updated Marketing Phase 30; see §12b–§12ze.*
