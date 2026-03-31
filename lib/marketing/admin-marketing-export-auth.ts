@@ -6,7 +6,8 @@ export type AdminMarketingExportAuthResult =
   | { ok: false; response: NextResponse };
 
 /**
- * **ADMIN** session only — for `/api/admin/marketing/export/*` CSV routes.
+ * **ADMIN** session only — for `/api/admin/marketing/export/*` CSV routes and
+ * **`/api/admin/marketing/snapshot`** JSON.
  * `/api/admin/*` is not covered by `middleware.ts`; routes must call this.
  */
 export async function requireAdminMarketingCsvAccess(): Promise<AdminMarketingExportAuthResult> {

@@ -5,6 +5,7 @@ import {
   Download,
   ExternalLink,
   Eye,
+  FileJson,
   Hand,
   Megaphone,
   MousePointerClick,
@@ -166,6 +167,17 @@ export default async function AdminMarketingPage() {
             >
               <Download className="mr-2 h-3.5 w-3.5" />
               Export tops (7d) CSV
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href="/api/admin/marketing/snapshot"
+              target="_blank"
+              rel="noreferrer"
+              title="Machine-readable snapshot (same data as this page); admin session required"
+            >
+              <FileJson className="mr-2 h-3.5 w-3.5" />
+              JSON snapshot
             </a>
           </Button>
         </div>

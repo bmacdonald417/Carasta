@@ -732,7 +732,24 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_25_NOTES.md`.
 
-**Next recommended step (PR 26):** **`GET /api/admin/marketing/snapshot.json`** (or similar) returning the same shape as the summary helper for integrations/dashboards — **read-only**, **ADMIN** session, **no** seller UI — or client **`track`** helper + docs for **`EXTERNAL_REFERRAL`** beacons on listing landings.
+**Next recommended step (PR 26):** Implemented as Phase 26 (below).
+
+---
+
+## 12za. Phase 26 — Admin marketing JSON snapshot (implemented)
+
+**Goal:** **`GET /api/admin/marketing/snapshot`** returns **`getAdminMarketingPlatformSummary()`** as **JSON** for internal tools / BI — **read-only**, **ADMIN** session, **no** schema change.
+
+**Implemented:**
+
+- **Route:** **`app/api/admin/marketing/snapshot/route.ts`** — **`Content-Type: application/json`**, **`Cache-Control: no-store`**.
+- **Auth:** **`requireAdminMarketingCsvAccess()`** (same as CSV exports).
+- **Payload:** **`buildAdminMarketingSnapshotJson()`** in **`lib/marketing/admin-marketing-snapshot-json.ts`** — **`ok`**, **`generatedAt`** (ISO), **`note`**, **`marketingEnabled`**, **`totals`**, **`recentActivity`** (7d/30d, including **external referral** counts), **`topAuctions`**, **`topSellers`**, **`topAuctionsLast7Days`**, **`topSellersLast7Days`**, **`recentCampaigns`** (**`updatedAt`** as ISO string).
+- **UI:** **`/admin/marketing`** — **JSON snapshot** outline button (opens in new tab; session cookie sent).
+
+**Notes:** `MARKETING_PHASE_26_NOTES.md`.
+
+**Next recommended step (PR 27):** Document or implement **EXTERNAL_REFERRAL** client beacon on listing landings (runbook + optional thin **`trackMarketingEvent`** wrapper), or **ETag / If-None-Match** on snapshot for polling clients — **one PR**, still low-risk.
 
 ---
 
@@ -747,4 +764,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 25; see §12b–§12z.*
+*Plan updated Marketing Phase 26; see §12b–§12za.*

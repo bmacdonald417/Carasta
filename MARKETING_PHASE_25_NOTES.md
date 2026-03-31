@@ -54,6 +54,10 @@
 
 ---
 
-## PR 26 (exact next best step)
+## PR 26
 
-Add **`GET /api/admin/marketing/snapshot.json`** with **`requireAdminMarketingCsvAccess`**-style auth, **`JSON`** body from **`getAdminMarketingPlatformSummary()`** (dates as ISO strings), for BI/tools — **or** ship a tiny client **`trackExternalReferral`** + runbook note for UTM/referrer landings.
+Implemented as **Phase 26** — **`MARKETING_PHASE_26_NOTES.md`**.
+
+## PR 27 (suggested next step)
+
+**EXTERNAL_REFERRAL** listing-landing beacon (runbook + optional client helper), or **conditional GET** / **ETag** on the snapshot for pollers — still low-risk.
