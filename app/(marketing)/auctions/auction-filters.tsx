@@ -16,6 +16,15 @@ import { X } from "lucide-react";
 
 type FilterPill = { key: string; label: string };
 
+const CONDITION_OPTIONS = [
+  { value: "__all__", label: "Any condition" },
+  { value: "CONCOURS", label: "Concours" },
+  { value: "EXCELLENT", label: "Excellent" },
+  { value: "VERY_GOOD", label: "Very good" },
+  { value: "GOOD", label: "Good" },
+  { value: "FAIR", label: "Fair" },
+] as const;
+
 export function AuctionFilters({
   makes,
   models,
@@ -25,6 +34,11 @@ export function AuctionFilters({
   yearMax,
   priceMin,
   priceMax,
+  mileageMin,
+  mileageMax,
+  location,
+  condition,
+  featured,
   noReserve,
   endingSoon,
   status,
@@ -33,6 +47,9 @@ export function AuctionFilters({
   zip,
   radius,
   view,
+  page = 1,
+  total,
+  pageSize = 50,
 }: {
   makes: string[];
   models: string[];
@@ -42,6 +59,11 @@ export function AuctionFilters({
   yearMax?: number;
   priceMin?: number;
   priceMax?: number;
+  mileageMin?: number;
+  mileageMax?: number;
+  location?: string;
+  condition?: string;
+  featured?: boolean;
   noReserve?: boolean;
   endingSoon?: boolean;
   status?: string;
@@ -50,6 +72,9 @@ export function AuctionFilters({
   zip?: string;
   radius?: number;
   view?: "grid" | "map";
+  page?: number;
+  total?: number;
+  pageSize?: number;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,6 +87,7 @@ export function AuctionFilters({
     const next = new URLSearchParams(searchParams.toString());
     if (value === undefined || value === "") next.delete(key);
     else next.set(key, String(value));
+    if (key !== "page") next.delete("page");
     router.push(`/auctions?${next.toString()}`);
   }
 
@@ -73,6 +99,7 @@ export function AuctionFilters({
       next.delete("radius");
     }
     if (key === "view") next.delete("view");
+    next.delete("page");
     router.push(`/auctions?${next.toString()}`);
   }
 
@@ -190,6 +217,55 @@ export function AuctionFilters({
             className="mt-1"
           />
         </div>
+        <div className="w-[100px]">
+          <Label className="text-xs">Mileage min</Label>
+          <Input
+            type="number"
+            min={0}
+            placeholder="0"
+            defaultValue={mileageMin}
+            onBlur={(e) => update("mileageMin", e.target.value || undefined)}
+            className="mt-1"
+          />
+        </div>
+        <div className="w-[100px]">
+          <Label className="text-xs">Mileage max</Label>
+          <Input
+            type="number"
+            min={0}
+            placeholder="Any"
+            defaultValue={mileageMax}
+            onBlur={(e) => update("mileageMax", e.target.value || undefined)}
+            className="mt-1"
+          />
+        </div>
+        <div className="min-w-[140px] max-w-[200px]">
+          <Label className="text-xs">Location</Label>
+          <Input
+            placeholder="Zip, city, title…"
+            defaultValue={location}
+            onBlur={(e) => update("location", e.target.value.trim() || undefined)}
+            className="mt-1"
+          />
+        </div>
+        <div className="w-[140px]">
+          <Label className="text-xs">Condition</Label>
+          <Select
+            value={condition ?? "__all__"}
+            onValueChange={(v) => update("condition", v === "__all__" ? undefined : v)}
+          >
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="Any" />
+            </SelectTrigger>
+            <SelectContent>
+              {CONDITION_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="w-[120px]">
           <Label className="text-xs">Status</Label>
           <Select
@@ -227,8 +303,22 @@ export function AuctionFilters({
             />
             <Label htmlFor="endingSoon" className="text-sm">Ending in 24h</Label>
           </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="featured"
+              checked={!!featured}
+              title="Reserved for future featured listings"
+              onChange={(e) => update("featured", e.target.checked ? "1" : undefined)}
+              className="h-4 w-4 rounded border-border"
+            />
+            <Label htmlFor="featured" className="text-sm text-muted-foreground">
+              Featured{" "}
+              <span className="text-xs">(soon)</span>
+            </Label>
+          </div>
         </div>
-        <div className="w-[140px]">
+        <div className="w-[180px]">
           <Label className="text-xs">Sort</Label>
           <Select value={sort ?? "ending"} onValueChange={(v) => update("sort", v)}>
             <SelectTrigger className="mt-1">
@@ -238,6 +328,8 @@ export function AuctionFilters({
               <SelectItem value="ending">Ending soon</SelectItem>
               <SelectItem value="newest">Newest</SelectItem>
               <SelectItem value="highest">Highest bid</SelectItem>
+              <SelectItem value="price_asc">Price: low → high</SelectItem>
+              <SelectItem value="price_desc">Price: high → low</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -303,6 +395,12 @@ export function AuctionFilters({
           </Select>
         </div>
       </div>
+
+      {total != null && view !== "map" && (
+        <p className="text-xs text-muted-foreground">
+          Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total}
+        </p>
+      )}
 
       {activePills.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
