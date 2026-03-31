@@ -749,7 +749,25 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_26_NOTES.md`.
 
-**Next recommended step (PR 27):** Document or implement **EXTERNAL_REFERRAL** client beacon on listing landings (runbook + optional thin **`trackMarketingEvent`** wrapper), or **ETag / If-None-Match** on snapshot for polling clients — **one PR**, still low-risk.
+**Next recommended step (PR 27):** Implemented as Phase 27 (below).
+
+---
+
+## 12zb. Phase 27 — EXTERNAL_REFERRAL landing runbook + thin client helper (implemented)
+
+**Goal:** Practical **EXTERNAL_REFERRAL** from the browser: **runbook**, **`MarketingTrackPayload`** support, **`sendMarketingTrackExternalReferralLanding`** + **`urlHasUtmAttributionParams`**, **UTM**-gated beacon on **public auction detail** — **no** schema change.
+
+**Implemented:**
+
+- **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`** — semantics vs **VIEW**, when to fire, dedupe, metadata, QA.
+- **`lib/marketing/track-external-referral-landing.ts`** — thin helpers; reuse **`sendMarketingTrack`**.
+- **`lib/marketing/track-payload-types.ts`** — **EXTERNAL_REFERRAL** on **eventType** union.
+- **`components/marketing/auction-view-tracker.tsx`** — after **VIEW**, one **EXTERNAL_REFERRAL** when the URL has any **`utm_`-prefixed** query parameter.
+- **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** — related-doc link.
+
+**Notes:** `MARKETING_PHASE_27_NOTES.md`.
+
+**Next recommended step (PR 28):** **ETag** / **If-None-Match** (or short **max-age**) on **`GET /api/admin/marketing/snapshot`**, or optional **gclid** / **fbclid** gates alongside UTM — **one PR**, still low-risk.
 
 ---
 
@@ -764,4 +782,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 26; see §12b–§12za.*
+*Plan updated Marketing Phase 27; see §12b–§12zb.*

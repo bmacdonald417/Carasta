@@ -196,6 +196,7 @@ Adjust **N** using §7.
 
 ## Related docs
 
+- `MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md` — when to fire **EXTERNAL_REFERRAL** vs **VIEW**, UTM landing helper
 - `MARKETING_PHASE_10_NOTES.md` — dedupe + metadata
 - `MARKETING_PHASE_12_NOTES.md` — in-app rate limiter
 - `MARKETING_IMPLEMENTATION_PLAN.md` — §12q Phase 16, §12r Phase 17

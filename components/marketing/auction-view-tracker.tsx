@@ -5,6 +5,10 @@ import {
   getOrCreateMarketingVisitorKey,
   sendMarketingTrack,
 } from "@/lib/marketing/send-marketing-track";
+import {
+  sendMarketingTrackExternalReferralLanding,
+  urlHasUtmAttributionParams,
+} from "@/lib/marketing/track-external-referral-landing";
 
 export function AuctionViewTracker({
   auctionId,
@@ -14,6 +18,7 @@ export function AuctionViewTracker({
   enabled: boolean;
 }) {
   const sentRef = useRef(false);
+  const externalReferralSentRef = useRef(false);
 
   useEffect(() => {
     if (!enabled || !auctionId || sentRef.current) return;
@@ -34,6 +39,14 @@ export function AuctionViewTracker({
           typeof window !== "undefined" ? window.location.href : undefined,
       },
     });
+
+    if (!externalReferralSentRef.current && urlHasUtmAttributionParams()) {
+      externalReferralSentRef.current = true;
+      sendMarketingTrackExternalReferralLanding({
+        auctionId,
+        visitorKey: vk || undefined,
+      });
+    }
   }, [auctionId, enabled]);
 
   return null;

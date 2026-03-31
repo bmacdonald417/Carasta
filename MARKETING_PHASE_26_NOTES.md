@@ -51,6 +51,10 @@ IDs and handles are opaque identifiers suitable for joining in BI; **no** seller
 
 ---
 
-## PR 27 (exact next best step)
+## PR 27
 
-Publish a short **runbook** (or extend **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`**) for firing **`EXTERNAL_REFERRAL`** on external listing landings, and optionally a **one-line** `fetch('/api/marketing/track', …)` helper in app code — **or** add **ETag** / **`If-None-Match`** on **`/api/admin/marketing/snapshot`** for efficient polling.
+Implemented as **Phase 27** — **`MARKETING_PHASE_27_NOTES.md`** and **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`**.
+
+## PR 28 (suggested next step)
+
+**Conditional GET** / **ETag** on **`/api/admin/marketing/snapshot`**, or optional **`gclid` / `fbclid`** (or similar) alongside UTM for **`AuctionViewTracker`** — still documented and rate-limit aware.

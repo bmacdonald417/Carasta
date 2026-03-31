@@ -1,6 +1,6 @@
 export type MarketingTrackPayload = {
   auctionId: string;
-  eventType: "VIEW" | "SHARE_CLICK" | "BID_CLICK";
+  eventType: "VIEW" | "SHARE_CLICK" | "BID_CLICK" | "EXTERNAL_REFERRAL";
   metadata?: {
     path?: string;
     referrer?: string;
