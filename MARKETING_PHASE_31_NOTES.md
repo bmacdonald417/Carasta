@@ -57,13 +57,18 @@ Keys in **`counters`** are only those outcomes that have been **observed at leas
 
 **`MARKETING_HANDOFF_INDEX.md`** — **`MARKETING_PHASE_33_NOTES.md`**.
 
-## PR 34 (exact next best step)
+## PR 34 (implemented)
 
-**`MARKETING_DEPLOYMENT_CHECKLIST.md`** or defer — see **`MARKETING_HANDOFF_INDEX.md`** §14.
+**`MARKETING_DEPLOYMENT_CHECKLIST.md`** — **`MARKETING_PHASE_34_NOTES.md`**.
+
+## PR 35 (suggested next step)
+
+See plan §12zi.
 
 ## Related
 
-- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zf–§12zh
+- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zf–§12zi
 - **`MARKETING_HANDOFF_INDEX.md`**
+- **`MARKETING_DEPLOYMENT_CHECKLIST.md`**
 - **`MARKETING_PHASE_30_NOTES.md`** — counter semantics
 - **`app/api/admin/marketing-track-observability/route.ts`** — parallel auth pattern

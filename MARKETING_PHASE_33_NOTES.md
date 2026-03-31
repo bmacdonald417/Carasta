@@ -23,13 +23,16 @@
 - Runbooks and **§12** phase-note pointers
 - Deployment/ops workflow summary, known limitations, light roadmap
 
-## PR 34 (exact next best step)
+## PR 34 (implemented)
 
-**Option A:** **`MARKETING_DEPLOYMENT_CHECKLIST.md`** — one page: required env vars per environment, **`/api/jobs/marketing-digest`** URL + Bearer header example, pointers to prune/backfill — **docs only**.
+**`MARKETING_DEPLOYMENT_CHECKLIST.md`** — see **`MARKETING_PHASE_34_NOTES.md`**.
 
-**Option B:** Declare marketing **handoff-complete**; no **PR 34** until product opens a new epic (e.g. **`ttclid`**-class attribution only with legal sign-off).
+## PR 35 (suggested next step)
+
+Product-scoped epic for new marketing work **or** optional synthetic health check for **`/api/jobs/marketing-digest?dryRun=1`** — see **`MARKETING_IMPLEMENTATION_PLAN.md`** §12zi.
 
 ## Related
 
-- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zh, §13 blockers
-- **`MARKETING_PHASE_32_NOTES.md`** — last code-touching marketing phase before this doc milestone
+- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zh–§12zi, §13 blockers
+- **`MARKETING_DEPLOYMENT_CHECKLIST.md`**
+- **`MARKETING_PHASE_32_NOTES.md`** — last code-touching marketing phase before handoff docs

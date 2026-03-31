@@ -4,6 +4,8 @@
 
 **Scope:** Seller tools, traffic ingest, analytics rollups, campaigns/presets, admin reporting/exports, digests, observability, and related runbooks. **Not** a substitute for reading Prisma **`schema.prisma`** or route handlers when changing behavior.
 
+**Staging / production checklist:** **`MARKETING_DEPLOYMENT_CHECKLIST.md`** (Phase 34).
+
 ---
 
 ## 1. Subsystem overview
@@ -95,6 +97,7 @@ Protected by app **`middleware.ts`** (ADMIN). Distinct from bearer-protected JSO
 | **`MARKETING_DIGEST_SEND_ENABLED`** | Allow real email sends from cron/script |
 | **`MARKETING_DIGEST_FROM`** | From address for digest email |
 | **`MARKETING_DIGEST_FORCE`** | Manual script override spacing (see `scripts/send-marketing-digest.ts`) |
+| **`RESEND_API_KEY`** | Real digest email (Resend API — see `lib/email/send-marketing-digest-email.ts`) |
 | **`TRAFFIC_EVENT_PRUNE_ENABLED`** | Required for destructive prune |
 | **`TRAFFIC_EVENT_RETENTION_DAYS`** | Prune age (default per script) |
 | **`TRAFFIC_EVENT_PRUNE_DRY_RUN`** | Prune script dry-run gate |
@@ -145,6 +148,7 @@ All counter snapshots are **per Node process** unless aggregated externally.
 | Document | Topics |
 |----------|--------|
 | **`MARKETING_IMPLEMENTATION_PLAN.md`** | Architecture audit, phased delivery narrative, blockers |
+| **`MARKETING_DEPLOYMENT_CHECKLIST.md`** | Deploy prerequisites, env, migrations, cron, smokes, rollback |
 | **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`** | EXTERNAL_REFERRAL semantics, UTM + click-ids, QA |
 | **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** | Track route limits, edge/WAF |
 | **`TRAFFICEVENT_RETENTION_PRIVACY_RUNBOOK.md`** | Retention, prune, privacy baseline for **`TrafficEvent`** |
@@ -153,11 +157,13 @@ All counter snapshots are **per Node process** unless aggregated externally.
 
 ## 11. Phase notes (1–33)
 
-Each root-level **`MARKETING_PHASE_<N>_NOTES.md`** (for **N** from **1** through **33**) captures scoped decisions and PR boundaries. Read with **`MARKETING_IMPLEMENTATION_PLAN.md`** §12 (*Marketing phases*). **Phase 33** introduces this handoff index and points to **PR 34**.
+Each root-level **`MARKETING_PHASE_<N>_NOTES.md`** (for **N** from **1** through **34**) captures scoped decisions and PR boundaries. Read with **`MARKETING_IMPLEMENTATION_PLAN.md`** §12 (*Marketing phases*). **Phase 33** introduces this handoff index; **Phase 34** adds **`MARKETING_DEPLOYMENT_CHECKLIST.md`**.
 
 ---
 
 ## 12. Deployment / ops workflow (summary)
+
+Use **`MARKETING_DEPLOYMENT_CHECKLIST.md`** for step-by-step staging/production work. Short version:
 
 1. Set **`MARKETING_ENABLED`** per environment policy.
 2. Configure digest: **`MARKETING_DIGEST_*`** + secure cron calling **`/api/jobs/marketing-digest`** with Bearer secret; optional manual **`npm run marketing:send-digest`**.
@@ -176,9 +182,9 @@ From **`MARKETING_IMPLEMENTATION_PLAN.md`** §13 and runbooks: no separate “ma
 ## 14. Suggested roadmap (post-handoff)
 
 - **Product-led:** New attribution keys only with legal sign-off + runbook updates (same pattern as **`twclid`**).
-- **Ops:** Optional single-page **deployment checklist** (env + cron URLs per host) — proposed as **PR 34** in phase notes.
+- **Ops:** **`MARKETING_DEPLOYMENT_CHECKLIST.md`** (Phase 34) — use for new environments; optional synthetic cron health checks (**PR 35** suggestion in plan).
 - **Analytics:** Deeper dashboards or external BI are out of scope for this index; **`/api/admin/marketing/snapshot`** is the stable machine-readable aggregate.
 
 ---
 
-*Last aligned to Marketing Phase 33. For changes to routes or models, update this file in the same PR as the code.*
+*Last aligned to Marketing Phase 34. For changes to routes or models, update this file in the same PR as the code.*

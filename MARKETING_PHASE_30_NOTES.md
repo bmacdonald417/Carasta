@@ -42,12 +42,17 @@ Add **lightweight** operational observability around **`GET /api/admin/marketing
 
 **`twclid`** — **`MARKETING_PHASE_32_NOTES.md`**.
 
-## PR 33 (exact next best step)
+## PR Phase 33–34 (implemented)
 
-Optional **`ttclid`** (etc.) or defer param expansion — see plan §12zg.
+Handoff index + deployment checklist — **`MARKETING_HANDOFF_INDEX.md`**, **`MARKETING_DEPLOYMENT_CHECKLIST.md`**, **`MARKETING_PHASE_34_NOTES.md`**.
+
+## PR 35 (suggested next step)
+
+Plan §12zi.
 
 ## Related
 
-- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12ze–§12zh
+- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12ze–§12zi
 - **`MARKETING_HANDOFF_INDEX.md`** — observability URLs
+- **`MARKETING_DEPLOYMENT_CHECKLIST.md`**
 - Track observability pattern — **`lib/marketing/marketing-track-observability.ts`**, **`app/api/admin/marketing-track-observability/route.ts`**

@@ -54,6 +54,10 @@ Implemented — **`GET /api/admin/marketing-snapshot-observability`** — **`MAR
 
 **`MARKETING_HANDOFF_INDEX.md`** — **`MARKETING_PHASE_33_NOTES.md`**.
 
-## PR 34 (exact next best step)
+## PR 34 (implemented)
 
-Deployment checklist doc **or** handoff-frozen; optional future **`ttclid`** only with sign-off.
+**`MARKETING_DEPLOYMENT_CHECKLIST.md`** — **`MARKETING_PHASE_34_NOTES.md`**.
+
+## PR 35 (suggested next step)
+
+Product epic **or** optional digest health monitor — plan §12zi.

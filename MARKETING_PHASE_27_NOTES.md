@@ -49,6 +49,10 @@ Implemented — **`MARKETING_PHASE_32_NOTES.md`**.
 
 **`MARKETING_HANDOFF_INDEX.md`** — **`MARKETING_PHASE_33_NOTES.md`**.
 
-## PR 34 (suggested next step)
+## PR 34 (implemented)
 
-**`MARKETING_DEPLOYMENT_CHECKLIST.md`** or defer.
+**`MARKETING_DEPLOYMENT_CHECKLIST.md`** — **`MARKETING_PHASE_34_NOTES.md`**.
+
+## PR 35 (suggested next step)
+
+Plan §12zi.

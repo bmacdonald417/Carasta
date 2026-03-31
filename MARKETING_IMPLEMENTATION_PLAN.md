@@ -12,6 +12,8 @@ Carasta is a **Next.js App Router** app with a **global shell** (`CarastaLayout`
 
 **Master handoff map (Phase 33):** **`MARKETING_HANDOFF_INDEX.md`** — routes, scripts, env vars, models, exports, observability URLs, runbooks, and pointers to all **`MARKETING_PHASE_*_NOTES.md`**.
 
+**Deployment checklist (Phase 34):** **`MARKETING_DEPLOYMENT_CHECKLIST.md`** — staging/prod prerequisites, env vars, migrations, backfill, digest cron, prune, smoke tests, rollback flags.
+
 ---
 
 ## 2. Current Architecture Summary
@@ -859,7 +861,21 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_33_NOTES.md`.
 
-**Next recommended step (PR 34):** Add **`MARKETING_DEPLOYMENT_CHECKLIST.md`** (host-specific env + digest cron URL verification) **or** treat subsystem as **handoff-frozen** and route new work through product intake — **documentation-only** preferred unless product requests code.
+**Next recommended step (PR 34):** Implemented as Phase 34 (below).
+
+---
+
+## 12zi. Phase 34 — Marketing deployment checklist (implemented)
+
+**Goal:** One **operator-facing** checklist for standing up and maintaining marketing in **staging/production** — **documentation only**.
+
+**Implemented:**
+
+- **`MARKETING_DEPLOYMENT_CHECKLIST.md`** — prerequisites, DB/migrations, env vars (including digest + Resend + prune + observability), digest cron (**Bearer** or query **`secret`**), backfill, prune, admin/seller smoke tests, rollback flags, runbook links.
+
+**Notes:** `MARKETING_PHASE_34_NOTES.md`.
+
+**Next recommended step (PR 35):** **Product intake only** — new marketing features require a scoped epic; **or** optional operational hardening (e.g. synthetic monitor for **`/api/jobs/marketing-digest?dryRun=1`**) — keep changes narrow.
 
 ---
 
@@ -874,6 +890,6 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 33; see §12b–§12zh.*
+*Plan updated Marketing Phase 34; see §12b–§12zi.*
 
-**Handoff:** `MARKETING_HANDOFF_INDEX.md`
+**Handoff:** `MARKETING_HANDOFF_INDEX.md` · **Deploy:** `MARKETING_DEPLOYMENT_CHECKLIST.md`

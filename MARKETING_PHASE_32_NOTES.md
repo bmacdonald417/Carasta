@@ -19,12 +19,17 @@ X (Twitter) Ads appends **`twclid`** on outbound clicks in common campaign flows
 
 **`MARKETING_HANDOFF_INDEX.md`** — master subsystem map. See **`MARKETING_PHASE_33_NOTES.md`**.
 
-## PR 34 (exact next best step)
+## PR 34 (implemented)
 
-**`MARKETING_DEPLOYMENT_CHECKLIST.md`** (env + digest cron) **or** handoff-frozen until product requests work.
+**`MARKETING_DEPLOYMENT_CHECKLIST.md`** — **`MARKETING_PHASE_34_NOTES.md`**.
+
+## PR 35 (suggested next step)
+
+See **`MARKETING_IMPLEMENTATION_PLAN.md`** §12zi.
 
 ## Related
 
 - **`MARKETING_PHASE_29_NOTES.md`** — original click-id batch
-- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zg–§12zh
+- **`MARKETING_IMPLEMENTATION_PLAN.md`** — §12zg–§12zi
 - **`MARKETING_HANDOFF_INDEX.md`**
+- **`MARKETING_DEPLOYMENT_CHECKLIST.md`**
