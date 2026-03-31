@@ -767,7 +767,23 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_27_NOTES.md`.
 
-**Next recommended step (PR 28):** **ETag** / **If-None-Match** (or short **max-age**) on **`GET /api/admin/marketing/snapshot`**, or optional **gclid** / **fbclid** gates alongside UTM — **one PR**, still low-risk.
+**Next recommended step (PR 28):** Implemented as Phase 28 (below).
+
+---
+
+## 12zc. Phase 28 — ETag / If-None-Match for admin marketing snapshot (implemented)
+
+**Goal:** **Conditional GET** on **`GET /api/admin/marketing/snapshot`** — **304** when unchanged, **conservative caching** — **no** auth or field-shape change on **200**.
+
+**Implemented:**
+
+- **`lib/marketing/admin-marketing-snapshot-etag.ts`** — stable JSON for hashing (**omits `generatedAt`**), **SHA-256** **base64url** strong **`ETag`**, **`If-None-Match`** parser (**`*`**, weak **W/**, comma list).
+- **`app/api/admin/marketing/snapshot/route.ts`** — **`NextRequest`**, **304** empty body + **`ETag`** when matched; **200** same JSON as before with **`ETag`**; **`Cache-Control: private, max-age=15`** (replaces **no-store** on this route).
+- **Note:** **ETag** reflects data only; **200** responses still include a new **`generatedAt`**. **304** clients keep prior body (standard).
+
+**Notes:** `MARKETING_PHASE_28_NOTES.md`.
+
+**Next recommended step (PR 29):** Optional **`gclid` / `fbclid`** (or similar) for **EXTERNAL_REFERRAL** in **`AuctionViewTracker`** per runbook, or admin API **observability** counters for snapshot **304** rate — **one PR**, still low-risk.
 
 ---
 
@@ -782,4 +798,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 27; see §12b–§12zb.*
+*Plan updated Marketing Phase 28; see §12b–§12zc.*

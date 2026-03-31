@@ -25,6 +25,10 @@
 
 ---
 
-## PR 28 (exact next best step)
+## PR 28
 
-Add **ETag** / **304** support on **`GET /api/admin/marketing/snapshot`**, or document optional **`gclid` / `fbclid`** handling in **`AuctionViewTracker`** with the same conservative “signal required” rules as UTM.
+Implemented as **Phase 28** — **`MARKETING_PHASE_28_NOTES.md`**.
+
+## PR 29 (suggested next step)
+
+**`gclid` / `fbclid`** (or similar) for **`EXTERNAL_REFERRAL`** with runbook rules, or other admin API polish — narrow scope.

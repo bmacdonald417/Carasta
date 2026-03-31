@@ -6,6 +6,7 @@ import type { AdminMarketingPlatformSummary } from "@/lib/marketing/get-admin-ma
  *
  * Auth: same as other admin marketing API routes (requireAdminMarketingCsvAccess).
  * Not a public API; shape may evolve without semver.
+ * ETag for conditional GET excludes generatedAt; see admin-marketing-snapshot-etag.ts.
  */
 export type AdminMarketingSnapshotJson = {
   ok: true;

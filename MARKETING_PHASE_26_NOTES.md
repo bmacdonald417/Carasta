@@ -11,7 +11,9 @@
 |--------|------|---------|
 | **GET** | **`/api/admin/marketing/snapshot`** | `app/api/admin/marketing/snapshot/route.ts` |
 
-**Headers:** **`Content-Type: application/json; charset=utf-8`**, **`Cache-Control: no-store`**.
+**Headers (200 / 304):** **`ETag`**, **`Cache-Control: private, max-age=15`**. **200** also sets **`Content-Type: application/json; charset=utf-8`**.
+
+**Conditional GET:** **`If-None-Match`** matching **`ETag`** → **304** empty body (auth still required). **ETag** hashes JSON **without `generatedAt`** so unchanged metrics can revalidate without a full body. See **Phase 28** / **`MARKETING_PHASE_28_NOTES.md`**.
 
 ---
 
@@ -55,6 +57,10 @@ IDs and handles are opaque identifiers suitable for joining in BI; **no** seller
 
 Implemented as **Phase 27** — **`MARKETING_PHASE_27_NOTES.md`** and **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`**.
 
-## PR 28 (suggested next step)
+## PR 28
 
-**Conditional GET** / **ETag** on **`/api/admin/marketing/snapshot`**, or optional **`gclid` / `fbclid`** (or similar) alongside UTM for **`AuctionViewTracker`** — still documented and rate-limit aware.
+Implemented as **Phase 28** — **`MARKETING_PHASE_28_NOTES.md`**.
+
+## PR 29 (suggested next step)
+
+Optional **`gclid` / `fbclid`** (or similar) alongside UTM in **`AuctionViewTracker`**, or snapshot **Vary** / **Accept** negotiation — still low-risk and documented.
