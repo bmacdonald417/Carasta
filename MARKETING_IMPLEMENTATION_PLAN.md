@@ -22,7 +22,7 @@ Carasta is a **Next.js App Router** app with a **global shell** (`CarastaLayout`
 | Root layout | `app/layout.tsx` | Wraps everything in `Providers` + `CarastaLayout`. |
 | Public marketing | `/`, `/how-it-works`, `/contact`, `/terms`, `/privacy`, `/merch`, `/auctions`, `/auctions/[id]`, `/explore`, `/community/leaderboard` | Auction detail and explore are under `(marketing)` but are core product surfaces. |
 | Authenticated “app” | `/settings`, `/sell`, `/u/[handle]`, `/u/[handle]/garage`, `/dream`, `/garage`, listings | Seller listing management: `/u/[handle]/listings` (owner-only via server check). |
-| Admin | `/admin`, `/admin/reputation/[handle]` | Protected by `middleware.ts` (`role === ADMIN`). |
+| Admin | `/admin`, `/admin/marketing`, `/admin/reputation/[handle]` | Protected by `middleware.ts` (`role === ADMIN`). |
 | API | `app/api/*` | e.g. `auth`, `auctions/[id]`, `notifications`, `activity-feed`, `explore/*`, `contact`. |
 
 ### 2.2 Dashboard / user account structure
@@ -664,7 +664,24 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_21_NOTES.md`.
 
-**Next recommended step (PR 22):** Roadmap slice (e.g. marketing analytics depth) — **one PR**, no core auction/bid/buy-now/community engine changes unless scoped.
+**Next recommended step (PR 22):** Implemented as Phase 22 (below).
+
+---
+
+## 12w. Phase 22 — Admin marketing summary tooling (implemented)
+
+**Goal:** **Admin-only**, **read-only** platform-wide marketing health: aggregates from **`TrafficEvent`**, **`AuctionAnalytics`**, **`Campaign`**, and marketing **`Notification`** rows — **no** seller workflow changes, **no** mutations from admin, **no** schema changes.
+
+**Implemented:**
+
+- **Page:** **`/admin/marketing`** — `app/(admin)/admin/marketing/page.tsx` (same **`ADMIN`** guard as other admin routes via **`app/(admin)/admin/layout.tsx`** + **`middleware.ts`**).
+- **Helper:** **`lib/marketing/get-admin-marketing-platform-summary.ts`** — totals (event counts by type, rollup sums, campaign counts, marketing notification count), top auctions/sellers by traffic engagement, recent campaigns with listing/seller labels; reuses **`getViewShareTotalsForAuctionIds`**, **`isMarketingEnabled`**, **`MARKETING_NOTIFICATION_PREFIX`**.
+- **Admin home:** link card to **`/admin/marketing`** on **`app/(admin)/admin/page.tsx`**.
+- **Links on page:** public **`/auctions/[id]`** and **`/u/[handle]`** only (no seller marketing owner URLs — avoids misleading edit paths for staff).
+
+**Notes:** `MARKETING_PHASE_22_NOTES.md`.
+
+**Next recommended step (PR 23):** Optional **time-bounded** admin metrics (e.g. events in last 7/30 days), **CSV snapshot** export for support, or **deeper funnel** breakdowns — **one PR**, still **read-only** and **admin-only** unless product explicitly scopes seller-facing work.
 
 ---
 
@@ -679,4 +696,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 21; see §12b–§12v.*
+*Plan updated Marketing Phase 22; see §12b–§12w.*

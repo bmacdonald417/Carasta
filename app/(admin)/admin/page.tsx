@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 import Link from "next/link";
-import { Gavel, Users, DollarSign, Flag } from "lucide-react";
+import { Gavel, Users, DollarSign, Flag, Megaphone } from "lucide-react";
 
 async function getAdminStats() {
   const [auctionCount, userCount, bidStats, liveAuctions] = await Promise.all([
@@ -102,6 +102,27 @@ export default async function AdminPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Marketing (platform summary) */}
+      <div className="mt-8">
+        <Link
+          href="/admin/marketing"
+          className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition hover:border-[#ff3b5c]/30 hover:bg-white/[0.07]"
+        >
+          <div className="rounded-lg bg-[#ff3b5c]/20 p-3">
+            <Megaphone className="h-6 w-6 text-[#ff3b5c]" />
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-neutral-100">
+              Marketing summary
+            </h2>
+            <p className="mt-1 text-sm text-neutral-500">
+              Platform-wide traffic events, rollups, campaigns, and marketing
+              notifications — read-only.
+            </p>
+          </div>
+        </Link>
       </div>
 
       {/* Reputation debug */}

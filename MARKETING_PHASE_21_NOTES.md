@@ -27,6 +27,10 @@
 - **Sentence case** for many KPI labels (e.g. **Total listings**) for calmer scanning.
 - **Open marketing** replaces **View marketing** / plain **Marketing** where it navigates to the listing drill-down.
 
-## PR 22 (suggested next step)
+## PR 22
 
-Pick the next **product** slice from the roadmap (e.g. richer marketing analytics, listing-level shortcuts) — **one PR**, still no core bid/buy-now/community engine changes unless explicitly in scope.
+Implemented as **Phase 22** — admin-only marketing summary at **`/admin/marketing`**. See **`MARKETING_PHASE_22_NOTES.md`**.
+
+## PR 23 (suggested next step)
+
+Optional **time-windowed** platform aggregates, admin **CSV** snapshot, or **read-only** funnel breakdowns — **one PR**; still avoid core auction/bid/buy-now/community mutations unless explicitly scoped.
