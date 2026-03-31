@@ -21,7 +21,7 @@
 
 1. Read **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`** for **VIEW vs EXTERNAL_REFERRAL**, dedupe, and metadata.
 2. For **custom** landings (not the default auction page), call **`sendMarketingTrackExternalReferralLanding({ auctionId, visitorKey? })`** only when your product rule says there is an external-attribution signal; reuse **`getOrCreateMarketingVisitorKey()`** when anonymous.
-3. **UTM auto-path:** Any listing URL with **`?utm_…=…`** triggers the extra beacon once per tracker mount (marketing flag on).
+3. **Attribution auto-path:** Any listing URL with **UTM** or supported **click ids** (Phase 29) triggers the extra beacon once per mount (marketing flag on).
 
 ---
 
@@ -29,6 +29,10 @@
 
 Implemented as **Phase 28** — **`MARKETING_PHASE_28_NOTES.md`**.
 
-## PR 29 (suggested next step)
+## PR 29
 
-**`gclid` / `fbclid`** (or similar) for **`EXTERNAL_REFERRAL`** with runbook rules, or other admin API polish — narrow scope.
+Implemented as **Phase 29** — **`MARKETING_PHASE_29_NOTES.md`**.
+
+## PR 30 (suggested next step)
+
+Snapshot route **observability** or click-id allowlist expansion with sign-off — narrow scope.

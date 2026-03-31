@@ -762,7 +762,7 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 - **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`** — semantics vs **VIEW**, when to fire, dedupe, metadata, QA.
 - **`lib/marketing/track-external-referral-landing.ts`** — thin helpers; reuse **`sendMarketingTrack`**.
 - **`lib/marketing/track-payload-types.ts`** — **EXTERNAL_REFERRAL** on **eventType** union.
-- **`components/marketing/auction-view-tracker.tsx`** — after **VIEW**, one **EXTERNAL_REFERRAL** when the URL has any **`utm_`-prefixed** query parameter.
+- **`components/marketing/auction-view-tracker.tsx`** — after **VIEW**, one **EXTERNAL_REFERRAL** when the URL has **UTM** or supported **click-id** params (Phase 29 expands beyond UTM only).
 - **`MARKETING_TRACK_EDGE_WAF_RUNBOOK.md`** — related-doc link.
 
 **Notes:** `MARKETING_PHASE_27_NOTES.md`.
@@ -783,7 +783,23 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 **Notes:** `MARKETING_PHASE_28_NOTES.md`.
 
-**Next recommended step (PR 29):** Optional **`gclid` / `fbclid`** (or similar) for **EXTERNAL_REFERRAL** in **`AuctionViewTracker`** per runbook, or admin API **observability** counters for snapshot **304** rate — **one PR**, still low-risk.
+**Next recommended step (PR 29):** Implemented as Phase 29 (below).
+
+---
+
+## 12zd. Phase 29 — Conservative click-id support for EXTERNAL_REFERRAL (implemented)
+
+**Goal:** Recognize common ad **click-id** query params (**`gclid`**, **`fbclid`**, **`msclkid`**) alongside **UTM** for the default **`AuctionViewTracker`** **EXTERNAL_REFERRAL** beacon — **no** new event type, **no** metadata expansion beyond existing **`path` / `referrer` / `currentUrl`**.
+
+**Implemented:**
+
+- **`lib/marketing/track-external-referral-landing.ts`** — **`EXTERNAL_MARKETING_CLICK_ID_PARAMS`**, **`urlHasClickIdAttributionParams`**, **`urlHasExternalMarketingAttributionParams`** (UTM **or** click id); **`urlHasUtmAttributionParams`** unchanged.
+- **`components/marketing/auction-view-tracker.tsx`** — uses **`urlHasExternalMarketingAttributionParams()`**.
+- **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`** — UTM vs click ids, limitations, QA.
+
+**Notes:** `MARKETING_PHASE_29_NOTES.md`.
+
+**Next recommended step (PR 30):** Admin snapshot **observability** (**304**/**200** counters or structured log sampling), or a **second** conservative param allowlist review (**`twclid`**, etc.) with legal/privacy sign-off — **one PR**, still narrow.
 
 ---
 
@@ -798,4 +814,4 @@ Only this document was added initially: `MARKETING_IMPLEMENTATION_PLAN.md`.
 
 ---
 
-*Plan updated Marketing Phase 28; see §12b–§12zc.*
+*Plan updated Marketing Phase 29; see §12b–§12zd.*

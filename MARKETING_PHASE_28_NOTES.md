@@ -34,6 +34,10 @@ Omitting **`generatedAt`** from the hash allows **304** when underlying aggregat
 
 ---
 
-## PR 29 (exact next best step)
+## PR 29
 
-**`gclid` / `fbclid`** (or similar) gated **EXTERNAL_REFERRAL** in **`AuctionViewTracker`** with **`MARKETING_EXTERNAL_REFERRAL_LANDING_RUNBOOK.md`** updates, or lightweight **metrics** for snapshot **304**/**200** in existing marketing observability.
+Implemented as **Phase 29** — **`MARKETING_PHASE_29_NOTES.md`**.
+
+## PR 30 (suggested next step)
+
+Snapshot **304**/**200** observability, or a reviewed expand of click-id allowlist (**`twclid`**, etc.) with privacy notes.

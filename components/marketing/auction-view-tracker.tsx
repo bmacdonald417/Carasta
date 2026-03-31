@@ -7,7 +7,7 @@ import {
 } from "@/lib/marketing/send-marketing-track";
 import {
   sendMarketingTrackExternalReferralLanding,
-  urlHasUtmAttributionParams,
+  urlHasExternalMarketingAttributionParams,
 } from "@/lib/marketing/track-external-referral-landing";
 
 export function AuctionViewTracker({
@@ -40,7 +40,10 @@ export function AuctionViewTracker({
       },
     });
 
-    if (!externalReferralSentRef.current && urlHasUtmAttributionParams()) {
+    if (
+      !externalReferralSentRef.current &&
+      urlHasExternalMarketingAttributionParams()
+    ) {
       externalReferralSentRef.current = true;
       sendMarketingTrackExternalReferralLanding({
         auctionId,
