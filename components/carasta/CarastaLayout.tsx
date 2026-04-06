@@ -140,13 +140,27 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                       Profile
                     </Link>
                   </DropdownMenuItem>
+                  {session.user?.handle && session.user.marketingEnabled && (
+                    <DropdownMenuItem asChild>
+                      <Link href={`/u/${session.user.handle}/marketing`}>
+                        Marketing
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   {(session.user as any)?.role === "ADMIN" && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin">Admin</Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin">Admin</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/marketing">
+                          Seller marketing (review)
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>

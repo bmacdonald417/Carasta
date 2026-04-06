@@ -7,10 +7,18 @@
 
 ## Step 1: Add PostgreSQL on Railway
 
+**Use exactly one Postgres service per environment** (e.g. one for production). Adding **PostgreSQL** multiple times via **+ New → Database → PostgreSQL** creates a **separate empty database** each time (names like `Postgres-jfmG`). That is **not** caused by `git push` or this repo’s code—only by provisioning extra DB services in Railway. The app uses whichever database **`DATABASE_URL`** on the **Carasta** service points to; extra Postgres plugins stay empty unless you connect to them on purpose.
+
 1. Open your Carasta project: https://railway.com/project/977696bb-9a14-485a-834a-b3e2561bbea9
-2. Click **"+ New"** → **"Database"** → **"Add PostgreSQL"**
+2. Click **"+ New"** → **"Database"** → **"Add PostgreSQL"** — **only once** unless you intentionally want another database (e.g. a separate staging project).
 3. Railway will provision Postgres and add `DATABASE_URL` to your project variables
 4. Copy the `DATABASE_URL` (or `DATABASE_PUBLIC_URL` if your app needs public access)
+
+### If you already have multiple Postgres services
+
+1. Open the **Carasta** web service → **Variables** and note which **`DATABASE_URL`** is set (often a reference like `${{ Postgres.DATABASE_URL }}` — check which **Postgres** plugin name it uses). That instance is your **live** database for the app (including marketing tables once `prisma db push` / migrate has run).
+2. **Empty extras:** If the other Postgres volumes have **no data you need**, remove those services in Railway (**Postgres-…** → **Settings** → remove service) so you are not billed for unused databases. Do **not** delete the one referenced by **Carasta**’s `DATABASE_URL`.
+3. **Merge data** (rare): If something important lived on a second instance, use `pg_dump` from that database and `psql` restore into the canonical one before deleting the extra service.
 
 ## Step 2: Configure Web Service Variables
 
@@ -18,6 +26,7 @@ Add these variables to the **Carasta** web service:
    - `DATABASE_URL` (reference from Postgres — see Step 1)
    - `NEXTAUTH_URL` = `https://your-app.railway.app`
    - `NEXTAUTH_SECRET` = generate with `openssl rand -base64 32`
+   - **`MARKETING_ENABLED=true`** — required for seller **Marketing** hub (`/u/[handle]/marketing`), listing tools, and ingest; without it those pages **404** and marketing links stay hidden. Admins can still open **`/admin/marketing`** for the platform summary, but seller-facing marketing is off until this is set.
 
 ## Step 3: Database Schema and Seed
 

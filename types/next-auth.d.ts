@@ -9,6 +9,8 @@ declare module "next-auth" {
       image?: string | null;
       handle?: string;
       role?: "USER" | "ADMIN";
+      /** Mirrors `MARKETING_ENABLED` env — seller marketing routes and nav. */
+      marketingEnabled?: boolean;
     };
   }
 }

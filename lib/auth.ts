@@ -72,6 +72,8 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id;
         (session.user as any).handle = token.handle;
         (session.user as any).role = token.role;
+        (session.user as any).marketingEnabled =
+          process.env.MARKETING_ENABLED === "true";
       }
       return session;
     },
