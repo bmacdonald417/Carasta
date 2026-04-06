@@ -140,10 +140,19 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                       Profile
                     </Link>
                   </DropdownMenuItem>
+                  {(session.user as any)?.handle && (
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={`/u/${(session.user as any).handle}/listings`}
+                      >
+                        My listings
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   {session.user?.handle && session.user.marketingEnabled && (
                     <DropdownMenuItem asChild>
                       <Link href={`/u/${session.user.handle}/marketing`}>
-                        Marketing
+                        Marketing dashboard
                       </Link>
                     </DropdownMenuItem>
                   )}
