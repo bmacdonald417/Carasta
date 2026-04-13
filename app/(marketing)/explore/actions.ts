@@ -1,7 +1,12 @@
 "use server";
 
 import { getSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import {
+  addCarmunityComment,
+  createCarmunityPost,
+  likeCarmunityPost,
+  unlikeCarmunityPost,
+} from "@/lib/carmunity/engagement-service";
 import { revalidatePath } from "next/cache";
 
 export async function createPost(formData: FormData) {
@@ -10,17 +15,12 @@ export async function createPost(formData: FormData) {
 
   const content = formData.get("content") as string | null;
   const imageUrl = formData.get("imageUrl") as string | null;
-  if (!content?.trim() && !imageUrl?.trim()) {
-    return { ok: false, error: "Add some text or a photo." };
-  }
-
-  await prisma.post.create({
-    data: {
-      authorId: (session.user as any).id,
-      content: content?.trim() || null,
-      imageUrl: imageUrl?.trim() || null,
-    },
+  const result = await createCarmunityPost({
+    authorId: (session.user as any).id,
+    content,
+    imageUrl,
   });
+  if (!result.ok) return result;
   revalidatePath("/explore");
   return { ok: true };
 }
@@ -29,13 +29,11 @@ export async function likePost(postId: string) {
   const session = await getSession();
   if (!session?.user?.id) return { ok: false, error: "Not signed in." };
 
-  await prisma.like.upsert({
-    where: {
-      userId_postId: { userId: (session.user as any).id, postId },
-    },
-    create: { userId: (session.user as any).id, postId },
-    update: {},
+  const result = await likeCarmunityPost({
+    userId: (session.user as any).id,
+    postId,
   });
+  if (!result.ok) return result;
   revalidatePath("/explore");
   return { ok: true };
 }
@@ -44,12 +42,11 @@ export async function unlikePost(postId: string) {
   const session = await getSession();
   if (!session?.user?.id) return { ok: false, error: "Not signed in." };
 
-  await prisma.like.deleteMany({
-    where: {
-      userId: (session.user as any).id,
-      postId,
-    },
+  const result = await unlikeCarmunityPost({
+    userId: (session.user as any).id,
+    postId,
   });
+  if (!result.ok) return result;
   revalidatePath("/explore");
   return { ok: true };
 }
@@ -57,22 +54,13 @@ export async function unlikePost(postId: string) {
 export async function addComment(postId: string, content: string) {
   const session = await getSession();
   if (!session?.user?.id) return { ok: false, error: "Not signed in." };
-  if (!content?.trim()) return { ok: false, error: "Comment is required." };
 
-  await prisma.comment.create({
-    data: {
-      postId,
-      authorId: (session.user as any).id,
-      content: content.trim(),
-    },
-  });
-  const { broadcastActivityEvent } = await import("@/lib/pusher");
-  broadcastActivityEvent({
-    type: "new_comment",
+  const result = await addCarmunityComment({
+    authorId: (session.user as any).id,
     postId,
-    label: "New comment in community",
-    timestamp: new Date().toISOString(),
+    content,
   });
+  if (!result.ok) return result;
   revalidatePath("/explore");
   revalidatePath(`/explore/post/${postId}`);
   return { ok: true };
