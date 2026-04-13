@@ -1,0 +1,15 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+build/
+*.iml
+.idea/
+*.lock
+
+# Env / local
+.env
+.env.*
+
+# Platform (regenerate with flutter create .)
+# Keep if you commit platform folders:
+# ios/Pods/
