@@ -20,7 +20,85 @@ const CAR_IMAGES: Record<string, string> = {
 };
 const USER_AVATAR = "https://placehold.co/100/2a2a2a/888?text=U";
 
+/** Idempotent forum spaces + categories (Mechanics Corner, Gear Interests). Runs every seed. */
+async function ensureForumSpacesAndCategories() {
+  const mechanics = await prisma.forumSpace.upsert({
+    where: { slug: "mechanics-corner" },
+    create: {
+      slug: "mechanics-corner",
+      title: "Mechanics Corner",
+      description: "Repairs, diagnostics, and shop talk.",
+      sortOrder: 0,
+      isActive: true,
+    },
+    update: {
+      title: "Mechanics Corner",
+      description: "Repairs, diagnostics, and shop talk.",
+    },
+  });
+
+  const gear = await prisma.forumSpace.upsert({
+    where: { slug: "gear-interests" },
+    create: {
+      slug: "gear-interests",
+      title: "Gear Interests",
+      description: "Watches, apparel, tools, and collector lifestyle.",
+      sortOrder: 1,
+      isActive: true,
+    },
+    update: {
+      title: "Gear Interests",
+      description: "Watches, apparel, tools, and collector lifestyle.",
+    },
+  });
+
+  await prisma.forumCategory.upsert({
+    where: { spaceId_slug: { spaceId: mechanics.id, slug: "general" } },
+    create: {
+      spaceId: mechanics.id,
+      slug: "general",
+      title: "General",
+      sortOrder: 0,
+    },
+    update: {},
+  });
+  await prisma.forumCategory.upsert({
+    where: { spaceId_slug: { spaceId: mechanics.id, slug: "diagnostics" } },
+    create: {
+      spaceId: mechanics.id,
+      slug: "diagnostics",
+      title: "Diagnostics",
+      sortOrder: 1,
+    },
+    update: {},
+  });
+  await prisma.forumCategory.upsert({
+    where: { spaceId_slug: { spaceId: gear.id, slug: "watches" } },
+    create: {
+      spaceId: gear.id,
+      slug: "watches",
+      title: "Watches",
+      sortOrder: 0,
+    },
+    update: {},
+  });
+  await prisma.forumCategory.upsert({
+    where: { spaceId_slug: { spaceId: gear.id, slug: "apparel" } },
+    create: {
+      spaceId: gear.id,
+      slug: "apparel",
+      title: "Apparel & kit",
+      sortOrder: 1,
+    },
+    update: {},
+  });
+
+  console.log("Forum spaces ensured:", mechanics.slug, gear.slug);
+}
+
 async function main() {
+  await ensureForumSpacesAndCategories();
+
   const existingCount = await prisma.auction.count();
   if (existingCount > 0) {
     console.log("Seed skipped — database already has", existingCount, "auctions.");
