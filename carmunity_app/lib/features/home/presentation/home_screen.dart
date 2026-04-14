@@ -73,7 +73,8 @@ class HomeScreen extends ConsumerWidget {
               padding: EdgeInsets.symmetric(horizontal: hPad),
               child: const _InfoBanner(
                 message:
-                    'Following uses your Carasta user id on the feed API. Sign-in wiring lands in Phase 2.',
+                    'Following needs your Carasta user id (DEV_USER_ID or Developer session on You). '
+                    'You also need a session cookie for mutations.',
               ),
             ),
           Expanded(
@@ -223,7 +224,11 @@ class _FeedBody extends ConsumerWidget {
             final post = posts[index];
             return FeedPostCard(
               post: post,
-              onTap: () => context.push(AppRoutes.postDetail(post.id)),
+              onEngagementChanged: () => ref.invalidate(homeFeedProvider),
+              onTap: () async {
+                await context.push(AppRoutes.postDetail(post.id));
+                ref.invalidate(homeFeedProvider);
+              },
             );
           },
         );

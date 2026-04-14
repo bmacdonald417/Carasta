@@ -10,6 +10,8 @@ class ApiException implements Exception {
   final int? statusCode;
   final Object? cause;
 
+  bool get isUnauthorized => statusCode == 401;
+
   @override
   String toString() =>
       'ApiException($statusCode): $message${cause != null ? ' ($cause)' : ''}';

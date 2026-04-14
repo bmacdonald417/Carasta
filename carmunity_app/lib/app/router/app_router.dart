@@ -4,13 +4,18 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auctions/presentation/auction_detail_placeholder_screen.dart';
 import '../../features/auctions/presentation/auctions_screen.dart';
-import '../../features/create/presentation/create_screen.dart';
+import '../../features/create/presentation/create_forum_thread_placeholder_screen.dart';
+import '../../features/create/presentation/create_hub_screen.dart';
+import '../../features/create/presentation/create_media_placeholder_screen.dart';
+import '../../features/create/presentation/create_post_screen.dart';
+import '../../features/create/presentation/share_link_post_screen.dart';
 import '../../features/forums/presentation/forum_category_placeholder_screen.dart';
 import '../../features/forums/presentation/forum_thread_placeholder_screen.dart';
 import '../../features/forums/presentation/forums_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
-import '../../features/home/presentation/post_detail_placeholder_screen.dart';
+import '../../features/home/presentation/post_detail_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/profile/presentation/dev_session_screen.dart';
 import '../../features/profile/presentation/garage_placeholder_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/profile/presentation/settings_placeholder_screen.dart';
@@ -51,7 +56,7 @@ GoRouter createAppRouter() {
                     path: 'post/:id',
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return PostDetailPlaceholderScreen(postId: id);
+                      return PostDetailScreen(postId: id);
                     },
                   ),
                 ],
@@ -86,7 +91,25 @@ GoRouter createAppRouter() {
             routes: [
               GoRoute(
                 path: '/create',
-                builder: (context, state) => const CreateScreen(),
+                builder: (context, state) => const CreateHubScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'post',
+                    builder: (context, state) => const CreatePostScreen(),
+                  ),
+                  GoRoute(
+                    path: 'share-link',
+                    builder: (context, state) => const ShareLinkPostScreen(),
+                  ),
+                  GoRoute(
+                    path: 'forum-thread',
+                    builder: (context, state) => const CreateForumThreadPlaceholderScreen(),
+                  ),
+                  GoRoute(
+                    path: 'media',
+                    builder: (context, state) => const CreateMediaPlaceholderScreen(),
+                  ),
+                ],
               ),
             ],
           ),
@@ -125,6 +148,10 @@ GoRouter createAppRouter() {
                     path: 'settings',
                     builder: (context, state) => const SettingsPlaceholderScreen(),
                   ),
+                  GoRoute(
+                    path: 'dev-session',
+                    builder: (context, state) => const DevSessionScreen(),
+                  ),
                 ],
               ),
             ],
@@ -138,7 +165,7 @@ GoRouter createAppRouter() {
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
           final id = state.pathParameters['id']!;
-          return PostDetailPlaceholderScreen(postId: id);
+          return PostDetailScreen(postId: id);
         },
       ),
       GoRoute(

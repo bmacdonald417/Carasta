@@ -31,6 +31,7 @@
 
 | Method | Path | Purpose |
 |--------|------|---------|
+| GET | `/api/carmunity/posts/[id]` | Post detail + comments + `liked` / `viewerFollowsAuthor` for viewer |
 | POST | `/api/carmunity/posts` | Create post |
 | POST | `/api/carmunity/posts/[id]/like` | Like |
 | DELETE | `/api/carmunity/posts/[id]/like` | Unlike |

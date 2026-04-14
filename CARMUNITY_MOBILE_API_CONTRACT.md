@@ -9,6 +9,44 @@ Base URL: same origin as the Carasta deployment (e.g. `https://…`). All respon
 
 ## Endpoints
 
+### GET `/api/carmunity/posts/:id`
+
+Post detail for mobile clients: author, content, image, counts, `liked` / `viewerFollowsAuthor` when the session resolves a viewer, and ordered `comments[]`.
+
+**200**
+
+```json
+{
+  "ok": true,
+  "post": {
+    "id": "…",
+    "authorId": "…",
+    "auctionId": null,
+    "content": "…",
+    "imageUrl": null,
+    "createdAt": "…ISO…",
+    "author": { "id": "…", "handle": "…", "name": "…", "avatarUrl": null },
+    "liked": false,
+    "likeCount": 0,
+    "commentCount": 0,
+    "viewerFollowsAuthor": false,
+    "comments": [
+      {
+        "id": "…",
+        "content": "…",
+        "createdAt": "…ISO…",
+        "author": { "id": "…", "handle": "…", "name": "…", "avatarUrl": null }
+      }
+    ]
+  }
+}
+```
+
+**404** — post not found  
+**401** — not required for read; viewer-specific flags default when unauthenticated.
+
+---
+
 ### POST `/api/carmunity/posts`
 
 Create post (same rules as web: text and/or image URL).
@@ -29,6 +67,10 @@ Omitted keys are treated as “not provided” for that field.
 
 **400** — validation / empty body  
 **401** — not signed in
+
+**Link / share posts (Phase 3 mobile):** There is no separate `linkUrl` field. Clients that “share a link” typically send a **single `content` string** containing the URL (and optional caption), e.g. `"Check this out\n\nhttps://example.com/article"`. **Open Graph / link preview metadata is not returned** by this endpoint; enrichment remains a future backend + schema concern.
+
+**Images:** `imageUrl` must be a URL the server can persist (usually **https** to a publicly reachable object). **Binary uploads** are not handled by this route; mobile apps should obtain `imageUrl` via a future **upload/presign** API (see Phase 3 notes) or any other server-approved source.
 
 ---
 

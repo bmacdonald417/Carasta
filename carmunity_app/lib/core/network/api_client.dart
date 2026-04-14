@@ -29,6 +29,10 @@ class ApiClient {
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
+          final cookie = _auth.sessionCookieHeader;
+          if (cookie != null && cookie.isNotEmpty) {
+            options.headers['Cookie'] = cookie;
+          }
           handler.next(options);
         },
       ),
@@ -65,6 +69,24 @@ class ApiClient {
   }) async {
     try {
       return await _dio.post<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+    } on DioException catch (e) {
+      throw _mapDio(e);
+    }
+  }
+
+  Future<Response<T>> delete<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      return await _dio.delete<T>(
         path,
         data: data,
         queryParameters: queryParameters,

@@ -41,4 +41,19 @@ class AppConfig {
   }
 
   bool get isProduction => environmentLabel == 'prod';
+
+  // --- Provisional mobile auth (dev / until Bearer issuance ships) ---
+
+  /// Carasta `User.id` for feed `userId` param and self-follow checks.
+  static const String devUserId = String.fromEnvironment('DEV_USER_ID', defaultValue: '');
+
+  /// Raw value of the NextAuth session cookie (copy from browser DevTools).
+  static const String devNextAuthSessionToken =
+      String.fromEnvironment('DEV_NEXTAUTH_SESSION_TOKEN', defaultValue: '');
+
+  /// Cookie name (use `__Secure-next-auth.session-token` on HTTPS if applicable).
+  static const String devSessionCookieName = String.fromEnvironment(
+    'DEV_SESSION_COOKIE_NAME',
+    defaultValue: 'next-auth.session-token',
+  );
 }
