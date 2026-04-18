@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
 
 type GarageCar = {
   id: string;
@@ -25,31 +26,36 @@ export function GarageCard3D({
   ownerHandle: string;
   index?: number;
 }) {
+  const reduceMotion = usePrefersReducedMotion();
   const img = car.images[0]?.url;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.4 }}
-      whileHover={{ y: -4, scale: 1.02 }}
+      transition={{ delay: reduceMotion ? 0 : index * 0.04, duration: reduceMotion ? 0.15 : 0.32, ease: "easeOut" }}
+      whileHover={reduceMotion ? undefined : { y: -2, scale: 1.01 }}
       className="group"
     >
       <Link href={`/u/${ownerHandle}/garage`}>
-        <Card className="overflow-hidden border border-border/50 bg-card/60 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/60 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
           <div
             className="relative aspect-[4/3] w-full overflow-hidden bg-muted sm:aspect-video"
-            style={{
-              transform: "perspective(800px) rotateX(2deg)",
-              transformOrigin: "center bottom",
-            }}
+            style={
+              reduceMotion
+                ? undefined
+                : {
+                    transform: "perspective(800px) rotateX(2deg)",
+                    transformOrigin: "center bottom",
+                  }
+            }
           >
             {img ? (
               <Image
                 src={img}
                 alt={`${car.year} ${car.make} ${car.model}`}
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                className="object-cover transition-transform duration-200 ease-out motion-safe:group-hover:scale-[1.03]"
                 sizes="(max-width: 640px) 100vw, 50vw"
               />
             ) : (

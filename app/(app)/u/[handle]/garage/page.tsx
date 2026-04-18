@@ -51,11 +51,26 @@ export default async function GaragePage({
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
         {cars.length === 0 ? (
-          <div className="col-span-full rounded-2xl border border-dashed border-border/60 bg-muted/10 py-16 text-center">
-            <p className="text-sm font-medium text-foreground">No cars in this garage yet</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {isOwn ? "Add a car from the web to build your collection here." : "Check back later."}
+          <div className="col-span-full rounded-2xl border border-dashed border-border/60 bg-gradient-to-b from-muted/25 to-muted/10 px-6 py-14 text-center sm:px-10">
+            <p className="text-sm font-semibold text-foreground">Room in the garage</p>
+            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
+              {isOwn
+                ? "Add your first car on the web — this grid becomes a rolling portfolio of what you actually own."
+                : "They haven’t published rides yet. Peek at their profile or explore the feed while you wait."}
             </p>
+            <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+              {isOwn ? (
+                <Button size="sm" asChild>
+                  <Link href="/garage/add">Add a car</Link>
+                </Button>
+              ) : null}
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/u/${user.handle}`}>Back to profile</Link>
+              </Button>
+              <Button size="sm" variant="outline" asChild>
+                <Link href="/explore">Explore Carmunity</Link>
+              </Button>
+            </div>
           </div>
         ) : (
           cars.map((car, i) => (

@@ -50,11 +50,26 @@ export default async function DreamGaragePage({
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         {cars.length === 0 ? (
-          <div className="col-span-full rounded-2xl border border-dashed border-border/60 bg-muted/10 py-16 text-center">
-            <p className="text-sm font-medium text-foreground">No dream cars yet</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {isOwn ? "Add a dream car from the web to pin it here." : "Check back later."}
+          <div className="col-span-full rounded-2xl border border-dashed border-border/60 bg-gradient-to-b from-muted/25 to-muted/10 px-6 py-14 text-center sm:px-10">
+            <p className="text-sm font-semibold text-foreground">Dream sheet is blank</p>
+            <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
+              {isOwn
+                ? "Pin the cars you’re chasing — it’s a public moodboard that pairs with your owned garage."
+                : "They haven’t shared dream picks yet. Explore Carmunity or peek at their owned garage."}
             </p>
+            <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+              {isOwn ? (
+                <Button size="sm" asChild>
+                  <Link href="/dream/add">Add a dream car</Link>
+                </Button>
+              ) : null}
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/u/${user.handle}`}>Profile</Link>
+              </Button>
+              <Button size="sm" variant="outline" asChild>
+                <Link href="/explore">Explore Carmunity</Link>
+              </Button>
+            </div>
           </div>
         ) : (
           cars.map((car) => (

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentForm } from "./comment-form";
 import { ShareButtons } from "@/components/ui/share-buttons";
@@ -79,7 +80,7 @@ export default async function PostDetailPage({
         ← Carmunity
       </Link>
 
-      <Card className="mt-6 overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm">
+      <Card className="carmunity-feed-card mt-6 overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/20">
         {/* Author */}
         <div className="flex items-start gap-3 border-b border-border/40 px-5 pt-5 pb-4">
           <Link href={`/u/${post.author.handle}`} className="shrink-0">
@@ -143,6 +144,21 @@ export default async function PostDetailPage({
             description={post.content ?? undefined}
           />
         </div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border/40 px-5 py-3 text-xs">
+          <Link
+            href={`/u/${post.author.handle}`}
+            className="font-medium text-primary transition-colors duration-150 hover:underline"
+          >
+            View profile
+          </Link>
+          <span className="text-border">·</span>
+          <Link
+            href={`/u/${post.author.handle}/garage`}
+            className="text-muted-foreground transition-colors duration-150 hover:text-foreground hover:underline"
+          >
+            Garage
+          </Link>
+        </div>
       </Card>
 
       <section className="mt-10">
@@ -152,9 +168,17 @@ export default async function PostDetailPage({
         {session?.user && <CommentForm postId={post.id} className="mt-4" />}
         <div className="mt-5 space-y-3">
           {post.comments.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-border/50 bg-muted/15 px-4 py-6 text-center text-sm text-muted-foreground">
-              No comments yet. Start the thread.
-            </p>
+            <div className="rounded-xl border border-dashed border-border/50 bg-gradient-to-b from-muted/20 to-muted/5 px-5 py-8 text-center">
+              <p className="text-sm font-medium text-foreground">Be the first voice in the thread</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Short reactions welcome — keep it respectful and specific.
+              </p>
+              {!session?.user ? (
+                <Button asChild className="mt-5" size="sm">
+                  <Link href="/auth/sign-in">Sign in to comment</Link>
+                </Button>
+              ) : null}
+            </div>
           ) : (
             post.comments.map((c) => (
               <div

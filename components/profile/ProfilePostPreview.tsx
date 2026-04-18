@@ -34,7 +34,7 @@ export function ProfilePostPreview({ post }: { post: ProfilePostPreviewData }) {
   const detailHref = `/explore/post/${post.id}`;
 
   return (
-    <Card className="overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm transition-colors hover:border-primary/25 hover:shadow-md">
+    <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
       <div className="flex items-center justify-between gap-2 px-4 pt-3 pb-2">
         <div className="flex min-w-0 items-center gap-2">
           {post.auctionId ? (

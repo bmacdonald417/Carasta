@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle } from "lucide-react";
+import { FeedEmptyState } from "@/components/carmunity/FeedEmptyState";
+import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
 import { likePost, unlikePost } from "./actions";
 import { CreatePostForm } from "./create-post-form";
 
@@ -115,16 +117,16 @@ export function CommunityFeed({
       )}
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid w-full grid-cols-2 border-border/50 bg-muted/40">
+        <TabsList className="grid w-full grid-cols-2 border-border/50 bg-muted/40 p-1">
           <TabsTrigger
             value="trending"
-            className="data-[state=active]:bg-primary/15 data-[state=active]:text-primary"
+            className="rounded-xl text-muted-foreground transition-colors duration-150 ease-out data-[state=active]:bg-primary/15 data-[state=active]:text-primary data-[state=active]:shadow-none"
           >
             Trending
           </TabsTrigger>
           <TabsTrigger
             value="following"
-            className="data-[state=active]:bg-primary/15 data-[state=active]:text-primary"
+            className="rounded-xl text-muted-foreground transition-colors duration-150 ease-out data-[state=active]:bg-primary/15 data-[state=active]:text-primary data-[state=active]:shadow-none"
           >
             Following
           </TabsTrigger>
@@ -134,8 +136,8 @@ export function CommunityFeed({
             <FeedSkeletonList />
           ) : (
             <PostList
+              variant="trending"
               posts={posts}
-              emptyLabel="No posts yet."
               currentUserId={currentUserId}
               onToggleLike={toggleLike}
             />
@@ -146,8 +148,8 @@ export function CommunityFeed({
             <FeedSkeletonList count={2} />
           ) : (
             <PostList
+              variant="following"
               posts={posts}
-              emptyLabel="Follow people to see their posts here."
               currentUserId={currentUserId}
               onToggleLike={toggleLike}
             />
@@ -164,23 +166,23 @@ function FeedSkeletonList({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <Card
           key={`feed-skeleton-${i}`}
-          className="overflow-hidden border-border/50 bg-card/50 p-0 shadow-sm"
+          className="carmunity-feed-card overflow-hidden border-border/50 bg-card/50 p-0 shadow-sm"
         >
           <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-            <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-muted" />
+            <div className="carmunity-skeleton-pulse h-11 w-11 shrink-0 rounded-full bg-muted" />
             <div className="min-w-0 flex-1 space-y-2">
-              <div className="h-3.5 w-1/3 animate-pulse rounded bg-muted" />
-              <div className="h-3 w-1/4 animate-pulse rounded bg-muted" />
+              <div className="carmunity-skeleton-pulse h-3.5 w-1/3 rounded bg-muted" />
+              <div className="carmunity-skeleton-pulse h-3 w-1/4 rounded bg-muted" />
             </div>
           </div>
-          <div className="aspect-[4/3] w-full animate-pulse bg-muted/80 sm:aspect-video" />
+          <div className="carmunity-skeleton-pulse aspect-[4/3] w-full bg-muted/80 sm:aspect-video" />
           <div className="space-y-2 px-4 py-4">
-            <div className="h-3 w-full animate-pulse rounded bg-muted" />
-            <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
+            <div className="carmunity-skeleton-pulse h-3 w-full rounded bg-muted" />
+            <div className="carmunity-skeleton-pulse h-3 w-5/6 rounded bg-muted" />
           </div>
           <div className="flex gap-3 border-t border-border/40 px-3 py-3">
-            <div className="h-8 w-16 animate-pulse rounded-full bg-muted" />
-            <div className="h-8 w-16 animate-pulse rounded-full bg-muted" />
+            <div className="carmunity-skeleton-pulse h-8 w-16 rounded-full bg-muted" />
+            <div className="carmunity-skeleton-pulse h-8 w-16 rounded-full bg-muted" />
           </div>
         </Card>
       ))}
@@ -189,22 +191,18 @@ function FeedSkeletonList({ count = 3 }: { count?: number }) {
 }
 
 function PostList({
+  variant,
   posts,
-  emptyLabel,
   currentUserId,
   onToggleLike,
 }: {
+  variant: "trending" | "following";
   posts: Post[];
-  emptyLabel: string;
   currentUserId: string | null;
   onToggleLike: (postId: string, currentlyLiked: boolean) => void;
 }) {
   if (posts.length === 0) {
-    return (
-      <p className="rounded-2xl border border-dashed border-border/60 bg-muted/20 py-14 text-center text-sm text-muted-foreground">
-        {emptyLabel}
-      </p>
-    );
+    return <FeedEmptyState variant={variant} currentUserId={currentUserId} />;
   }
   return (
     <div className="space-y-6">
@@ -229,6 +227,7 @@ function PostCard({
   currentUserId: string | null;
   onToggleLike: (postId: string, currentlyLiked: boolean) => void;
 }) {
+  const reduceMotion = usePrefersReducedMotion();
   const hasImage = Boolean(post.imageUrl?.trim());
   const hasContent = Boolean(post.content?.trim());
   const displayName =
@@ -237,11 +236,11 @@ function PostCard({
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 10 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, ease: "easeOut" }}
+      transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
     >
-      <Card className="overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm transition-colors hover:border-primary/25 hover:shadow-md">
+      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
         {/* 1 — Author row */}
         <div className="flex items-start gap-3 px-4 pt-4 pb-3">
           <Link href={`/u/${post.author.handle}`} className="shrink-0">

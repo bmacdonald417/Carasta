@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export type GaragePreviewCar = {
   id: string;
@@ -15,21 +16,37 @@ export type GaragePreviewCar = {
 export function ProfileGaragePreviewGrid({
   handle,
   cars,
+  isOwnProfile = false,
 }: {
   handle: string;
   cars: GaragePreviewCar[];
+  /** When true, show “Add a car” for the signed-in owner viewing their profile. */
+  isOwnProfile?: boolean;
 }) {
   const href = `/u/${handle}/garage`;
 
   if (cars.length === 0) {
     return (
-      <Link
-        href={href}
-        className="group flex aspect-[21/9] max-h-40 flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-muted/15 px-6 text-center transition hover:border-primary/30 hover:bg-muted/25"
-      >
-        <p className="text-sm font-medium text-foreground">Garage</p>
-        <p className="mt-1 text-xs text-muted-foreground">No cars yet — open to add from the web</p>
-      </Link>
+      <div className="flex flex-col gap-4 rounded-xl border border-dashed border-border/60 bg-gradient-to-b from-muted/25 to-muted/10 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-foreground">Garage portfolio</p>
+          <p className="mt-1 max-w-md text-xs leading-relaxed text-muted-foreground">
+            {isOwnProfile
+              ? "Your collection is empty — add a car on the web to make this grid shine."
+              : "No public garage cars yet — when they add rides, thumbnails appear here."}
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          {isOwnProfile ? (
+            <Button size="sm" asChild>
+              <Link href="/garage/add">Add a car</Link>
+            </Button>
+          ) : null}
+          <Button size="sm" variant="outline" asChild>
+            <Link href={href}>Open garage</Link>
+          </Button>
+        </div>
+      </div>
     );
   }
 
@@ -39,14 +56,14 @@ export function ProfileGaragePreviewGrid({
         <Link
           key={car.id}
           href={href}
-          className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border/50 bg-muted/30 transition hover:border-primary/30 hover:shadow-md"
+          className="carmunity-feed-card group relative aspect-[4/3] overflow-hidden rounded-xl border border-border/50 bg-muted/30 hover:border-primary/30"
         >
           {car.imageUrl ? (
             <Image
               src={car.imageUrl}
               alt={`${car.year} ${car.make} ${car.model}`}
               fill
-              className="object-cover transition duration-300 group-hover:scale-[1.03]"
+              className="object-cover transition duration-200 ease-out motion-safe:group-hover:scale-[1.02]"
               sizes="(max-width: 640px) 50vw, 200px"
             />
           ) : (

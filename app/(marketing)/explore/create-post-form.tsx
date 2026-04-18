@@ -45,8 +45,9 @@ export function CreatePostForm({
 
   return (
     <form
+      id="carmunity-create-post"
       onSubmit={submit}
-      className={`rounded-2xl border border-border/50 bg-card/70 p-4 shadow-sm backdrop-blur-sm ${className ?? ""}`}
+      className={`scroll-mt-28 rounded-2xl border border-border/50 bg-card/70 p-4 shadow-sm backdrop-blur-sm ${className ?? ""}`}
     >
       <div className="mb-3 flex items-center gap-2 text-muted-foreground">
         <PenLine className="h-4 w-4 text-primary" aria-hidden />

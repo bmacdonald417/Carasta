@@ -247,6 +247,11 @@ class _SignedInBody extends StatelessWidget {
               icon: const Icon(Icons.star_outline_rounded, size: 18),
               label: const Text('Saved'),
             ),
+            OutlinedButton.icon(
+              onPressed: () => context.push(AppRoutes.settings),
+              icon: const Icon(Icons.settings_outlined, size: 18),
+              label: const Text('Settings'),
+            ),
           ],
         ),
         const SizedBox(height: AppSpacing.xl),

@@ -102,7 +102,8 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={href}
                   href={href}
-                  className={`transition ${
+                  data-active={appActive ? "true" : "false"}
+                  className={`carmunity-nav-link ${
                     appActive
                       ? "font-medium text-primary"
                       : "text-neutral-400 hover:text-neutral-100"

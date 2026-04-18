@@ -1,5 +1,6 @@
 @import "../styles/carasta.css";
 @import "../styles/carmunity-tokens.css";
+@import "../styles/carmunity-motion.css";
 
 @tailwind base;
 @tailwind components;

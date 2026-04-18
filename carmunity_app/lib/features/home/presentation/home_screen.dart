@@ -10,6 +10,7 @@ import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/dto/post_summary.dart';
 import '../../../shared/state/providers.dart';
 import 'widgets/feed_post_card.dart';
+import 'widgets/feed_skeleton_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -233,7 +234,18 @@ class _FeedBody extends ConsumerWidget {
           },
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => ListView.separated(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            AppSpacing.md,
+            horizontalPadding,
+            AppSpacing.xxl,
+          ),
+          itemCount: 3,
+          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.lg),
+          itemBuilder: (_, __) => const FeedSkeletonCard(),
+        ),
       error: (e, _) => ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.fromLTRB(

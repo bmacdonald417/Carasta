@@ -25,7 +25,17 @@ class ForumsScreen extends ConsumerWidget {
         title: const Text('Forums'),
       ),
       body: async.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => ListView(
+              padding: EdgeInsets.fromLTRB(h, AppSpacing.lg, h, AppSpacing.xxl),
+              children: const [
+                SizedBox(height: AppSpacing.sm),
+                _ForumSkeletonRow(),
+                SizedBox(height: AppSpacing.md),
+                _ForumSkeletonRow(),
+                SizedBox(height: AppSpacing.md),
+                _ForumSkeletonRow(),
+              ],
+            ),
         error: (e, _) => _ErrorBody(
           message: e is ApiException ? e.message : e.toString(),
           onRetry: () => ref.invalidate(forumSpacesProvider),
@@ -35,10 +45,40 @@ class ForumsScreen extends ConsumerWidget {
             return Center(
               child: Padding(
                 padding: EdgeInsets.all(h),
-                child: Text(
-                  'No forum spaces yet. Start Carasta with a seeded database (prisma db seed).',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.forum_outlined, size: 44, color: AppColors.accent.withOpacity(0.85)),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'Forums are warming up',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Spaces appear when your Carasta deployment has forum data (e.g. prisma db seed). '
+                        'Meanwhile, catch live chatter on Carmunity.',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textSecondary,
+                              height: 1.45,
+                            ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      FilledButton(
+                        onPressed: () => context.push(AppRoutes.home),
+                        child: const Text('Open Carmunity feed'),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      OutlinedButton(
+                        onPressed: () => context.push(AppRoutes.createForumThread),
+                        child: const Text('Draft a thread (create)'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -80,6 +120,55 @@ class ForumsScreen extends ConsumerWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _ForumSkeletonRow extends StatelessWidget {
+  const _ForumSkeletonRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final bar = BoxDecoration(
+      color: AppColors.surfaceElevated,
+      borderRadius: BorderRadius.circular(4),
+    );
+    return Container(
+      height: 104,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceCard,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: AppColors.borderSubtle.withOpacity(0.85)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceElevated,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(height: 12, width: 160, decoration: bar),
+                  const SizedBox(height: 10),
+                  Container(height: 10, width: double.infinity, decoration: bar),
+                  const SizedBox(height: 8),
+                  Container(height: 10, width: 120, decoration: bar),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -135,6 +224,9 @@ class _SpaceHeroCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push(AppRoutes.forumSpace(space.slug)),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        splashColor: AppColors.accent.withOpacity(0.1),
+        highlightColor: AppColors.accent.withOpacity(0.04),
         child: Ink(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLg),

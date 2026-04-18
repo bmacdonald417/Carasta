@@ -12,6 +12,7 @@ import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { ProfilePostPreview } from "@/components/profile/ProfilePostPreview";
 import { ProfileGaragePreviewGrid } from "@/components/profile/ProfileGaragePreviewGrid";
+import { ProfilePostsEmpty } from "@/components/carmunity/ProfilePostsEmpty";
 
 export default async function ProfilePage({
   params,
@@ -125,7 +126,7 @@ export default async function ProfilePage({
   return (
     <div className="carasta-container max-w-3xl space-y-8 py-10 pb-16">
       {/* 1 — Profile header */}
-      <section className="overflow-hidden rounded-2xl border border-border/50 bg-card/70 shadow-sm backdrop-blur-sm">
+      <section className="carmunity-profile-enter overflow-hidden rounded-2xl border border-border/50 bg-card/70 shadow-sm backdrop-blur-sm">
         <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start sm:gap-8">
           <Avatar className="mx-auto h-28 w-28 shrink-0 ring-2 ring-border/60 sm:mx-0 sm:h-32 sm:w-32">
             <AvatarImage src={user.avatarUrl ?? user.image ?? undefined} alt="" />
@@ -196,9 +197,14 @@ export default async function ProfilePage({
           <FollowButton targetUserId={user.id} initialFollowing={!!following} />
         ) : null}
         {isOwnProfile ? (
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/explore">Open Carmunity</Link>
-          </Button>
+          <>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/explore">Open Carmunity</Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/settings">Settings</Link>
+            </Button>
+          </>
         ) : null}
         <Button variant="outline" size="sm" asChild>
           <Link href={`/u/${user.handle}/garage`}>Garage</Link>
@@ -231,7 +237,7 @@ export default async function ProfilePage({
             <Link href={`/u/${user.handle}/garage`}>View all</Link>
           </Button>
         </div>
-        <ProfileGaragePreviewGrid handle={user.handle} cars={garageTiles} />
+        <ProfileGaragePreviewGrid handle={user.handle} cars={garageTiles} isOwnProfile={isOwnProfile} />
       </section>
 
       <TrustPanel
@@ -256,9 +262,7 @@ export default async function ProfilePage({
           ) : null}
         </div>
         {recentPosts.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border/60 bg-muted/15 py-12 text-center text-sm text-muted-foreground">
-            No public posts yet.
-          </p>
+          <ProfilePostsEmpty isOwnProfile={isOwnProfile} handle={user.handle} />
         ) : (
           <div className="space-y-5">
             {recentPosts.map((p) => (

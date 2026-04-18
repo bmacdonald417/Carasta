@@ -122,6 +122,9 @@ class _FeedPostCardState extends ConsumerState<FeedPostCard> {
           children: [
             InkWell(
               onTap: widget.onTap,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              splashColor: AppColors.accent.withOpacity(0.12),
+              highlightColor: AppColors.accent.withOpacity(0.05),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
