@@ -141,7 +141,17 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New post'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Share to Carmunity', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'by Carasta',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textTertiary),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: canPost ? _submit : null,
@@ -173,7 +183,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             minLines: 5,
             maxLines: 12,
             decoration: const InputDecoration(
-              labelText: 'What is on your mind?',
+              labelText: 'Share an update, a find, or a moment from the garage…',
               alignLabelWithHint: true,
               border: OutlineInputBorder(),
             ),

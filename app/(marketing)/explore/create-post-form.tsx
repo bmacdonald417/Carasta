@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -45,38 +46,42 @@ export function CreatePostForm({
   return (
     <form
       onSubmit={submit}
-      className={`rounded-2xl border border-border/50 bg-card/80 p-4 ${className ?? ""}`}
+      className={`rounded-2xl border border-border/50 bg-card/70 p-4 shadow-sm backdrop-blur-sm ${className ?? ""}`}
     >
-      <Label htmlFor="post-content">What’s on your mind?</Label>
+      <div className="mb-3 flex items-center gap-2 text-muted-foreground">
+        <PenLine className="h-4 w-4 text-primary" aria-hidden />
+        <span className="text-xs font-semibold uppercase tracking-wider text-foreground/80">
+          Share to Carmunity
+        </span>
+      </div>
+      <Label htmlFor="post-content" className="sr-only">
+        Post body
+      </Label>
       <Textarea
         id="post-content"
-        placeholder="Share a build, a find, or a thought..."
+        placeholder="Build update, garage shot, or what you’re chasing…"
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="mt-2 min-h-[80px]"
+        className="min-h-[88px] resize-none border-border/60 bg-background/60 text-[15px] leading-relaxed"
       />
-      <div className="mt-2">
+      <div className="mt-3">
         <Label htmlFor="post-image" className="text-xs text-muted-foreground">
           Image URL (optional)
         </Label>
         <Input
           id="post-image"
           type="url"
-          placeholder="https://..."
+          placeholder="https://…"
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
-          className="mt-1"
+          className="mt-1 border-border/60 bg-background/60"
         />
       </div>
-      <Button
-        type="submit"
-        variant="performance"
-        size="sm"
-        className="mt-3"
-        disabled={loading}
-      >
-        {loading ? "Posting…" : "Post"}
-      </Button>
+      <div className="mt-4 flex justify-end">
+        <Button type="submit" variant="default" size="sm" disabled={loading}>
+          {loading ? "Posting…" : "Post"}
+        </Button>
+      </div>
     </form>
   );
 }

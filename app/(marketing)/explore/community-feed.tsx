@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle } from "lucide-react";
@@ -27,6 +27,19 @@ type Post = {
   _count: { likes: number; comments: number };
   liked?: boolean;
 };
+
+function formatPostTime(iso: string): string {
+  const d = new Date(iso);
+  const diffMs = Date.now() - d.getTime();
+  if (diffMs < 60_000) return "Just now";
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d`;
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
 
 export function CommunityFeed({
   tab: initialTab,
@@ -96,9 +109,9 @@ export function CommunityFeed({
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-8">
       {currentUserId && (
-        <CreatePostForm onCreated={onPostCreated} className="mb-6" />
+        <CreatePostForm onCreated={onPostCreated} className="mb-8" />
       )}
 
       <Tabs value={tab} onValueChange={setTab}>
@@ -116,64 +129,93 @@ export function CommunityFeed({
             Following
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="trending" className="mt-4">
+        <TabsContent value="trending" className="mt-6">
           {loading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="p-6">
-                  <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
-                  <div className="mt-2 h-20 animate-pulse rounded bg-muted" />
-                </Card>
-              ))}
-            </div>
+            <FeedSkeletonList />
           ) : (
-            <div className="space-y-4">
-              {posts.length === 0 ? (
-                <p className="py-8 text-center text-muted-foreground">
-                  No posts yet.
-                </p>
-              ) : (
-                posts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    currentUserId={currentUserId}
-                    onToggleLike={toggleLike}
-                  />
-                ))
-              )}
-            </div>
+            <PostList
+              posts={posts}
+              emptyLabel="No posts yet."
+              currentUserId={currentUserId}
+              onToggleLike={toggleLike}
+            />
           )}
         </TabsContent>
-        <TabsContent value="following" className="mt-4">
+        <TabsContent value="following" className="mt-6">
           {loading ? (
-            <div className="space-y-4">
-              {[1, 2].map((i) => (
-                <Card key={i} className="p-6">
-                  <div className="h-4 w-1/3 animate-pulse rounded bg-muted" />
-                </Card>
-              ))}
-            </div>
+            <FeedSkeletonList count={2} />
           ) : (
-            <div className="space-y-4">
-              {posts.length === 0 ? (
-                <p className="py-8 text-center text-muted-foreground">
-                  Follow people to see their posts here.
-                </p>
-              ) : (
-                posts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    currentUserId={currentUserId}
-                    onToggleLike={toggleLike}
-                  />
-                ))
-              )}
-            </div>
+            <PostList
+              posts={posts}
+              emptyLabel="Follow people to see their posts here."
+              currentUserId={currentUserId}
+              onToggleLike={toggleLike}
+            />
           )}
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function FeedSkeletonList({ count = 3 }: { count?: number }) {
+  return (
+    <div className="space-y-6">
+      {Array.from({ length: count }).map((_, i) => (
+        <Card
+          key={`feed-skeleton-${i}`}
+          className="overflow-hidden border-border/50 bg-card/50 p-0 shadow-sm"
+        >
+          <div className="flex items-center gap-3 px-4 pt-4 pb-3">
+            <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-muted" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-3.5 w-1/3 animate-pulse rounded bg-muted" />
+              <div className="h-3 w-1/4 animate-pulse rounded bg-muted" />
+            </div>
+          </div>
+          <div className="aspect-[4/3] w-full animate-pulse bg-muted/80 sm:aspect-video" />
+          <div className="space-y-2 px-4 py-4">
+            <div className="h-3 w-full animate-pulse rounded bg-muted" />
+            <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="flex gap-3 border-t border-border/40 px-3 py-3">
+            <div className="h-8 w-16 animate-pulse rounded-full bg-muted" />
+            <div className="h-8 w-16 animate-pulse rounded-full bg-muted" />
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function PostList({
+  posts,
+  emptyLabel,
+  currentUserId,
+  onToggleLike,
+}: {
+  posts: Post[];
+  emptyLabel: string;
+  currentUserId: string | null;
+  onToggleLike: (postId: string, currentlyLiked: boolean) => void;
+}) {
+  if (posts.length === 0) {
+    return (
+      <p className="rounded-2xl border border-dashed border-border/60 bg-muted/20 py-14 text-center text-sm text-muted-foreground">
+        {emptyLabel}
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-6">
+      {posts.map((post) => (
+        <PostCard
+          key={post.id}
+          post={post}
+          currentUserId={currentUserId}
+          onToggleLike={onToggleLike}
+        />
+      ))}
     </div>
   );
 }
@@ -187,66 +229,115 @@ function PostCard({
   currentUserId: string | null;
   onToggleLike: (postId: string, currentlyLiked: boolean) => void;
 }) {
+  const hasImage = Boolean(post.imageUrl?.trim());
+  const hasContent = Boolean(post.content?.trim());
+  const displayName =
+    post.author.name?.trim() || `@${post.author.handle}`;
+  const metaLine = `@${post.author.handle} · ${formatPostTime(post.createdAt)}`;
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
+    <motion.article
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.28, ease: "easeOut" }}
     >
-    <Card className="overflow-hidden border-border/60 bg-card/60 transition-all hover:border-primary/25 hover:shadow-lg">
-      <CardContent className="p-4">
-        <Link
-          href={`/u/${post.author.handle}`}
-          className="flex items-center gap-3"
-        >
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={post.author.avatarUrl ?? undefined} />
-            <AvatarFallback>
-              {(post.author.name ?? post.author.handle).slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-medium">@{post.author.handle}</p>
-            <p className="text-xs text-muted-foreground">
-              {new Date(post.createdAt).toLocaleString()}
-            </p>
+      <Card className="overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm transition-colors hover:border-primary/25 hover:shadow-md">
+        {/* 1 — Author row */}
+        <div className="flex items-start gap-3 px-4 pt-4 pb-3">
+          <Link href={`/u/${post.author.handle}`} className="shrink-0">
+            <Avatar className="h-11 w-11 ring-1 ring-border/60">
+              <AvatarImage src={post.author.avatarUrl ?? undefined} alt="" />
+              <AvatarFallback className="bg-muted text-sm font-medium">
+                {(post.author.name ?? post.author.handle).slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <div className="min-w-0 flex-1">
+            <Link
+              href={`/u/${post.author.handle}`}
+              className="block truncate text-sm font-semibold tracking-tight text-foreground hover:text-primary"
+            >
+              {displayName}
+            </Link>
+            <p className="truncate text-xs text-muted-foreground">{metaLine}</p>
           </div>
-        </Link>
-        {post.content && (
-          <p className="mt-3 whitespace-pre-wrap text-sm">{post.content}</p>
-        )}
-        {post.imageUrl && (
-          <div className="relative mt-3 aspect-video w-full overflow-hidden rounded-xl bg-muted">
+        </div>
+
+        {/* 2 — Media (image-forward, edge-to-edge in card) */}
+        {hasImage && (
+          <Link
+            href={`/explore/post/${post.id}`}
+            className="relative block aspect-[4/3] w-full bg-muted sm:aspect-video"
+          >
             <Image
-              src={post.imageUrl}
+              src={post.imageUrl!.trim()}
               alt=""
               fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, 600px"
+              className="object-cover transition duration-300 hover:opacity-[0.98]"
+              sizes="(max-width: 640px) 100vw, 640px"
             />
+          </Link>
+        )}
+
+        {/* 3 — Caption + 4 — metadata (caption only; time is in author row) */}
+        {(hasContent || !hasImage) && (
+          <div className="px-4 pb-1 pt-2">
+            {hasContent ? (
+              <Link href={`/explore/post/${post.id}`} className="block">
+                <p className="line-clamp-6 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
+                  {post.content}
+                </p>
+              </Link>
+            ) : !hasImage ? (
+              <Link
+                href={`/explore/post/${post.id}`}
+                className="text-sm text-muted-foreground hover:text-primary"
+              >
+                View post
+              </Link>
+            ) : null}
           </div>
         )}
-        <div className="mt-3 flex gap-4">
+
+        {/* 5 — Social action row */}
+        <div className="flex items-center gap-1 border-t border-border/40 px-2 py-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9 gap-1.5 rounded-full px-3 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            onClick={(e) => {
+              e.preventDefault();
+              onToggleLike(post.id, !!post.liked);
+            }}
+          >
+            <Heart
+              className={`h-[18px] w-[18px] shrink-0 ${post.liked ? "fill-primary text-primary" : ""}`}
+            />
+            <span className="min-w-[1ch] tabular-nums text-xs font-medium">
+              {post._count.likes}
+            </span>
+          </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="gap-1"
-            onClick={() => onToggleLike(post.id, !!post.liked)}
+            className="h-9 gap-1.5 rounded-full px-3 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            asChild
           >
-            <Heart
-              className={`h-4 w-4 ${post.liked ? "fill-primary text-primary" : ""}`}
-            />
-            {post._count.likes}
+            <Link href={`/explore/post/${post.id}`}>
+              <MessageCircle className="h-[18px] w-[18px] shrink-0" />
+              <span className="min-w-[1ch] tabular-nums text-xs font-medium">
+                {post._count.comments}
+              </span>
+            </Link>
           </Button>
-          <Link href={`/explore/post/${post.id}`}>
-            <Button variant="ghost" size="sm" className="gap-1">
-              <MessageCircle className="h-4 w-4" />
-              {post._count.comments}
-            </Button>
-          </Link>
+          {!currentUserId && (
+            <span className="ml-auto pr-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+              Sign in to like
+            </span>
+          )}
         </div>
-      </CardContent>
-    </Card>
-    </motion.div>
+      </Card>
+    </motion.article>
   );
 }

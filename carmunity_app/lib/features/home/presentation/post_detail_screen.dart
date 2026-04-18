@@ -1,3 +1,5 @@
+import 'dart:ui' show FontFeature;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -59,6 +61,15 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     }
   }
 
+  String _relativeTime(DateTime t) {
+    final diff = DateTime.now().difference(t);
+    if (diff.inSeconds < 60) return 'Just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return DateFormat.yMMMd().add_jm().format(t.toLocal());
+  }
+
   @override
   Widget build(BuildContext context) {
     final h = pageHorizontalPadding(context);
@@ -113,94 +124,221 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     required PostDetailNotifier notifier,
   }) {
     final theme = Theme.of(context);
-    final time = DateFormat.yMMMd().add_jm().format(post.createdAt.toLocal());
+    final meta = '@${post.author.handle} · ${_relativeTime(post.createdAt.toLocal())}';
     final isSelf = auth.userId != null && auth.userId == post.authorId;
+    final hasImage = post.imageUrl != null && post.imageUrl!.trim().isNotEmpty;
+    final hasContent = post.content != null && post.content!.trim().isNotEmpty;
 
     return ListView(
       padding: EdgeInsets.fromLTRB(horizontalPadding, AppSpacing.md, horizontalPadding, AppSpacing.xxl),
       children: [
         if (!auth.canPerformMutations) const SignInRequiredHint(),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: AppColors.surfaceElevated,
-              backgroundImage: post.author.avatarUrl != null && post.author.avatarUrl!.isNotEmpty
-                  ? NetworkImage(post.author.avatarUrl!)
-                  : null,
-              child: post.author.avatarUrl == null || post.author.avatarUrl!.isEmpty
-                  ? Text(
-                      post.author.handle.isNotEmpty ? post.author.handle[0].toUpperCase() : '?',
-                      style: theme.textTheme.titleSmall,
-                    )
-                  : null,
+        Material(
+          color: AppColors.surfaceCard.withOpacity(0.92),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          clipBehavior: Clip.antiAlias,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              border: Border.all(color: AppColors.borderSubtle.withOpacity(0.9)),
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(post.author.displayName, style: theme.textTheme.titleSmall),
-                  Text('@${post.author.handle}', style: theme.textTheme.bodySmall),
-                  Text(time, style: theme.textTheme.bodySmall),
-                ],
-              ),
-            ),
-            if (!isSelf)
-              FilledButton.tonal(
-                onPressed: () => _guardMutations(auth, () => notifier.toggleFollow()),
-                child: Text(post.viewerFollowsAuthor ? 'Following' : 'Follow'),
-              ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.md),
-        if (post.content != null && post.content!.trim().isNotEmpty)
-          Text(post.content!, style: theme.textTheme.bodyLarge),
-        if (post.imageUrl != null && post.imageUrl!.trim().isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.md),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            child: AspectRatio(
-              aspectRatio: 16 / 10,
-              child: Image.network(
-                post.imageUrl!.trim(),
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, p) {
-                  if (p == null) return child;
-                  return Container(
-                    color: AppColors.imagePlaceholder,
-                    alignment: Alignment.center,
-                    child: const CircularProgressIndicator(strokeWidth: 2),
-                  );
-                },
-                errorBuilder: (_, __, ___) => Container(
-                  color: AppColors.imagePlaceholder,
-                  height: 200,
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.broken_image_outlined),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 1 — Author row
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.md,
+                    AppSpacing.md,
+                    AppSpacing.sm,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundColor: AppColors.surfaceElevated,
+                        backgroundImage: post.author.avatarUrl != null && post.author.avatarUrl!.isNotEmpty
+                            ? NetworkImage(post.author.avatarUrl!)
+                            : null,
+                        child: post.author.avatarUrl == null || post.author.avatarUrl!.isEmpty
+                            ? Text(
+                                post.author.handle.isNotEmpty ? post.author.handle[0].toUpperCase() : '?',
+                                style: theme.textTheme.titleSmall,
+                              )
+                            : null,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    post.author.displayName,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: -0.2,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (post.auctionId != null)
+                                  Container(
+                                    margin: const EdgeInsets.only(left: AppSpacing.xs),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.sm,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.auctionSignal.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                                      border: Border.all(
+                                        color: AppColors.auctionSignal.withOpacity(0.35),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Auction',
+                                      style: theme.textTheme.labelSmall?.copyWith(
+                                        color: AppColors.auctionSignal,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.4,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              meta,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: AppColors.textTertiary,
+                                fontSize: 12,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!isSelf)
+                        FilledButton.tonal(
+                          style: FilledButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                          ),
+                          onPressed: () => _guardMutations(auth, () => notifier.toggleFollow()),
+                          child: Text(post.viewerFollowsAuthor ? 'Following' : 'Follow'),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
+
+                // 2 — Media (image-forward, matches feed)
+                if (hasImage)
+                  AspectRatio(
+                    aspectRatio: 4 / 3,
+                    child: Image.network(
+                      post.imageUrl!.trim(),
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, p) {
+                        if (p == null) return child;
+                        return Container(
+                          color: AppColors.imagePlaceholder,
+                          alignment: Alignment.center,
+                          child: const SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        );
+                      },
+                      errorBuilder: (_, __, ___) => Container(
+                        color: AppColors.imagePlaceholder,
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.broken_image_outlined, color: AppColors.textTertiary),
+                      ),
+                    ),
+                  ),
+
+                // 3 — Body
+                if (hasContent)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSpacing.md,
+                      hasImage ? AppSpacing.sm : 0,
+                      AppSpacing.md,
+                      AppSpacing.sm,
+                    ),
+                    child: Text(
+                      post.content!.trim(),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        height: 1.45,
+                        color: AppColors.textPrimary.withOpacity(0.92),
+                      ),
+                    ),
+                  ),
+
+                const Divider(height: 1, thickness: 1, color: AppColors.borderSubtle),
+
+                // 4 — Engagement row (copper like state; counts only)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xs,
+                    AppSpacing.xs,
+                    AppSpacing.md,
+                    AppSpacing.sm,
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        style: IconButton.styleFrom(
+                          foregroundColor: post.liked ? AppColors.accent : AppColors.textSecondary,
+                        ),
+                        onPressed: () => _guardMutations(auth, () => notifier.toggleLike()),
+                        icon: Icon(
+                          post.liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          size: 22,
+                        ),
+                      ),
+                      Text(
+                        '${post.likeCount}',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Icon(Icons.chat_bubble_outline_rounded, size: 20, color: AppColors.textTertiary),
+                      const SizedBox(width: AppSpacing.xxs),
+                      Text(
+                        '${post.commentCount}',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-        const SizedBox(height: AppSpacing.md),
-        Row(
-          children: [
-            IconButton.filledTonal(
-              onPressed: () => _guardMutations(auth, () => notifier.toggleLike()),
-              icon: Icon(post.liked ? Icons.favorite : Icons.favorite_border),
-            ),
-            const SizedBox(width: AppSpacing.xs),
-            Text('${post.likeCount}', style: theme.textTheme.titleSmall),
-            const SizedBox(width: AppSpacing.lg),
-            Icon(Icons.chat_bubble_outline, color: AppColors.textSecondary, size: 22),
-            const SizedBox(width: AppSpacing.xs),
-            Text('${post.commentCount}', style: theme.textTheme.titleSmall),
-          ],
         ),
-        const Divider(height: AppSpacing.xxl),
-        Text('Comments', style: theme.textTheme.titleMedium),
+
+        const SizedBox(height: AppSpacing.lg),
+        Text(
+          'Comments',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
+          ),
+        ),
         const SizedBox(height: AppSpacing.sm),
         if (post.comments.isEmpty)
           Text(
@@ -215,8 +353,17 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             controller: _commentController,
             minLines: 2,
             maxLines: 5,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Add a comment…',
+              filled: true,
+              fillColor: AppColors.surfaceElevated.withOpacity(0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                borderSide: BorderSide(color: AppColors.borderSubtle.withOpacity(0.9)),
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -269,27 +416,24 @@ class _CommentTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderSubtle),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          color: AppColors.surfaceCard,
+          border: Border(
+            bottom: BorderSide(color: AppColors.borderSubtle.withOpacity(0.85)),
+          ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, AppSpacing.md),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
                 radius: 18,
                 backgroundColor: AppColors.surfaceElevated,
-                backgroundImage: comment.author.avatarUrl != null &&
-                        comment.author.avatarUrl!.isNotEmpty
+                backgroundImage: comment.author.avatarUrl != null && comment.author.avatarUrl!.isNotEmpty
                     ? NetworkImage(comment.author.avatarUrl!)
                     : null,
                 child: comment.author.avatarUrl == null || comment.author.avatarUrl!.isEmpty
                     ? Text(
-                        comment.author.handle.isNotEmpty
-                            ? comment.author.handle[0].toUpperCase()
-                            : '?',
+                        comment.author.handle.isNotEmpty ? comment.author.handle[0].toUpperCase() : '?',
                         style: theme.textTheme.bodySmall,
                       )
                     : null,
@@ -299,9 +443,17 @@ class _CommentTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('@${comment.author.handle}', style: theme.textTheme.titleSmall),
+                    Text(
+                      '@${comment.author.handle}',
+                      style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 2),
                     Text(comment.content, style: theme.textTheme.bodyMedium),
-                    Text(t, style: theme.textTheme.bodySmall),
+                    const SizedBox(height: 4),
+                    Text(
+                      t,
+                      style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textTertiary, fontSize: 12),
+                    ),
                   ],
                 ),
               ),

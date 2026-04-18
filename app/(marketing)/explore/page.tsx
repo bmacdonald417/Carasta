@@ -17,7 +17,7 @@ export default async function ExplorePage({
   const currentUserId = (session?.user as any)?.id;
 
   return (
-    <div className="carasta-container max-w-2xl py-8">
+    <div className="carasta-container max-w-2xl py-10 pb-16">
       <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
         Carmunity
       </h1>

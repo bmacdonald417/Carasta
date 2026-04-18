@@ -2,12 +2,31 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentForm } from "./comment-form";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
+
+function formatPostTime(iso: Date): string {
+  const d = new Date(iso);
+  const diffMs = Date.now() - d.getTime();
+  if (diffMs < 60_000) return "Just now";
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return d.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
 export default async function PostDetailPage({
   params,
@@ -47,106 +66,127 @@ export default async function PostDetailPage({
     liked = !!like;
   }
 
+  const displayName = post.author.name?.trim() || `@${post.author.handle}`;
+  const hasImage = Boolean(post.imageUrl?.trim());
+  const hasContent = Boolean(post.content?.trim());
+
   return (
     <div className="carasta-container max-w-2xl py-8">
       <Link
         href="/explore"
-        className="text-sm text-muted-foreground hover:text-foreground"
+        className="text-sm text-muted-foreground transition hover:text-primary"
       >
         ← Carmunity
       </Link>
 
-      <Card className="mt-4">
-        <CardContent className="p-4">
-          <Link
-            href={`/u/${post.author.handle}`}
-            className="flex items-center gap-3"
-          >
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={post.author.avatarUrl ?? undefined} />
+      <Card className="mt-6 overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm">
+        {/* Author */}
+        <div className="flex items-start gap-3 border-b border-border/40 px-5 pt-5 pb-4">
+          <Link href={`/u/${post.author.handle}`} className="shrink-0">
+            <Avatar className="h-12 w-12 ring-1 ring-border/60">
+              <AvatarImage src={post.author.avatarUrl ?? undefined} alt="" />
               <AvatarFallback>
-                {(post.author.name ?? post.author.handle)
-                  .slice(0, 2)
-                  .toUpperCase()}
+                {(post.author.name ?? post.author.handle).slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="font-medium">@{post.author.handle}</p>
-                <ReputationBadge tier={post.author.collectorTier} />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {new Date(post.createdAt).toLocaleString()}
-              </p>
-            </div>
           </Link>
-          {post.content && (
-            <p className="mt-3 whitespace-pre-wrap">{post.content}</p>
-          )}
-          {post.imageUrl && (
-            <div className="relative mt-3 aspect-video w-full overflow-hidden rounded-xl bg-muted">
-              <Image
-                src={post.imageUrl}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="600px"
-              />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href={`/u/${post.author.handle}`}
+                className="text-base font-semibold tracking-tight text-foreground hover:text-primary"
+              >
+                {displayName}
+              </Link>
+              <ReputationBadge tier={post.author.collectorTier} />
             </div>
-          )}
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm text-muted-foreground">
-              {post._count.likes} like{post._count.likes !== 1 ? "s" : ""}
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              @{post.author.handle} · {formatPostTime(post.createdAt)}
             </p>
-            <ShareButtons
-              url={`/explore/post/${post.id}`}
-              title={`Post by @${post.author.handle}`}
-              description={post.content ?? undefined}
+          </div>
+        </div>
+
+        {/* Media first when present */}
+        {hasImage && (
+          <div className="relative aspect-[4/3] w-full bg-muted sm:aspect-video">
+            <Image
+              src={post.imageUrl!.trim()}
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 672px"
+              priority
             />
           </div>
-        </CardContent>
+        )}
+
+        {/* Body */}
+        {hasContent && (
+          <div className="px-5 py-5">
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
+              {post.content}
+            </p>
+          </div>
+        )}
+
+        {/* Engagement + share */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/40 px-5 py-4">
+          <p className="text-sm text-muted-foreground">
+            <span className={liked ? "font-medium text-primary" : ""}>
+              {post._count.likes} like{post._count.likes !== 1 ? "s" : ""}
+            </span>
+            {liked ? <span className="text-xs"> · You liked this</span> : null}
+          </p>
+          <ShareButtons
+            url={`/explore/post/${post.id}`}
+            title={`Post by @${post.author.handle}`}
+            description={post.content ?? undefined}
+          />
+        </div>
       </Card>
 
-      <div className="mt-6">
-        <h2 className="font-display font-semibold">Comments</h2>
-        {session?.user && (
-          <CommentForm postId={post.id} className="mt-2" />
-        )}
-        <div className="mt-4 space-y-3">
+      <section className="mt-10">
+        <h2 className="font-display text-sm font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          Comments
+        </h2>
+        {session?.user && <CommentForm postId={post.id} className="mt-4" />}
+        <div className="mt-5 space-y-3">
           {post.comments.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No comments yet.</p>
+            <p className="rounded-xl border border-dashed border-border/50 bg-muted/15 px-4 py-6 text-center text-sm text-muted-foreground">
+              No comments yet. Start the thread.
+            </p>
           ) : (
             post.comments.map((c) => (
               <div
                 key={c.id}
-                className="flex gap-3 rounded-xl border border-border/50 p-3"
+                className="flex gap-3 rounded-xl border border-border/50 bg-card/40 px-4 py-3"
               >
-                <Avatar className="h-8 w-8 shrink-0">
+                <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border/40">
                   <AvatarImage src={c.author.avatarUrl ?? undefined} />
                   <AvatarFallback className="text-xs">
                     {(c.author.name ?? c.author.handle).slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href={`/u/${c.author.handle}`}
-                      className="text-sm font-medium hover:underline"
+                      className="text-sm font-semibold hover:text-primary"
                     >
                       @{c.author.handle}
                     </Link>
                     <ReputationBadge tier={c.author.collectorTier} />
                   </div>
-                  <p className="text-sm text-muted-foreground">{c.content}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(c.createdAt).toLocaleString()}
+                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">{c.content}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {formatPostTime(c.createdAt)}
                   </p>
                 </div>
               </div>
             ))
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

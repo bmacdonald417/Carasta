@@ -219,7 +219,7 @@ class _FeedBody extends ConsumerWidget {
             AppSpacing.xxl,
           ),
           itemCount: posts.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
+          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.lg),
           itemBuilder: (context, index) {
             final post = posts[index];
             return FeedPostCard(
