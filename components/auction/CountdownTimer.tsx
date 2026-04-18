@@ -21,10 +21,10 @@ const urgencyStyles: Record<
   { default: string; dark: string; pulse?: boolean }
 > = {
   normal: { default: "text-muted-foreground", dark: "text-white/80" },
-  subtle: { default: "text-[#ff3b5c]/80", dark: "text-[#ff3b5c]/90" },
+  subtle: { default: "text-signal/80", dark: "text-signal/90" },
   elevated: {
-    default: "text-[#ff3b5c] font-semibold",
-    dark: "text-[#ff3b5c] font-semibold",
+    default: "text-signal font-semibold",
+    dark: "text-signal font-semibold",
     pulse: true,
   },
   ended: { default: "text-muted-foreground", dark: "text-white/60" },

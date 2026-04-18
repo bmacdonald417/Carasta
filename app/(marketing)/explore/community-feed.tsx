@@ -102,11 +102,17 @@ export function CommunityFeed({
       )}
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid w-full grid-cols-2 border-white/10 bg-white/5">
-          <TabsTrigger value="trending" className="data-[state=active]:bg-[#ff3b5c]/20 data-[state=active]:text-[#ff3b5c]">
+        <TabsList className="grid w-full grid-cols-2 border-border/50 bg-muted/40">
+          <TabsTrigger
+            value="trending"
+            className="data-[state=active]:bg-primary/15 data-[state=active]:text-primary"
+          >
             Trending
           </TabsTrigger>
-          <TabsTrigger value="following" className="data-[state=active]:bg-[#ff3b5c]/20 data-[state=active]:text-[#ff3b5c]">
+          <TabsTrigger
+            value="following"
+            className="data-[state=active]:bg-primary/15 data-[state=active]:text-primary"
+          >
             Following
           </TabsTrigger>
         </TabsList>
@@ -187,7 +193,7 @@ function PostCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-    <Card className="overflow-hidden border-white/10 bg-white/5 transition-all hover:border-[#ff3b5c]/20 hover:shadow-lg hover:shadow-[#ff3b5c]/5">
+    <Card className="overflow-hidden border-border/60 bg-card/60 transition-all hover:border-primary/25 hover:shadow-lg">
       <CardContent className="p-4">
         <Link
           href={`/u/${post.author.handle}`}
@@ -228,7 +234,7 @@ function PostCard({
             onClick={() => onToggleLike(post.id, !!post.liked)}
           >
             <Heart
-              className={`h-4 w-4 ${post.liked ? "fill-[hsl(var(--performance-red))] text-[hsl(var(--performance-red))]" : ""}`}
+              className={`h-4 w-4 ${post.liked ? "fill-primary text-primary" : ""}`}
             />
             {post._count.likes}
           </Button>

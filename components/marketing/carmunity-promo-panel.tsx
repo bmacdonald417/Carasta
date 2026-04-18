@@ -196,7 +196,7 @@ export function CarmunityPromoPanel({
           {publishing ? "Publishing…" : "Publish to Carmunity"}
         </Button>
         <Button type="button" variant="outline" asChild>
-          <Link href="/explore">Open community feed</Link>
+          <Link href="/explore">Open Carmunity feed</Link>
         </Button>
       </div>
     </div>

@@ -15,7 +15,8 @@ export default async function SignInPage() {
           Welcome back
         </h1>
         <p className="text-muted-foreground">
-          Sign in to your account to bid, sell, and connect with the community.
+          Sign in to bid, sell, join Carmunity, and connect with other
+          enthusiasts.
         </p>
         <SignInForm googleEnabled={googleEnabled} />
       </div>

@@ -2,15 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { Gavel, Users, ShoppingBag, LayoutGrid } from "lucide-react";
+import {
+  Gavel,
+  Users,
+  ShoppingBag,
+  LayoutGrid,
+  MessageSquare,
+} from "lucide-react";
 
 const navItems = [
-  { href: "/", label: "Showroom", icon: LayoutGrid },
+  { href: "/", label: "Home", icon: LayoutGrid },
+  { href: "/explore", label: "Carmunity", icon: Users },
+  { href: "/forums", label: "Forums", icon: MessageSquare },
   { href: "/auctions", label: "Auctions", icon: Gavel },
-  { href: "/explore", label: "Community", icon: Users },
   { href: "/merch", label: "Merch", icon: ShoppingBag },
-];
+] as const;
 
 export function MobileBottomNav() {
   const pathname = usePathname();
@@ -24,8 +30,8 @@ export function MobileBottomNav() {
   if (hideNav) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0a0a0f]/95 backdrop-blur-xl lg:hidden">
-      <div className="flex justify-around py-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur-xl lg:hidden">
+      <div className="flex justify-around gap-0.5 py-1.5">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -33,14 +39,14 @@ export function MobileBottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-1 px-4 py-2 text-xs font-medium transition ${
+              className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 px-1 py-1.5 text-[10px] font-medium transition sm:text-xs ${
                 isActive
-                  ? "text-[#ff3b5c]"
+                  ? "text-primary"
                   : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
-              <Icon className="h-5 w-5" />
-              {label}
+              <Icon className="h-5 w-5 shrink-0" />
+              <span className="truncate">{label}</span>
             </Link>
           );
         })}

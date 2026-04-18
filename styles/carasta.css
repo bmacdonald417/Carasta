@@ -1,12 +1,12 @@
 /**
- * Carasta Cyber-Luxury theme — Futuristic design system.
- * Deep charcoal/black, red and gray accents.
+ * Carasta / Carmunity marketing chrome — aligns with styles/carmunity-tokens.css.
+ * Brand copper for glows; signal red reserved for live / bid affordances in components.
  */
 
 :root {
   /* Cyber-Luxury palette */
-  --carasta-bg: #0a0a0f;
-  --carasta-card-bg: rgba(18, 18, 24, 0.7);
+  --carasta-bg: #07080c;
+  --carasta-card-bg: rgba(16, 18, 26, 0.78);
   --carasta-white: #ffffff;
 
   /* Text — high contrast */
@@ -14,20 +14,21 @@
   --carasta-muted: #a1a1aa;
   --carasta-muted-dark: #71717a;
 
-  /* Borders — subtle with red glow potential */
-  --carasta-border: rgba(255, 255, 255, 0.08);
-  --carasta-border-glow: rgba(255, 59, 92, 0.3);
+  /* Borders — subtle; brand hover uses copper */
+  --carasta-border: rgba(255, 255, 255, 0.07);
+  --carasta-border-glow: rgba(232, 165, 75, 0.35);
 
-  /* Accent colors — red and gray */
+  /* Brand copper + signal red (auction only in UI code) */
+  --carasta-brand-copper: #e8a54b;
   --carasta-neon-blue: #ff3b5c;
-  --carasta-neon-lime: #CCFF00;
-  --carasta-blue: #ff3b5c;
+  --carasta-neon-lime: #ccff00;
+  --carasta-blue: #e8a54b;
   --carasta-red: #ff3b5c;
 
   /* Glassmorphism */
-  --carasta-glass-bg: rgba(10, 10, 15, 0.8);
-  --carasta-glass-border: rgba(255, 255, 255, 0.06);
-  --carasta-glass-border-glow: rgba(255, 59, 92, 0.15);
+  --carasta-glass-bg: rgba(7, 8, 12, 0.88);
+  --carasta-glass-border: rgba(255, 255, 255, 0.055);
+  --carasta-glass-border-glow: rgba(232, 165, 75, 0.18);
 
   /* Typography */
   --carasta-font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
@@ -71,7 +72,7 @@ body.carasta-theme .carasta-body {
 
 .carasta-card:hover {
   border-color: var(--carasta-border-glow);
-  box-shadow: 0 4px 32px rgba(255, 59, 92, 0.08);
+  box-shadow: 0 4px 32px rgba(232, 165, 75, 0.1);
 }
 
 /* Glassmorphism header/nav */
@@ -83,9 +84,9 @@ body.carasta-theme .carasta-body {
 }
 
 .carasta-glass-scrolled {
-  background: rgba(10, 10, 15, 0.95);
-  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.3),
-    0 0 40px rgba(255, 59, 92, 0.03);
+  background: rgba(7, 8, 12, 0.96);
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.35),
+    0 0 40px rgba(232, 165, 75, 0.04);
 }
 
 /* Container */
@@ -106,7 +107,7 @@ body.carasta-theme .carasta-body {
 
 /* Neon glow utilities */
 .neon-glow-blue {
-  box-shadow: 0 0 20px rgba(255, 59, 92, 0.3);
+  box-shadow: 0 0 20px rgba(232, 165, 75, 0.28);
 }
 
 .neon-glow-lime {
@@ -114,8 +115,8 @@ body.carasta-theme .carasta-body {
 }
 
 .neon-text-blue {
-  color: var(--carasta-neon-blue);
-  text-shadow: 0 0 20px rgba(255, 59, 92, 0.5);
+  color: var(--carasta-brand-copper);
+  text-shadow: 0 0 20px rgba(232, 165, 75, 0.45);
 }
 
 .neon-text-lime {

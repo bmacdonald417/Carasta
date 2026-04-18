@@ -62,7 +62,7 @@ export function AuctionCard({
         initial="hidden"
         animate="visible"
       >
-        <Card className="group overflow-hidden border-white/10 bg-white/5 transition-all duration-300 hover:border-[#ff3b5c]/30 hover:shadow-lg hover:shadow-[#ff3b5c]/5">
+        <Card className="group overflow-hidden border-border/60 bg-card/50 transition-all duration-300 hover:border-signal/30 hover:shadow-lg">
           <div className="relative aspect-video w-full overflow-hidden bg-neutral-900">
             <Image
               src={img}
@@ -85,7 +85,7 @@ export function AuctionCard({
             {/* LIVE badge — futuristic pulse */}
             {isLive && (
               <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-                <div className="live-pulse flex items-center gap-1.5 rounded-full border border-[#ff3b5c]/50 bg-[#ff3b5c]/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow-lg shadow-[#ff3b5c]/30">
+                <div className="live-pulse flex items-center gap-1.5 rounded-full border border-signal/50 bg-signal/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow-lg shadow-signal/30">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
                   Live
                 </div>
@@ -109,14 +109,14 @@ export function AuctionCard({
               </div>
             )}
           </div>
-          <CardContent className="border-t border-white/5 bg-white/[0.02] p-4 backdrop-blur-sm">
+          <CardContent className="border-t border-border/40 bg-card/40 p-4 backdrop-blur-sm">
             <p className="text-xs text-neutral-500">
               {auction.year} {auction.make} {auction.model}
             </p>
             <h2 className="mt-1 font-display text-lg font-semibold tracking-tight line-clamp-1 text-neutral-100">
               {auction.title}
             </h2>
-            <p className="mt-2 text-lg font-semibold text-[#ff3b5c]">
+            <p className="mt-2 text-lg font-semibold text-signal">
               {formatCurrency(highBidCents)}
               <span className="ml-1 text-sm font-normal text-neutral-500">
                 high bid

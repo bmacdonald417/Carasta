@@ -160,7 +160,7 @@ export function CampaignForm({
               <SelectItem value="social">Social</SelectItem>
               <SelectItem value="email">Email</SelectItem>
               <SelectItem value="featured">Featured</SelectItem>
-              <SelectItem value="community">Community</SelectItem>
+              <SelectItem value="community">Carmunity</SelectItem>
             </SelectContent>
           </Select>
         </div>

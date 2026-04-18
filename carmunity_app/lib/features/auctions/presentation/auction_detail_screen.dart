@@ -248,7 +248,7 @@ class _DetailBody extends StatelessWidget {
               minHeight: 8,
               value: (auction.reserveMeterPercent!.clamp(0, 100)) / 100.0,
               backgroundColor: AppColors.surfaceElevated,
-              color: AppColors.accent,
+              color: AppColors.auctionSignal,
             ),
           ),
         ],
@@ -374,13 +374,13 @@ class _MetaRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: emphasize ? AppColors.accent : AppColors.textTertiary),
+          Icon(icon, size: 20, color: emphasize ? AppColors.auctionSignal : AppColors.textTertiary),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               label,
               style: emphasize
-                  ? Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.accent)
+                  ? Theme.of(context).textTheme.titleMedium?.copyWith(color: AppColors.auctionSignal)
                   : Theme.of(context).textTheme.bodyMedium,
             ),
           ),

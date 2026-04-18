@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { getSession } from "@/lib/auth";
 import { CommunityFeed } from "./community-feed";
 import { TrendingDreamGarage } from "./TrendingDreamGarage";
@@ -17,10 +19,16 @@ export default async function ExplorePage({
   return (
     <div className="carasta-container max-w-2xl py-8">
       <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
-        Community
+        Carmunity
       </h1>
-      <p className="mt-1 text-neutral-400">
-        Posts from the community. Follow people to see them in Following.
+      <p className="mt-1 text-sm text-neutral-500">by Carasta</p>
+      <p className="mt-2 text-neutral-400">
+        Feed posts from builders and collectors. Follow people to see them in
+        Following — or jump to{" "}
+        <Link href="/forums" className="text-primary hover:underline">
+          Forums
+        </Link>{" "}
+        for threaded discussions.
       </p>
       <TrendingDreamGarage />
       <CommunityFeed tab={tab} currentUserId={currentUserId} />

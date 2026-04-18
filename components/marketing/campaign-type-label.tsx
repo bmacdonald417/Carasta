@@ -7,7 +7,7 @@ const LABELS: Record<MarketingCampaignType, string> = {
   social: "Social",
   email: "Email",
   featured: "Featured",
-  community: "Community",
+  community: "Carmunity",
 };
 
 export function campaignTypeLabel(type: string): string {

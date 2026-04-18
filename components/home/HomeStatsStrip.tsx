@@ -15,7 +15,7 @@ function StatItem({
 }) {
   const content = (
     <>
-      <Icon className="h-4 w-4 shrink-0 text-[#ff3b5c]/80" />
+      <Icon className="h-4 w-4 shrink-0 text-primary/85" />
       <span className="font-display text-lg font-semibold tabular-nums text-neutral-100 md:text-xl">
         {value.toLocaleString()}
       </span>
@@ -68,7 +68,7 @@ export function HomeStatsStrip({ stats }: { stats: HomeStats }) {
           <StatItem
             icon={FileText}
             value={stats.communityPosts}
-            label="Community posts"
+            label="Carmunity posts"
             href="/explore"
           />
         </div>

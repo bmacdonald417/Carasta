@@ -22,9 +22,12 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Carasta | Premium Collector Car Auctions",
+  title: {
+    default: "Carmunity by Carasta | Social-first automotive platform",
+    template: "%s | Carmunity by Carasta",
+  },
   description:
-    "Bid on exceptional collector cars. Join the community of enthusiasts.",
+    "Carmunity by Carasta — connect with gearheads, browse forums, show your garage, and bid on collector cars in one system.",
 };
 
 export default function RootLayout({
@@ -35,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`carasta-theme ${inter.variable} ${oswald.variable} ${playfair.variable} min-h-screen font-sans antialiased bg-[#0a0a0f] text-neutral-100`}
+        className={`carasta-theme ${inter.variable} ${oswald.variable} ${playfair.variable} min-h-screen bg-background font-sans antialiased text-foreground`}
       >
         <Providers>
           <CarastaLayout>{children}</CarastaLayout>

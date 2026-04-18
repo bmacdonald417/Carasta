@@ -106,7 +106,7 @@ export async function addCarmunityComment(input: {
   broadcastActivityEvent({
     type: "new_comment",
     postId: input.postId,
-    label: "New comment in community",
+    label: "New comment in Carmunity",
     timestamp: new Date().toISOString(),
   });
 

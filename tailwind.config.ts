@@ -30,6 +30,8 @@ const config: Config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        /** Auction / bid / live urgency — not general brand */
+        signal: "hsl(var(--performance-red))",
         "performance-red": "hsl(var(--performance-red))",
         "reserve-emerald": "hsl(var(--reserve-emerald))",
         "neon-blue": "hsl(var(--neon-blue))",

@@ -23,8 +23,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 
 const navLinks = [
+  { href: "/explore", label: "Carmunity" },
+  { href: "/forums", label: "Forums" },
   { href: "/auctions", label: "Auctions" },
-  { href: "/explore", label: "Community" },
   { href: "/sell", label: "Sell" },
 ];
 
@@ -92,7 +93,7 @@ export function Nav() {
                       onClick={() => setOpen(false)}
                     >
                       <User className="mr-2 h-4 w-4" />
-                      Profile
+                      You
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

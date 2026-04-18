@@ -6,6 +6,7 @@ import 'app_spacing.dart';
 import 'app_typography.dart';
 
 /// Dark-first Material 3 theme for Carmunity by Carasta.
+/// Brand chrome uses [AppColors.accent] (copper). Auction bid / urgency uses [AppColors.auctionSignal].
 class AppTheme {
   static ThemeData dark() {
     final textTheme = AppTypography.buildTextTheme();
@@ -25,6 +26,11 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
       textTheme: textTheme,
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: AppColors.accent.withOpacity(0.22),
+      ),
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,

@@ -33,7 +33,7 @@ export function marketingSourceLabel(source: MarketingTrafficSource): string {
     case MarketingTrafficSource.EMAIL:
       return "Email";
     case MarketingTrafficSource.CARMUNITY:
-      return "Carmunity / community";
+      return "Carmunity";
     case MarketingTrafficSource.UNKNOWN:
       return "Unknown";
     default:

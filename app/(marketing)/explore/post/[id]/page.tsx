@@ -53,7 +53,7 @@ export default async function PostDetailPage({
         href="/explore"
         className="text-sm text-muted-foreground hover:text-foreground"
       >
-        ← Community
+        ← Carmunity
       </Link>
 
       <Card className="mt-4">

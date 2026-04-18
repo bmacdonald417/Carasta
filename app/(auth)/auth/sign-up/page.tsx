@@ -21,8 +21,8 @@ export default async function SignUpPage({
           Create an account
         </h1>
         <p className="text-muted-foreground">
-          Join the community. Bid on cars, build your garage, and connect with
-          enthusiasts.
+          Join Carmunity by Carasta — bid on cars, build your garage, join
+          forums, and connect with enthusiasts.
         </p>
         <SignUpForm googleEnabled={googleEnabled} callbackUrl={callbackUrl} />
       </div>

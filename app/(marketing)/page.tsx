@@ -28,7 +28,7 @@ function AuctionSection({
 }) {
   if (auctions.length === 0) return null;
   return (
-    <section className="border-t border-white/10 bg-white/[0.02] py-12 md:py-16">
+    <section className="border-t border-border/60 bg-card/30 py-12 md:py-16">
       <div className="carasta-container">
         <div className="flex items-end justify-between gap-4">
           <div>
@@ -39,7 +39,7 @@ function AuctionSection({
           </div>
           <Link
             href={viewAllHref}
-            className="hidden shrink-0 items-center gap-2 rounded-lg border border-[#ff3b5c]/30 bg-[#ff3b5c]/10 px-4 py-2.5 font-medium text-[#ff3b5c] transition hover:bg-[#ff3b5c]/20 md:inline-flex"
+            className="hidden shrink-0 items-center gap-2 rounded-lg border border-signal/35 bg-signal/10 px-4 py-2.5 font-medium text-signal transition hover:bg-signal/20 md:inline-flex"
           >
             View all
             <Gavel className="h-4 w-4" />
@@ -71,7 +71,7 @@ function AuctionSection({
         <div className="mt-6 text-center md:hidden">
           <Link
             href={viewAllHref}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#ff3b5c]/20 px-4 py-2.5 font-medium text-[#ff3b5c] transition hover:bg-[#ff3b5c]/30"
+            className="inline-flex items-center gap-2 rounded-lg bg-signal/15 px-4 py-2.5 font-medium text-signal transition hover:bg-signal/25"
           >
             View all
             <Gavel className="h-4 w-4" />
@@ -115,7 +115,7 @@ export default async function HomePage() {
     recentAuctions.length > 0 ? recentAuctions : endingSoonAuctions;
 
   return (
-    <div className="bg-[#0a0a0f]">
+    <div className="bg-background">
       {/* Scrolling auction image strip */}
       <AuctionImageStrip
         auctions={stripAuctions.map((a) => ({
@@ -132,7 +132,7 @@ export default async function HomePage() {
       <HomeStatsStrip stats={homeStats} />
 
       {/* Live Activity Feed */}
-      <section className="border-t border-white/10 py-8">
+      <section className="border-t border-border/60 py-8">
         <div className="carasta-container">
           <div className="mx-auto max-w-sm">
             <LiveActivityFeed />
@@ -160,15 +160,15 @@ export default async function HomePage() {
 
       {/* Fallback when no auctions */}
       {endingSoonAuctions.length === 0 && recentAuctions.length === 0 && (
-        <section className="border-t border-white/10 py-16 md:py-24">
+        <section className="border-t border-border/60 py-16 md:py-24">
           <div className="carasta-container">
-            <div className="rounded-2xl border border-white/10 bg-white/5 py-16 text-center">
+            <div className="rounded-2xl border border-border/60 bg-card/50 py-16 text-center">
               <p className="text-neutral-400">
                 No live auctions at the moment. Check back soon.
               </p>
               <Link
                 href="/auctions"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#ff3b5c] hover:underline"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-signal hover:underline"
               >
                 Browse Auctions
                 <Gavel className="h-4 w-4" />
@@ -182,14 +182,15 @@ export default async function HomePage() {
       <InstagramShowcase />
 
       {/* Value proposition + Download App */}
-      <section className="border-t border-white/10 bg-white/[0.02] py-16 md:py-24">
+      <section className="border-t border-border/60 bg-card/25 py-16 md:py-24">
         <div className="carasta-container text-center">
           <h2 className="font-display text-2xl font-semibold uppercase tracking-[0.1em] text-neutral-100 md:text-3xl">
             Built by Enthusiasts, for Enthusiasts.
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-neutral-400">
-            A premium car auction experience with transparent bidding, reserve
-            meters, anti-sniping, and a connected community of collectors.
+            Carmunity by Carasta — a social-first home for gearheads and
+            collectors, with transparent auctions: bidding, reserve meters,
+            anti-sniping, and real listings.
           </p>
           <p className="mt-6 text-sm font-medium text-neutral-500">
             Download the app

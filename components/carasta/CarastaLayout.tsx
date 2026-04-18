@@ -27,8 +27,9 @@ const marketingNav = [
 ];
 
 const appNav = [
+  { href: "/explore", label: "Carmunity" },
+  { href: "/forums", label: "Forums" },
   { href: "/auctions", label: "Auctions" },
-  { href: "/explore", label: "Community" },
   { href: "/sell", label: "Sell" },
 ];
 
@@ -44,27 +45,20 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const isMarketing =
-    pathname === "/" ||
-    pathname === "/how-it-works" ||
-    pathname === "/contact" ||
-    pathname === "/terms" ||
-    pathname === "/privacy";
-
   return (
-    <div className="carasta-theme flex min-h-screen flex-col bg-[#0a0a0f]">
+    <div className="carasta-theme flex min-h-screen flex-col bg-background">
       {/* Sticky glassmorphism header — cyber-luxury */}
       <motion.header
         className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
           scrolled
-            ? "border-white/10 bg-[#0a0a0f]/95 shadow-lg shadow-black/20 backdrop-blur-xl"
+            ? "border-border/70 bg-background/95 shadow-lg shadow-black/25 backdrop-blur-xl"
             : "border-transparent bg-transparent"
         }`}
         initial={false}
         animate={{
           backgroundColor: scrolled
-            ? "rgba(10, 10, 15, 0.95)"
-            : "rgba(10, 10, 15, 0)",
+            ? "rgba(7, 8, 12, 0.95)"
+            : "rgba(7, 8, 12, 0)",
           backdropFilter: scrolled ? "blur(20px)" : "blur(0px)",
         }}
         transition={{ duration: 0.3 }}
@@ -95,29 +89,36 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 href={href}
                 className={`font-medium transition ${
                   pathname === href
-                    ? "text-[#ff3b5c]"
+                    ? "text-primary"
                     : "text-neutral-400 hover:text-neutral-100"
                 }`}
               >
                 {label}
               </Link>
             ))}
-            {appNav.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="text-neutral-400 transition hover:text-neutral-100"
-              >
-                {label}
-              </Link>
-            ))}
+            {appNav.map(({ href, label }) => {
+              const appActive = pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`transition ${
+                    appActive
+                      ? "font-medium text-primary"
+                      : "text-neutral-400 hover:text-neutral-100"
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
             {status === "loading" ? (
               <span className="text-neutral-500">…</span>
             ) : session ? (
               <>
                 <NotificationDropdown />
                 <DropdownMenu>
-                <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-[#0a0a0f] focus:ring-2 focus:ring-[#ff3b5c]">
+                <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-background focus:ring-2 focus:ring-ring">
                   <Avatar className="h-8 w-8 border border-white/10">
                     <AvatarImage src={session.user?.image ?? undefined} />
                     <AvatarFallback className="bg-neutral-800 text-xs text-neutral-300">
@@ -137,7 +138,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                           : "/settings"
                       }
                     >
-                      Profile
+                      You
                     </Link>
                   </DropdownMenuItem>
                   {(session.user as any)?.handle && (
@@ -181,7 +182,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             ) : (
               <Link
                 href="/auth/sign-in"
-                className="font-medium text-neutral-400 transition hover:text-[#ff3b5c]"
+                className="font-medium text-neutral-400 transition hover:text-primary"
               >
                 Sign in
               </Link>
@@ -192,13 +193,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex flex-1">
         <AppSidebar />
-        <main
-          className={`min-w-0 flex-1 pb-16 lg:pb-0 ${
-            isMarketing
-              ? "bg-[#0a0a0f] text-neutral-100"
-              : "bg-background text-foreground"
-          }`}
-        >
+        <main className="min-w-0 flex-1 bg-background pb-16 text-foreground lg:pb-0">
           {children}
         </main>
       </div>
@@ -207,7 +202,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
       {/* Footer — cyber-luxury with neon accent */}
       <footer className="mt-auto">
-        <div className="relative border-t border-white/10 bg-[#0a0a0f] pt-16 pb-24 md:pt-20 md:pb-28">
+        <div className="relative border-t border-border/60 bg-background pt-16 pb-24 md:pt-20 md:pb-28">
           <div className="carasta-container">
             <div className="flex flex-col items-center gap-10 md:flex-row md:items-start md:justify-between">
               <div className="flex items-center gap-2">
@@ -237,30 +232,36 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 </p>
                 <a
                   href="mailto:info@carasta.com"
-                  className="text-[#ff3b5c]/90 hover:text-[#ff3b5c]"
+                  className="text-primary/90 hover:text-primary"
                 >
                   info@carasta.com
                 </a>
               </div>
             </div>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#ff3b5c]/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
         </div>
-        <div className="border-t border-white/10 bg-[#0a0a0f] py-6">
+        <div className="border-t border-border/60 bg-background py-6">
           <div className="carasta-container flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
-            <p className="text-sm text-neutral-500">
-              © {new Date().getFullYear()} Carasta. All rights reserved.
-            </p>
+            <div className="text-center md:text-left">
+              <p className="text-sm text-neutral-500">
+                © {new Date().getFullYear()} Carasta. All rights reserved.
+              </p>
+              <p className="mt-1 text-xs text-neutral-600">
+                Carmunity by Carasta — feed, forums, garage, and auctions in
+                one place.
+              </p>
+            </div>
             <nav className="flex gap-6 text-sm">
               <Link
                 href="/terms"
-                className="text-neutral-500 transition hover:text-[#ff3b5c]"
+                className="text-neutral-500 transition hover:text-primary"
               >
                 Terms &amp; Conditions
               </Link>
               <Link
                 href="/privacy"
-                className="text-neutral-500 transition hover:text-[#ff3b5c]"
+                className="text-neutral-500 transition hover:text-primary"
               >
                 Privacy Policy
               </Link>

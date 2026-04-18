@@ -13,7 +13,7 @@ export default async function LeaderboardPage() {
         href="/explore"
         className="text-sm text-muted-foreground hover:text-foreground"
       >
-        ← Community
+        ← Carmunity
       </Link>
       <h1 className="mt-6 font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
         Leaderboard

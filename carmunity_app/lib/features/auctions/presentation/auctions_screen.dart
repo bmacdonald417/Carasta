@@ -372,7 +372,7 @@ class _AuctionCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       formatAuctionBidLine(item.highBidCents, item.bidCount),
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.accent),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.auctionSignal),
                     ),
                     const SizedBox(height: AppSpacing.xxs),
                     Row(

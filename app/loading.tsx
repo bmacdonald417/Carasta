@@ -14,7 +14,7 @@ export default function Loading() {
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="absolute h-full w-full rounded-lg border-2 border-[#ff3b5c]/30"
+            className="absolute h-full w-full rounded-lg border-2 border-primary/30"
             animate={{
               scale: [1, 1.2, 1],
               opacity: [0.5, 0.2, 0.5],
@@ -26,7 +26,7 @@ export default function Loading() {
             }}
           />
           <motion.div
-            className="absolute h-3/4 w-3/4 rounded-lg border-2 border-[#ff3b5c]/50"
+            className="absolute h-3/4 w-3/4 rounded-lg border-2 border-primary/50"
             animate={{
               scale: [1, 1.15, 1],
               opacity: [0.7, 0.3, 0.7],
@@ -39,7 +39,7 @@ export default function Loading() {
             }}
           />
           <motion.div
-            className="absolute h-1/2 w-1/2 rounded-lg border-2 border-[#ff3b5c]"
+            className="absolute h-1/2 w-1/2 rounded-lg border-2 border-primary"
             animate={{
               scale: [1, 1.1, 1],
               opacity: [1, 0.5, 1],

@@ -33,12 +33,12 @@ export function TrendingDreamGarage() {
 
   return (
     <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-      <h2 className="flex items-center gap-2 font-display text-lg font-semibold uppercase tracking-wider text-[#ff3b5c]">
+      <h2 className="flex items-center gap-2 font-display text-lg font-semibold uppercase tracking-wider text-primary">
         <Car className="h-5 w-5" />
         Trending Dream Garage
       </h2>
       <p className="mt-1 text-sm text-neutral-500">
-        Dream cars from the community
+        Dream cars from Carmunity
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cars.map((car, i) => (

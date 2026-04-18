@@ -14,12 +14,14 @@ import {
   LayoutGrid,
   ListOrdered,
   Megaphone,
+  MessageSquare,
 } from "lucide-react";
 
 const mainNav = [
-  { href: "/", label: "Showroom", icon: LayoutGrid },
+  { href: "/", label: "Home", icon: LayoutGrid },
+  { href: "/explore", label: "Carmunity", icon: Users },
+  { href: "/forums", label: "Forums", icon: MessageSquare },
   { href: "/auctions", label: "Auctions", icon: Gavel },
-  { href: "/explore", label: "Community", icon: Users },
   { href: "/sell", label: "Sell", icon: PlusCircle },
 ] as const;
 
@@ -33,7 +35,7 @@ export function AppSidebar() {
   );
 
   return (
-    <aside className="hidden w-56 shrink-0 border-r border-white/10 bg-[#0a0a0f]/50 backdrop-blur-sm lg:block">
+    <aside className="hidden w-56 shrink-0 border-r border-border/60 bg-card/40 backdrop-blur-sm lg:block">
       <nav className="sticky top-20 space-y-1 p-4">
         {mainNav.map(({ href, label, icon: Icon }) => {
           const isActive =
@@ -52,7 +54,7 @@ export function AppSidebar() {
                   <motion.div
                     className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                       isActive && !listingsActive && !marketingActive
-                        ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
+                        ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
                         : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                     }`}
                     whileHover={hoverScale}
@@ -67,7 +69,7 @@ export function AppSidebar() {
                     <motion.div
                       className={`flex items-center gap-2 rounded-lg py-2 pl-9 pr-3 text-xs font-medium transition ${
                         listingsActive
-                          ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-md shadow-[#ff3b5c]/15"
+                          ? "bg-primary/90 text-primary-foreground shadow-md shadow-black/30"
                           : "text-neutral-500 hover:bg-white/5 hover:text-neutral-200"
                       }`}
                       whileHover={hoverScale}
@@ -83,7 +85,7 @@ export function AppSidebar() {
                     <motion.div
                       className={`flex items-center gap-2 rounded-lg py-2 pl-9 pr-3 text-xs font-medium transition ${
                         marketingActive
-                          ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-md shadow-[#ff3b5c]/15"
+                          ? "bg-primary/90 text-primary-foreground shadow-md shadow-black/30"
                           : "text-neutral-500 hover:bg-white/5 hover:text-neutral-200"
                       }`}
                       whileHover={hoverScale}
@@ -102,7 +104,7 @@ export function AppSidebar() {
               <motion.div
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                   isActive
-                    ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
+                    ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
                     : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                 }`}
                 whileHover={hoverScale}
@@ -114,7 +116,7 @@ export function AppSidebar() {
             </Link>
           );
         })}
-        <div className="my-4 border-t border-white/10" />
+        <div className="my-4 border-t border-border/50" />
         <Link
           href={
             session?.user
@@ -125,7 +127,7 @@ export function AppSidebar() {
           <motion.div
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               pathname.includes("/garage")
-                ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
+                ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
                 : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
             }`}
             whileHover={hoverScale}
@@ -139,7 +141,7 @@ export function AppSidebar() {
           <motion.div
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               pathname.startsWith("/merch")
-                ? "bg-[#ff3b5c]/90 text-[#0a0a0f] shadow-lg shadow-[#ff3b5c]/20"
+                ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
                 : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
             }`}
             whileHover={hoverScale}

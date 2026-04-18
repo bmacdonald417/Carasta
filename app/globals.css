@@ -1,37 +1,9 @@
 @import "../styles/carasta.css";
+@import "../styles/carmunity-tokens.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer base {
-  :root {
-    /* Cyber-Luxury dark theme */
-    --background: 240 10% 4%;
-    --foreground: 240 5% 96%;
-    --card: 240 10% 6%;
-    --card-foreground: 240 5% 96%;
-    --popover: 240 10% 6%;
-    --popover-foreground: 240 5% 96%;
-    --primary: 348 100% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 6% 10%;
-    --secondary-foreground: 240 5% 96%;
-    --muted: 240 6% 10%;
-    --muted-foreground: 240 5% 64%;
-    --accent: 72 100% 50%;
-    --accent-foreground: 240 10% 4%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 16%;
-    --input: 240 6% 16%;
-    --ring: 348 100% 60%;
-    --performance-red: 348 100% 60%;
-    --reserve-emerald: 160 84% 39%;
-    --neon-blue: 348 100% 60%;
-    --neon-lime: 72 100% 50%;
-  }
-}
 
 @layer base {
   * {
@@ -47,7 +19,7 @@
   @apply bg-card/80 backdrop-blur-xl border border-border/50;
 }
 
-/* Reserve meter gradient — red → amber → emerald */
+/* Reserve meter gradient — signal red → amber → emerald */
 .reserve-meter {
   background: linear-gradient(
     to right,
@@ -59,7 +31,7 @@
 
 /* Cyber glassmorphism */
 .glass-enterprise {
-  background: rgba(18, 18, 24, 0.8);
+  background: rgba(12, 14, 20, 0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.06);
