@@ -155,3 +155,5 @@ Locked decisions are in **§5** below.
 
 - `CARMUNITY_DISCUSSIONS_TAXONOMY.md` — 20 Gears × 5–10 Lower Gears.
 - `CARMUNITY_LEGAL_UX_IMPLEMENTATION_NOTES.md` — consent UX and counsel-review process.
+- `CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md` — curated demo users, threads, flags, and cleanup.
+- `CARMUNITY_PHASE_E_DISCUSSIONS_EXPANSION.md` — Phase E social Discussions expansion (this release).

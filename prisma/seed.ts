@@ -1,6 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 
+import { ensureBadgesAndDiscussionReactions } from "./seed-badges-reactions";
+import { ensureDemoDiscussionSeed } from "./seed-demo-discussions";
+import { ensureTaxonomyGearsFromDoc } from "./seed-taxonomy-gears";
+
 const prisma = new PrismaClient();
 
 // Demo images — Unsplash collector cars
@@ -98,6 +102,9 @@ async function ensureForumSpacesAndCategories() {
 
 async function main() {
   await ensureForumSpacesAndCategories();
+  await ensureTaxonomyGearsFromDoc(prisma);
+  await ensureDemoDiscussionSeed(prisma);
+  await ensureBadgesAndDiscussionReactions(prisma);
 
   const existingCount = await prisma.auction.count();
   if (existingCount > 0) {

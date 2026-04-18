@@ -1,7 +1,16 @@
+import type { DiscussionReactionKind } from "@prisma/client";
+
 import { prisma } from "@/lib/db";
 
 export type ForumServiceError = { ok: false; error: string };
 export type ForumServiceOk<T extends object> = { ok: true } & T;
+
+export type DiscussionReactionTotals = {
+  total: number;
+  byKind: Partial<Record<DiscussionReactionKind, number>>;
+};
+
+export type DiscussionSortMode = "trending" | "new" | "top";
 
 const authorSelect = {
   id: true,
@@ -9,6 +18,64 @@ const authorSelect = {
   name: true,
   avatarUrl: true,
 } as const;
+
+const authorWithBadgesSelect = {
+  id: true,
+  handle: true,
+  name: true,
+  avatarUrl: true,
+  userBadges: {
+    orderBy: { awardedAt: "desc" as const },
+    take: 6,
+    select: {
+      badge: { select: { slug: true, name: true } },
+    },
+  },
+} as const;
+
+function emptyReactionSummary(): DiscussionReactionTotals {
+  return { total: 0, byKind: {} };
+}
+
+async function summarizeThreadReactionsForMany(
+  threadIds: string[]
+): Promise<Map<string, DiscussionReactionTotals>> {
+  const map = new Map<string, DiscussionReactionTotals>();
+  if (threadIds.length === 0) return map;
+  for (const id of threadIds) map.set(id, emptyReactionSummary());
+  const rows = await prisma.forumThreadReaction.groupBy({
+    by: ["threadId", "kind"],
+    where: { threadId: { in: threadIds } },
+    _count: { _all: true },
+  });
+  for (const row of rows) {
+    const cur = map.get(row.threadId) ?? emptyReactionSummary();
+    cur.byKind[row.kind] = (cur.byKind[row.kind] ?? 0) + row._count._all;
+    cur.total += row._count._all;
+    map.set(row.threadId, cur);
+  }
+  return map;
+}
+
+async function summarizeReplyReactionsForMany(
+  replyIds: string[]
+): Promise<Map<string, DiscussionReactionTotals>> {
+  const map = new Map<string, DiscussionReactionTotals>();
+  if (replyIds.length === 0) return map;
+  for (const id of replyIds) map.set(id, emptyReactionSummary());
+  const rows = await prisma.forumReplyReaction.groupBy({
+    by: ["replyId", "kind"],
+    where: { replyId: { in: replyIds } },
+    _count: { _all: true },
+  });
+  for (const row of rows) {
+    const cur = map.get(row.replyId) ?? emptyReactionSummary();
+    cur.byKind[row.kind] = (cur.byKind[row.kind] ?? 0) + row._count._all;
+    cur.total += row._count._all;
+    map.set(row.replyId, cur);
+  }
+  return map;
+}
 
 export async function listForumSpaces(): Promise<
   ForumServiceOk<{
@@ -42,6 +109,50 @@ export async function listForumSpaces(): Promise<
   };
 }
 
+/** @deprecated Use `getLowerGearBySlugs` in new code — same resolver (ForumCategory). */
+export async function getForumCategoryBySpaceAndCategorySlug(
+  gearSlug: string,
+  lowerGearSlug: string
+): Promise<
+  ForumServiceOk<{
+    category: {
+      id: string;
+      slug: string;
+      title: string;
+      description: string | null;
+      sortOrder: number;
+      space: { id: string; slug: string; title: string; description: string | null };
+    };
+  }> | { ok: false; error: string }
+> {
+  const row = await prisma.forumCategory.findFirst({
+    where: {
+      slug: lowerGearSlug,
+      space: { slug: gearSlug, isActive: true },
+    },
+    include: {
+      space: { select: { id: true, slug: true, title: true, description: true } },
+    },
+  });
+  if (!row) {
+    return { ok: false, error: "Lower Gear not found." };
+  }
+  return {
+    ok: true,
+    category: {
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      description: row.description,
+      sortOrder: row.sortOrder,
+      space: row.space,
+    },
+  };
+}
+
+/** Resolve Lower Gear (ForumCategory) within a Gear (ForumSpace) by public slugs. */
+export const getLowerGearBySlugs = getForumCategoryBySpaceAndCategorySlug;
+
 export async function getForumSpaceBySlug(slug: string): Promise<
   ForumServiceOk<{
     space: {
@@ -74,7 +185,7 @@ export async function getForumSpaceBySlug(slug: string): Promise<
     },
   });
   if (!space) {
-    return { ok: false, error: "Forum space not found." };
+    return { ok: false, error: "Gear not found." };
   }
   return {
     ok: true,
@@ -97,10 +208,9 @@ export async function getForumSpaceBySlug(slug: string): Promise<
   };
 }
 
-export async function listThreadsForCategory(input: {
-  categoryId: string;
+export async function listRecentThreadsForGear(input: {
+  spaceId: string;
   take?: number;
-  cursor?: string;
 }): Promise<
   ForumServiceOk<{
     threads: Array<{
@@ -109,12 +219,68 @@ export async function listThreadsForCategory(input: {
       replyCount: number;
       lastActivityAt: string;
       createdAt: string;
+      demoSeed: boolean;
+      reactionSummary: DiscussionReactionTotals;
+      category: { slug: string; gearSlug: string };
+      author: { id: string; handle: string; name: string | null; avatarUrl: string | null };
+    }>;
+  }>
+> {
+  const take = Math.min(Math.max(input.take ?? 12, 1), 30);
+  const threads = await prisma.forumThread.findMany({
+    where: { category: { spaceId: input.spaceId } },
+    orderBy: { lastActivityAt: "desc" },
+    take,
+    include: {
+      author: { select: authorSelect },
+      category: { select: { slug: true, space: { select: { slug: true } } } },
+    },
+  });
+  const ids = threads.map((t) => t.id);
+  const rx = await summarizeThreadReactionsForMany(ids);
+  return {
+    ok: true,
+    threads: threads.map((t) => ({
+      id: t.id,
+      title: t.title,
+      replyCount: t.replyCount,
+      lastActivityAt: t.lastActivityAt.toISOString(),
+      createdAt: t.createdAt.toISOString(),
+      demoSeed: t.isDemoSeed,
+      reactionSummary: rx.get(t.id) ?? emptyReactionSummary(),
+      category: { slug: t.category.slug, gearSlug: t.category.space.slug },
+      author: {
+        id: t.author.id,
+        handle: t.author.handle,
+        name: t.author.name,
+        avatarUrl: t.author.avatarUrl,
+      },
+    })),
+  };
+}
+
+export async function listThreadsForCategory(input: {
+  categoryId: string;
+  take?: number;
+  cursor?: string;
+  sort?: DiscussionSortMode;
+}): Promise<
+  ForumServiceOk<{
+    threads: Array<{
+      id: string;
+      title: string;
+      replyCount: number;
+      lastActivityAt: string;
+      createdAt: string;
+      demoSeed: boolean;
+      reactionSummary: DiscussionReactionTotals;
       author: { id: string; handle: string; name: string | null; avatarUrl: string | null };
     }>;
     nextCursor: string | null;
   }> | { ok: false; error: string }
 > {
   const take = Math.min(Math.max(input.take ?? 20, 1), 50);
+  const sort: DiscussionSortMode = input.sort ?? "trending";
   const cat = await prisma.forumCategory.findUnique({
     where: { id: input.categoryId },
     select: { id: true },
@@ -122,6 +288,13 @@ export async function listThreadsForCategory(input: {
   if (!cat) {
     return { ok: false, error: "Category not found." };
   }
+
+  const orderBy =
+    sort === "new"
+      ? { createdAt: "desc" as const }
+      : sort === "top"
+        ? { replyCount: "desc" as const }
+        : { lastActivityAt: "desc" as const };
 
   const threads = await prisma.forumThread.findMany({
     where: { categoryId: input.categoryId },
@@ -132,7 +305,7 @@ export async function listThreadsForCategory(input: {
           cursor: { id: input.cursor },
         }
       : {}),
-    orderBy: { lastActivityAt: "desc" },
+    orderBy,
     include: {
       author: { select: authorSelect },
     },
@@ -141,6 +314,7 @@ export async function listThreadsForCategory(input: {
   const hasMore = threads.length > take;
   const slice = hasMore ? threads.slice(0, take) : threads;
   const nextCursor = hasMore ? slice[slice.length - 1]!.id : null;
+  const rx = await summarizeThreadReactionsForMany(slice.map((t) => t.id));
 
   return {
     ok: true,
@@ -150,6 +324,8 @@ export async function listThreadsForCategory(input: {
       replyCount: t.replyCount,
       lastActivityAt: t.lastActivityAt.toISOString(),
       createdAt: t.createdAt.toISOString(),
+      demoSeed: t.isDemoSeed,
+      reactionSummary: rx.get(t.id) ?? emptyReactionSummary(),
       author: {
         id: t.author.id,
         handle: t.author.handle,
@@ -177,11 +353,21 @@ export async function getForumThreadDetail(threadId: string): Promise<
         title: string;
         space: { id: string; slug: string; title: string };
       };
-      author: { id: string; handle: string; name: string | null; avatarUrl: string | null };
+      author: {
+        id: string;
+        handle: string;
+        name: string | null;
+        avatarUrl: string | null;
+        badges: Array<{ slug: string; name: string }>;
+      };
+      demoSeed: boolean;
+      reactionSummary: DiscussionReactionTotals;
       replies: Array<{
         id: string;
         body: string;
         createdAt: string;
+        demoSeed: boolean;
+        reactionSummary: DiscussionReactionTotals;
         author: { id: string; handle: string; name: string | null; avatarUrl: string | null };
       }>;
     };
@@ -190,7 +376,7 @@ export async function getForumThreadDetail(threadId: string): Promise<
   const thread = await prisma.forumThread.findUnique({
     where: { id: threadId },
     include: {
-      author: { select: authorSelect },
+      author: { select: authorWithBadgesSelect },
       category: {
         select: {
           id: true,
@@ -208,6 +394,12 @@ export async function getForumThreadDetail(threadId: string): Promise<
     },
   });
   if (!thread) return null;
+
+  const replyIds = thread.replies.map((r) => r.id);
+  const [threadRx, repliesRx] = await Promise.all([
+    summarizeThreadReactionsForMany([thread.id]),
+    summarizeReplyReactionsForMany(replyIds),
+  ]);
 
   return {
     ok: true,
@@ -229,16 +421,24 @@ export async function getForumThreadDetail(threadId: string): Promise<
           title: thread.category.space.title,
         },
       },
+      demoSeed: thread.isDemoSeed,
+      reactionSummary: threadRx.get(thread.id) ?? emptyReactionSummary(),
       author: {
         id: thread.author.id,
         handle: thread.author.handle,
         name: thread.author.name,
         avatarUrl: thread.author.avatarUrl,
+        badges: thread.author.userBadges.map((ub) => ({
+          slug: ub.badge.slug,
+          name: ub.badge.name,
+        })),
       },
       replies: thread.replies.map((r) => ({
         id: r.id,
         body: r.body,
         createdAt: r.createdAt.toISOString(),
+        demoSeed: r.isDemoSeed,
+        reactionSummary: repliesRx.get(r.id) ?? emptyReactionSummary(),
         author: {
           id: r.author.id,
           handle: r.author.handle,
@@ -259,7 +459,7 @@ export async function createForumThread(input: {
   const title = input.title.trim();
   const body = input.body.trim();
   if (!input.categoryId.trim()) {
-    return { ok: false, error: "Category is required." };
+    return { ok: false, error: "Lower Gear is required." };
   }
   if (!title) {
     return { ok: false, error: "Title is required." };
@@ -273,10 +473,10 @@ export async function createForumThread(input: {
     include: { space: true },
   });
   if (!category) {
-    return { ok: false, error: "Category not found." };
+    return { ok: false, error: "Lower Gear not found." };
   }
   if (!category.space.isActive) {
-    return { ok: false, error: "This forum space is not available." };
+    return { ok: false, error: "This Gear is not available." };
   }
 
   const thread = await prisma.forumThread.create({

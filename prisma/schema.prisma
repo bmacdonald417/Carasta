@@ -75,6 +75,16 @@ enum MarketingCampaignStatus {
   ENDED
 }
 
+/// Discussion reactions (threads & replies). Distinct from feed Post [Like].
+enum DiscussionReactionKind {
+  LIKE
+  FIRE
+  WRENCH
+  MIND_BLOWN
+  LAUGH
+  RESPECT
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -89,6 +99,8 @@ model User {
   acceptedTermsAt DateTime?
   acceptedPrivacyAt DateTime?
   acceptedCommunityGuidelinesAt DateTime?
+  /// Seeded Carmunity demo profile — safe to delete in bulk; see CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md
+  isDemoSeed   Boolean   @default(false)
   role         Role      @default(USER)
   instagramUrl String?
   facebookUrl  String?
@@ -130,6 +142,9 @@ model User {
 
   forumThreads ForumThread[]
   forumReplies ForumReply[]
+  forumThreadReactions ForumThreadReaction[]
+  forumReplyReactions ForumReplyReaction[]
+  userBadges UserBadge[]
   auctionWatches AuctionWatch[]
 }
 
@@ -179,12 +194,15 @@ model ForumThread {
   replyCount     Int      @default(0)
   lastActivityAt DateTime @default(now())
   locked         Boolean  @default(false)
+  /// Seeded demo thread — see CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md
+  isDemoSeed     Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   category ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   replies  ForumReply[]
+  threadReactions ForumThreadReaction[]
 
   @@index([categoryId, lastActivityAt])
   @@index([authorId])
@@ -195,14 +213,73 @@ model ForumReply {
   threadId  String
   authorId  String
   body      String   @db.Text
+  /// Seeded demo reply — see CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md
+  isDemoSeed Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   author User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  replyReactions ForumReplyReaction[]
 
   @@index([threadId, createdAt])
   @@index([authorId])
+}
+
+model ForumThreadReaction {
+  id        String                 @id @default(cuid())
+  threadId String
+  userId    String
+  kind      DiscussionReactionKind
+  createdAt DateTime               @default(now())
+
+  thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, userId, kind])
+  @@index([threadId])
+  @@index([userId])
+}
+
+model ForumReplyReaction {
+  id        String                 @id @default(cuid())
+  replyId   String
+  userId    String
+  kind      DiscussionReactionKind
+  createdAt DateTime               @default(now())
+
+  reply ForumReply @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([replyId, userId, kind])
+  @@index([replyId])
+  @@index([userId])
+}
+
+/// Platform-defined badge (e.g. Top Contributor). Awarded via UserBadge.
+model Badge {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userBadges UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  awardedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
 }
 
 /// Seller-saved Share & Promote defaults (UTM campaign + copy options). Manual only.

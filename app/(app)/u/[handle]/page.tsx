@@ -13,6 +13,11 @@ import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { ProfilePostPreview } from "@/components/profile/ProfilePostPreview";
 import { ProfileGaragePreviewGrid } from "@/components/profile/ProfileGaragePreviewGrid";
 import { ProfilePostsEmpty } from "@/components/carmunity/ProfilePostsEmpty";
+import { DemoProfileBanner } from "@/components/discussions/DemoProfileBanner";
+import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
+import { CarmunityActivitySection } from "@/components/profile/CarmunityActivitySection";
+import type { CarmunityActivityItem } from "@/components/profile/CarmunityActivitySection";
+import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 
 export default async function ProfilePage({
   params,
@@ -38,6 +43,14 @@ export default async function ProfilePage({
       twitterUrl: true,
       tiktokUrl: true,
       collectorTier: true,
+      isDemoSeed: true,
+      userBadges: {
+        orderBy: { awardedAt: "desc" },
+        take: 10,
+        select: {
+          badge: { select: { slug: true, name: true } },
+        },
+      },
       reputationScore: true,
       completedSalesCount: true,
       completedPurchasesCount: true,
@@ -69,7 +82,7 @@ export default async function ProfilePage({
       })
     : null;
 
-  const [recentPosts, garagePreviewCars] = await Promise.all([
+  const [recentPosts, garagePreviewCars, forumThreads, forumReplies] = await Promise.all([
     prisma.post.findMany({
       where: { authorId: user.id },
       orderBy: { createdAt: "desc" },
@@ -95,6 +108,44 @@ export default async function ProfilePage({
         images: { orderBy: { sortOrder: "asc" }, take: 1, select: { url: true } },
       },
     }),
+    prisma.forumThread.findMany({
+      where: { authorId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        category: {
+          select: {
+            slug: true,
+            space: { select: { slug: true } },
+          },
+        },
+      },
+    }),
+    prisma.forumReply.findMany({
+      where: { authorId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        body: true,
+        createdAt: true,
+        thread: {
+          select: {
+            id: true,
+            title: true,
+            category: {
+              select: {
+                slug: true,
+                space: { select: { slug: true } },
+              },
+            },
+          },
+        },
+      },
+    }),
   ]);
 
   const wonAuctions = await prisma.auction.findMany({
@@ -114,6 +165,33 @@ export default async function ProfilePage({
     (a) => a.buyerId === user.id || a.bids[0]?.bidderId === user.id
   );
 
+  const profileBadges = user.userBadges.map((ub) => ({
+    slug: ub.badge.slug,
+    name: ub.badge.name,
+  }));
+
+  const activityItems: CarmunityActivityItem[] = [
+    ...forumThreads.map((t) => ({
+      kind: "thread" as const,
+      at: t.createdAt.toISOString(),
+      title: t.title,
+      href: discussionThreadPath(t.category.space.slug, t.category.slug, t.id),
+    })),
+    ...forumReplies.map((r) => ({
+      kind: "reply" as const,
+      at: r.createdAt.toISOString(),
+      excerpt: r.body.replace(/\s+/g, " ").trim().slice(0, 220),
+      threadTitle: r.thread.title,
+      href: discussionThreadPath(
+        r.thread.category.space.slug,
+        r.thread.category.slug,
+        r.thread.id
+      ),
+    })),
+  ]
+    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    .slice(0, 18);
+
   const displayName = user.name?.trim() || `@${user.handle}`;
   const garageTiles = garagePreviewCars.map((c) => ({
     id: c.id,
@@ -125,6 +203,7 @@ export default async function ProfilePage({
 
   return (
     <div className="carasta-container max-w-3xl space-y-8 py-10 pb-16">
+      {user.isDemoSeed ? <DemoProfileBanner /> : null}
       {/* 1 — Profile header */}
       <section className="carmunity-profile-enter overflow-hidden rounded-2xl border border-border/50 bg-card/70 shadow-sm backdrop-blur-sm">
         <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start sm:gap-8">
@@ -146,6 +225,10 @@ export default async function ProfilePage({
               <ReputationBadge tier={user.collectorTier} />
             </div>
             <p className="mt-0.5 text-sm text-muted-foreground">@{user.handle}</p>
+            <DiscussionAuthorBadges
+              badges={profileBadges}
+              className="mt-2 flex justify-center sm:justify-start"
+            />
             {user.location ? (
               <p className="mt-1 text-xs text-muted-foreground">{user.location}</p>
             ) : null}
@@ -221,6 +304,8 @@ export default async function ProfilePage({
           </Button>
         ) : null}
       </section>
+
+      <CarmunityActivitySection items={activityItems} handle={user.handle} />
 
       {/* 3 — Garage spotlight */}
       <section className="space-y-3">
