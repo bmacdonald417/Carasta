@@ -2,6 +2,9 @@
   "name": "aurum-auctions",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && npx ts-node -P tsconfig.scripts.json scripts/revert-enum-if-needed.ts && prisma db push && prisma db seed && next build",
