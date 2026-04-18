@@ -10,6 +10,8 @@ import { SocialLinks } from "@/components/profile/SocialLinks";
 import { TrustPanel } from "@/components/profile/TrustPanel";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
+import { ProfilePostPreview } from "@/components/profile/ProfilePostPreview";
+import { ProfileGaragePreviewGrid } from "@/components/profile/ProfileGaragePreviewGrid";
 
 export default async function ProfilePage({
   params,
@@ -66,11 +68,33 @@ export default async function ProfilePage({
       })
     : null;
 
-  const auctionsParticipated = await prisma.bid.findMany({
-    where: { bidderId: user.id },
-    select: { auctionId: true },
-    distinct: ["auctionId"],
-  });
+  const [recentPosts, garagePreviewCars] = await Promise.all([
+    prisma.post.findMany({
+      where: { authorId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: {
+        id: true,
+        content: true,
+        imageUrl: true,
+        auctionId: true,
+        createdAt: true,
+        _count: { select: { likes: true, comments: true } },
+      },
+    }),
+    prisma.garageCar.findMany({
+      where: { ownerId: user.id, type: "GARAGE" },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+      select: {
+        id: true,
+        year: true,
+        make: true,
+        model: true,
+        images: { orderBy: { sortOrder: "asc" }, take: 1, select: { url: true } },
+      },
+    }),
+  ]);
 
   const wonAuctions = await prisma.auction.findMany({
     where: {
@@ -89,139 +113,212 @@ export default async function ProfilePage({
     (a) => a.buyerId === user.id || a.bids[0]?.bidderId === user.id
   );
 
+  const displayName = user.name?.trim() || `@${user.handle}`;
+  const garageTiles = garagePreviewCars.map((c) => ({
+    id: c.id,
+    year: c.year,
+    make: c.make,
+    model: c.model,
+    imageUrl: c.images[0]?.url ?? null,
+  }));
+
   return (
-    <div className="carasta-container max-w-2xl py-8">
-      <div className="rounded-2xl border border-border/50 bg-card/80 p-6">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-          <Avatar className="h-24 w-24">
-            <AvatarImage src={user.avatarUrl ?? user.image ?? undefined} />
-            <AvatarFallback className="text-2xl">
+    <div className="carasta-container max-w-3xl space-y-8 py-10 pb-16">
+      {/* 1 — Profile header */}
+      <section className="overflow-hidden rounded-2xl border border-border/50 bg-card/70 shadow-sm backdrop-blur-sm">
+        <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start sm:gap-8">
+          <Avatar className="mx-auto h-28 w-28 shrink-0 ring-2 ring-border/60 sm:mx-0 sm:h-32 sm:w-32">
+            <AvatarImage src={user.avatarUrl ?? user.image ?? undefined} alt="" />
+            <AvatarFallback className="text-2xl font-semibold">
               {(user.name ?? user.handle).slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1 text-center sm:text-left">
-            <div className="flex items-center gap-2">
-              <h1 className="font-display text-2xl font-bold">@{user.handle}</h1>
+
+          <div className="min-w-0 flex-1 text-center sm:text-left">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+              Carmunity
+            </p>
+            <div className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+              <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                {displayName}
+              </h1>
               <ReputationBadge tier={user.collectorTier} />
             </div>
-            {user.name && (
-              <p className="text-muted-foreground">{user.name}</p>
-            )}
-            {user.location && (
-              <p className="text-sm text-muted-foreground">{user.location}</p>
-            )}
-            {user.bio && (
-              <p className="mt-2 text-sm text-muted-foreground">{user.bio}</p>
-            )}
-            <SocialLinks
-              instagramUrl={user.instagramUrl}
-              facebookUrl={user.facebookUrl}
-              twitterUrl={user.twitterUrl}
-              tiktokUrl={user.tiktokUrl}
-            />
-            {!isOwnProfile && currentUserId && (
-              <FollowButton
-                targetUserId={user.id}
-                initialFollowing={!!following}
-                className="mt-4"
+            <p className="mt-0.5 text-sm text-muted-foreground">@{user.handle}</p>
+            {user.location ? (
+              <p className="mt-1 text-xs text-muted-foreground">{user.location}</p>
+            ) : null}
+            {user.bio ? (
+              <p className="mt-3 max-w-prose text-sm leading-relaxed text-foreground/85">{user.bio}</p>
+            ) : null}
+
+            <div className="mt-4 flex justify-center sm:justify-start">
+              <SocialLinks
+                instagramUrl={user.instagramUrl}
+                facebookUrl={user.facebookUrl}
+                twitterUrl={user.twitterUrl}
+                tiktokUrl={user.tiktokUrl}
               />
-            )}
+            </div>
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div className="rounded-xl bg-muted/50 p-3 text-center">
-            <p className="font-display text-xl font-semibold">
-              {user._count.followers}
-            </p>
-            <p className="text-xs text-muted-foreground">Followers</p>
-          </div>
-          <div className="rounded-xl bg-muted/50 p-3 text-center">
-            <p className="font-display text-xl font-semibold">
-              {user._count.following}
-            </p>
-            <p className="text-xs text-muted-foreground">Following</p>
-          </div>
-          <div className="rounded-xl bg-muted/50 p-3 text-center">
-            <p className="font-display text-xl font-semibold">
-              {user._count.auctions}
-            </p>
-            <p className="text-xs text-muted-foreground">Listings</p>
-          </div>
-          <div className="rounded-xl bg-muted/50 p-3 text-center">
-            <p className="font-display text-xl font-semibold">
-              {user._count.garageCars}
-            </p>
-            <p className="text-xs text-muted-foreground">Garage</p>
-          </div>
+        {/* Stats — identity hub: posts + social first */}
+        <div className="grid grid-cols-3 border-t border-border/40 bg-muted/10 sm:grid-cols-6">
+          {(
+            [
+              { label: "Posts", value: user._count.posts },
+              { label: "Followers", value: user._count.followers },
+              { label: "Following", value: user._count.following },
+              { label: "Garage", value: user._count.garageCars },
+              { label: "Listings", value: user._count.auctions },
+              { label: "Bids", value: user._count.bids },
+            ] as const
+          ).map((s) => (
+            <div
+              key={s.label}
+              className="border-border/30 px-2 py-4 text-center sm:border-r sm:border-border/30 sm:last:border-r-0"
+            >
+              <p className="font-display text-lg font-semibold tabular-nums text-foreground sm:text-xl">
+                {s.value}
+              </p>
+              <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
+                {s.label}
+              </p>
+            </div>
+          ))}
         </div>
+      </section>
 
-        <TrustPanel
-          collectorTier={user.collectorTier}
-          reputationScore={user.reputationScore}
-          completedSalesCount={user.completedSalesCount}
-          completedPurchasesCount={user.completedPurchasesCount}
-          disputesLostCount={user.disputesLostCount}
-        />
+      {/* 2 — Action row */}
+      <section className="flex flex-wrap items-center gap-2">
+        {!isOwnProfile && currentUserId ? (
+          <FollowButton targetUserId={user.id} initialFollowing={!!following} />
+        ) : null}
+        {isOwnProfile ? (
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/explore">Open Carmunity</Link>
+          </Button>
+        ) : null}
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/u/${user.handle}/garage`}>Garage</Link>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/u/${user.handle}/dream`}>Dream garage</Link>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link href={`/u/${user.handle}/listings`}>Listings</Link>
+        </Button>
+        {isOwnProfile && isMarketingEnabled() ? (
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/u/${user.handle}/marketing`}>Marketing</Link>
+          </Button>
+        ) : null}
+      </section>
 
-        <div className="mt-6 flex flex-wrap gap-4">
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/u/${user.handle}/garage`}>Garage</Link>
+      {/* 3 — Garage spotlight */}
+      <section className="space-y-3">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-lg font-semibold tracking-tight">Garage</h2>
+            <p className="text-sm text-muted-foreground">
+              {user._count.garageCars === 0
+                ? "Collection portfolio — add cars on the web."
+                : `${user._count.garageCars} car${user._count.garageCars === 1 ? "" : "s"} on file`}
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" className="shrink-0 text-primary" asChild>
+            <Link href={`/u/${user.handle}/garage`}>View all</Link>
           </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/u/${user.handle}/dream`}>Dream Garage</Link>
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/u/${user.handle}/listings`}>Listings</Link>
-          </Button>
-          {isOwnProfile && isMarketingEnabled() ? (
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/u/${user.handle}/marketing`}>Marketing</Link>
+        </div>
+        <ProfileGaragePreviewGrid handle={user.handle} cars={garageTiles} />
+      </section>
+
+      <TrustPanel
+        collectorTier={user.collectorTier}
+        reputationScore={user.reputationScore}
+        completedSalesCount={user.completedSalesCount}
+        completedPurchasesCount={user.completedPurchasesCount}
+        disputesLostCount={user.disputesLostCount}
+      />
+
+      {/* 4 — Posts (Carmunity card language) */}
+      <section className="space-y-3">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-lg font-semibold tracking-tight">Posts</h2>
+            <p className="text-sm text-muted-foreground">Carmunity updates from @{user.handle}</p>
+          </div>
+          {recentPosts.length > 0 ? (
+            <Button variant="ghost" size="sm" className="shrink-0 text-primary" asChild>
+              <Link href="/explore">Explore feed</Link>
             </Button>
           ) : null}
         </div>
-
-        {wonAuctionsFiltered.length > 0 && (
-          <div className="mt-8">
-            <h2 className="font-display text-lg font-semibold">Won Auctions</h2>
-            <p className="text-sm text-muted-foreground">
-              Auctions won by @{user.handle}
-            </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {wonAuctionsFiltered.map((a) => (
-                <Link key={a.id} href={`/auctions/${a.id}`}>
-                  <div className="flex gap-4 rounded-xl border border-neutral-200 p-4 transition hover:bg-neutral-50">
-                    <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
-                      {a.images[0]?.url ? (
-                        <Image
-                          src={a.images[0].url}
-                          alt={a.title}
-                          fill
-                          className="object-cover"
-                          sizes="112px"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-xs text-neutral-400">
-                          No image
-                        </div>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium line-clamp-1">{a.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {a.year} {a.make} {a.model}
-                      </p>
-                      <p className="text-sm font-semibold text-[hsl(var(--performance-red))]">
-                        Won at ${(((a.buyerId ? a.buyNowPriceCents : a.bids[0]?.amountCents) ?? 0) / 100).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+        {recentPosts.length === 0 ? (
+          <p className="rounded-2xl border border-dashed border-border/60 bg-muted/15 py-12 text-center text-sm text-muted-foreground">
+            No public posts yet.
+          </p>
+        ) : (
+          <div className="space-y-5">
+            {recentPosts.map((p) => (
+              <ProfilePostPreview
+                key={p.id}
+                post={{
+                  id: p.id,
+                  createdAt: p.createdAt,
+                  content: p.content,
+                  imageUrl: p.imageUrl,
+                  auctionId: p.auctionId,
+                  _count: p._count,
+                }}
+              />
+            ))}
           </div>
         )}
-      </div>
+      </section>
+
+      {wonAuctionsFiltered.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-display text-lg font-semibold tracking-tight">Won auctions</h2>
+          <p className="text-sm text-muted-foreground">Auctions won by @{user.handle}</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {wonAuctionsFiltered.map((a) => (
+              <Link key={a.id} href={`/auctions/${a.id}`}>
+                <div className="flex gap-4 rounded-xl border border-border/50 bg-card/50 p-4 transition hover:border-primary/25 hover:bg-muted/20">
+                  <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-muted">
+                    {a.images[0]?.url ? (
+                      <Image
+                        src={a.images[0].url}
+                        alt={a.title}
+                        fill
+                        className="object-cover"
+                        sizes="112px"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[10px] text-muted-foreground">
+                        No image
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium line-clamp-1">{a.title}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {a.year} {a.make} {a.model}
+                    </p>
+                    <p className="text-sm font-semibold tabular-nums text-primary">
+                      Won at $
+                      {(
+                        ((a.buyerId ? a.buyNowPriceCents : a.bids[0]?.amountCents) ?? 0) / 100
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

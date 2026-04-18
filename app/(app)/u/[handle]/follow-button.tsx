@@ -30,13 +30,13 @@ export function FollowButton({
 
   return (
     <Button
-      variant={following ? "secondary" : "performance"}
+      variant={following ? "secondary" : "default"}
       size="sm"
       onClick={toggle}
       disabled={loading}
       className={className}
     >
-      {following ? "Unfollow" : "Follow"}
+      {following ? "Following" : "Follow"}
     </Button>
   );
 }

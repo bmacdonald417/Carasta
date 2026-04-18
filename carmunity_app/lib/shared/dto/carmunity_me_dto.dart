@@ -26,17 +26,30 @@ class CarmunityRecentPostDto {
     required this.id,
     this.imageUrl,
     this.content,
+    this.createdAt,
+    this.auctionId,
+    this.likeCount = 0,
+    this.commentCount = 0,
   });
 
   final String id;
   final String? imageUrl;
   final String? content;
+  final DateTime? createdAt;
+  final String? auctionId;
+  final int likeCount;
+  final int commentCount;
 
   factory CarmunityRecentPostDto.fromJson(Map<String, dynamic> json) {
+    final createdRaw = json['createdAt'] as String?;
     return CarmunityRecentPostDto(
       id: json['id'] as String,
       imageUrl: json['imageUrl'] as String?,
       content: json['content'] as String?,
+      createdAt: createdRaw != null ? DateTime.tryParse(createdRaw) : null,
+      auctionId: json['auctionId'] as String?,
+      likeCount: (json['likeCount'] as num?)?.toInt() ?? 0,
+      commentCount: (json['commentCount'] as num?)?.toInt() ?? 0,
     );
   }
 }

@@ -26,35 +26,40 @@ export default async function DreamGaragePage({
   });
 
   return (
-    <div className="carasta-container max-w-4xl py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold">Dream Garage</h1>
-        <div className="flex items-center gap-2">
-          {isOwn && (
-            <Button size="sm" variant="performance" asChild>
+    <div className="carasta-container max-w-5xl space-y-8 py-10 pb-16">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Wishlist
+          </p>
+          <h1 className="font-display text-3xl font-bold tracking-tight">Dream garage</h1>
+          <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            Cars @{user.handle} is chasing — same layout language as the owned garage.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {isOwn ? (
+            <Button size="sm" variant="default" asChild>
               <Link href="/dream/add">Add car</Link>
             </Button>
-          )}
-          <Link
-            href={`/u/${user.handle}`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← @{user.handle}
-          </Link>
+          ) : null}
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/u/${user.handle}`}>Profile</Link>
+          </Button>
         </div>
       </div>
-      <p className="text-muted-foreground">
-        Cars {user.handle} wants.
-      </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         {cars.length === 0 ? (
-          <p className="col-span-full py-8 text-center text-muted-foreground">
-            No dream cars yet.
-          </p>
+          <div className="col-span-full rounded-2xl border border-dashed border-border/60 bg-muted/10 py-16 text-center">
+            <p className="text-sm font-medium text-foreground">No dream cars yet</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {isOwn ? "Add a dream car from the web to pin it here." : "Check back later."}
+            </p>
+          </div>
         ) : (
           cars.map((car) => (
-            <Card key={car.id} className="overflow-hidden">
-              <div className="relative aspect-video w-full bg-muted">
+            <Card key={car.id} className="overflow-hidden border-border/50 bg-card/60 shadow-sm">
+              <div className="relative aspect-[4/3] w-full bg-muted sm:aspect-video">
                 {car.images[0]?.url ? (
                   <Image
                     src={car.images[0].url}
