@@ -4,9 +4,11 @@ import '../../app/config/app_config.dart';
 
 /// Session + transport for Carasta APIs. Mutations require a session cookie and/or Bearer token.
 ///
-/// **Provisional:** NextAuth identifies mobile clients via the same JWT as the website when the
-/// `Cookie` header is set. Optional `DEV_*` build flags seed a dev session without a login UI.
-/// Replace with secure storage + real token exchange when the backend exposes it.
+/// **Bearer (Phase 7):** `Authorization: Bearer <jwt>` where `<jwt>` is a NextAuth-compatible token
+/// from `POST /api/auth/mobile/token` or the same string as `next-auth.session-token`.
+/// **Cookie:** legacy browser-style `Cookie` header still works.
+///
+/// `signInWithAccessToken` prefers Bearer-only transport (clears pasted cookie) for a cleaner mobile path.
 class AuthService extends ChangeNotifier {
   AuthService() {
     _applyBuildTimeProvisionalDefaults();
@@ -93,5 +95,20 @@ class AuthService extends ChangeNotifier {
     _bearerToken = null;
     _sessionCookieHeader = null;
     notifyListeners();
+  }
+
+  /// Prefer Bearer for mobile — same JWT the web stores in `next-auth.session-token`.
+  void signInWithAccessToken({required String accessToken, required String userId}) {
+    final t = accessToken.trim();
+    final u = userId.trim();
+    _bearerToken = t.isEmpty ? null : t;
+    _userId = u.isEmpty ? null : u;
+    _sessionCookieHeader = null;
+    notifyListeners();
+  }
+
+  /// Apply a raw JWT as Bearer plus user id (e.g. paste from DevTools). Clears cookie header.
+  void applyBearerJwtAndUserId({required String jwt, required String userId}) {
+    signInWithAccessToken(accessToken: jwt, userId: userId);
   }
 }

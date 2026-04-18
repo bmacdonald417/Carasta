@@ -4,7 +4,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/utils/responsive_layout.dart';
 
-/// Dedicated media hub — staged until upload/presign + storage policy land on Carasta.
+/// Dedicated media hub — staged (post composer has real photo upload; see CARASTA_APP_PHASE_5_NOTES.md).
 class CreateMediaPlaceholderScreen extends StatelessWidget {
   const CreateMediaPlaceholderScreen({super.key});
 
@@ -19,19 +19,18 @@ class CreateMediaPlaceholderScreen extends StatelessWidget {
           Icon(Icons.cloud_upload_outlined, size: 48, color: AppColors.accent.withValues(alpha: 0.8)),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'Upload pipeline is staged',
+            'This hub is still staged',
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'The post composer already supports public image URLs and local gallery previews. '
-            'Binary uploads require a server-issued destination (presigned URL or authenticated upload) '
-            'so the app never pretends a file reached Carasta storage.',
+            'Create → Post: gallery photos upload via Carasta (`POST /api/carmunity/media/upload`) and attach to your post. '
+            'This screen is for a future multi-asset / video flow — not wired yet.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'See CARASTA_APP_PHASE_3_NOTES.md for the recommended backend contract and Phase 4 scope.',
+            'See CARASTA_APP_PHASE_5_NOTES.md and CARMUNITY_MEDIA_UPLOAD_CONTRACT.md.',
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],

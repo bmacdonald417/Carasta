@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 
 import '../../app/config/app_config.dart';
 import '../../shared/services/auth_service.dart';
@@ -73,6 +74,33 @@ class ApiClient {
         data: data,
         queryParameters: queryParameters,
         options: options,
+      );
+    } on DioException catch (e) {
+      throw _mapDio(e);
+    }
+  }
+
+  /// Multipart upload (e.g. Carmunity post images). Field name must match the API contract.
+  Future<Response<T>> postMultipart<T>(
+    String path, {
+    required String fileFieldName,
+    required List<int> bytes,
+    required String filename,
+    required String mimeType,
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    final formData = FormData.fromMap(<String, dynamic>{
+      fileFieldName: MultipartFile.fromBytes(
+        bytes,
+        filename: filename,
+        contentType: MediaType.parse(mimeType),
+      ),
+    });
+    try {
+      return await _dio.post<T>(
+        path,
+        data: formData,
+        queryParameters: queryParameters,
       );
     } on DioException catch (e) {
       throw _mapDio(e);

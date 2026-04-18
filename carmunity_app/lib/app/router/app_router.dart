@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auctions/presentation/auction_detail_placeholder_screen.dart';
+import '../../features/auctions/presentation/auction_detail_screen.dart';
 import '../../features/auctions/presentation/auctions_screen.dart';
-import '../../features/create/presentation/create_forum_thread_placeholder_screen.dart';
+import '../../features/auctions/presentation/saved_auctions_screen.dart';
+import '../../features/create/presentation/create_forum_thread_screen.dart';
 import '../../features/create/presentation/create_hub_screen.dart';
 import '../../features/create/presentation/create_media_placeholder_screen.dart';
 import '../../features/create/presentation/create_post_screen.dart';
 import '../../features/create/presentation/share_link_post_screen.dart';
-import '../../features/forums/presentation/forum_category_placeholder_screen.dart';
-import '../../features/forums/presentation/forum_thread_placeholder_screen.dart';
+import '../../features/forums/presentation/forum_category_threads_screen.dart';
+import '../../features/forums/presentation/forum_space_screen.dart';
+import '../../features/forums/presentation/forum_thread_detail_screen.dart';
 import '../../features/forums/presentation/forums_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/home/presentation/post_detail_screen.dart';
@@ -70,17 +72,24 @@ GoRouter createAppRouter() {
                 builder: (context, state) => const ForumsScreen(),
                 routes: [
                   GoRoute(
-                    path: 'c/:slug',
+                    path: 'space/:spaceSlug',
                     builder: (context, state) {
-                      final slug = state.pathParameters['slug']!;
-                      return ForumCategoryPlaceholderScreen(slug: slug);
+                      final slug = state.pathParameters['spaceSlug']!;
+                      return ForumSpaceScreen(spaceSlug: slug);
+                    },
+                  ),
+                  GoRoute(
+                    path: 'category/:categoryId',
+                    builder: (context, state) {
+                      final id = state.pathParameters['categoryId']!;
+                      return ForumCategoryThreadsScreen(categoryId: id);
                     },
                   ),
                   GoRoute(
                     path: 'thread/:threadId',
                     builder: (context, state) {
                       final id = state.pathParameters['threadId']!;
-                      return ForumThreadPlaceholderScreen(threadId: id);
+                      return ForumThreadDetailScreen(threadId: id);
                     },
                   ),
                 ],
@@ -103,7 +112,7 @@ GoRouter createAppRouter() {
                   ),
                   GoRoute(
                     path: 'forum-thread',
-                    builder: (context, state) => const CreateForumThreadPlaceholderScreen(),
+                    builder: (context, state) => const CreateForumThreadScreen(),
                   ),
                   GoRoute(
                     path: 'media',
@@ -123,7 +132,7 @@ GoRouter createAppRouter() {
                     path: 'detail/:auctionId',
                     builder: (context, state) {
                       final id = state.pathParameters['auctionId']!;
-                      return AuctionDetailPlaceholderScreen(auctionId: id);
+                      return AuctionDetailScreen(auctionId: id);
                     },
                   ),
                 ],
@@ -143,6 +152,10 @@ GoRouter createAppRouter() {
                   GoRoute(
                     path: 'garage',
                     builder: (context, state) => const GaragePlaceholderScreen(),
+                  ),
+                  GoRoute(
+                    path: 'saved-auctions',
+                    builder: (context, state) => const SavedAuctionsScreen(),
                   ),
                   GoRoute(
                     path: 'settings',
@@ -173,7 +186,7 @@ GoRouter createAppRouter() {
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
           final id = state.pathParameters['id']!;
-          return AuctionDetailPlaceholderScreen(auctionId: id);
+          return AuctionDetailScreen(auctionId: id);
         },
       ),
     ],

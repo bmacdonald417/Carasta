@@ -86,14 +86,15 @@ Future<void> _applyDemoAccount(BuildContext context, WidgetRef ref, DemoAccountD
   final messenger = ScaffoldMessenger.maybeOf(context);
   try {
     final minted = await ref.read(carmunityRepositoryProvider).mintDemoSession(email: a.email);
-    ref.read(authServiceProvider).applyDevSessionFields(
-          userIdInput: minted.userId,
-          cookieName: minted.cookieName,
-          cookieValueInput: minted.sessionToken,
+    ref.read(authServiceProvider).signInWithAccessToken(
+          accessToken: minted.sessionToken,
+          userId: minted.userId,
         );
     ref.invalidate(carmunityMeProvider);
     ref.invalidate(homeFeedProvider);
     ref.invalidate(carmunityDemoAccountsProvider);
+    ref.invalidate(auctionWatchedIdsProvider);
+    ref.invalidate(auctionWatchlistProvider);
     messenger?.showSnackBar(
       SnackBar(content: Text('Signed in as @${a.handle}')),
     );

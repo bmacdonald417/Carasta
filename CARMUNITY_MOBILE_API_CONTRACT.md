@@ -2,10 +2,24 @@
 
 Base URL: same origin as the Carasta deployment (e.g. `https://…`). All responses are JSON.
 
-## Auth (Phase 2)
+## Auth (Phase 2 + Phase 7)
 
-- **Today:** `getToken` / JWT **subject** from the **NextAuth session cookie** on the request (`Cookie` header), via `NEXTAUTH_SECRET`.
-- **Flutter:** must send a session cookie **or** a future **Bearer** scheme once implemented. Unauthenticated requests return **401** `{ "ok": false, "error": "Unauthorized" }`.
+- **Cookie:** NextAuth session JWT via `Cookie` (same as web) — `getToken` with `NEXTAUTH_SECRET`.
+- **Bearer (Phase 7):** `Authorization: Bearer <jwt>` where `<jwt>` is the same encoded token the server would put in the session (from `mintCarmunityAccessToken`, web session, or **`POST /api/auth/mobile/token`**). `decode` + `sub` / `id` resolves the user id.
+- **Flutter:** send **Bearer** for mobile credential sign-in; cookie remains valid for dev paste flows. Unauthenticated calls to protected routes return **401** `{ "ok": false, "error": "Unauthorized" }`.
+
+### POST `/api/auth/mobile/token`
+
+Exchange **email + password** for a JWT (users with `passwordHash` only).
+
+**Body:** `{ "email": "string", "password": "string" }`
+
+**200:** `{ "ok": true, "accessToken": "…", "userId": "…", "handle": "…" }`  
+**400** — invalid body  
+**401** — invalid credentials (includes OAuth-only accounts without a password)  
+**500** — server cannot mint (`NEXTAUTH_SECRET` missing)
+
+Details: **`CARMUNITY_MOBILE_AUTH_BRIDGE.md`**.
 
 ## Endpoints
 
@@ -70,7 +84,26 @@ Omitted keys are treated as “not provided” for that field.
 
 **Link / share posts (Phase 3 mobile):** There is no separate `linkUrl` field. Clients that “share a link” typically send a **single `content` string** containing the URL (and optional caption), e.g. `"Check this out\n\nhttps://example.com/article"`. **Open Graph / link preview metadata is not returned** by this endpoint; enrichment remains a future backend + schema concern.
 
-**Images:** `imageUrl` must be a URL the server can persist (usually **https** to a publicly reachable object). **Binary uploads** are not handled by this route; mobile apps should obtain `imageUrl` via a future **upload/presign** API (see Phase 3 notes) or any other server-approved source.
+**Images:** `imageUrl` must be a URL the server can persist (usually **https** to a publicly reachable object). **Binary uploads** are not handled by this route; obtain `imageUrl` via **`POST /api/carmunity/media/upload`** (multipart) or another server-approved source. See **`CARMUNITY_MEDIA_UPLOAD_CONTRACT.md`**.
+
+---
+
+### POST `/api/carmunity/media/upload`
+
+Authenticated **multipart** upload for post images. Returns a public `imageUrl` for use with **`POST /api/carmunity/posts`**.
+
+**Body:** `multipart/form-data` — field name **`file`**.
+
+**200**
+
+```json
+{ "ok": true, "imageUrl": "https://…/uploads/carmunity/…/….jpg" }
+```
+
+**400** — missing file, wrong type, too large, empty file  
+**401** — not signed in
+
+Full rules (MIME, size limits, storage, env): **`CARMUNITY_MEDIA_UPLOAD_CONTRACT.md`**.
 
 ---
 
@@ -140,6 +173,50 @@ Omitted keys are treated as “not provided” for that field.
 { "ok": true }
 ```
 
+**401** — not signed in
+
+---
+
+### GET `/api/carmunity/watchlist`
+
+Saved auctions for the signed-in user (Carmunity).
+
+**200**
+
+```json
+{
+  "ok": true,
+  "items": [
+    {
+      "id": "…",
+      "title": "…",
+      "endAt": "…ISO…",
+      "imageUrl": null,
+      "status": "LIVE"
+    }
+  ],
+  "auctionIds": ["…"]
+}
+```
+
+**401** — not signed in
+
+Full field semantics: **`CARMUNITY_AUCTION_WATCHLIST_CONTRACT.md`**.
+
+### GET `/api/auctions/:id/watch`
+
+**200:** `{ "ok": true, "watching": true | false }`  
+**401** — not signed in
+
+### POST `/api/auctions/:id/watch`
+
+**200:** `{ "ok": true }`  
+**404** — auction not found  
+**401** — not signed in
+
+### DELETE `/api/auctions/:id/watch`
+
+**200:** `{ "ok": true }`  
 **401** — not signed in
 
 ---

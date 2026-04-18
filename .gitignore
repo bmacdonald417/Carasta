@@ -48,5 +48,9 @@ prisma/migrations/*_migration.sql
 coverage/
 .nyc_output/
 
+# Carmunity multipart uploads (dev/local — keep directory via .gitkeep)
+public/uploads/carmunity/*
+!public/uploads/carmunity/.gitkeep
+
 # Misc
 *.pem

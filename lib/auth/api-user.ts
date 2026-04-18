@@ -1,15 +1,36 @@
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { decode, getToken } from "next-auth/jwt";
+
+function subjectFromPayload(payload: Record<string, unknown> | null): string | undefined {
+  if (!payload) return undefined;
+  const sub = payload.sub;
+  if (typeof sub === "string" && sub.length > 0) return sub;
+  const id = payload.id;
+  if (typeof id === "string" && id.length > 0) return id;
+  return undefined;
+}
 
 /**
- * Resolves the signed-in user id from the NextAuth JWT attached to the request.
- * Works when the client sends the session cookie (browser). For mobile, the same
- * JWT must be sent (e.g. Cookie header) until a Bearer strategy is added.
+ * Resolves the signed-in user id from the NextAuth JWT.
+ * - **Cookie:** same as browser (`getToken`).
+ * - **Bearer:** `Authorization: Bearer <jwt>` where `<jwt>` matches the encoded session token
+ *   (from `mintCarmunityAccessToken`, web cookie value, or `POST /api/auth/mobile/token`).
  */
 export async function getJwtSubjectUserId(req: NextRequest): Promise<string | undefined> {
   const secret = process.env.NEXTAUTH_SECRET;
   if (!secret) return undefined;
-  const token = await getToken({ req, secret });
-  const sub = token?.sub;
-  return typeof sub === "string" && sub.length > 0 ? sub : undefined;
+
+  const fromCookie = await getToken({ req, secret });
+  const cookieSub = subjectFromPayload(fromCookie as Record<string, unknown> | null);
+  if (cookieSub) return cookieSub;
+
+  const auth = req.headers.get("authorization");
+  if (auth?.startsWith("Bearer ")) {
+    const raw = auth.slice(7).trim();
+    if (!raw) return undefined;
+    const decoded = (await decode({ token: raw, secret })) as Record<string, unknown> | null;
+    return subjectFromPayload(decoded);
+  }
+
+  return undefined;
 }

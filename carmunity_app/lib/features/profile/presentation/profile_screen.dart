@@ -43,6 +43,8 @@ class ProfileScreen extends ConsumerWidget {
                         ref.read(authServiceProvider).clearSession();
                         ref.invalidate(carmunityMeProvider);
                         ref.invalidate(homeFeedProvider);
+                        ref.invalidate(auctionWatchedIdsProvider);
+                        ref.invalidate(auctionWatchlistProvider);
                       },
                     );
                   }
@@ -206,6 +208,15 @@ class _SignedInBody extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.xl),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.star_outline_rounded, color: AppColors.accent),
+          title: const Text('Saved auctions'),
+          subtitle: const Text('Listings you saved from Auctions'),
+          trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary),
+          onTap: () => context.push(AppRoutes.savedAuctions),
+        ),
+        const Divider(height: AppSpacing.xl),
         Text('Garage', style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: AppSpacing.sm),
         _GaragePreview(

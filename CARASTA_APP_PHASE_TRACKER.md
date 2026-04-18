@@ -6,3 +6,4 @@
 - **Phase 4** — Forums
 - **Phase 5** — Auctions
 - **Phase 6** — Notifications / polish
+- **Phase 7** — Mobile auth hardening (Bearer + mobile token) + auction watchlist foundation — see `CARASTA_APP_PHASE_7_NOTES.md`

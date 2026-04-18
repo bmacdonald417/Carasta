@@ -27,6 +27,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Uint8List? _pickedPreview;
   String? _pickedName;
   String? _pickedMime;
+  bool _uploadingImage = false;
   bool _submitting = false;
 
   @override
@@ -45,6 +46,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       _pickedPreview = bytes;
       _pickedName = file.name;
       _pickedMime = _guessMime(file.name);
+      _imageUrlCtrl.clear(); // Gallery upload wins over any pasted URL
     });
   }
 
@@ -77,21 +79,26 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     var imageUrlOut = _imageUrlCtrl.text.trim();
 
     if (_pickedPreview != null && imageUrlOut.isEmpty) {
-      final upload = ref.read(carmunityMediaUploadPortProvider);
-      final name = _pickedName ?? 'image.jpg';
-      final mime = _pickedMime ?? 'image/jpeg';
-      final result = await upload.uploadPostImage(
-        bytes: _pickedPreview!.toList(),
-        filename: name,
-        mimeType: mime,
-      );
-      if (result is CarmunityUploadUnavailable) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.message)));
-        return;
-      }
-      if (result is CarmunityUploadSuccess) {
-        imageUrlOut = result.imageUrl;
+      setState(() => _uploadingImage = true);
+      try {
+        final upload = ref.read(carmunityMediaUploadPortProvider);
+        final name = _pickedName ?? 'image.jpg';
+        final mime = _pickedMime ?? 'image/jpeg';
+        final result = await upload.uploadPostImage(
+          bytes: _pickedPreview!.toList(),
+          filename: name,
+          mimeType: mime,
+        );
+        if (result is CarmunityUploadUnavailable) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.message)));
+          return;
+        }
+        if (result is CarmunityUploadSuccess) {
+          imageUrlOut = result.imageUrl;
+        }
+      } finally {
+        if (mounted) setState(() => _uploadingImage = false);
       }
     }
 
@@ -99,7 +106,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
     if (text.isEmpty && imageUrlOut.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add text, an image URL, or clear the photo and try again.')),
+        const SnackBar(content: Text('Add text, a photo, or an image URL.')),
       );
       return;
     }
@@ -129,7 +136,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authServiceProvider);
     final h = pageHorizontalPadding(context);
-    final canPost = auth.canPerformMutations && !_submitting;
+    final busy = _uploadingImage || _submitting;
+    final canPost = auth.canPerformMutations && !busy;
 
     return Scaffold(
       appBar: AppBar(
@@ -137,7 +145,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         actions: [
           TextButton(
             onPressed: canPost ? _submit : null,
-            child: _submitting
+            child: busy
                 ? const SizedBox(
                     width: 20,
                     height: 20,
@@ -151,6 +159,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         padding: EdgeInsets.fromLTRB(h, AppSpacing.md, h, AppSpacing.xxl),
         children: [
           if (!auth.canPerformMutations) const SignInRequiredHint(),
+          if (_uploadingImage) ...[
+            const LinearProgressIndicator(minHeight: 3),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Uploading photo…',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
           TextField(
             controller: _contentCtrl,
             minLines: 5,
@@ -168,16 +185,20 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Paste a public image URL (recommended today). Gallery pick previews locally; '
-            'binary upload waits on a Carasta upload API.',
+            'Choose a photo to upload to Carasta, or paste a public https image URL.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: AppSpacing.sm),
           TextField(
             controller: _imageUrlCtrl,
             keyboardType: TextInputType.url,
+            onChanged: (v) {
+              if (v.trim().isNotEmpty && _pickedPreview != null) {
+                setState(_clearPick);
+              }
+            },
             decoration: const InputDecoration(
-              labelText: 'Image URL (https://…)',
+              labelText: 'Image URL (optional)',
               border: OutlineInputBorder(),
             ),
           ),
@@ -185,13 +206,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           Row(
             children: [
               OutlinedButton.icon(
-                onPressed: _submitting ? null : _pickImage,
+                onPressed: busy ? null : _pickImage,
                 icon: const Icon(Icons.photo_outlined),
                 label: const Text('Choose from gallery'),
               ),
               if (_pickedPreview != null) ...[
                 const SizedBox(width: AppSpacing.sm),
-                TextButton(onPressed: _submitting ? null : _clearPick, child: const Text('Clear photo')),
+                TextButton(onPressed: busy ? null : _clearPick, child: const Text('Clear photo')),
               ],
             ],
           ),
@@ -211,7 +232,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           const SizedBox(height: AppSpacing.xl),
           FilledButton(
             onPressed: canPost ? _submit : null,
-            child: _submitting
+            child: busy
                 ? const SizedBox(
                     height: 22,
                     width: 22,

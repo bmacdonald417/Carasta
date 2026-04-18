@@ -127,6 +127,7 @@ model User {
 
   forumThreads ForumThread[]
   forumReplies ForumReply[]
+  auctionWatches AuctionWatch[]
 }
 
 /// Top-level Carmunity forum area (e.g. Mechanics Corner, Gear Interests). Distinct from feed [Post].
@@ -384,6 +385,7 @@ model Auction {
   marketingCampaigns Campaign[]
   auctionAnalytics   AuctionAnalytics[]
   promoPosts         Post[]           @relation("AuctionPromoPosts")
+  watches            AuctionWatch[]
 
   @@index([sellerId])
   @@index([buyerId])
@@ -403,6 +405,21 @@ model AuctionImage {
 
   auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
 
+  @@index([auctionId])
+}
+
+/// User-saved auction for Carmunity watchlist (not bids, not garage inventory).
+model AuctionWatch {
+  id        String   @id @default(cuid())
+  userId    String
+  auctionId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, auctionId])
+  @@index([userId])
   @@index([auctionId])
 }
 

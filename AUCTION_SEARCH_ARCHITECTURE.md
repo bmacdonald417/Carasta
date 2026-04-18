@@ -103,3 +103,4 @@
 
 - `lib/auction-queries.ts` — other list helpers (homepage, etc.); not replaced by search service but can call it later.
 - `MARKETING_HANDOFF_INDEX.md` — marketing APIs are separate; auction search is discovery, not ingest.
+- **Carmunity (Flutter)** — browse uses this route; detail uses `GET /api/auctions/[id]`. See `CARMUNITY_AUCTIONS_MOBILE_CONTRACT.md` and `CARASTA_APP_PHASE_6_NOTES.md`.

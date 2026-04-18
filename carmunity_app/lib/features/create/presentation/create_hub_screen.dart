@@ -24,7 +24,7 @@ class CreateHubScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Start a post, share a link, or explore staged creation paths. Server rules stay on Carasta.',
+            'Start a post, share a link, or open a forum thread. Media upload stays staged until presign ships. Server rules stay on Carasta.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -45,8 +45,8 @@ class CreateHubScreen extends StatelessWidget {
           _HubTile(
             icon: Icons.forum_outlined,
             title: 'Forum thread',
-            subtitle: 'Forums API not exposed for mobile yet — staged.',
-            badge: const _StagedBadge(),
+            subtitle: 'Mechanics Corner & Gear Interests — pick space, category, then post.',
+            badge: const _LiveBadge(),
             onTap: () => context.push(AppRoutes.createForumThread),
           ),
           _HubTile(

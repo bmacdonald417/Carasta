@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { encode } from "next-auth/jwt";
 
+import { mintCarmunityAccessToken } from "@/lib/auth/carmunity-access-token";
 import { assertCarmunityDemoApisEnabled, isDemoSeedEmail } from "@/lib/carmunity/demo-auth";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 const COOKIE_NAME = "next-auth.session-token";
-const MAX_AGE_SEC = 30 * 24 * 60 * 60;
 
 /**
  * POST /api/carmunity/demo-session — development only.
@@ -17,14 +16,6 @@ const MAX_AGE_SEC = 30 * 24 * 60 * 60;
 export async function POST(req: NextRequest) {
   const denied = assertCarmunityDemoApisEnabled();
   if (denied) return denied;
-
-  const secret = process.env.NEXTAUTH_SECRET;
-  if (!secret?.trim()) {
-    return NextResponse.json(
-      { ok: false, error: "NEXTAUTH_SECRET is not set; cannot mint a session token." },
-      { status: 500 }
-    );
-  }
 
   let body: unknown;
   try {
@@ -60,20 +51,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const picture = user.avatarUrl ?? user.image ?? null;
-  const token = await encode({
-    secret,
-    maxAge: MAX_AGE_SEC,
-    token: {
-      sub: user.id,
+  let token: string;
+  try {
+    token = await mintCarmunityAccessToken({
       id: user.id,
       email: user.email,
       name: user.name,
-      picture,
+      avatarUrl: user.avatarUrl,
+      image: user.image,
       handle: user.handle,
       role: user.role,
-    },
-  });
+    });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "NEXTAUTH_SECRET is not set; cannot mint a session token." },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json({
     ok: true,
