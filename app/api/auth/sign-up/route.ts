@@ -11,7 +11,13 @@ function sanitizeHandleBase(s: string): string {
 function getValidationMessage(parsed: z.SafeParseError<unknown>): string {
   const flat = parsed.error.flatten().fieldErrors as Record<string, string[] | undefined>;
   const first =
-    flat.email?.[0] ?? flat.password?.[0] ?? flat.handle?.[0] ?? flat.name?.[0];
+    flat.email?.[0] ??
+    flat.password?.[0] ??
+    flat.handle?.[0] ??
+    flat.name?.[0] ??
+    flat.acceptTerms?.[0] ??
+    flat.acceptPrivacy?.[0] ??
+    flat.acceptCommunityGuidelines?.[0];
   return first ?? "Invalid input.";
 }
 
@@ -27,6 +33,7 @@ export async function POST(req: Request) {
     }
     const { email, password, name } = parsed.data;
     const handle = parsed.data.handle?.trim() || undefined;
+    const consentAt = new Date();
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -55,6 +62,9 @@ export async function POST(req: Request) {
         passwordHash,
         handle: finalHandle,
         name: name ?? null,
+        acceptedTermsAt: consentAt,
+        acceptedPrivacyAt: consentAt,
+        acceptedCommunityGuidelinesAt: consentAt,
       },
     });
     return NextResponse.json({ ok: true });

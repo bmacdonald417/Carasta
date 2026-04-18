@@ -13,7 +13,7 @@ import {
 const navItems = [
   { href: "/", label: "Home", icon: LayoutGrid },
   { href: "/explore", label: "Carmunity", icon: Users },
-  { href: "/forums", label: "Forums", icon: MessageSquare },
+  { href: "/discussions", label: "Discussions", icon: MessageSquare },
   { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/merch", label: "Merch", icon: ShoppingBag },
 ] as const;
@@ -25,6 +25,7 @@ export function MobileBottomNav() {
     pathname === "/contact" ||
     pathname === "/terms" ||
     pathname === "/privacy" ||
+    pathname === "/community-guidelines" ||
     pathname.startsWith("/auth");
 
   if (hideNav) return null;

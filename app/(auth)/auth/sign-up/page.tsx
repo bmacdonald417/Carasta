@@ -22,7 +22,7 @@ export default async function SignUpPage({
         </h1>
         <p className="text-muted-foreground">
           Join Carmunity by Carasta — bid on cars, build your garage, join
-          forums, and connect with enthusiasts.
+          discussions, and connect with enthusiasts.
         </p>
         <SignUpForm googleEnabled={googleEnabled} callbackUrl={callbackUrl} />
       </div>

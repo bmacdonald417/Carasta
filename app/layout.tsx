@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | Carmunity by Carasta",
   },
   description:
-    "Carmunity by Carasta — connect with gearheads, browse forums, show your garage, and bid on collector cars in one system.",
+    "Carmunity by Carasta — connect with gearheads, browse discussions, show your garage, and bid on collector cars in one system.",
 };
 
 export default function RootLayout({

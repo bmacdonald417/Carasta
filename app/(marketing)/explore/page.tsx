@@ -25,8 +25,12 @@ export default async function ExplorePage({
       <p className="mt-2 text-neutral-400">
         Feed posts from builders and collectors. Follow people to see them in
         Following — or jump to{" "}
-        <Link href="/forums" className="carmunity-nav-link text-primary hover:underline" data-active="false">
-          Forums
+        <Link
+          href="/discussions"
+          className="carmunity-nav-link text-primary hover:underline"
+          data-active="false"
+        >
+          Discussions
         </Link>{" "}
         for threaded discussions.
       </p>

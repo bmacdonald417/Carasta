@@ -20,7 +20,7 @@ import {
 const mainNav = [
   { href: "/", label: "Home", icon: LayoutGrid },
   { href: "/explore", label: "Carmunity", icon: Users },
-  { href: "/forums", label: "Forums", icon: MessageSquare },
+  { href: "/discussions", label: "Discussions", icon: MessageSquare },
   { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/sell", label: "Sell", icon: PlusCircle },
 ] as const;

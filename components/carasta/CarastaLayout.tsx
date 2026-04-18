@@ -28,7 +28,7 @@ const marketingNav = [
 
 const appNav = [
   { href: "/explore", label: "Carmunity" },
-  { href: "/forums", label: "Forums" },
+  { href: "/discussions", label: "Discussions" },
   { href: "/auctions", label: "Auctions" },
   { href: "/sell", label: "Sell" },
 ];
@@ -249,11 +249,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 © {new Date().getFullYear()} Carasta. All rights reserved.
               </p>
               <p className="mt-1 text-xs text-neutral-600">
-                Carmunity by Carasta — feed, forums, garage, and auctions in
-                one place.
+                Carmunity by Carasta — feed, discussions, garage, and auctions
+                in one place.
               </p>
             </div>
-            <nav className="flex gap-6 text-sm">
+            <nav className="flex flex-wrap justify-center gap-6 text-sm md:justify-end">
               <Link
                 href="/terms"
                 className="text-neutral-500 transition hover:text-primary"
@@ -265,6 +265,12 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 className="text-neutral-500 transition hover:text-primary"
               >
                 Privacy Policy
+              </Link>
+              <Link
+                href="/community-guidelines"
+                className="text-neutral-500 transition hover:text-primary"
+              >
+                Community Guidelines
               </Link>
             </nav>
           </div>

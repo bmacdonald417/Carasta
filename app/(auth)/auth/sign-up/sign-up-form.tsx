@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -8,6 +8,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabled?: boolean; callbackUrl?: string }) {
   const router = useRouter();
@@ -16,18 +17,36 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
   const [showPassword, setShowPassword] = useState(false);
   const [handle, setHandle] = useState("");
   const [name, setName] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [acceptCommunityGuidelines, setAcceptCommunityGuidelines] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const consentComplete =
+    acceptTerms && acceptPrivacy && acceptCommunityGuidelines;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (!consentComplete) {
+      setError("Please accept the Terms, Privacy Policy, and Community Guidelines.");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/auth/sign-up", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, handle: handle || undefined, name: name || undefined }),
+        body: JSON.stringify({
+          email,
+          password,
+          handle: handle || undefined,
+          name: name || undefined,
+          acceptTerms: true,
+          acceptPrivacy: true,
+          acceptCommunityGuidelines: true,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -113,7 +132,74 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
           onChange={(e) => setName(e.target.value)}
         />
       </div>
-      <Button type="submit" className="w-full" variant="performance" disabled={loading}>
+
+      <fieldset className="space-y-3 rounded-2xl border border-border/60 bg-card/40 p-4">
+        <legend className="sr-only">Legal agreements</legend>
+        <ConsentRow
+          id="accept-terms"
+          checked={acceptTerms}
+          onCheckedChange={setAcceptTerms}
+          label={
+            <>
+              I agree to the{" "}
+              <Link
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline-offset-4 hover:underline"
+              >
+                Terms of Service
+              </Link>
+              .
+            </>
+          }
+        />
+        <ConsentRow
+          id="accept-privacy"
+          checked={acceptPrivacy}
+          onCheckedChange={setAcceptPrivacy}
+          label={
+            <>
+              I agree to the{" "}
+              <Link
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline-offset-4 hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </>
+          }
+        />
+        <ConsentRow
+          id="accept-community"
+          checked={acceptCommunityGuidelines}
+          onCheckedChange={setAcceptCommunityGuidelines}
+          label={
+            <>
+              I agree to the{" "}
+              <Link
+                href="/community-guidelines"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline-offset-4 hover:underline"
+              >
+                Community Guidelines
+              </Link>
+              .
+            </>
+          }
+        />
+      </fieldset>
+
+      <Button
+        type="submit"
+        className="w-full"
+        variant="performance"
+        disabled={loading || !consentComplete}
+      >
         {loading ? "Creating account…" : "Create account"}
       </Button>
       {googleEnabled && (
@@ -135,8 +221,13 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
           >
             Continue with Google
           </Button>
+          <p className="text-xs text-muted-foreground">
+            Google sign-in may not record the same policy acknowledgments yet; we
+            may prompt you separately in a future update.
+          </p>
         </>
       )}
+
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
@@ -147,5 +238,36 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
         </Link>
       </p>
     </form>
+  );
+}
+
+function ConsentRow({
+  id,
+  checked,
+  onCheckedChange,
+  label,
+}: {
+  id: string;
+  checked: boolean;
+  onCheckedChange: (v: boolean) => void;
+  label: ReactNode;
+}) {
+  return (
+    <label
+      htmlFor={id}
+      className="flex cursor-pointer items-start gap-3 text-sm text-muted-foreground"
+    >
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onCheckedChange(e.target.checked)}
+        className={cn(
+          "mt-0.5 h-4 w-4 shrink-0 rounded border border-input bg-background",
+          "text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        )}
+      />
+      <span>{label}</span>
+    </label>
   );
 }
