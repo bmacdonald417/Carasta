@@ -3,10 +3,12 @@ import type { DiscussionReactionKind } from "@prisma/client";
 import { extractMentionHandles } from "@/lib/discussions/mentions";
 import {
   countThreadsInCategory,
+  countThreadsInCategoryTopWindow,
   listRankedThreadIdsForCategory,
   type ThreadListSort,
+  type ThreadVisibilityContext,
 } from "@/lib/forums/discussion-ranking-queries";
-import { TOP_WINDOW_DAYS } from "@/lib/forums/discussion-ranking";
+import { listBlockedUserIdsForBlocker, viewerBlocksUserId } from "@/lib/user-safety";
 import { prisma } from "@/lib/db";
 import {
   notifyMention,
@@ -47,6 +49,20 @@ const authorWithBadgesSelect = {
 
 function emptyReactionSummary(): DiscussionReactionTotals {
   return { total: 0, byKind: {} };
+}
+
+async function resolveThreadVisibility(input: {
+  viewerUserId?: string | null;
+  viewerIsAdmin?: boolean;
+}): Promise<ThreadVisibilityContext> {
+  if (input.viewerIsAdmin) {
+    return { viewerIsAdmin: true, blockedAuthorIds: [] };
+  }
+  if (!input.viewerUserId) {
+    return { viewerIsAdmin: false, blockedAuthorIds: [] };
+  }
+  const blockedAuthorIds = await listBlockedUserIdsForBlocker(prisma, input.viewerUserId);
+  return { viewerIsAdmin: false, blockedAuthorIds };
 }
 
 async function summarizeThreadReactionsForMany(
@@ -223,6 +239,8 @@ export async function getForumSpaceBySlug(slug: string): Promise<
 export async function listRecentThreadsForGear(input: {
   spaceId: string;
   take?: number;
+  viewerUserId?: string | null;
+  viewerIsAdmin?: boolean;
 }): Promise<
   ForumServiceOk<{
     threads: Array<{
@@ -239,8 +257,22 @@ export async function listRecentThreadsForGear(input: {
   }>
 > {
   const take = Math.min(Math.max(input.take ?? 12, 1), 30);
+  const visibility = await resolveThreadVisibility({
+    viewerUserId: input.viewerUserId ?? null,
+    viewerIsAdmin: input.viewerIsAdmin,
+  });
   const threads = await prisma.forumThread.findMany({
-    where: { category: { spaceId: input.spaceId } },
+    where: {
+      category: { spaceId: input.spaceId },
+      ...(visibility.viewerIsAdmin
+        ? {}
+        : {
+            isHidden: false,
+            ...(visibility.blockedAuthorIds.length
+              ? { authorId: { notIn: visibility.blockedAuthorIds } }
+              : {}),
+          }),
+    },
     orderBy: { lastActivityAt: "desc" },
     take,
     include: {
@@ -273,16 +305,13 @@ export async function listRecentThreadsForGear(input: {
 
 async function countThreadsForCategorySort(
   categoryId: string,
-  sort: DiscussionSortMode
+  sort: DiscussionSortMode,
+  visibility: ThreadVisibilityContext
 ): Promise<number> {
   if (sort === "top") {
-    const since = new Date();
-    since.setUTCDate(since.getUTCDate() - TOP_WINDOW_DAYS);
-    return prisma.forumThread.count({
-      where: { categoryId, createdAt: { gte: since } },
-    });
+    return countThreadsInCategoryTopWindow(categoryId, visibility);
   }
-  return countThreadsInCategory(categoryId);
+  return countThreadsInCategory(categoryId, visibility);
 }
 
 export async function listThreadsForCategory(input: {
@@ -290,6 +319,8 @@ export async function listThreadsForCategory(input: {
   page?: number;
   take?: number;
   sort?: DiscussionSortMode;
+  viewerUserId?: string | null;
+  viewerIsAdmin?: boolean;
 }): Promise<
   ForumServiceOk<{
     threads: Array<{
@@ -320,11 +351,16 @@ export async function listThreadsForCategory(input: {
 
   const skip = (page - 1) * take;
   const sortKey = sort as ThreadListSort;
+  const visibility = await resolveThreadVisibility({
+    viewerUserId: input.viewerUserId ?? null,
+    viewerIsAdmin: input.viewerIsAdmin,
+  });
   const ids = await listRankedThreadIdsForCategory({
     categoryId: input.categoryId,
     sort: sortKey,
     skip,
     take: take + 1,
+    visibility,
   });
   const hasNextPage = ids.length > take;
   const sliceIds = hasNextPage ? ids.slice(0, take) : ids;
@@ -336,7 +372,7 @@ export async function listThreadsForCategory(input: {
           include: { author: { select: authorSelect } },
         })
       : Promise.resolve([]),
-    countThreadsForCategorySort(input.categoryId, sort),
+    countThreadsForCategorySort(input.categoryId, sort, visibility),
   ]);
 
   const byId = new Map(rows.map((t) => [t.id, t] as const));
@@ -375,6 +411,8 @@ export type ForumReplyListRow = {
   body: string;
   createdAt: string;
   demoSeed: boolean;
+  /** Moderation hide or viewer block — UI shows placeholder instead of body. */
+  contentWithdrawn: boolean;
   reactionSummary: DiscussionReactionTotals;
   viewerReactionKind: DiscussionReactionKind | null;
   author: { id: string; handle: string; name: string | null; avatarUrl: string | null };
@@ -385,6 +423,7 @@ export async function listForumRepliesPage(input: {
   take?: number;
   cursorId?: string | null;
   viewerUserId?: string | null;
+  viewerIsAdmin?: boolean;
 }): Promise<{
   replies: ForumReplyListRow[];
   nextCursor: string | null;
@@ -422,30 +461,47 @@ export async function listForumRepliesPage(input: {
     viewerReplyRows.map((row) => [row.replyId, row.kind] as const)
   );
 
+  const blockedAuthorIds =
+    input.viewerUserId && !input.viewerIsAdmin
+      ? await listBlockedUserIdsForBlocker(prisma, input.viewerUserId)
+      : [];
+  const blocked = new Set(blockedAuthorIds);
+
   return {
-    replies: slice.map((r) => ({
-      id: r.id,
-      authorId: r.author.id,
-      body: r.body,
-      createdAt: r.createdAt.toISOString(),
-      demoSeed: r.isDemoSeed,
-      reactionSummary: repliesRx.get(r.id) ?? emptyReactionSummary(),
-      viewerReactionKind: viewerReplyKindById.get(r.id) ?? null,
-      author: {
-        id: r.author.id,
-        handle: r.author.handle,
-        name: r.author.name,
-        avatarUrl: r.author.avatarUrl,
-      },
-    })),
+    replies: slice.map((r) => {
+      const contentWithdrawn = Boolean(
+        !input.viewerIsAdmin && (r.isHidden || blocked.has(r.author.id))
+      );
+      return {
+        id: r.id,
+        authorId: r.author.id,
+        body: contentWithdrawn ? "" : r.body,
+        createdAt: r.createdAt.toISOString(),
+        demoSeed: r.isDemoSeed,
+        contentWithdrawn,
+        reactionSummary: repliesRx.get(r.id) ?? emptyReactionSummary(),
+        viewerReactionKind: viewerReplyKindById.get(r.id) ?? null,
+        author: {
+          id: r.author.id,
+          handle: r.author.handle,
+          name: r.author.name,
+          avatarUrl: r.author.avatarUrl,
+        },
+      };
+    }),
     nextCursor,
   };
 }
 
+export type GetForumThreadDetailOptions = {
+  viewerUserId?: string | null;
+  viewerIsAdmin?: boolean;
+  replies?: { take?: number; cursorId?: string | null };
+};
+
 export async function getForumThreadDetail(
   threadId: string,
-  viewerUserId?: string | null,
-  repliesPagination?: { take?: number; cursorId?: string | null }
+  opts?: GetForumThreadDetailOptions
 ): Promise<
   ForumServiceOk<{
     thread: {
@@ -477,6 +533,10 @@ export async function getForumThreadDetail(
     };
   }> | null
 > {
+  const viewerUserId = opts?.viewerUserId ?? null;
+  const viewerIsAdmin = Boolean(opts?.viewerIsAdmin);
+  const repliesPagination = opts?.replies;
+
   const thread = await prisma.forumThread.findUnique({
     where: { id: threadId },
     include: {
@@ -493,11 +553,24 @@ export async function getForumThreadDetail(
   });
   if (!thread) return null;
 
+  if (!viewerIsAdmin && thread.isHidden) {
+    return null;
+  }
+
+  if (
+    viewerUserId &&
+    !viewerIsAdmin &&
+    (await viewerBlocksUserId(prisma, viewerUserId, thread.authorId))
+  ) {
+    return null;
+  }
+
   const replyPage = await listForumRepliesPage({
     threadId: thread.id,
     take: repliesPagination?.take ?? 40,
     cursorId: repliesPagination?.cursorId ?? null,
-    viewerUserId: viewerUserId ?? null,
+    viewerUserId,
+    viewerIsAdmin,
   });
 
   const [threadRx, viewerThreadRx] = await Promise.all([
@@ -612,6 +685,7 @@ export async function createForumReply(input: {
     select: {
       id: true,
       locked: true,
+      isHidden: true,
       title: true,
       authorId: true,
       category: {
@@ -621,6 +695,9 @@ export async function createForumReply(input: {
   });
   if (!thread) {
     return { ok: false, error: "Thread not found." };
+  }
+  if (thread.isHidden) {
+    return { ok: false, error: "This thread is not available." };
   }
   if (thread.locked) {
     return { ok: false, error: "This thread is locked." };

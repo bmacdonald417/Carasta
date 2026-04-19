@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { AuthorHandleLink } from "@/components/discussions/AuthorHandleLink";
 import { DiscussionReactionSummary } from "@/components/discussions/DiscussionReactionSummary";
 import { getForumSpaceBySlug, listRecentThreadsForGear } from "@/lib/forums/forum-service";
+import { getSession } from "@/lib/auth";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 
 export const dynamic = "force-dynamic";
@@ -29,8 +30,17 @@ export default async function GearPage({ params }: Props) {
   const res = await getForumSpaceBySlug(gearSlug);
   if (!res.ok) notFound();
 
+  const session = await getSession();
+  const viewerUserId = (session?.user as { id?: string } | undefined)?.id ?? null;
+  const viewerIsAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
+
   const { space } = res;
-  const recent = await listRecentThreadsForGear({ spaceId: space.id, take: 12 });
+  const recent = await listRecentThreadsForGear({
+    spaceId: space.id,
+    take: 12,
+    viewerUserId,
+    viewerIsAdmin,
+  });
 
   return (
     <div className="carasta-container max-w-3xl py-8">

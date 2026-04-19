@@ -9,6 +9,7 @@ import {
   listThreadsForCategory,
   type DiscussionSortMode,
 } from "@/lib/forums/forum-service";
+import { getSession } from "@/lib/auth";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 
 export const dynamic = "force-dynamic";
@@ -84,6 +85,10 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
   const sort = parseSort(typeof sp.sort === "string" ? sp.sort : undefined);
   const page = parsePage(typeof sp.page === "string" ? sp.page : undefined);
 
+  const session = await getSession();
+  const viewerUserId = (session?.user as { id?: string } | undefined)?.id ?? null;
+  const viewerIsAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
+
   const catRes = await getLowerGearBySlugs(gearSlug, lowerGearSlug);
   if (!catRes.ok) notFound();
   const { category } = catRes;
@@ -93,6 +98,8 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
     page,
     take: 20,
     sort,
+    viewerUserId,
+    viewerIsAdmin,
   });
   if (!threadsRes.ok) notFound();
   const { threads, hasNextPage, totalCount } = threadsRes;

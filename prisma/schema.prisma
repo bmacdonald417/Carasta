@@ -99,9 +99,9 @@ enum DiscussionReportReason {
 
 enum DiscussionReportStatus {
   OPEN
-  REVIEWED
-  DISMISSED
+  REVIEWING
   ACTIONED
+  DISMISSED
 }
 
 model User {
@@ -169,6 +169,13 @@ model User {
   notificationsSent Notification[] @relation("NotificationActor")
   discussionReportsSubmitted DiscussionReport[] @relation("DiscussionReportReporter")
   discussionReportsReviewed DiscussionReport[] @relation("DiscussionReportReviewer")
+
+  forumThreadsHidden ForumThread[] @relation("ForumThreadHiddenBy")
+  forumRepliesHidden ForumReply[] @relation("ForumReplyHiddenBy")
+  blocksGiven          UserBlock[] @relation("UserBlockBlocker")
+  blocksReceived       UserBlock[] @relation("UserBlockBlocked")
+  mutesGiven           UserMute[]  @relation("UserMuteMuter")
+  mutesReceived        UserMute[]  @relation("UserMuteMuted")
 }
 
 /// Top-level Carmunity forum area (e.g. Mechanics Corner, Gear Interests). Distinct from feed [Post].
@@ -219,11 +226,16 @@ model ForumThread {
   locked         Boolean  @default(false)
   /// Seeded demo thread — see CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md
   isDemoSeed     Boolean  @default(false)
+  /// Soft moderation hide — record kept; non-admins do not see in lists or thread view.
+  isHidden       Boolean  @default(false)
+  hiddenAt       DateTime?
+  hiddenById     String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   category ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  hiddenBy User?         @relation("ForumThreadHiddenBy", fields: [hiddenById], references: [id], onDelete: SetNull)
   replies  ForumReply[]
   threadReactions ForumThreadReaction[]
   discussionReports DiscussionReport[]
@@ -241,11 +253,15 @@ model ForumReply {
   body      String   @db.Text
   /// Seeded demo reply — see CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md
   isDemoSeed Boolean  @default(false)
+  isHidden   Boolean  @default(false)
+  hiddenAt   DateTime?
+  hiddenById String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   author User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  hiddenBy User?    @relation("ForumReplyHiddenBy", fields: [hiddenById], references: [id], onDelete: SetNull)
   parentReply ForumReply?  @relation("ForumReplyThread", fields: [parentReplyId], references: [id], onDelete: SetNull)
   childReplies ForumReply[] @relation("ForumReplyThread")
   replyReactions ForumReplyReaction[]
@@ -265,6 +281,7 @@ model DiscussionReport {
   reason       DiscussionReportReason
   details      String?                @db.Text
   status       DiscussionReportStatus @default(OPEN)
+  moderatorNote String?             @db.Text
   createdAt    DateTime               @default(now())
   reviewedAt   DateTime?
   reviewedById String?
@@ -278,6 +295,36 @@ model DiscussionReport {
   @@index([reporterId])
   @@index([threadId])
   @@index([replyId])
+}
+
+/// User A blocks user B — B’s discussions content is hidden from A only (Phase H).
+model UserBlock {
+  id         String   @id @default(cuid())
+  blockerId  String
+  blockedId  String
+  createdAt  DateTime @default(now())
+
+  blocker User @relation("UserBlockBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("UserBlockBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+}
+
+/// Muting reduces notification noise from a user; they may still appear in threads (Phase H).
+model UserMute {
+  id           String   @id @default(cuid())
+  userId       String
+  mutedUserId  String
+  createdAt    DateTime @default(now())
+
+  muter User @relation("UserMuteMuter", fields: [userId], references: [id], onDelete: Cascade)
+  muted User @relation("UserMuteMuted", fields: [mutedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mutedUserId])
+  @@index([userId])
+  @@index([mutedUserId])
 }
 
 model ForumThreadReaction {

@@ -129,12 +129,16 @@ export async function listDiscussionReportsForAdmin(input: {
         reason: true,
         status: true,
         details: true,
+        moderatorNote: true,
         createdAt: true,
+        reviewedAt: true,
+        reviewedBy: { select: { id: true, handle: true } },
         reporter: { select: { handle: true } },
         thread: {
           select: {
             id: true,
             title: true,
+            isHidden: true,
             category: {
               select: { slug: true, space: { select: { slug: true } } },
             },
@@ -145,10 +149,12 @@ export async function listDiscussionReportsForAdmin(input: {
             id: true,
             threadId: true,
             body: true,
+            isHidden: true,
             thread: {
               select: {
                 id: true,
                 title: true,
+                isHidden: true,
                 category: {
                   select: { slug: true, space: { select: { slug: true } } },
                 },

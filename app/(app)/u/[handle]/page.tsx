@@ -15,6 +15,7 @@ import { ProfileGaragePreviewGrid } from "@/components/profile/ProfileGaragePrev
 import { ProfilePostsEmpty } from "@/components/carmunity/ProfilePostsEmpty";
 import { DemoProfileBanner } from "@/components/discussions/DemoProfileBanner";
 import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
+import { DiscussionPeerSafetyMenu } from "@/components/discussions/DiscussionPeerSafetyMenu";
 import { CarmunityActivitySection } from "@/components/profile/CarmunityActivitySection";
 import type { CarmunityActivityItem } from "@/components/profile/CarmunityActivitySection";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
@@ -137,11 +138,34 @@ export default async function ProfilePage({
   }));
 
   const activityPage = Math.max(1, Number(sp.activityPage) || 1);
-  const activity = await listProfileDiscussionActivityPage({
-    userId: user.id,
-    page: activityPage,
-    take: 15,
-  });
+
+  const [blockRow, muteRow] =
+    currentUserId && !isOwnProfile
+      ? await Promise.all([
+          prisma.userBlock.findUnique({
+            where: {
+              blockerId_blockedId: { blockerId: currentUserId, blockedId: user.id },
+            },
+            select: { id: true },
+          }),
+          prisma.userMute.findUnique({
+            where: {
+              userId_mutedUserId: { userId: currentUserId, mutedUserId: user.id },
+            },
+            select: { id: true },
+          }),
+        ])
+      : [null, null];
+
+  const viewerBlocksProfile = Boolean(blockRow);
+
+  const activity = viewerBlocksProfile
+    ? { items: [], hasNextPage: false, page: activityPage }
+    : await listProfileDiscussionActivityPage({
+        userId: user.id,
+        page: activityPage,
+        take: 15,
+      });
 
   const activityItems: CarmunityActivityItem[] = activity.items.map((row) => {
     if (row.kind === "thread") {
@@ -251,6 +275,14 @@ export default async function ProfilePage({
       <section className="flex flex-wrap items-center gap-2">
         {!isOwnProfile && currentUserId ? (
           <FollowButton targetUserId={user.id} initialFollowing={!!following} />
+        ) : null}
+        {!isOwnProfile && currentUserId ? (
+          <DiscussionPeerSafetyMenu
+            targetUserId={user.id}
+            targetHandle={user.handle}
+            initialBlocked={viewerBlocksProfile}
+            initialMuted={Boolean(muteRow)}
+          />
         ) : null}
         {isOwnProfile ? (
           <>

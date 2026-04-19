@@ -28,12 +28,14 @@ export async function GET(
 
   const session = await getSession();
   const viewerUserId = (session?.user as { id?: string } | undefined)?.id ?? null;
+  const viewerIsAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
 
   const page = await listForumRepliesPage({
     threadId,
     take: take.success ? take.data : 40,
     cursorId,
     viewerUserId,
+    viewerIsAdmin,
   });
 
   return NextResponse.json(page);

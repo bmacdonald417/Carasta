@@ -1,5 +1,7 @@
 import type { DiscussionReactionKind, PrismaClient } from "@prisma/client";
 
+import { recipientHasMutedActor } from "@/lib/user-safety";
+
 export const CARMUNITY_NOTIFICATION_TYPES = {
   THREAD_REPLY: "THREAD_REPLY",
   REPLY_REPLY: "REPLY_REPLY",
@@ -63,6 +65,7 @@ export async function notifyThreadReply(input: {
   threadTitle: string;
 }): Promise<void> {
   if (input.recipientId === input.actorId) return;
+  if (await recipientHasMutedActor(input.prisma, input.recipientId, input.actorId)) return;
   const href = `/discussions/${input.gearSlug}/${input.lowerGearSlug}/${input.threadId}`;
   const payload: DiscussionNotificationPayload = {
     title: `${input.actorHandle} replied to your thread`,
@@ -99,6 +102,7 @@ export async function notifyReplyToReply(input: {
   parentSnippet: string;
 }): Promise<void> {
   if (input.recipientId === input.actorId) return;
+  if (await recipientHasMutedActor(input.prisma, input.recipientId, input.actorId)) return;
   const href = `/discussions/${input.gearSlug}/${input.lowerGearSlug}/${input.threadId}`;
   const payload: DiscussionNotificationPayload = {
     title: `${input.actorHandle} replied to your comment`,
@@ -136,6 +140,7 @@ export async function notifyReaction(input: {
   onReply: boolean;
 }): Promise<void> {
   if (input.recipientId === input.actorId) return;
+  if (await recipientHasMutedActor(input.prisma, input.recipientId, input.actorId)) return;
   const since = new Date(Date.now() - 10 * 60 * 1000);
   if (
     await hasRecentDuplicate(input.prisma, {
@@ -183,6 +188,7 @@ export async function notifyMention(input: {
   snippet: string;
 }): Promise<void> {
   if (input.recipientId === input.actorId) return;
+  if (await recipientHasMutedActor(input.prisma, input.recipientId, input.actorId)) return;
   const since = new Date(Date.now() - 2 * 60 * 1000);
   const targetId = `${input.threadId}:${input.replyId ?? "op"}:${input.recipientId}`;
   if (

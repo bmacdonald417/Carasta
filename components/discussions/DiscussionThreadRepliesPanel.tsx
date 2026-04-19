@@ -18,6 +18,7 @@ export type SerializedThreadReply = {
   body: string;
   createdAt: string;
   demoSeed: boolean;
+  contentWithdrawn?: boolean;
   reactionSummary: DiscussionReactionTotals;
   viewerReactionKind: DiscussionReactionKind | null;
   author: { handle: string; name: string | null };
@@ -120,28 +121,40 @@ export function DiscussionThreadRepliesPanel({
                     </span>
                   ) : null}
                 </p>
-                <DiscussionReactionPicker
-                  target="reply"
-                  targetId={r.id}
-                  summary={r.reactionSummary}
-                  initialKind={r.viewerReactionKind}
-                />
+                {!r.contentWithdrawn ? (
+                  <DiscussionReactionPicker
+                    target="reply"
+                    targetId={r.id}
+                    summary={r.reactionSummary}
+                    initialKind={r.viewerReactionKind}
+                  />
+                ) : (
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
+                    Unavailable
+                  </span>
+                )}
               </div>
               <p className="mt-2 text-sm leading-relaxed text-foreground/90">
-                <DiscussionRichText text={r.body} validHandles={validMentionHandles} />
+                {r.contentWithdrawn ? (
+                  <span className="text-muted-foreground">This content has been removed.</span>
+                ) : (
+                  <DiscussionRichText text={r.body} validHandles={validMentionHandles} />
+                )}
               </p>
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 px-2 text-xs text-primary hover:text-primary"
-                    onClick={() => setParentReplyId(r.id)}
-                  >
-                    Reply
-                  </Button>
-                  {viewerUserId && viewerUserId !== r.authorId ? (
+                  {!r.contentWithdrawn ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs text-primary hover:text-primary"
+                      onClick={() => setParentReplyId(r.id)}
+                    >
+                      Reply
+                    </Button>
+                  ) : null}
+                  {viewerUserId && viewerUserId !== r.authorId && !r.contentWithdrawn ? (
                     <DiscussionReportDialog
                       target="reply"
                       threadId={threadId}
@@ -182,7 +195,11 @@ export function DiscussionThreadRepliesPanel({
               <span className="font-semibold text-primary">Replying to </span>
               <AuthorHandleLink handle={parentPreview.author.handle} className="text-xs" />
               <span className="mx-1 text-neutral-500">·</span>
-              <span className="line-clamp-2 text-neutral-400">{parentPreview.body}</span>
+              <span className="line-clamp-2 text-neutral-400">
+                {parentPreview.contentWithdrawn
+                  ? "This content has been removed."
+                  : parentPreview.body}
+              </span>
             </p>
             <button
               type="button"

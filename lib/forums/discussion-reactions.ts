@@ -19,12 +19,14 @@ export async function upsertDiscussionReaction(input: {
       select: {
         id: true,
         authorId: true,
+        isHidden: true,
         category: {
           select: { slug: true, space: { select: { slug: true } } },
         },
       },
     });
     if (!thread) return { ok: false, error: "Thread not found." };
+    if (thread.isHidden) return { ok: false, error: "This thread is not available." };
 
     const row = await input.prisma.forumThreadReaction.upsert({
       where: {
@@ -70,15 +72,20 @@ export async function upsertDiscussionReaction(input: {
       id: true,
       authorId: true,
       threadId: true,
+      isHidden: true,
       thread: {
         select: {
           id: true,
+          isHidden: true,
           category: { select: { slug: true, space: { select: { slug: true } } } },
         },
       },
     },
   });
   if (!reply) return { ok: false, error: "Reply not found." };
+  if (reply.isHidden || reply.thread.isHidden) {
+    return { ok: false, error: "This content is not available." };
+  }
 
   const row = await input.prisma.forumReplyReaction.upsert({
     where: {
@@ -127,9 +134,10 @@ export async function removeDiscussionReaction(input: {
   if (input.target === "thread") {
     const thread = await input.prisma.forumThread.findUnique({
       where: { id: input.targetId },
-      select: { id: true },
+      select: { id: true, isHidden: true },
     });
     if (!thread) return { ok: false, error: "Thread not found." };
+    if (thread.isHidden) return { ok: false, error: "This thread is not available." };
     await input.prisma.forumThreadReaction.deleteMany({
       where: { threadId: input.targetId, userId: input.userId },
     });
@@ -138,9 +146,16 @@ export async function removeDiscussionReaction(input: {
 
   const reply = await input.prisma.forumReply.findUnique({
     where: { id: input.targetId },
-    select: { id: true },
+    select: {
+      id: true,
+      isHidden: true,
+      thread: { select: { isHidden: true } },
+    },
   });
   if (!reply) return { ok: false, error: "Reply not found." };
+  if (reply.isHidden || reply.thread.isHidden) {
+    return { ok: false, error: "This content is not available." };
+  }
   await input.prisma.forumReplyReaction.deleteMany({
     where: { replyId: input.targetId, userId: input.userId },
   });

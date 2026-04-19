@@ -6,6 +6,7 @@ import { AuthorHandleLink } from "@/components/discussions/AuthorHandleLink";
 import { DemoDiscussionsBanner } from "@/components/discussions/DemoDiscussionsBanner";
 import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
 import { DiscussionReactionPicker } from "@/components/discussions/DiscussionReactionPicker";
+import { DiscussionPeerSafetyMenu } from "@/components/discussions/DiscussionPeerSafetyMenu";
 import { DiscussionReportDialog } from "@/components/discussions/DiscussionReportDialog";
 import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
 import { DiscussionThreadRepliesPanel } from "@/components/discussions/DiscussionThreadRepliesPanel";
@@ -22,7 +23,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { threadId } = await params;
-  const detail = await getForumThreadDetail(threadId);
+  const detail = await getForumThreadDetail(threadId, { viewerIsAdmin: false });
   if (!detail?.ok) return { title: "Thread" };
   return {
     title: detail.thread.title,
@@ -65,7 +66,11 @@ export default async function ThreadPage({ params }: Props) {
   const { gearSlug, lowerGearSlug, threadId } = await params;
   const session = await getSession();
   const viewerId = (session?.user as { id?: string } | undefined)?.id ?? null;
-  const detail = await getForumThreadDetail(threadId, viewerId);
+  const viewerIsAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
+  const detail = await getForumThreadDetail(threadId, {
+    viewerUserId: viewerId,
+    viewerIsAdmin,
+  });
   if (!detail?.ok) notFound();
 
   const { thread } = detail;
@@ -81,12 +86,31 @@ export default async function ThreadPage({ params }: Props) {
     replyBodies: thread.replies.map((r) => r.body),
   });
 
+  const peerSafety =
+    viewerId && viewerId !== thread.author.id
+      ? await Promise.all([
+          prisma.userBlock.findUnique({
+            where: {
+              blockerId_blockedId: { blockerId: viewerId, blockedId: thread.author.id },
+            },
+            select: { id: true },
+          }),
+          prisma.userMute.findUnique({
+            where: {
+              userId_mutedUserId: { userId: viewerId, mutedUserId: thread.author.id },
+            },
+            select: { id: true },
+          }),
+        ])
+      : null;
+
   const serializedReplies = thread.replies.map((r) => ({
     id: r.id,
     authorId: r.authorId,
     body: r.body,
     createdAt: r.createdAt,
     demoSeed: r.demoSeed,
+    contentWithdrawn: r.contentWithdrawn,
     reactionSummary: r.reactionSummary,
     viewerReactionKind: r.viewerReactionKind,
     author: { handle: r.author.handle, name: r.author.name },
@@ -124,13 +148,23 @@ export default async function ThreadPage({ params }: Props) {
                 {thread.title}
               </h1>
               {viewerId && viewerId !== thread.author.id ? (
-                <DiscussionReportDialog
-                  target="thread"
-                  threadId={thread.id}
-                  contentLabel={`Reporting “${thread.title.slice(0, 120)}${thread.title.length > 120 ? "…" : ""}”`}
-                  variant="outline"
-                  className="shrink-0 border-border/60"
-                />
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <DiscussionReportDialog
+                    target="thread"
+                    threadId={thread.id}
+                    contentLabel={`Reporting “${thread.title.slice(0, 120)}${thread.title.length > 120 ? "…" : ""}”`}
+                    variant="outline"
+                    className="border-border/60"
+                  />
+                  {peerSafety ? (
+                    <DiscussionPeerSafetyMenu
+                      targetUserId={thread.author.id}
+                      targetHandle={thread.author.handle}
+                      initialBlocked={Boolean(peerSafety[0])}
+                      initialMuted={Boolean(peerSafety[1])}
+                    />
+                  ) : null}
+                </div>
               ) : null}
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
