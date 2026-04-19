@@ -5,8 +5,13 @@ import { notFound } from "next/navigation";
 import { AuthorHandleLink } from "@/components/discussions/AuthorHandleLink";
 import { DemoDiscussionsBanner } from "@/components/discussions/DemoDiscussionsBanner";
 import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
-import { DiscussionReactionSummary } from "@/components/discussions/DiscussionReactionSummary";
-import { DiscussionThreadReplyComposer } from "@/components/discussions/DiscussionThreadReplyComposer";
+import { DiscussionReactionPicker } from "@/components/discussions/DiscussionReactionPicker";
+import { DiscussionReportDialog } from "@/components/discussions/DiscussionReportDialog";
+import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
+import { DiscussionThreadRepliesPanel } from "@/components/discussions/DiscussionThreadRepliesPanel";
+import { getSession } from "@/lib/auth";
+import { extractMentionHandles } from "@/lib/discussions/mentions";
+import { prisma } from "@/lib/db";
 import { getForumThreadDetail } from "@/lib/forums/forum-service";
 
 export const dynamic = "force-dynamic";
@@ -39,9 +44,28 @@ function formatLong(iso: string) {
   }
 }
 
+async function resolveValidMentionHandlesForThread(args: {
+  opBody: string;
+  replyBodies: string[];
+}): Promise<string[]> {
+  const handles = new Set<string>();
+  extractMentionHandles(args.opBody).forEach((h) => handles.add(h));
+  for (const b of args.replyBodies) {
+    extractMentionHandles(b).forEach((h) => handles.add(h));
+  }
+  if (handles.size === 0) return [];
+  const rows = await prisma.user.findMany({
+    where: { handle: { in: Array.from(handles), mode: "insensitive" } },
+    select: { handle: true },
+  });
+  return rows.map((r) => r.handle.toLowerCase());
+}
+
 export default async function ThreadPage({ params }: Props) {
   const { gearSlug, lowerGearSlug, threadId } = await params;
-  const detail = await getForumThreadDetail(threadId);
+  const session = await getSession();
+  const viewerId = (session?.user as { id?: string } | undefined)?.id ?? null;
+  const detail = await getForumThreadDetail(threadId, viewerId);
   if (!detail?.ok) notFound();
 
   const { thread } = detail;
@@ -51,6 +75,22 @@ export default async function ThreadPage({ params }: Props) {
   ) {
     notFound();
   }
+
+  const validMentionHandles = await resolveValidMentionHandlesForThread({
+    opBody: thread.body,
+    replyBodies: thread.replies.map((r) => r.body),
+  });
+
+  const serializedReplies = thread.replies.map((r) => ({
+    id: r.id,
+    authorId: r.authorId,
+    body: r.body,
+    createdAt: r.createdAt,
+    demoSeed: r.demoSeed,
+    reactionSummary: r.reactionSummary,
+    viewerReactionKind: r.viewerReactionKind,
+    author: { handle: r.author.handle, name: r.author.name },
+  }));
 
   return (
     <div className="carasta-container max-w-3xl py-8">
@@ -79,9 +119,20 @@ export default async function ThreadPage({ params }: Props) {
       <article className="mt-6 rounded-2xl border border-border/50 bg-card/60 p-5 shadow-glass-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="font-display text-xl font-bold uppercase tracking-wide text-neutral-100 md:text-2xl">
-              {thread.title}
-            </h1>
+            <div className="flex flex-wrap items-start gap-3">
+              <h1 className="font-display text-xl font-bold uppercase tracking-wide text-neutral-100 md:text-2xl">
+                {thread.title}
+              </h1>
+              {viewerId && viewerId !== thread.author.id ? (
+                <DiscussionReportDialog
+                  target="thread"
+                  threadId={thread.id}
+                  contentLabel={`Reporting “${thread.title.slice(0, 120)}${thread.title.length > 120 ? "…" : ""}”`}
+                  variant="outline"
+                  className="shrink-0 border-border/60"
+                />
+              ) : null}
+            </div>
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
               <AuthorHandleLink handle={thread.author.handle} className="text-sm" />
               {thread.author.name ? (
@@ -93,54 +144,28 @@ export default async function ThreadPage({ params }: Props) {
           </div>
           <div className="shrink-0 text-right">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">Reactions</p>
-            <DiscussionReactionSummary summary={thread.reactionSummary} compact={false} />
+            <DiscussionReactionPicker
+              target="thread"
+              targetId={thread.id}
+              summary={thread.reactionSummary}
+              initialKind={thread.viewerReactionKind}
+            />
           </div>
         </div>
-        <div className="mt-5 whitespace-pre-wrap border-t border-border/40 pt-5 text-sm leading-relaxed text-foreground/90">
-          {thread.body}
+        <div className="mt-5 border-t border-border/40 pt-5 text-sm leading-relaxed text-foreground/90">
+          <DiscussionRichText text={thread.body} validHandles={validMentionHandles} />
         </div>
       </article>
 
-      <section className="mt-8 space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-neutral-400">
-            Replies ({thread.replyCount})
-          </h2>
-        </div>
-        <ul className="space-y-3">
-          {thread.replies.length === 0 ? (
-            <li className="text-sm text-muted-foreground">No replies yet.</li>
-          ) : (
-            thread.replies.map((r) => (
-              <li
-                key={r.id}
-                className="rounded-2xl border border-border/50 bg-card/45 px-4 py-3 shadow-sm"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <p className="text-xs text-muted-foreground">
-                    <AuthorHandleLink handle={r.author.handle} className="text-xs" />
-                    {r.author.name ? (
-                      <span className="text-neutral-500"> · {r.author.name}</span>
-                    ) : null}
-                    <span className="text-neutral-500"> · {formatLong(r.createdAt)}</span>
-                    {r.demoSeed ? (
-                      <span className="ml-2 rounded border border-amber-500/35 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-200">
-                        Demo
-                      </span>
-                    ) : null}
-                  </p>
-                  <DiscussionReactionSummary summary={r.reactionSummary} />
-                </div>
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                  {r.body}
-                </p>
-              </li>
-            ))
-          )}
-        </ul>
-
-        <DiscussionThreadReplyComposer threadId={thread.id} locked={thread.locked} />
-      </section>
+      <DiscussionThreadRepliesPanel
+        threadId={thread.id}
+        viewerUserId={viewerId}
+        locked={thread.locked}
+        replyCount={thread.replyCount}
+        initialReplies={serializedReplies}
+        initialNextCursor={thread.repliesNextCursor}
+        validMentionHandles={validMentionHandles}
+      />
 
       <p className="mt-10 text-sm text-muted-foreground">
         <Link

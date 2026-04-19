@@ -32,9 +32,15 @@ function formatWhen(iso: string) {
 export function CarmunityActivitySection({
   items,
   handle,
+  page = 1,
+  hasNextPage = false,
+  nextPageHref,
 }: {
   items: CarmunityActivityItem[];
   handle: string;
+  page?: number;
+  hasNextPage?: boolean;
+  nextPageHref?: string | null;
 }) {
   if (items.length === 0) {
     return (
@@ -62,6 +68,9 @@ export function CarmunityActivitySection({
         </h2>
         <p className="text-sm text-muted-foreground">
           Recent Discussions participation by @{handle}
+          {page > 1 ? (
+            <span className="ml-2 text-xs text-primary">· page {page}</span>
+          ) : null}
         </p>
       </div>
       <ul className="space-y-2">
@@ -92,6 +101,16 @@ export function CarmunityActivitySection({
           </li>
         ))}
       </ul>
+      {hasNextPage && nextPageHref ? (
+        <div className="flex justify-center pt-2">
+          <Link
+            href={nextPageHref}
+            className="rounded-full border border-primary/35 bg-primary/5 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary/10"
+          >
+            Load more activity
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }

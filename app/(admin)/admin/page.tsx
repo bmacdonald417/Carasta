@@ -104,6 +104,26 @@ export default async function AdminPage() {
         </div>
       </div>
 
+      {/* Carmunity moderation */}
+      <div className="mt-8">
+        <Link
+          href="/admin/moderation/discussions"
+          className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition hover:border-primary/30 hover:bg-white/[0.07]"
+        >
+          <div className="rounded-lg bg-primary/15 p-3">
+            <Flag className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-neutral-100">
+              Discussion reports
+            </h2>
+            <p className="mt-1 text-sm text-neutral-500">
+              Review user-submitted Discussions reports (read-only queue).
+            </p>
+          </div>
+        </Link>
+      </div>
+
       {/* Marketing (platform summary) */}
       <div className="mt-8">
         <Link

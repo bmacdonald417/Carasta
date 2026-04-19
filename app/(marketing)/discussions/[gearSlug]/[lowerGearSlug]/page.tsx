@@ -15,12 +15,18 @@ export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ gearSlug: string; lowerGearSlug: string }>;
-  searchParams: Promise<{ sort?: string }>;
+  searchParams: Promise<{ sort?: string; page?: string }>;
 };
 
 function parseSort(raw: string | undefined): DiscussionSortMode {
   if (raw === "new" || raw === "top") return raw;
   return "trending";
+}
+
+function parsePage(raw: string | undefined): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 1) return 1;
+  return Math.floor(n);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -53,11 +59,14 @@ function sortLink(
   mode: DiscussionSortMode,
   active: DiscussionSortMode
 ) {
-  const qs = mode === "trending" ? "" : `?sort=${mode}`;
+  const params = new URLSearchParams();
+  if (mode !== "trending") params.set("sort", mode);
+  const qs = params.toString();
+  const suffix = qs ? `?${qs}` : "";
   const isActive = mode === active;
   return (
     <Link
-      href={`/discussions/${gearSlug}/${lowerGearSlug}${qs}`}
+      href={`/discussions/${gearSlug}/${lowerGearSlug}${suffix}`}
       className={
         isActive
           ? "rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary"
@@ -73,6 +82,7 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
   const { gearSlug, lowerGearSlug } = await params;
   const sp = await searchParams;
   const sort = parseSort(typeof sp.sort === "string" ? sp.sort : undefined);
+  const page = parsePage(typeof sp.page === "string" ? sp.page : undefined);
 
   const catRes = await getLowerGearBySlugs(gearSlug, lowerGearSlug);
   if (!catRes.ok) notFound();
@@ -80,11 +90,13 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
 
   const threadsRes = await listThreadsForCategory({
     categoryId: category.id,
-    take: 30,
+    page,
+    take: 20,
     sort,
   });
   if (!threadsRes.ok) notFound();
-  const { threads } = threadsRes;
+  const { threads, hasNextPage, totalCount } = threadsRes;
+  const totalPages = Math.max(1, Math.ceil(totalCount / 20));
 
   return (
     <div className="carasta-container max-w-3xl py-8">
@@ -114,7 +126,8 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
           {sortLink(gearSlug, lowerGearSlug, "top", sort)}
         </div>
         <p className="mt-2 text-[11px] text-muted-foreground">
-          Trending = recent activity · New = created date · Top = reply count (placeholder ranking).
+          New = recency · Top = replies + reactions (last 90 days) · Trending = engagement with recency decay. See
+          CARMUNITY_PHASE_G_MODERATION_AND_SCALE.md for formulas.
         </p>
       </header>
 
@@ -154,6 +167,44 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
           ))
         )}
       </ul>
+
+      {totalPages > 1 || hasNextPage ? (
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/50 bg-card/35 px-4 py-3 text-sm text-muted-foreground">
+          <p className="text-xs">
+            Page <span className="font-semibold text-primary">{page}</span> of{" "}
+            <span className="font-semibold text-foreground">{totalPages}</span>
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {page > 1 ? (
+              <Link
+                href={(() => {
+                  const p = new URLSearchParams();
+                  if (sort !== "trending") p.set("sort", sort);
+                  p.set("page", String(page - 1));
+                  const qs = p.toString();
+                  return `/discussions/${gearSlug}/${lowerGearSlug}${qs ? `?${qs}` : ""}`;
+                })()}
+                className="rounded-full border border-border/60 bg-background/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary hover:border-primary/40"
+              >
+                Previous
+              </Link>
+            ) : null}
+            {hasNextPage ? (
+              <Link
+                href={(() => {
+                  const p = new URLSearchParams();
+                  if (sort !== "trending") p.set("sort", sort);
+                  p.set("page", String(page + 1));
+                  return `/discussions/${gearSlug}/${lowerGearSlug}?${p.toString()}`;
+                })()}
+                className="rounded-full border border-primary/35 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary hover:bg-primary/15"
+              >
+                Next
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <p className="mt-10 text-sm text-muted-foreground">
         <Link href={`/discussions/${category.space.slug}`} className="text-primary hover:underline">

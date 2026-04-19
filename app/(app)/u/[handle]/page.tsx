@@ -18,13 +18,17 @@ import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAutho
 import { CarmunityActivitySection } from "@/components/profile/CarmunityActivitySection";
 import type { CarmunityActivityItem } from "@/components/profile/CarmunityActivitySection";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
+import { listProfileDiscussionActivityPage } from "@/lib/forums/profile-discussion-activity";
 
 export default async function ProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ handle: string }>;
+  searchParams?: Promise<{ activityPage?: string }>;
 }) {
   const { handle } = await params;
+  const sp = (await searchParams) ?? {};
   const session = await getSession();
   const currentUserId = (session?.user as any)?.id;
 
@@ -82,7 +86,7 @@ export default async function ProfilePage({
       })
     : null;
 
-  const [recentPosts, garagePreviewCars, forumThreads, forumReplies] = await Promise.all([
+  const [recentPosts, garagePreviewCars] = await Promise.all([
     prisma.post.findMany({
       where: { authorId: user.id },
       orderBy: { createdAt: "desc" },
@@ -106,44 +110,6 @@ export default async function ProfilePage({
         make: true,
         model: true,
         images: { orderBy: { sortOrder: "asc" }, take: 1, select: { url: true } },
-      },
-    }),
-    prisma.forumThread.findMany({
-      where: { authorId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      select: {
-        id: true,
-        title: true,
-        createdAt: true,
-        category: {
-          select: {
-            slug: true,
-            space: { select: { slug: true } },
-          },
-        },
-      },
-    }),
-    prisma.forumReply.findMany({
-      where: { authorId: user.id },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      select: {
-        id: true,
-        body: true,
-        createdAt: true,
-        thread: {
-          select: {
-            id: true,
-            title: true,
-            category: {
-              select: {
-                slug: true,
-                space: { select: { slug: true } },
-              },
-            },
-          },
-        },
       },
     }),
   ]);
@@ -170,27 +136,34 @@ export default async function ProfilePage({
     name: ub.badge.name,
   }));
 
-  const activityItems: CarmunityActivityItem[] = [
-    ...forumThreads.map((t) => ({
-      kind: "thread" as const,
-      at: t.createdAt.toISOString(),
-      title: t.title,
-      href: discussionThreadPath(t.category.space.slug, t.category.slug, t.id),
-    })),
-    ...forumReplies.map((r) => ({
+  const activityPage = Math.max(1, Number(sp.activityPage) || 1);
+  const activity = await listProfileDiscussionActivityPage({
+    userId: user.id,
+    page: activityPage,
+    take: 15,
+  });
+
+  const activityItems: CarmunityActivityItem[] = activity.items.map((row) => {
+    if (row.kind === "thread") {
+      return {
+        kind: "thread" as const,
+        at: row.at.toISOString(),
+        title: row.title,
+        href: discussionThreadPath(row.gearSlug, row.lowerGearSlug, row.id),
+      };
+    }
+    return {
       kind: "reply" as const,
-      at: r.createdAt.toISOString(),
-      excerpt: r.body.replace(/\s+/g, " ").trim().slice(0, 220),
-      threadTitle: r.thread.title,
-      href: discussionThreadPath(
-        r.thread.category.space.slug,
-        r.thread.category.slug,
-        r.thread.id
-      ),
-    })),
-  ]
-    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
-    .slice(0, 18);
+      at: row.at.toISOString(),
+      excerpt: row.body.replace(/\s+/g, " ").trim().slice(0, 220),
+      threadTitle: row.threadTitle,
+      href: discussionThreadPath(row.gearSlug, row.lowerGearSlug, row.threadId),
+    };
+  });
+
+  const activityNextHref = activity.hasNextPage
+    ? `/u/${encodeURIComponent(user.handle)}?activityPage=${activityPage + 1}`
+    : null;
 
   const displayName = user.name?.trim() || `@${user.handle}`;
   const garageTiles = garagePreviewCars.map((c) => ({
@@ -305,7 +278,13 @@ export default async function ProfilePage({
         ) : null}
       </section>
 
-      <CarmunityActivitySection items={activityItems} handle={user.handle} />
+      <CarmunityActivitySection
+        items={activityItems}
+        handle={user.handle}
+        page={activityPage}
+        hasNextPage={activity.hasNextPage}
+        nextPageHref={activityNextHref}
+      />
 
       {/* 3 — Garage spotlight */}
       <section className="space-y-3">

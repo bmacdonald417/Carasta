@@ -85,10 +85,10 @@ async function reactThread(
 ) {
   await prisma.forumThreadReaction.upsert({
     where: {
-      threadId_userId_kind: { threadId, userId, kind },
+      threadId_userId: { threadId, userId },
     },
     create: { threadId, userId, kind },
-    update: {},
+    update: { kind },
   });
 }
 
@@ -100,10 +100,10 @@ async function reactReply(
 ) {
   await prisma.forumReplyReaction.upsert({
     where: {
-      replyId_userId_kind: { replyId, userId, kind },
+      replyId_userId: { replyId, userId },
     },
     create: { replyId, userId, kind },
-    update: {},
+    update: { kind },
   });
 }
 

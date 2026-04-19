@@ -10,12 +10,19 @@ import { Textarea } from "@/components/ui/textarea";
 export function DiscussionThreadReplyComposer({
   threadId,
   locked,
+  parentReplyId,
+  onPosted,
+  signInCallbackUrl,
 }: {
   threadId: string;
   locked: boolean;
+  parentReplyId?: string | null;
+  onPosted?: () => void;
+  signInCallbackUrl?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const callbackUrl = signInCallbackUrl ?? (pathname || "/discussions");
   const { data: session, status } = useSession();
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
@@ -37,7 +44,7 @@ export function DiscussionThreadReplyComposer({
     return (
       <div className="rounded-xl border border-border/60 bg-card/60 p-4 text-sm text-muted-foreground">
         <Link
-          href={`/auth/sign-in?callbackUrl=${encodeURIComponent(pathname || "/discussions")}`}
+          href={`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`}
           className="text-primary hover:underline"
         >
           Sign in
@@ -60,7 +67,10 @@ export function DiscussionThreadReplyComposer({
       const res = await fetch(`/api/discussions/threads/${encodeURIComponent(threadId)}/replies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: trimmed }),
+        body: JSON.stringify({
+          body: trimmed,
+          parentReplyId: parentReplyId ?? undefined,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -68,6 +78,7 @@ export function DiscussionThreadReplyComposer({
         return;
       }
       setBody("");
+      onPosted?.();
       router.refresh();
     } finally {
       setSending(false);
@@ -90,7 +101,8 @@ export function DiscussionThreadReplyComposer({
       />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[11px] text-muted-foreground">
-          Reactions picker ships next — for now, replies only.
+          Tip: mention someone with <span className="font-mono text-primary/90">@handle</span> — valid handles
+          become profile links and send a notification.
         </p>
         <Button type="submit" variant="performance" size="sm" disabled={sending}>
           {sending ? "Posting…" : "Post reply"}

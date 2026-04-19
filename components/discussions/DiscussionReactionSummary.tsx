@@ -1,23 +1,9 @@
 import type { DiscussionReactionTotals } from "@/lib/forums/forum-service";
+import {
+  DISCUSSION_REACTION_COMPACT,
+  DISCUSSION_REACTION_KIND_ORDER,
+} from "@/lib/discussions/reaction-labels";
 import { cn } from "@/lib/utils";
-
-const KIND_ORDER = [
-  "LIKE",
-  "FIRE",
-  "WRENCH",
-  "MIND_BLOWN",
-  "LAUGH",
-  "RESPECT",
-] as const;
-
-const SHORT: Record<(typeof KIND_ORDER)[number], string> = {
-  LIKE: "Like",
-  FIRE: "Fire",
-  WRENCH: "Wrench",
-  MIND_BLOWN: "Mind",
-  LAUGH: "Laugh",
-  RESPECT: "Respect",
-};
 
 export function DiscussionReactionSummary({
   summary,
@@ -36,10 +22,12 @@ export function DiscussionReactionSummary({
     );
   }
 
-  const parts = KIND_ORDER.filter((k) => (summary.byKind[k] ?? 0) > 0).map((k) => {
-    const n = summary.byKind[k] ?? 0;
-    return `${SHORT[k]} ${n}`;
-  });
+  const parts = DISCUSSION_REACTION_KIND_ORDER.filter((k) => (summary.byKind[k] ?? 0) > 0).map(
+    (k) => {
+      const n = summary.byKind[k] ?? 0;
+      return `${DISCUSSION_REACTION_COMPACT[k]} ${n}`;
+    }
+  );
 
   return (
     <span

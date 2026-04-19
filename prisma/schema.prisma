@@ -85,6 +85,25 @@ enum DiscussionReactionKind {
   RESPECT
 }
 
+enum DiscussionReportReason {
+  harassment
+  spam
+  hate
+  illegal
+  self_harm
+  explicit
+  misinformation
+  off_topic
+  other
+}
+
+enum DiscussionReportStatus {
+  OPEN
+  REVIEWED
+  DISMISSED
+  ACTIONED
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -146,6 +165,10 @@ model User {
   forumReplyReactions ForumReplyReaction[]
   userBadges UserBadge[]
   auctionWatches AuctionWatch[]
+  /// Outbound Carmunity / system notifications where this user is the actor.
+  notificationsSent Notification[] @relation("NotificationActor")
+  discussionReportsSubmitted DiscussionReport[] @relation("DiscussionReportReporter")
+  discussionReportsReviewed DiscussionReport[] @relation("DiscussionReportReviewer")
 }
 
 /// Top-level Carmunity forum area (e.g. Mechanics Corner, Gear Interests). Distinct from feed [Post].
@@ -203,6 +226,7 @@ model ForumThread {
   author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   replies  ForumReply[]
   threadReactions ForumThreadReaction[]
+  discussionReports DiscussionReport[]
 
   @@index([categoryId, lastActivityAt])
   @@index([authorId])
@@ -212,6 +236,8 @@ model ForumReply {
   id        String   @id @default(cuid())
   threadId  String
   authorId  String
+  /// When set, this reply is nested under another reply in the same thread (Phase F).
+  parentReplyId String?
   body      String   @db.Text
   /// Seeded demo reply — see CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md
   isDemoSeed Boolean  @default(false)
@@ -220,10 +246,38 @@ model ForumReply {
 
   thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   author User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentReply ForumReply?  @relation("ForumReplyThread", fields: [parentReplyId], references: [id], onDelete: SetNull)
+  childReplies ForumReply[] @relation("ForumReplyThread")
   replyReactions ForumReplyReaction[]
+  discussionReports DiscussionReport[]
 
   @@index([threadId, createdAt])
   @@index([authorId])
+  @@index([parentReplyId])
+}
+
+/// User-submitted moderation signal for Discussions (Phase G). Not a verdict.
+model DiscussionReport {
+  id           String                 @id @default(cuid())
+  reporterId   String
+  threadId     String?
+  replyId      String?
+  reason       DiscussionReportReason
+  details      String?                @db.Text
+  status       DiscussionReportStatus @default(OPEN)
+  createdAt    DateTime               @default(now())
+  reviewedAt   DateTime?
+  reviewedById String?
+
+  reporter   User         @relation("DiscussionReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  thread     ForumThread? @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  reply      ForumReply?  @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  reviewedBy User?        @relation("DiscussionReportReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([reporterId])
+  @@index([threadId])
+  @@index([replyId])
 }
 
 model ForumThreadReaction {
@@ -232,11 +286,13 @@ model ForumThreadReaction {
   userId    String
   kind      DiscussionReactionKind
   createdAt DateTime               @default(now())
+  updatedAt DateTime               @default(now()) @updatedAt
 
   thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([threadId, userId, kind])
+  /// One reaction per user per thread (kind can change).
+  @@unique([threadId, userId])
   @@index([threadId])
   @@index([userId])
 }
@@ -247,11 +303,13 @@ model ForumReplyReaction {
   userId    String
   kind      DiscussionReactionKind
   createdAt DateTime               @default(now())
+  updatedAt DateTime               @default(now()) @updatedAt
 
   reply ForumReply @relation(fields: [replyId], references: [id], onDelete: Cascade)
   user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([replyId, userId, kind])
+  /// One reaction per user per reply (kind can change).
+  @@unique([replyId, userId])
   @@index([replyId])
   @@index([userId])
 }
@@ -565,15 +623,21 @@ model AutoBid {
 model Notification {
   id         String    @id @default(cuid())
   userId     String
+  /// User who triggered this notification (discussions / social), when applicable.
+  actorId    String?
+  /// Focal entity id for dedupe (e.g. thread id, reply id). Optional for legacy rows.
+  targetId   String?
   type       String
   payloadJson String
   createdAt  DateTime  @default(now())
   readAt     DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([userId, readAt])
+  @@index([userId, type, actorId, targetId, createdAt])
 }
 
 model ReputationEvent {
