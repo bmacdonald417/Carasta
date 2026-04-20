@@ -54,8 +54,11 @@ When discussing deploys, migrations, or env vars, default assumptions must be:
 `package.json` defines:
 
 ```json
-"build": "prisma generate && npx ts-node -P tsconfig.scripts.json scripts/revert-enum-if-needed.ts && prisma db push && prisma db seed && next build"
+"build": "node scripts/build-with-public-db.cjs",
+"build:core": "prisma generate && npx ts-node -P tsconfig.scripts.json scripts/revert-enum-if-needed.ts && prisma db push && prisma db seed && next build"
 ```
+
+The **`build-with-public-db`** wrapper sets `DATABASE_URL` to **`DATABASE_PUBLIC_URL`** for the build subprocess when the latter is set. Railway’s **Nixpacks build network** often cannot reach **`postgres-*.railway.internal`**, so the **web service** should set **`DATABASE_PUBLIC_URL`** to the Postgres plugin’s **public / proxy** connection string while keeping **`DATABASE_URL`** as the **private** URL for **runtime**.
 
 So a **default `npm run build`** on Railway **already** runs **`prisma db push`** and **`prisma db seed`** (after `prisma generate` and the enum helper script). This is **not** `prisma migrate deploy`; the project relies on **`db push`** for deploy-time schema sync.
 

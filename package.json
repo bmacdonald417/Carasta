@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && npx ts-node -P tsconfig.scripts.json scripts/revert-enum-if-needed.ts && prisma db push && prisma db seed && next build",
+    "build": "node scripts/build-with-public-db.cjs",
+    "build:core": "prisma generate && npx ts-node -P tsconfig.scripts.json scripts/revert-enum-if-needed.ts && prisma db push && prisma db seed && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",

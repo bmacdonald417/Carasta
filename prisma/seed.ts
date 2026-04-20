@@ -2,6 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 import { ensureBadgesAndDiscussionReactions } from "./seed-badges-reactions";
+import {
+  ensureAiTestAccount,
+  MAX_AUCTIONS_BEFORE_FULL_DEMO_SEED,
+} from "./seed-ai-test-account";
 import { ensureDemoDiscussionSeed } from "./seed-demo-discussions";
 import { ensureTaxonomyGearsFromDoc } from "./seed-taxonomy-gears";
 
@@ -130,10 +134,17 @@ async function main() {
   await ensureTaxonomyGearsFromDoc(prisma);
   await ensureDemoDiscussionSeed(prisma);
   await ensureBadgesAndDiscussionReactions(prisma);
+  await ensureAiTestAccount(prisma);
 
   const existingCount = await prisma.auction.count();
-  if (existingCount > 0) {
-    console.log("Seed skipped — database already has", existingCount, "auctions.");
+  if (existingCount > MAX_AUCTIONS_BEFORE_FULL_DEMO_SEED) {
+    console.log(
+      "Full listing demo seed skipped — database has",
+      existingCount,
+      "auctions (threshold:",
+      MAX_AUCTIONS_BEFORE_FULL_DEMO_SEED,
+      "= only the fixed AI test listing may exist before inserting Tom + demo pack).",
+    );
     return;
   }
 
