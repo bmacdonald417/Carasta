@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { MentionComposerTextarea } from "@/components/carmunity/MentionComposerTextarea";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 
 export function DiscussionThreadReplyComposer({
   threadId,
@@ -86,25 +86,41 @@ export function DiscussionThreadReplyComposer({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3 rounded-2xl border border-border/60 bg-card/50 p-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Your reply</p>
+    <form
+      onSubmit={onSubmit}
+      className="space-y-4 rounded-2xl border border-border/50 bg-card/55 p-4 shadow-sm backdrop-blur-sm sm:p-5"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-primary/90">Reply</p>
+          <p className="text-sm font-medium text-foreground">Join the thread</p>
+        </div>
+        <span className="tabular-nums text-[11px] text-muted-foreground">{body.length} / 8000</span>
+      </div>
       {error ? (
         <p className="text-sm text-destructive">{error}</p>
       ) : null}
-      <Textarea
+      <MentionComposerTextarea
+        threadId={threadId}
         value={body}
-        onChange={(e) => setBody(e.target.value)}
-        placeholder="Share perspective, data, or encouragement…"
+        onChange={setBody}
+        placeholder="Add perspective, data, or encouragement — type @ to mention someone."
         rows={4}
-        className="resize-y bg-background/80"
+        className="min-h-[108px] resize-y border-border/60 bg-background/70 text-[15px] leading-relaxed"
         maxLength={8000}
       />
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[11px] text-muted-foreground">
-          Tip: mention someone with <span className="font-mono text-primary/90">@handle</span> — valid handles
-          become profile links and send a notification.
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/35 pt-3">
+        <p className="max-w-xl text-[11px] leading-snug text-muted-foreground">
+          <span className="font-mono text-primary/90">@handle</span> linkifies for readers and notifies when the
+          handle is valid on Carmunity.
         </p>
-        <Button type="submit" variant="performance" size="sm" disabled={sending}>
+        <Button
+          type="submit"
+          variant="performance"
+          size="sm"
+          disabled={sending}
+          className="shrink-0 rounded-full px-4"
+        >
           {sending ? "Posting…" : "Post reply"}
         </Button>
       </div>

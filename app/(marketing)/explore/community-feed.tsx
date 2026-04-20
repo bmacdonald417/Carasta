@@ -367,7 +367,7 @@ function FollowingFeedList({
     return <FeedEmptyState variant="following" currentUserId={currentUserId} />;
   }
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {items.map((item) => {
         if (item.type === "post") {
           return (
@@ -417,7 +417,7 @@ function FollowingThreadCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
     >
-      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
+      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm transition-[border-color,box-shadow] duration-200 hover:border-primary/25 hover:shadow-md">
         <div className="flex items-start gap-3 px-4 pt-4 pb-2">
           <Link href={`/u/${thread.author.handle}`} className="shrink-0">
             <Avatar className="h-11 w-11 ring-1 ring-border/60">
@@ -490,7 +490,7 @@ function FollowingReplyCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
     >
-      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
+      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm transition-[border-color,box-shadow] duration-200 hover:border-primary/25 hover:shadow-md">
         <div className="flex items-start gap-3 px-4 pt-4 pb-2">
           <Link href={`/u/${reply.author.handle}`} className="shrink-0">
             <Avatar className="h-11 w-11 ring-1 ring-border/60">
@@ -545,11 +545,16 @@ function FollowingReplyCard({
 
 function FeedSkeletonList({ count = 3 }: { count?: number }) {
   return (
-    <div className="space-y-6">
+    <div
+      className="space-y-5"
+      role="status"
+      aria-busy="true"
+      aria-label="Loading Carmunity feed"
+    >
       {Array.from({ length: count }).map((_, i) => (
         <Card
           key={`feed-skeleton-${i}`}
-          className="carmunity-feed-card overflow-hidden border-border/50 bg-card/50 p-0 shadow-sm"
+          className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/50 p-0 shadow-sm"
         >
           <div className="flex items-center gap-3 px-4 pt-4 pb-3">
             <div className="carmunity-skeleton-pulse h-11 w-11 shrink-0 rounded-full bg-muted" />
@@ -588,7 +593,7 @@ function PostList({
     return <FeedEmptyState variant={variant} currentUserId={currentUserId} />;
   }
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {posts.map((post) => (
         <PostCard
           key={post.id}
@@ -622,8 +627,8 @@ function PostCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
     >
-      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
-        <div className="flex items-start gap-3 px-4 pt-4 pb-3">
+      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm transition-[border-color,box-shadow] duration-200 hover:border-primary/25 hover:shadow-md">
+        <div className="flex items-start gap-3 px-4 pt-4 pb-2">
           <Link href={`/u/${post.author.handle}`} className="shrink-0">
             <Avatar className="h-11 w-11 ring-1 ring-border/60">
               <AvatarImage src={post.author.avatarUrl ?? undefined} alt="" />
@@ -660,7 +665,7 @@ function PostCard({
         )}
 
         {(hasContent || !hasImage) && (
-          <div className="px-4 pb-1 pt-2">
+          <div className="px-4 pb-2 pt-1">
             {hasContent ? (
               <Link href={`/explore/post/${post.id}`} className="block">
                 <p className="line-clamp-6 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
@@ -678,26 +683,30 @@ function PostCard({
           </div>
         )}
 
-        <div className="flex items-center gap-1 border-t border-border/40 px-2 py-2">
+        <div className="flex items-center gap-0.5 border-t border-border/40 px-2 py-2.5">
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="h-9 gap-1.5 rounded-full px-3 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            className={`h-9 gap-1.5 rounded-full px-3 transition-colors duration-150 hover:bg-muted/50 ${
+              post.liked ? "text-primary hover:text-primary" : "text-muted-foreground hover:text-foreground"
+            } active:scale-[0.98]`}
             onClick={(e) => {
               e.preventDefault();
               onToggleLike(post.id, !!post.liked);
             }}
           >
             <Heart
-              className={`h-[18px] w-[18px] shrink-0 ${post.liked ? "fill-primary text-primary" : ""}`}
+              className={`h-[18px] w-[18px] shrink-0 transition-transform duration-150 ${
+                post.liked ? "scale-105 fill-primary text-primary" : ""
+              }`}
             />
             <span className="min-w-[1ch] tabular-nums text-xs font-medium">{post._count.likes}</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="h-9 gap-1.5 rounded-full px-3 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            className="h-9 gap-1.5 rounded-full px-3 text-muted-foreground transition-colors duration-150 hover:bg-muted/50 hover:text-foreground active:scale-[0.98]"
             asChild
           >
             <Link href={`/explore/post/${post.id}`}>

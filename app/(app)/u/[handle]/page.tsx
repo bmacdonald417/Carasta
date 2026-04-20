@@ -256,7 +256,7 @@ export default async function ProfilePage({
     <div className="carasta-container max-w-3xl space-y-8 py-10 pb-16">
       {user.isDemoSeed ? <DemoProfileBanner /> : null}
       {/* 1 — Profile header */}
-      <section className="carmunity-profile-enter overflow-hidden rounded-2xl border border-border/50 bg-card/70 shadow-sm backdrop-blur-sm">
+      <section className="carmunity-profile-enter overflow-hidden rounded-2xl border border-border/50 bg-card/70 shadow-md backdrop-blur-sm">
         <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start sm:gap-8">
           <Avatar className="mx-auto h-28 w-28 shrink-0 ring-2 ring-border/60 sm:mx-0 sm:h-32 sm:w-32">
             <AvatarImage src={user.avatarUrl ?? user.image ?? undefined} alt="" />
@@ -529,7 +529,7 @@ export default async function ProfilePage({
         {recentPosts.length === 0 ? (
           <ProfilePostsEmpty isOwnProfile={isOwnProfile} handle={user.handle} />
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4">
             {recentPosts.map((p) => (
               <ProfilePostPreview
                 key={p.id}

@@ -1,13 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { PenLine } from "lucide-react";
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import { ImageIcon, PenLine } from "lucide-react";
+
+import { MentionComposerTextarea } from "@/components/carmunity/MentionComposerTextarea";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createPost } from "./actions";
 import { useToast } from "@/components/ui/use-toast";
+
+import { createPost } from "./actions";
+
+function looksLikeHttpUrl(s: string) {
+  try {
+    const u = new URL(s.trim());
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 export function CreatePostForm({
   onCreated,
@@ -20,6 +32,12 @@ export function CreatePostForm({
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const previewUrl = useMemo(() => {
+    const t = imageUrl.trim();
+    if (!t || !looksLikeHttpUrl(t)) return null;
+    return t;
+  }, [imageUrl]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,25 +65,29 @@ export function CreatePostForm({
     <form
       id="carmunity-create-post"
       onSubmit={submit}
-      className={`scroll-mt-28 rounded-2xl border border-border/50 bg-card/70 p-4 shadow-sm backdrop-blur-sm ${className ?? ""}`}
+      className={`scroll-mt-28 rounded-2xl border border-border/50 bg-card/70 p-4 shadow-sm backdrop-blur-sm sm:p-5 ${className ?? ""}`}
     >
-      <div className="mb-3 flex items-center gap-2 text-muted-foreground">
-        <PenLine className="h-4 w-4 text-primary" aria-hidden />
-        <span className="text-xs font-semibold uppercase tracking-wider text-foreground/80">
-          Share to Carmunity
-        </span>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <PenLine className="h-4 w-4 text-primary" aria-hidden />
+          <span className="text-xs font-semibold uppercase tracking-wider text-foreground/80">
+            Share to Carmunity
+          </span>
+        </div>
+        <span className="tabular-nums text-[11px] text-muted-foreground">{content.length} / 8000</span>
       </div>
       <Label htmlFor="post-content" className="sr-only">
         Post body
       </Label>
-      <Textarea
+      <MentionComposerTextarea
         id="post-content"
-        placeholder="Build update, garage shot, or what you’re chasing…"
         value={content}
-        onChange={(e) => setContent(e.target.value)}
-        className="min-h-[88px] resize-none border-border/60 bg-background/60 text-[15px] leading-relaxed"
+        onChange={setContent}
+        placeholder="Garage shot, build note, or a question for the lane — type @ to mention someone."
+        className="min-h-[96px] resize-none border-border/60 bg-background/60 text-[15px] leading-relaxed"
+        maxLength={8000}
       />
-      <div className="mt-3">
+      <div className="mt-4 space-y-2">
         <Label htmlFor="post-image" className="text-xs text-muted-foreground">
           Image URL (optional)
         </Label>
@@ -75,11 +97,29 @@ export function CreatePostForm({
           placeholder="https://…"
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
-          className="mt-1 border-border/60 bg-background/60"
+          className="border-border/60 bg-background/60"
         />
+        {previewUrl ? (
+          <div className="mt-2 overflow-hidden rounded-xl border border-border/50 bg-muted/20">
+            <div className="relative aspect-[16/9] w-full max-h-48 bg-muted">
+              <Image
+                src={previewUrl}
+                alt=""
+                fill
+                unoptimized
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 640px"
+              />
+            </div>
+            <p className="flex items-center gap-1.5 px-3 py-2 text-[11px] text-muted-foreground">
+              <ImageIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              Preview — Carmunity will store the URL you post.
+            </p>
+          </div>
+        ) : null}
       </div>
-      <div className="mt-4 flex justify-end">
-        <Button type="submit" variant="default" size="sm" disabled={loading}>
+      <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-border/35 pt-4">
+        <Button type="submit" variant="default" size="sm" className="rounded-full px-5" disabled={loading}>
           {loading ? "Posting…" : "Post"}
         </Button>
       </div>

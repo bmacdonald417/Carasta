@@ -162,9 +162,33 @@ class _ForumThreadDetailScreenState extends ConsumerState<ForumThreadDetailScree
                                       ),
                                       const SizedBox(height: AppSpacing.sm),
                                       if (_thread!.replies.isEmpty)
-                                        Text(
-                                          'No replies yet.',
-                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                                        Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.all(AppSpacing.lg),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.surfaceCard.withOpacity(0.65),
+                                            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                                            border: Border.all(color: AppColors.accent.withOpacity(0.22)),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Be the first reply',
+                                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                              ),
+                                              const SizedBox(height: AppSpacing.xs),
+                                              Text(
+                                                'Lead with context or a specific question. Use @handle when you want someone looped in — autocomplete lives on web; parsing stays server-side.',
+                                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                      color: AppColors.textSecondary,
+                                                      height: 1.45,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
                                         )
                                       else
                                         ..._thread!.replies.map((r) => _ReplyBubble(reply: r)),
@@ -205,9 +229,27 @@ class _ForumThreadDetailScreenState extends ConsumerState<ForumThreadDetailScree
                                           minLines: 1,
                                           maxLines: 5,
                                           enabled: auth.canPerformMutations && !_replying,
-                                          decoration: const InputDecoration(
-                                            labelText: 'Reply',
-                                            border: OutlineInputBorder(),
+                                          textInputAction: TextInputAction.newline,
+                                          decoration: InputDecoration(
+                                            hintText: 'Write a reply… (@mentions supported on web)',
+                                            filled: true,
+                                            fillColor: AppColors.surfaceCard.withOpacity(0.85),
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: AppSpacing.md,
+                                              vertical: AppSpacing.sm,
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                                              borderSide: BorderSide(color: AppColors.borderSubtle),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                                              borderSide: BorderSide(color: AppColors.borderSubtle),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                                              borderSide: BorderSide(color: AppColors.accent.withOpacity(0.55)),
+                                            ),
                                           ),
                                         ),
                                       ),

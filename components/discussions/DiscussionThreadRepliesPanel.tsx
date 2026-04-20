@@ -111,7 +111,15 @@ export function DiscussionThreadRepliesPanel({
 
       <ul className="space-y-3">
         {replies.length === 0 ? (
-          <li className="text-sm text-muted-foreground">No replies yet.</li>
+          <li className="rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-5 py-8 text-center">
+            <p className="font-display text-sm font-semibold uppercase tracking-wide text-neutral-200">
+              Start the thread momentum
+            </p>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+              A clear question or reference photo invites better answers. Mention someone with{" "}
+              <span className="font-mono text-primary/90">@handle</span> when you want them in the loop.
+            </p>
+          </li>
         ) : (
           replies.map((r) => (
             <li

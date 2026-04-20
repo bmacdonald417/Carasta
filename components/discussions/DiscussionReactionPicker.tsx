@@ -93,7 +93,7 @@ export function DiscussionReactionPicker({
 
   return (
     <div className={cn("flex flex-wrap items-center justify-end gap-2", className)}>
-      <DiscussionReactionSummary summary={summary} compact={false} />
+      <DiscussionReactionSummary summary={summary} compact={false} viewerActive={Boolean(kind)} />
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -101,7 +101,11 @@ export function DiscussionReactionPicker({
             variant="outline"
             size="sm"
             disabled={pending}
-            className="h-8 border-primary/35 bg-primary/5 text-xs font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
+            className={cn(
+              "h-8 border-primary/35 bg-primary/5 text-xs font-semibold uppercase tracking-wide text-primary transition-[transform,box-shadow,opacity,background-color] duration-150 ease-out hover:bg-primary/10 active:scale-[0.98]",
+              kind ? "ring-2 ring-primary/30 shadow-sm" : "",
+              pending && "opacity-70"
+            )}
           >
             <SmilePlus className="mr-1.5 h-3.5 w-3.5" />
             {kind ? DISCUSSION_REACTION_LABELS[kind] : "React"}
@@ -118,7 +122,7 @@ export function DiscussionReactionPicker({
             <DropdownMenuItem
               key={k}
               className={cn(
-                "cursor-pointer text-sm",
+                "cursor-pointer text-sm transition-colors duration-150",
                 kind === k ? "bg-primary/10 text-primary" : ""
               )}
               onClick={() => {

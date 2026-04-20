@@ -278,22 +278,31 @@ class _FeedPostCardState extends ConsumerState<FeedPostCard> {
               ),
               child: Row(
                 children: [
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    style: IconButton.styleFrom(
-                      foregroundColor: _liked ? AppColors.accent : AppColors.textSecondary,
+                  Tooltip(
+                    message: 'Like',
+                    child: IconButton(
+                      visualDensity: VisualDensity.compact,
+                      splashRadius: 22,
+                      style: IconButton.styleFrom(
+                        foregroundColor: _liked ? AppColors.accent : AppColors.textSecondary,
+                      ),
+                      onPressed: _likeBusy ? null : _toggleLike,
+                      icon: _likeBusy
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : AnimatedScale(
+                              scale: _liked ? 1.06 : 1,
+                              duration: const Duration(milliseconds: 140),
+                              curve: Curves.easeOut,
+                              child: Icon(
+                                _liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                size: 22,
+                              ),
+                            ),
                     ),
-                    onPressed: _likeBusy ? null : _toggleLike,
-                    icon: _likeBusy
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Icon(
-                            _liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                            size: 22,
-                          ),
                   ),
                   Text(
                     '$_likeCount',

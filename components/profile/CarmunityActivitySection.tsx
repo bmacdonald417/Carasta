@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type CarmunityActivityItem =
@@ -50,11 +51,25 @@ export function CarmunityActivitySection({
             Carmunity Activity
           </h2>
           <p className="text-sm text-muted-foreground">
-            Discussions by @{handle} will appear here.
+            Discussions by @{handle} will appear here — threads started and replies added across Carmunity.
           </p>
         </div>
-        <div className="rounded-2xl border border-border/50 bg-card/40 p-6 text-sm text-muted-foreground">
-          No threads or replies yet.
+        <div className="rounded-2xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/10 via-muted/15 to-muted/5 px-6 py-10 text-center sm:px-10">
+          <p className="font-display text-base font-semibold tracking-tight text-neutral-100">
+            No public discussion activity yet
+          </p>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+            When @{handle} starts a thread or weighs in on someone else&apos;s build, it shows up here with a
+            quick path back to the conversation.
+          </p>
+          <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+            <Button asChild className="sm:min-w-[200px]">
+              <Link href="/discussions">Browse discussions</Link>
+            </Button>
+            <Button asChild variant="outline" className="border-border/60 sm:min-w-[200px]">
+              <Link href="/explore">Open Carmunity feed</Link>
+            </Button>
+          </div>
         </div>
       </section>
     );
