@@ -7,7 +7,7 @@ The upstream kit directory (`components/`, `api/`, `migrations/`, etc.) was **no
 | `src/components/feedback/` | `components/feedback/` (`@/components/feedback/*`) |
 | `src/app/api/feedback/route.ts` | `app/api/feedback/route.ts` |
 | `src/app/dashboard/feedback/` | `app/dashboard/feedback/page.tsx` + `app/dashboard/layout.tsx` |
-| `api/ai/incorporate-feedback/` | `app/api/ai/incorporate-feedback/route.ts` |
+| `api/ai/incorporate-feedback/` | `app/api/ai/incorporate-feedback/route.ts` (calls Anthropic **routine fire** when env is set; see `lib/claude-code-routine-fire.ts`) |
 | `api/agent/run/[runId]/` | `app/api/agent/run/[runId]/events/route.ts`, `status/route.ts`, `route.ts` |
 | `lib/agent-shim-auth.ts` | `lib/agent-shim-auth.ts` |
 | Drizzle schema | **Prisma** — `ElementFeedback` (`@@map("feedback")`), `AgentRun`, `AgentRunEvent` in `prisma/schema.prisma` |
