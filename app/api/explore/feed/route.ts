@@ -1,10 +1,58 @@
 import { NextResponse } from "next/server";
+
+import {
+  summarizePostReactionsMerged,
+  viewerPostReactionKinds,
+} from "@/lib/carmunity/post-reactions";
+import type { DiscussionReactionTotals } from "@/lib/forums/forum-service";
 import { prisma } from "@/lib/db";
+
+function emptySummary(): DiscussionReactionTotals {
+  return { total: 0, byKind: {} };
+}
+
+async function decoratePosts(
+  posts: Array<{
+    id: string;
+    content: string | null;
+    imageUrl: string | null;
+    createdAt: Date;
+    author: {
+      id: string;
+      handle: string;
+      name: string | null;
+      avatarUrl: string | null;
+    };
+    _count: { likes: number; comments: number; postReactions?: number };
+  }>,
+  userId: string | null
+) {
+  const ids = posts.map((p) => p.id);
+  const merged = await summarizePostReactionsMerged(prisma, ids);
+  const viewer = await viewerPostReactionKinds(prisma, userId, ids);
+  return posts.map((p) => {
+    const reactionSummary = merged.get(p.id) ?? emptySummary();
+    const viewerReactionKind = viewer.get(p.id) ?? null;
+    return {
+      ...p,
+      createdAt: p.createdAt.toISOString(),
+      reactionSummary,
+      viewerReactionKind,
+      liked: viewerReactionKind === "LIKE",
+      _count: {
+        likes: p._count.likes,
+        comments: p._count.comments,
+      },
+    };
+  });
+}
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const tab = searchParams.get("tab") ?? "trending";
   const userId = searchParams.get("userId");
+
+  const countSelect = { likes: true, comments: true, postReactions: true } as const;
 
   if (tab === "latest") {
     const posts = await prisma.post.findMany({
@@ -14,25 +62,11 @@ export async function GET(req: Request) {
         author: {
           select: { id: true, handle: true, name: true, avatarUrl: true },
         },
-        _count: { select: { likes: true, comments: true } },
+        _count: { select: countSelect },
       },
     });
-    const likedPostIds = userId
-      ? new Set(
-          (
-            await prisma.like.findMany({
-              where: { userId, postId: { in: posts.map((p) => p.id) } },
-              select: { postId: true },
-            })
-          ).map((l) => l.postId)
-        )
-      : new Set<string>();
-    const withLiked = posts.map((p) => ({
-      ...p,
-      liked: likedPostIds.has(p.id),
-      _count: p._count,
-    }));
-    return NextResponse.json({ posts: withLiked });
+    const decorated = await decoratePosts(posts, userId);
+    return NextResponse.json({ posts: decorated });
   }
 
   if (tab === "following" && userId) {
@@ -49,52 +83,23 @@ export async function GET(req: Request) {
         author: {
           select: { id: true, handle: true, name: true, avatarUrl: true },
         },
-        _count: { select: { likes: true, comments: true } },
+        _count: { select: countSelect },
       },
     });
-    const likedPostIds = userId
-      ? new Set(
-          (
-            await prisma.like.findMany({
-              where: { userId, postId: { in: posts.map((p) => p.id) } },
-              select: { postId: true },
-            })
-          ).map((l) => l.postId)
-        )
-      : new Set<string>();
-    const withLiked = posts.map((p) => ({
-      ...p,
-      liked: likedPostIds.has(p.id),
-      _count: p._count,
-    }));
-    return NextResponse.json({ posts: withLiked });
+    const decorated = await decoratePosts(posts, userId);
+    return NextResponse.json({ posts: decorated });
   }
 
-  // Trending: sort by likes count (most liked first)
   const posts = await prisma.post.findMany({
-    orderBy: { likes: { _count: "desc" } },
+    orderBy: [{ postReactions: { _count: "desc" } }, { likes: { _count: "desc" } }],
     take: 50,
     include: {
       author: {
         select: { id: true, handle: true, name: true, avatarUrl: true },
       },
-      _count: { select: { likes: true, comments: true } },
+      _count: { select: countSelect },
     },
   });
-  const likedPostIds = userId
-    ? new Set(
-        (
-          await prisma.like.findMany({
-            where: { userId, postId: { in: posts.map((p) => p.id) } },
-            select: { postId: true },
-          })
-        ).map((l) => l.postId)
-      )
-    : new Set<string>();
-  const withLiked = posts.map((p) => ({
-    ...p,
-    liked: likedPostIds.has(p.id),
-    _count: p._count,
-  }));
-  return NextResponse.json({ posts: withLiked });
+  const decorated = await decoratePosts(posts, userId);
+  return NextResponse.json({ posts: decorated });
 }

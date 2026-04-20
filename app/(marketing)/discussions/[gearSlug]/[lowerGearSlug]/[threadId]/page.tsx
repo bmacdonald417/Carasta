@@ -217,22 +217,49 @@ export default async function ThreadPage({ params }: Props) {
       ) : null}
 
       <article className="mt-6 rounded-2xl border border-border/50 bg-card/60 p-5 shadow-glass-sm">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-start gap-3">
-              <h1 className="font-display text-xl font-bold uppercase tracking-wide text-neutral-100 md:text-2xl">
-                {thread.title}
-              </h1>
-              <div className="flex shrink-0 flex-col items-end gap-2">
+        <header className="space-y-4">
+          <h1 className="font-display text-xl font-bold uppercase tracking-wide text-neutral-100 md:text-2xl">
+            {thread.title}
+          </h1>
+
+          <div className="flex flex-col gap-3 border-b border-border/40 pb-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 space-y-2">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
+                <AuthorHandleLink handle={thread.author.handle} className="text-sm" />
+                {thread.author.name ? (
+                  <span className="text-neutral-500">· {thread.author.name}</span>
+                ) : null}
+                <span className="text-neutral-500">· {formatLong(thread.createdAt)}</span>
+                {viewerId && viewerId !== thread.author.id ? (
+                  <span className="inline-flex flex-wrap items-center gap-2">
+                    <span className="text-neutral-600">·</span>
+                    <FollowButton
+                      targetUserId={thread.author.id}
+                      initialFollowing={viewerFollowsAuthor}
+                      className="h-7 border-primary/35 bg-primary/5 px-2 text-[10px] font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
+                    />
+                  </span>
+                ) : null}
+              </div>
+              <DiscussionAuthorBadges badges={thread.author.badges} className="flex flex-wrap gap-2" />
+            </div>
+
+            <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[280px]">
+              <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                {viewerId ? (
+                  <DiscussionThreadSaveButton
+                    threadId={thread.id}
+                    initialSaved={threadSaved}
+                    showNewActivityDot={savedThreadHasNew}
+                  />
+                ) : null}
                 <ShareButtons
                   url={threadSharePath}
                   title={thread.title}
                   description={`${thread.category.space.title} · ${thread.category.title}`}
                   triggerClassName="border-primary/35 bg-primary/5 text-xs text-primary hover:bg-primary/10"
                   carmunityShareMeta={
-                    viewerId
-                      ? { surface: "discussion_thread", threadId: thread.id }
-                      : undefined
+                    viewerId ? { surface: "discussion_thread", threadId: thread.id } : undefined
                   }
                 />
                 {viewerId && viewerId !== thread.author.id ? (
@@ -255,46 +282,22 @@ export default async function ThreadPage({ params }: Props) {
                   </>
                 ) : null}
               </div>
-            </div>
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
-              <AuthorHandleLink handle={thread.author.handle} className="text-sm" />
-              {thread.author.name ? (
-                <span className="text-neutral-500">· {thread.author.name}</span>
-              ) : null}
-              <span className="text-neutral-500">· {formatLong(thread.createdAt)}</span>
-              {viewerId && viewerId !== thread.author.id ? (
-                <span className="ml-1 inline-flex items-center gap-2">
-                  <span className="text-neutral-600">·</span>
-                  <FollowButton
-                    targetUserId={thread.author.id}
-                    initialFollowing={viewerFollowsAuthor}
-                    className="h-7 border-primary/35 bg-primary/5 px-2 text-[10px] font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
-                  />
-                </span>
-              ) : null}
-            </div>
-            <DiscussionAuthorBadges badges={thread.author.badges} className="mt-2" />
-          </div>
-          <div className="shrink-0 text-right">
-            {viewerId ? (
-              <div className="mb-2 flex justify-end">
-                <DiscussionThreadSaveButton
-                  threadId={thread.id}
-                  initialSaved={threadSaved}
-                  showNewActivityDot={savedThreadHasNew}
+
+              <div className="flex flex-col gap-2 rounded-xl border border-border/40 bg-muted/5 p-3 lg:items-end">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">Reactions</p>
+                <DiscussionReactionPicker
+                  target="thread"
+                  targetId={thread.id}
+                  summary={thread.reactionSummary}
+                  initialKind={thread.viewerReactionKind}
+                  className="w-full justify-between lg:justify-end"
                 />
               </div>
-            ) : null}
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">Reactions</p>
-            <DiscussionReactionPicker
-              target="thread"
-              targetId={thread.id}
-              summary={thread.reactionSummary}
-              initialKind={thread.viewerReactionKind}
-            />
+            </div>
           </div>
-        </div>
-        <div className="mt-5 border-t border-border/40 pt-5 text-sm leading-relaxed text-foreground/90">
+        </header>
+
+        <div className="mt-5 text-sm leading-relaxed text-foreground/90">
           <DiscussionRichText text={thread.body} validHandles={validMentionHandles} />
         </div>
       </article>

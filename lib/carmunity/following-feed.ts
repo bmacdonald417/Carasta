@@ -1,8 +1,10 @@
-import type { Prisma } from "@prisma/client";
+import type { DiscussionReactionKind, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { discussionThreadReplyHref } from "@/lib/discussions/discussion-paths";
 import { peerUserIdsHiddenFromViewer } from "@/lib/user-safety";
+import type { DiscussionReactionTotals } from "@/lib/forums/forum-service";
+import { summarizePostReactionsMerged, viewerPostReactionKinds } from "@/lib/carmunity/post-reactions";
 
 export async function resolveFollowingFeedAuthorAllowlist(viewerId: string): Promise<string[]> {
   const following = await prisma.follow.findMany({
@@ -28,6 +30,8 @@ export type FollowingFeedPostPayload = {
   imageUrl: string | null;
   createdAt: string;
   liked: boolean;
+  reactionSummary: DiscussionReactionTotals;
+  viewerReactionKind: DiscussionReactionKind | null;
   author: {
     id: string;
     handle: string;
@@ -142,7 +146,7 @@ export async function getFollowingFeedPayload(
         author: {
           select: { id: true, handle: true, name: true, avatarUrl: true },
         },
-        _count: { select: { likes: true, comments: true } },
+        _count: { select: { likes: true, comments: true, postReactions: true } },
       },
     }),
     prisma.forumThread.findMany({
@@ -180,18 +184,16 @@ export async function getFollowingFeedPayload(
   ]);
 
   const postIds = posts.map((p) => p.id);
-  const likedRows =
-    postIds.length > 0
-      ? await prisma.like.findMany({
-          where: { userId: viewerId, postId: { in: postIds } },
-          select: { postId: true },
-        })
-      : [];
-  const likedSet = new Set(likedRows.map((l) => l.postId));
+  const merged =
+    postIds.length > 0 ? await summarizePostReactionsMerged(prisma, postIds) : new Map();
+  const viewerKinds =
+    postIds.length > 0 ? await viewerPostReactionKinds(prisma, viewerId, postIds) : new Map();
 
   const items: FollowingFeedItem[] = [];
 
   for (const p of posts) {
+    const reactionSummary = merged.get(p.id) ?? { total: 0, byKind: {} };
+    const viewerReactionKind = viewerKinds.get(p.id) ?? null;
     items.push({
       type: "post",
       sortAt: p.createdAt.toISOString(),
@@ -200,9 +202,11 @@ export async function getFollowingFeedPayload(
         content: p.content,
         imageUrl: p.imageUrl,
         createdAt: p.createdAt.toISOString(),
-        liked: likedSet.has(p.id),
+        liked: viewerReactionKind === "LIKE",
+        reactionSummary,
+        viewerReactionKind,
         author: p.author,
-        _count: p._count,
+        _count: { likes: p._count.likes, comments: p._count.comments },
       },
     });
   }

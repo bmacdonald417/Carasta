@@ -2,7 +2,6 @@
 
 import type { DiscussionReactionKind } from "@prisma/client";
 import { ChevronDown, SmilePlus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, useTransition } from "react";
 
@@ -24,22 +23,23 @@ import {
 } from "@/lib/discussions/reaction-labels";
 import { cn } from "@/lib/utils";
 
-type Target = "thread" | "reply";
-
-export function DiscussionReactionPicker({
-  target,
-  targetId,
+export function PostReactionPicker({
+  postId,
   summary,
   initialKind,
+  onReactionApplied,
   className,
 }: {
-  target: Target;
-  targetId: string;
+  postId: string;
   summary: DiscussionReactionTotals;
   initialKind: DiscussionReactionKind | null;
+  onReactionApplied?: (args: {
+    postId: string;
+    prevKind: DiscussionReactionKind | null;
+    nextKind: DiscussionReactionKind | null;
+  }) => void;
   className?: string;
 }) {
-  const router = useRouter();
   const { data: session, status } = useSession();
   const { open, setOpen, openNow, scheduleClose, cancelClose } = useHoverDropdown(240);
   const [kind, setKind] = useState<DiscussionReactionKind | null>(initialKind);
@@ -57,21 +57,23 @@ export function DiscussionReactionPicker({
     setKind(next);
     try {
       if (next === null) {
-        const res = await fetch("/api/discussions/reactions", {
+        const res = await fetch("/api/carmunity/post-reactions", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ target, targetId }),
+          body: JSON.stringify({ postId }),
         });
         if (!res.ok) throw new Error("remove");
       } else {
-        const res = await fetch("/api/discussions/reactions", {
+        const res = await fetch("/api/carmunity/post-reactions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ target, targetId, kind: next }),
+          body: JSON.stringify({ postId, kind: next }),
         });
         if (!res.ok) throw new Error("post");
       }
-      startTransition(() => router.refresh());
+      startTransition(() => {
+        onReactionApplied?.({ postId, prevKind, nextKind: next });
+      });
     } catch {
       setKind(prevKind);
     }
@@ -94,7 +96,7 @@ export function DiscussionReactionPicker({
   }
 
   return (
-    <div className={cn("flex flex-wrap items-center justify-end gap-2", className)}>
+    <div className={cn("flex flex-wrap items-center gap-2", className)}>
       <DiscussionReactionSummary summary={summary} compact={false} viewerActive={Boolean(kind)} />
       <DropdownMenu
         open={open}
@@ -119,13 +121,12 @@ export function DiscussionReactionPicker({
           <DropdownMenuTrigger asChild>
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="sm"
               disabled={pending}
               className={cn(
-                "h-8 min-w-[2.5rem] gap-1 border-primary/35 bg-primary/5 px-2 text-sm text-primary transition-[transform,box-shadow,opacity,background-color] duration-150 ease-out hover:bg-primary/10 active:scale-[0.98]",
-                kind ? "ring-2 ring-primary/30 shadow-sm" : "",
-                pending && "opacity-70"
+                "h-9 min-w-[2.5rem] gap-1 rounded-full px-2 text-muted-foreground transition-colors duration-150 hover:bg-muted/50 hover:text-foreground active:scale-[0.98]",
+                kind ? "text-primary ring-2 ring-primary/25" : ""
               )}
               aria-haspopup="menu"
               aria-expanded={open}
@@ -135,7 +136,7 @@ export function DiscussionReactionPicker({
                   {DISCUSSION_REACTION_EMOJI[kind]}
                 </span>
               ) : (
-                <SmilePlus className="h-4 w-4" aria-hidden />
+                <SmilePlus className="h-[18px] w-[18px]" aria-hidden />
               )}
               <ChevronDown className="h-3.5 w-3.5 opacity-70" aria-hidden />
               <span className="sr-only">{kind ? DISCUSSION_REACTION_LABELS[kind] : "React"}</span>
@@ -143,7 +144,7 @@ export function DiscussionReactionPicker({
           </DropdownMenuTrigger>
         </div>
         <DropdownMenuContent
-          align="end"
+          align="start"
           className="min-w-[220px] border-border/60 bg-popover/95 text-popover-foreground"
           onPointerEnter={cancelClose}
           onPointerLeave={scheduleClose}

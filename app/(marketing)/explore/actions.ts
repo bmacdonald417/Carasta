@@ -63,5 +63,5 @@ export async function addComment(postId: string, content: string) {
   if (!result.ok) return result;
   revalidatePath("/explore");
   revalidatePath(`/explore/post/${postId}`);
-  return { ok: true };
+  return { ok: true, commentCount: result.commentCount };
 }

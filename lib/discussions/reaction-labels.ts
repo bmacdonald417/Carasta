@@ -27,3 +27,13 @@ export const DISCUSSION_REACTION_COMPACT: Record<DiscussionReactionKind, string>
   LAUGH: "Laugh",
   RESPECT: "Respect",
 };
+
+/** Primary display for summaries and menus — words remain in labels for accessibility. */
+export const DISCUSSION_REACTION_EMOJI: Record<DiscussionReactionKind, string> = {
+  LIKE: "👍",
+  FIRE: "🔥",
+  WRENCH: "🔧",
+  MIND_BLOWN: "🤯",
+  LAUGH: "😂",
+  RESPECT: "🫡",
+};

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Check, Copy } from "lucide-react";
+import { Check, Copy, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -17,8 +18,7 @@ import {
 const SHARE_LINKS = {
   twitter: (url: string, text: string) =>
     `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
-  facebook: (url: string) =>
-    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+  facebook: (url: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
   linkedin: (url: string, text: string) =>
     `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`,
 };
@@ -55,6 +55,7 @@ export function ShareButtons({
   const [copied, setCopied] = useState(false);
   const fullUrl = typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
   const shareText = description ? `${title} — ${description}` : title;
+  const captionBlock = `${title}\n${fullUrl}`;
 
   function emitShareClick(shareTarget: string) {
     if (!trackMarketing || !auctionId) return;
@@ -67,9 +68,7 @@ export function ShareButtons({
         shareTarget,
         currentUrl: typeof window !== "undefined" ? window.location.href : undefined,
         referrer:
-          typeof document !== "undefined" && document.referrer
-            ? document.referrer
-            : undefined,
+          typeof document !== "undefined" && document.referrer ? document.referrer : undefined,
         path: typeof window !== "undefined" ? window.location.pathname : undefined,
       },
     });
@@ -85,13 +84,60 @@ export function ShareButtons({
         fireCarmunityShareEvent({ ...carmunityShareMeta, channel: "copy_link" });
       }
     } catch {
-      // fallback
+      /* noop */
+    }
+  }
+
+  async function copyForInstagram() {
+    emitShareClick("instagram_copy");
+    try {
+      await navigator.clipboard.writeText(captionBlock);
+      if (carmunityShareMeta) fireCarmunityShareEvent({ ...carmunityShareMeta, channel: "instagram_copy" });
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* noop */
+    }
+  }
+
+  async function copyForTikTok() {
+    emitShareClick("tiktok_copy");
+    try {
+      await navigator.clipboard.writeText(`${shareText}\n${fullUrl}`);
+      if (carmunityShareMeta) fireCarmunityShareEvent({ ...carmunityShareMeta, channel: "tiktok_copy" });
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* noop */
+    }
+  }
+
+  async function copyForSnapchat() {
+    emitShareClick("snapchat_copy");
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      if (carmunityShareMeta) fireCarmunityShareEvent({ ...carmunityShareMeta, channel: "snapchat_copy" });
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* noop */
     }
   }
 
   function emitCarmunitySocial(channel: string) {
     if (carmunityShareMeta) {
       fireCarmunityShareEvent({ ...carmunityShareMeta, channel });
+    }
+  }
+
+  async function shareNative() {
+    if (typeof navigator === "undefined" || !navigator.share) return;
+    emitShareClick("native_share");
+    emitCarmunitySocial("native_share");
+    try {
+      await navigator.share({ title, text: shareText, url: fullUrl });
+    } catch {
+      /* user cancelled */
     }
   }
 
@@ -112,8 +158,21 @@ export function ShareButtons({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="border-white/10 bg-[#121218]/95 backdrop-blur-xl"
+        className="min-w-[220px] border-white/10 bg-[#121218]/95 backdrop-blur-xl"
       >
+        {typeof navigator !== "undefined" && typeof navigator.share === "function" ? (
+          <>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => {
+                void shareNative();
+              }}
+            >
+              Share via device…
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
         <DropdownMenuItem asChild>
           <a
             href={SHARE_LINKS.twitter(fullUrl, shareText)}
@@ -153,7 +212,27 @@ export function ShareButtons({
             Share on LinkedIn
           </a>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={copyLink}>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="cursor-pointer text-xs text-muted-foreground"
+          onClick={() => void copyForInstagram()}
+        >
+          Copy for Instagram (title + link)
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer text-xs text-muted-foreground"
+          onClick={() => void copyForTikTok()}
+        >
+          Copy for TikTok (caption + link)
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer text-xs text-muted-foreground"
+          onClick={() => void copyForSnapchat()}
+        >
+          Copy link for Snapchat
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => void copyLink()}>
           {copied ? (
             <>
               <Check className="mr-2 h-4 w-4 text-green-500" />

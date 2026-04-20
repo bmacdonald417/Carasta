@@ -134,6 +134,7 @@ model User {
   following    Follow[]  @relation("Follower")
   posts        Post[]
   likes        Like[]
+  postReactions PostReaction[]
   comments     Comment[]
   garageCars   GarageCar[]
   auctions     Auction[]  @relation("Seller")
@@ -502,10 +503,28 @@ model Post {
   auction Auction? @relation("AuctionPromoPosts", fields: [auctionId], references: [id], onDelete: SetNull)
   likes   Like[]
   comments Comment[]
+  postReactions PostReaction[]
 
   @@index([authorId])
   @@index([createdAt])
   @@index([auctionId])
+}
+
+/// Carmunity feed post reactions — same kinds as discussion reactions (Phase Q).
+model PostReaction {
+  id        String                 @id @default(cuid())
+  postId    String
+  userId    String
+  kind      DiscussionReactionKind
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
 }
 
 model Like {

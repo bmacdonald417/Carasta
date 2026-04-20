@@ -1,23 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import type { DiscussionReactionKind } from "@prisma/client";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
+
+import { FeedPostInlineComment } from "@/components/carmunity/FeedPostInlineComment";
+import { PostReactionPicker } from "@/components/carmunity/PostReactionPicker";
+import { CarmunityOnboardingDialog } from "@/components/carmunity/CarmunityOnboardingDialog";
+import { DiscussedAuctionsStrip } from "@/components/explore/DiscussedAuctionsStrip";
+import { FeedEmptyState } from "@/components/carmunity/FeedEmptyState";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ShareButtons } from "@/components/ui/share-buttons";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import type { OnboardingPack } from "@/lib/carmunity/onboarding-service";
-import { DiscussedAuctionsStrip } from "@/components/explore/DiscussedAuctionsStrip";
-import { CarmunityOnboardingDialog } from "@/components/carmunity/CarmunityOnboardingDialog";
 import type { DiscussedLiveAuctionRow } from "@/lib/forums/auction-discussion";
-import { FeedEmptyState } from "@/components/carmunity/FeedEmptyState";
+import type { DiscussionReactionTotals } from "@/lib/forums/forum-service";
 import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
-import { likePost, unlikePost } from "./actions";
 import { CreatePostForm } from "./create-post-form";
 
 type Post = {
@@ -33,7 +38,48 @@ type Post = {
   };
   _count: { likes: number; comments: number };
   liked?: boolean;
+  reactionSummary: DiscussionReactionTotals;
+  viewerReactionKind: DiscussionReactionKind | null;
 };
+
+function applyViewerReactionChange(
+  summary: DiscussionReactionTotals,
+  prevKind: DiscussionReactionKind | null,
+  nextKind: DiscussionReactionKind | null
+): DiscussionReactionTotals {
+  const byKind = { ...summary.byKind } as Partial<Record<DiscussionReactionKind, number>>;
+  let total = summary.total;
+  if (prevKind) {
+    const cur = (byKind[prevKind] ?? 0) - 1;
+    if (cur <= 0) delete byKind[prevKind];
+    else byKind[prevKind] = cur;
+    total -= 1;
+  }
+  if (nextKind) {
+    byKind[nextKind] = (byKind[nextKind] ?? 0) + 1;
+    total += 1;
+  }
+  return { total, byKind };
+}
+
+function normalizeFeedPost(raw: Record<string, unknown>): Post {
+  const p = raw as unknown as Post;
+  const likes = p._count?.likes ?? 0;
+  const summary =
+    p.reactionSummary ??
+    ({
+      total: likes,
+      byKind: likes > 0 ? { LIKE: likes } : {},
+    } satisfies DiscussionReactionTotals);
+  const viewerReactionKind =
+    p.viewerReactionKind ?? (p.liked ? ("LIKE" as const) : null);
+  return {
+    ...p,
+    reactionSummary: summary,
+    viewerReactionKind,
+    liked: viewerReactionKind === "LIKE",
+  };
+}
 
 type FollowingThreadPayload = {
   id: string;
@@ -156,7 +202,17 @@ export function CommunityFeed({
           return;
         }
         const data = (await res.json()) as { items?: FollowingFeedItem[] };
-        setFollowingItems(Array.isArray(data.items) ? data.items : []);
+        const rawItems = Array.isArray(data.items) ? data.items : [];
+        setFollowingItems(
+          rawItems.map((it) =>
+            it.type === "post"
+              ? {
+                  ...it,
+                  post: normalizeFeedPost(it.post as unknown as Record<string, unknown>),
+                }
+              : it
+          )
+        );
         setLoading(false);
         return;
       }
@@ -171,7 +227,8 @@ export function CommunityFeed({
         return;
       }
       const data = await res.json();
-      setTrendingPosts(data.posts ?? []);
+      const rawPosts = (data.posts ?? []) as Record<string, unknown>[];
+      setTrendingPosts(rawPosts.map((p) => normalizeFeedPost(p)));
       setLoading(false);
     })();
     return () => {
@@ -179,48 +236,16 @@ export function CommunityFeed({
     };
   }, [tab, currentUserId]);
 
-  async function toggleLike(postId: string, currentlyLiked: boolean) {
-    if (!currentUserId) {
-      router.push("/auth/sign-in");
-      return;
-    }
-    if (currentlyLiked) {
-      await unlikePost(postId);
-    } else {
-      await likePost(postId);
-    }
-    setTrendingPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId
-          ? {
-              ...p,
-              liked: !currentlyLiked,
-              _count: {
-                ...p._count,
-                likes: p._count.likes + (currentlyLiked ? -1 : 1),
-              },
-            }
-          : p
-      )
-    );
+  const patchPost = useCallback((postId: string, fn: (p: Post) => Post) => {
+    setTrendingPosts((prev) => prev.map((p) => (p.id === postId ? fn(p) : p)));
     setFollowingItems((prev) =>
       prev.map((item) => {
         if (item.type !== "post" || item.post.id !== postId) return item;
-        return {
-          ...item,
-          post: {
-            ...item.post,
-            liked: !currentlyLiked,
-            _count: {
-              ...item.post._count,
-              likes: item.post._count.likes + (currentlyLiked ? -1 : 1),
-            },
-          },
-        };
+        const asPost = item.post as unknown as Post;
+        return { ...item, post: fn(asPost) as (typeof item)["post"] };
       })
     );
-    router.refresh();
-  }
+  }, []);
 
   function onPostCreated() {
     router.refresh();
@@ -234,7 +259,17 @@ export function CommunityFeed({
           return;
         }
         const data = (await res.json()) as { items?: FollowingFeedItem[] };
-        setFollowingItems(Array.isArray(data.items) ? data.items : []);
+        const rawItems = Array.isArray(data.items) ? data.items : [];
+        setFollowingItems(
+          rawItems.map((it) =>
+            it.type === "post"
+              ? {
+                  ...it,
+                  post: normalizeFeedPost(it.post as unknown as Record<string, unknown>),
+                }
+              : it
+          )
+        );
         setLoading(false);
         return;
       }
@@ -247,7 +282,8 @@ export function CommunityFeed({
         return;
       }
       const data = await res.json();
-      setTrendingPosts(data.posts ?? []);
+      const rawPosts = (data.posts ?? []) as Record<string, unknown>[];
+      setTrendingPosts(rawPosts.map((p) => normalizeFeedPost(p)));
       setLoading(false);
     })();
   }
@@ -322,12 +358,7 @@ export function CommunityFeed({
           {loading ? (
             <FeedSkeletonList />
           ) : (
-            <PostList
-              variant="trending"
-              posts={trendingPosts}
-              currentUserId={currentUserId}
-              onToggleLike={toggleLike}
-            />
+            <PostList variant="trending" posts={trendingPosts} currentUserId={currentUserId} patchPost={patchPost} />
           )}
         </TabsContent>
         <TabsContent value="following" className="mt-6">
@@ -336,11 +367,7 @@ export function CommunityFeed({
           ) : !currentUserId ? (
             <FeedEmptyState variant="following" currentUserId={null} />
           ) : (
-            <FollowingFeedList
-              items={followingItems}
-              currentUserId={currentUserId}
-              onToggleLike={toggleLike}
-            />
+            <FollowingFeedList items={followingItems} currentUserId={currentUserId} patchPost={patchPost} />
           )}
         </TabsContent>
       </Tabs>
@@ -357,11 +384,11 @@ export function CommunityFeed({
 function FollowingFeedList({
   items,
   currentUserId,
-  onToggleLike,
+  patchPost,
 }: {
   items: FollowingFeedItem[];
   currentUserId: string | null;
-  onToggleLike: (postId: string, currentlyLiked: boolean) => void;
+  patchPost: (postId: string, fn: (p: Post) => Post) => void;
 }) {
   if (items.length === 0) {
     return <FeedEmptyState variant="following" currentUserId={currentUserId} />;
@@ -371,12 +398,7 @@ function FollowingFeedList({
       {items.map((item) => {
         if (item.type === "post") {
           return (
-            <PostCard
-              key={`post-${item.post.id}`}
-              post={item.post}
-              currentUserId={currentUserId}
-              onToggleLike={onToggleLike}
-            />
+            <PostCard key={`post-${item.post.id}`} post={item.post as unknown as Post} patchPost={patchPost} />
           );
         }
         if (item.type === "thread") {
@@ -582,12 +604,12 @@ function PostList({
   variant,
   posts,
   currentUserId,
-  onToggleLike,
+  patchPost,
 }: {
   variant: "trending" | "following";
   posts: Post[];
   currentUserId: string | null;
-  onToggleLike: (postId: string, currentlyLiked: boolean) => void;
+  patchPost: (postId: string, fn: (p: Post) => Post) => void;
 }) {
   if (posts.length === 0) {
     return <FeedEmptyState variant={variant} currentUserId={currentUserId} />;
@@ -595,12 +617,7 @@ function PostList({
   return (
     <div className="space-y-5">
       {posts.map((post) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          currentUserId={currentUserId}
-          onToggleLike={onToggleLike}
-        />
+        <PostCard key={post.id} post={post} patchPost={patchPost} />
       ))}
     </div>
   );
@@ -608,18 +625,18 @@ function PostList({
 
 function PostCard({
   post,
-  currentUserId,
-  onToggleLike,
+  patchPost,
 }: {
   post: Post;
-  currentUserId: string | null;
-  onToggleLike: (postId: string, currentlyLiked: boolean) => void;
+  patchPost: (postId: string, fn: (p: Post) => Post) => void;
 }) {
   const reduceMotion = usePrefersReducedMotion();
   const hasImage = Boolean(post.imageUrl?.trim());
   const hasContent = Boolean(post.content?.trim());
   const displayName = post.author.name?.trim() || `@${post.author.handle}`;
   const metaLine = `@${post.author.handle} · ${formatPostTime(post.createdAt)}`;
+  const sharePath = `/explore/post/${post.id}`;
+  const shareDescription = (post.content ?? "").replace(/\s+/g, " ").trim().slice(0, 160);
 
   return (
     <motion.article
@@ -651,7 +668,7 @@ function PostCard({
 
         {hasImage && (
           <Link
-            href={`/explore/post/${post.id}`}
+            href={sharePath}
             className="relative block aspect-[4/3] w-full bg-muted sm:aspect-video"
           >
             <Image
@@ -667,58 +684,58 @@ function PostCard({
         {(hasContent || !hasImage) && (
           <div className="px-4 pb-2 pt-1">
             {hasContent ? (
-              <Link href={`/explore/post/${post.id}`} className="block">
+              <Link href={sharePath} className="block">
                 <p className="line-clamp-6 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
                   {post.content}
                 </p>
               </Link>
             ) : !hasImage ? (
-              <Link
-                href={`/explore/post/${post.id}`}
-                className="text-sm text-muted-foreground hover:text-primary"
-              >
+              <Link href={sharePath} className="text-sm text-muted-foreground hover:text-primary">
                 View post
               </Link>
             ) : null}
           </div>
         )}
 
-        <div className="flex items-center gap-0.5 border-t border-border/40 px-2 py-2.5">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className={`h-9 gap-1.5 rounded-full px-3 transition-colors duration-150 hover:bg-muted/50 ${
-              post.liked ? "text-primary hover:text-primary" : "text-muted-foreground hover:text-foreground"
-            } active:scale-[0.98]`}
-            onClick={(e) => {
-              e.preventDefault();
-              onToggleLike(post.id, !!post.liked);
-            }}
-          >
-            <Heart
-              className={`h-[18px] w-[18px] shrink-0 transition-transform duration-150 ${
-                post.liked ? "scale-105 fill-primary text-primary" : ""
-              }`}
+        <div className="space-y-2 border-t border-border/40 px-3 py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <PostReactionPicker
+              postId={post.id}
+              summary={post.reactionSummary}
+              initialKind={post.viewerReactionKind}
+              onReactionApplied={({ postId, prevKind, nextKind }) => {
+                patchPost(postId, (p) => ({
+                  ...p,
+                  viewerReactionKind: nextKind,
+                  liked: nextKind === "LIKE",
+                  reactionSummary: applyViewerReactionChange(p.reactionSummary, prevKind, nextKind),
+                }));
+              }}
             />
-            <span className="min-w-[1ch] tabular-nums text-xs font-medium">{post._count.likes}</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 gap-1.5 rounded-full px-3 text-muted-foreground transition-colors duration-150 hover:bg-muted/50 hover:text-foreground active:scale-[0.98]"
-            asChild
-          >
-            <Link href={`/explore/post/${post.id}`}>
-              <MessageCircle className="h-[18px] w-[18px] shrink-0" />
-              <span className="min-w-[1ch] tabular-nums text-xs font-medium">{post._count.comments}</span>
-            </Link>
-          </Button>
-          {!currentUserId && (
-            <span className="ml-auto pr-2 text-[10px] uppercase tracking-wide text-muted-foreground">
-              Sign in to like
-            </span>
-          )}
+            <FeedPostInlineComment
+              postId={post.id}
+              initialCount={post._count.comments}
+              onCommented={(nextCount) => {
+                patchPost(post.id, (p) => ({
+                  ...p,
+                  _count: { ...p._count, comments: nextCount },
+                }));
+              }}
+            />
+            <ShareButtons
+              url={sharePath}
+              title={displayName}
+              description={shareDescription || "Carmunity post"}
+              triggerClassName="h-9 rounded-full border-primary/35 bg-primary/5 px-3 text-xs text-primary hover:bg-primary/10"
+              carmunityShareMeta={{ surface: "explore_feed", postId: post.id }}
+            />
+            <Button variant="ghost" size="sm" className="h-9 rounded-full px-3 text-xs text-muted-foreground" asChild>
+              <Link href={sharePath}>
+                <MessageCircle className="mr-1 inline h-4 w-4" />
+                Thread
+              </Link>
+            </Button>
+          </div>
         </div>
       </Card>
     </motion.article>

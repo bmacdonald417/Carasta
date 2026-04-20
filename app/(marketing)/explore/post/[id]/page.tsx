@@ -6,9 +6,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentForm } from "./comment-form";
-import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
+import { summarizePostReactionsMerged, viewerPostReactionKinds } from "@/lib/carmunity/post-reactions";
+import { PostEngagementBar } from "./post-engagement";
 
 function formatPostTime(iso: Date): string {
   const d = new Date(iso);
@@ -57,15 +58,11 @@ export default async function PostDetailPage({
 
   if (!post) notFound();
 
-  let liked = false;
-  if (session?.user?.id) {
-    const like = await prisma.like.findUnique({
-      where: {
-        userId_postId: { userId: (session.user as any).id, postId: id },
-      },
-    });
-    liked = !!like;
-  }
+  const viewerId = (session?.user as { id?: string } | undefined)?.id ?? null;
+  const merged = await summarizePostReactionsMerged(prisma, [id]);
+  const viewerKinds = await viewerPostReactionKinds(prisma, viewerId, [id]);
+  const reactionSummary = merged.get(id) ?? { total: 0, byKind: {} };
+  const viewerReactionKind = viewerKinds.get(id) ?? null;
 
   const displayName = post.author.name?.trim() || `@${post.author.handle}`;
   const hasImage = Boolean(post.imageUrl?.trim());
@@ -130,20 +127,13 @@ export default async function PostDetailPage({
           </div>
         )}
 
-        {/* Engagement + share */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/40 px-5 py-4">
-          <p className="text-sm text-muted-foreground">
-            <span className={liked ? "font-medium text-primary" : ""}>
-              {post._count.likes} like{post._count.likes !== 1 ? "s" : ""}
-            </span>
-            {liked ? <span className="text-xs"> · You liked this</span> : null}
-          </p>
-          <ShareButtons
-            url={`/explore/post/${post.id}`}
-            title={`Post by @${post.author.handle}`}
-            description={post.content ?? undefined}
-          />
-        </div>
+        <PostEngagementBar
+          postId={post.id}
+          title={`Post by @${post.author.handle}`}
+          description={post.content}
+          initialSummary={reactionSummary}
+          initialKind={viewerReactionKind}
+        />
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border/40 px-5 py-3 text-xs">
           <Link
             href={`/u/${post.author.handle}`}

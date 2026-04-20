@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/db";
 import { usersAreBlockedEitherWay } from "@/lib/user-safety";
+import {
+  removePostReaction,
+  summarizePostReactionsMerged,
+  upsertPostReaction,
+} from "@/lib/carmunity/post-reactions";
 
 export type CarmunityServiceError = { ok: false; error: string };
 export type CarmunityServiceSuccess = { ok: true };
@@ -42,19 +47,17 @@ export async function likeCarmunityPost(input: {
   });
   if (!post) return { ok: false, error: "Post not found." };
 
-  await prisma.like.upsert({
-    where: {
-      userId_postId: { userId: input.userId, postId: input.postId },
-    },
-    create: { userId: input.userId, postId: input.postId },
-    update: {},
+  const r = await upsertPostReaction({
+    prisma,
+    userId: input.userId,
+    postId: input.postId,
+    kind: "LIKE",
   });
+  if (!r.ok) return r;
 
-  const countRow = await prisma.post.findUnique({
-    where: { id: input.postId },
-    select: { _count: { select: { likes: true } } },
-  });
-  return { ok: true, likeCount: countRow?._count.likes ?? 0, liked: true };
+  const merged = await summarizePostReactionsMerged(prisma, [input.postId]);
+  const likeCount = merged.get(input.postId)?.byKind.LIKE ?? 0;
+  return { ok: true, likeCount, liked: true };
 }
 
 export async function unlikeCarmunityPost(input: {
@@ -67,15 +70,16 @@ export async function unlikeCarmunityPost(input: {
   });
   if (!post) return { ok: false, error: "Post not found." };
 
-  await prisma.like.deleteMany({
-    where: { userId: input.userId, postId: input.postId },
+  const r = await removePostReaction({
+    prisma,
+    userId: input.userId,
+    postId: input.postId,
   });
+  if (!r.ok) return r;
 
-  const countRow = await prisma.post.findUnique({
-    where: { id: input.postId },
-    select: { _count: { select: { likes: true } } },
-  });
-  return { ok: true, likeCount: countRow?._count.likes ?? 0, liked: false };
+  const merged = await summarizePostReactionsMerged(prisma, [input.postId]);
+  const likeCount = merged.get(input.postId)?.byKind.LIKE ?? 0;
+  return { ok: true, likeCount, liked: false };
 }
 
 export async function addCarmunityComment(input: {
