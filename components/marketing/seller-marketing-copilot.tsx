@@ -12,6 +12,8 @@ import {
   type MarketingCopilotGenerateBody,
   type MarketingCopilotStructuredResult,
 } from "@/lib/validations/marketing-copilot";
+import { MarketingCopilotIntakeMetricsPanel } from "@/components/marketing/marketing-copilot-intake-metrics-panel";
+import type { MarketingCopilotIntakeMetricsSnapshot } from "@/lib/marketing/marketing-copilot-intake-metrics";
 
 const OBJECTIVE_OPTIONS = [
   { value: "Sell faster — prioritize liquidity and clear next steps.", label: "Sell faster" },
@@ -46,6 +48,8 @@ export type SellerMarketingListingCapsule = {
 type Props = {
   auctionId: string;
   listingCapsule: SellerMarketingListingCapsule;
+  /** Dashboard snapshot for intake (optional). */
+  intakeMetrics?: MarketingCopilotIntakeMetricsSnapshot | null;
   /** Current workspace plan (optional) — used to prefill intake. */
   workspacePlan: {
     id: string;
@@ -75,6 +79,7 @@ function parseChannelsFromPlan(channels: unknown): Set<string> {
 export function SellerMarketingCopilot({
   auctionId,
   listingCapsule,
+  intakeMetrics = null,
   workspacePlan,
   copilotConfigured,
   onApplied,
@@ -275,6 +280,12 @@ export function SellerMarketingCopilot({
       if (!res.ok) throw new Error(j.message ?? "Apply failed.");
       await onApplied();
       resetToIdle();
+      window.setTimeout(() => {
+        document.getElementById("marketing-workspace")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 200);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Apply failed.");
     } finally {
@@ -429,6 +440,14 @@ export function SellerMarketingCopilot({
                   <p className="mt-3 text-xs text-neutral-600">No description on file — add highlights below.</p>
                 )}
               </div>
+
+              {intakeMetrics ? (
+                <MarketingCopilotIntakeMetricsPanel
+                  metrics={intakeMetrics}
+                  urgency={urgency}
+                  onApplyTimingHint={(text) => setUrgency(text)}
+                />
+              ) : null}
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2 md:col-span-2">
@@ -809,6 +828,12 @@ export function SellerMarketingCopilot({
                   ))}
                 </ul>
               </section>
+
+              <p className="text-[11px] text-neutral-600">
+                After a successful save, we scroll you to the{" "}
+                <span className="text-neutral-400">Marketing workspace</span> block below so you can
+                edit the plan, checklist, and drafts.
+              </p>
 
               <div className="flex flex-wrap gap-3">
                 <Button type="button" variant="outline" onClick={() => setStep("intake")}>

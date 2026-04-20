@@ -47,6 +47,7 @@ import { serializeWorkspacePlan } from "@/lib/marketing/listing-marketing-worksp
 import { SellerMarketingWorkspace } from "@/components/marketing/seller-marketing-workspace";
 import { HashScrollIntoView } from "@/components/marketing/hash-scroll-into-view";
 import { MarketingAuctionStickyNav } from "@/components/marketing/marketing-auction-sticky-nav";
+import { buildMarketingCopilotIntakeMetricsFromDetail } from "@/lib/marketing/marketing-copilot-intake-metrics";
 
 function ProportionBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -229,6 +230,7 @@ export default async function MarketingAuctionDetailPage({
   };
 
   const copilotConfigured = Boolean(process.env.OPENAI_API_KEY?.trim());
+  const copilotIntakeMetrics = buildMarketingCopilotIntakeMetricsFromDetail(detail);
 
   const kpiActivity = [
     {
@@ -385,6 +387,7 @@ export default async function MarketingAuctionDetailPage({
         initialPlan={initialWorkspacePlan}
         listingCapsule={listingCapsule}
         copilotConfigured={copilotConfigured}
+        copilotIntakeMetrics={copilotIntakeMetrics}
       />
 
       <section id="marketing-share-promote" className="scroll-mt-32 mt-10">

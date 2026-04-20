@@ -5,6 +5,10 @@ export type CopilotLightMetrics = {
   bidCount: number;
   viewsLast7d: number;
   totalViewEvents: number;
+  /** Tracked share-button taps (marketing traffic). */
+  totalShareClicks: number;
+  /** Tracked bid-button taps (marketing traffic). */
+  totalBidClicks: number;
   hoursRemaining: number | null;
   listingStatus: string;
   endAtIso: string;
@@ -28,16 +32,23 @@ export async function loadCopilotLightMetrics(
   const windowStart = new Date(dayStart);
   windowStart.setUTCDate(windowStart.getUTCDate() - 6);
 
-  const [bidCount, viewsLast7dAgg, totalViewEvents] = await Promise.all([
-    prisma.bid.count({ where: { auctionId } }),
-    prisma.auctionAnalytics.aggregate({
-      where: { auctionId, day: { gte: windowStart } },
-      _sum: { views: true },
-    }),
-    prisma.trafficEvent.count({
-      where: { auctionId, eventType: MarketingTrafficEventType.VIEW },
-    }),
-  ]);
+  const [bidCount, viewsLast7dAgg, totalViewEvents, totalShareClicks, totalBidClicks] =
+    await Promise.all([
+      prisma.bid.count({ where: { auctionId } }),
+      prisma.auctionAnalytics.aggregate({
+        where: { auctionId, day: { gte: windowStart } },
+        _sum: { views: true },
+      }),
+      prisma.trafficEvent.count({
+        where: { auctionId, eventType: MarketingTrafficEventType.VIEW },
+      }),
+      prisma.trafficEvent.count({
+        where: { auctionId, eventType: MarketingTrafficEventType.SHARE_CLICK },
+      }),
+      prisma.trafficEvent.count({
+        where: { auctionId, eventType: MarketingTrafficEventType.BID_CLICK },
+      }),
+    ]);
 
   let hoursRemaining: number | null = null;
   if (auction.status === "LIVE" && auction.endAt.getTime() > now.getTime()) {
@@ -48,6 +59,8 @@ export async function loadCopilotLightMetrics(
     bidCount,
     viewsLast7d: viewsLast7dAgg._sum.views ?? 0,
     totalViewEvents,
+    totalShareClicks,
+    totalBidClicks,
     hoursRemaining,
     listingStatus: auction.status,
     endAtIso: auction.endAt.toISOString(),

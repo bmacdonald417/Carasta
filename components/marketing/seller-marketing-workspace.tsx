@@ -12,6 +12,7 @@ import {
   SellerMarketingCopilot,
   type SellerMarketingListingCapsule,
 } from "@/components/marketing/seller-marketing-copilot";
+import type { MarketingCopilotIntakeMetricsSnapshot } from "@/lib/marketing/marketing-copilot-intake-metrics";
 
 export type WorkspacePlanState = {
   id: string;
@@ -64,6 +65,8 @@ type Props = {
   initialPlan: WorkspacePlanState | null;
   listingCapsule: SellerMarketingListingCapsule;
   copilotConfigured: boolean;
+  /** Optional dashboard snapshot for copilot intake (per-listing marketing page). */
+  copilotIntakeMetrics?: MarketingCopilotIntakeMetricsSnapshot | null;
 };
 
 export function SellerMarketingWorkspace({
@@ -71,6 +74,7 @@ export function SellerMarketingWorkspace({
   initialPlan,
   listingCapsule,
   copilotConfigured,
+  copilotIntakeMetrics = null,
 }: Props) {
   const [plan, setPlan] = useState<WorkspacePlanState | null>(initialPlan);
   const [busy, setBusy] = useState(false);
@@ -243,7 +247,10 @@ export function SellerMarketingWorkspace({
   );
 
   return (
-    <div className="mt-10 space-y-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+    <div
+      id="marketing-workspace"
+      className="scroll-mt-32 mt-10 space-y-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+    >
       <div>
         <h2 className="font-display text-lg font-semibold text-neutral-100">
           Marketing workspace
@@ -263,6 +270,7 @@ export function SellerMarketingWorkspace({
       <SellerMarketingCopilot
         auctionId={auctionId}
         listingCapsule={listingCapsule}
+        intakeMetrics={copilotIntakeMetrics}
         workspacePlan={
           plan
             ? {

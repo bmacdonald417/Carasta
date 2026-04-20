@@ -4,6 +4,7 @@ const LINKS = [
   { href: "#marketing-overview", label: "Overview" },
   { href: "#marketing-alerts", label: "Alerts" },
   { href: "#marketing-ai-copilot", label: "AI copilot" },
+  { href: "#marketing-workspace", label: "Workspace" },
   { href: "#marketing-share-promote", label: "Share & Promote" },
   { href: "#marketing-carmunity", label: "Carmunity" },
   { href: "#marketing-promo-posts", label: "Promo posts" },
