@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ListingAiAssistant, type ListingAiApplyPatch } from "@/components/sell/listing-ai-assistant";
 import { ListingAiFieldImprove } from "@/components/sell/listing-ai-field-improve";
+import { ListingAiRunHistory } from "@/components/sell/listing-ai-run-history";
 import { updateDraftListingCopy } from "@/lib/listings/update-draft-listing-copy";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -40,6 +41,11 @@ export function ListingsAiRefineDialog({
   const { toast } = useToast();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [historyTick, setHistoryTick] = useState(0);
+
+  useEffect(() => {
+    if (open) setHistoryTick((t) => t + 1);
+  }, [open]);
 
   const handleApply = useCallback(
     async (patch: ListingAiApplyPatch) => {
@@ -153,6 +159,11 @@ export function ListingsAiRefineDialog({
             onApply={(patch) => {
               void handleApply(patch);
             }}
+          />
+          <ListingAiRunHistory
+            auctionId={row.id}
+            active={open}
+            refreshKey={historyTick}
           />
         </DialogContent>
       </Dialog>
