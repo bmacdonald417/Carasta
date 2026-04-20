@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -31,6 +31,18 @@ export function CarmunityOnboardingDialog({
   const [lowerCats, setLowerCats] = useState<Array<{ spaceSlug: string; slug: string }>>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [seededFromPack, setSeededFromPack] = useState(false);
+
+  useEffect(() => {
+    if (!pack) {
+      setSeededFromPack(false);
+      return;
+    }
+    if (seededFromPack) return;
+    setGearSlugs(new Set(pack.initialGearSlugs ?? []));
+    setLowerCats(pack.initialLowerCategories ?? []);
+    setSeededFromPack(true);
+  }, [pack, seededFromPack]);
 
   const selectedSpaces = useMemo(() => {
     if (!pack) return [];
@@ -119,7 +131,8 @@ export function CarmunityOnboardingDialog({
           <section className="space-y-2">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Interests</p>
             <p className="text-xs text-muted-foreground">
-              Tap Gears to personalize discovery (you can change this later from Discussions).
+              Tap Gears to personalize discovery — adjust anytime in{" "}
+            <span className="text-neutral-200">Settings → Carmunity</span>.
             </p>
             <div className="flex flex-wrap gap-2">
               {pack.spaces.map((s) => {

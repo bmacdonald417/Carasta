@@ -5,6 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { getCarmunityOnboardingState } from "@/lib/carmunity/onboarding-service";
 import {
+  listDiscoveryThreadMixForViewer,
+  listSuggestedDiscussionUsersForViewer,
+} from "@/lib/forums/discussion-recommendations";
+import {
   listRecommendedGears,
   listSuggestedDiscussionUsers,
   listThreadsForPreferredGears,
@@ -36,23 +40,31 @@ export default async function DiscussionsPage() {
   }> = [];
   let loadError: string | null = null;
 
-  const [recommendedGears, trendingThreads, suggestedUsers, followedThreads] = await Promise.all([
+  const [recommendedGears, followedThreads, onboardingState] = await Promise.all([
     listRecommendedGears({ take: 4 }).catch(() => []),
-    listTrendingThreadsGlobal({ take: 6 }).catch(() => []),
-    listSuggestedDiscussionUsers({ take: 6, excludeUserId: viewerId }).catch(() => []),
     listFollowedThreadsForViewer(viewerId, { take: 6 }).catch(() => []),
+    viewerId ? getCarmunityOnboardingState(viewerId) : Promise.resolve(null),
   ]);
 
-  let interestThreads: Awaited<ReturnType<typeof listThreadsForPreferredGears>> = [];
-  if (viewerId) {
-    const st = await getCarmunityOnboardingState(viewerId);
-    const slugs = (st.prefs.gearSlugs ?? []).filter(Boolean);
-    if (slugs.length > 0) {
-      interestThreads = await listThreadsForPreferredGears({ gearSlugs: slugs, take: 6 }).catch(
-        () => []
-      );
-    }
-  }
+  const gearSlugs = (onboardingState?.prefs.gearSlugs ?? []).filter(Boolean);
+
+  const [suggestedUsers, interestThreads, trendingPool] = await Promise.all([
+    viewerId
+      ? listSuggestedDiscussionUsersForViewer({ viewerId, take: 6 }).catch(() => [])
+      : listSuggestedDiscussionUsers({ take: 6, excludeUserId: viewerId }).catch(() => []),
+    viewerId && gearSlugs.length > 0
+      ? listThreadsForPreferredGears({ gearSlugs, take: 6 }).catch(() => [])
+      : Promise.resolve([]),
+    viewerId
+      ? listDiscoveryThreadMixForViewer(viewerId, { take: 8 }).catch(() => [])
+      : listTrendingThreadsGlobal({ take: 6 }).catch(() => []),
+  ]);
+
+  const interestIds = new Set(interestThreads.map((t) => t.id));
+  const trendingThreads =
+    viewerId && interestThreads.length > 0
+      ? trendingPool.filter((t) => !interestIds.has(t.id))
+      : trendingPool;
 
   try {
     const result = await listForumSpaces();
@@ -201,7 +213,9 @@ export default async function DiscussionsPage() {
                   Trending threads
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Reply- and reaction-weighted ranking with recency decay (Phase G style, global).
+                  {viewerId
+                    ? "Your Gears first, blended with global momentum — de-duplicated against the “Threads in your Gears” strip above."
+                    : "Reply- and reaction-weighted ranking with recency decay (Phase G style, global)."}
                 </p>
               </div>
               <ul className="divide-y divide-white/5 rounded-2xl border border-border/50 bg-card/40">

@@ -3,8 +3,12 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import {
   listSuggestedDiscussionUsers,
-  listTrendingThreadsGlobal,
+  type SuggestedUserRow,
 } from "@/lib/forums/discussions-discovery";
+import {
+  listDiscoveryThreadMixForViewer,
+  listSuggestedDiscussionUsersForViewer,
+} from "@/lib/forums/discussion-recommendations";
 
 export type OnboardingStarterThread = {
   id: string;
@@ -26,8 +30,11 @@ export type OnboardingSpaceOption = {
 
 export type OnboardingPack = {
   spaces: OnboardingSpaceOption[];
-  suggestedUsers: Awaited<ReturnType<typeof listSuggestedDiscussionUsers>>;
+  suggestedUsers: SuggestedUserRow[];
   starterThreads: OnboardingStarterThread[];
+  /** Pre-fill chips when revisiting onboarding (prefs stay on the user). */
+  initialGearSlugs?: string[];
+  initialLowerCategories?: Array<{ spaceSlug: string; slug: string }>;
 };
 
 export async function listOnboardingSpaceOptions(): Promise<OnboardingSpaceOption[]> {
@@ -52,18 +59,27 @@ export async function listOnboardingSpaceOptions(): Promise<OnboardingSpaceOptio
 }
 
 export async function buildOnboardingPack(input: { viewerUserId: string | null }): Promise<OnboardingPack> {
-  const [spaces, suggestedUsers, trending] = await Promise.all([
+  const [spaces, suggestedUsers, mixRows, st] = await Promise.all([
     listOnboardingSpaceOptions(),
-    listSuggestedDiscussionUsers({ take: 8, excludeUserId: input.viewerUserId }).catch(() => []),
-    listTrendingThreadsGlobal({ take: 6 }).catch(() => []),
+    input.viewerUserId
+      ? listSuggestedDiscussionUsersForViewer({ viewerId: input.viewerUserId, take: 8 }).catch(() => [])
+      : listSuggestedDiscussionUsers({ take: 8, excludeUserId: null }).catch(() => []),
+    listDiscoveryThreadMixForViewer(input.viewerUserId, { take: 6 }).catch(() => []),
+    input.viewerUserId ? getCarmunityOnboardingState(input.viewerUserId) : Promise.resolve(null),
   ]);
-  const starterThreads: OnboardingStarterThread[] = trending.map((t) => ({
+  const starterThreads: OnboardingStarterThread[] = mixRows.map((t) => ({
     id: t.id,
     title: t.title,
     gearSlug: t.gearSlug,
     lowerGearSlug: t.lowerGearSlug,
   }));
-  return { spaces, suggestedUsers, starterThreads };
+  return {
+    spaces,
+    suggestedUsers,
+    starterThreads,
+    initialGearSlugs: st?.prefs.gearSlugs,
+    initialLowerCategories: st?.prefs.lowerCategories,
+  };
 }
 
 function parsePrefs(raw: Prisma.JsonValue | null): CarmunityInterestPrefs {
@@ -118,5 +134,12 @@ export async function completeCarmunityOnboarding(userId: string): Promise<void>
   await prisma.user.update({
     where: { id: userId },
     data: { carmunityOnboardingCompletedAt: new Date() },
+  });
+}
+
+export async function resetCarmunityOnboarding(userId: string): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { carmunityOnboardingCompletedAt: null },
   });
 }

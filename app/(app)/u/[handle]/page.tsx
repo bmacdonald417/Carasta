@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
@@ -23,6 +24,51 @@ import type { CarmunityActivityItem } from "@/components/profile/CarmunityActivi
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { listProfileDiscussionActivityPage } from "@/lib/forums/profile-discussion-activity";
 import { listSavedThreadsForUser, savedThreadHref } from "@/lib/forums/thread-subscriptions";
+import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}): Promise<Metadata> {
+  const { handle } = await params;
+  const user = await prisma.user.findUnique({
+    where: { handle: handle.toLowerCase() },
+    select: { handle: true, name: true, bio: true, avatarUrl: true, image: true },
+  });
+  if (!user) return { title: "Profile" };
+  const origin = getPublicSiteOrigin();
+  const path = `/u/${encodeURIComponent(user.handle)}`;
+  const display = user.name?.trim() || `@${user.handle}`;
+  const title = user.name?.trim() ? `${user.name} (@${user.handle})` : `@${user.handle}`;
+  const description =
+    user.bio?.replace(/\s+/g, " ").trim().slice(0, 180) ||
+    `Garage, posts, and discussions for ${display} on Carmunity by Carasta.`;
+  const rawImg = user.avatarUrl?.trim() || user.image?.trim();
+  const ogImages =
+    rawImg != null && rawImg.length > 0
+      ? [rawImg.startsWith("http") ? rawImg : `${origin}${rawImg.startsWith("/") ? "" : "/"}${rawImg}`]
+      : undefined;
+  return {
+    title,
+    description,
+    alternates: { canonical: `${origin}${path}` },
+    openGraph: {
+      title,
+      description,
+      url: `${origin}${path}`,
+      siteName: "Carmunity by Carasta",
+      type: "profile",
+      images: ogImages,
+    },
+    twitter: {
+      card: ogImages ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: ogImages,
+    },
+  };
+}
 
 export default async function ProfilePage({
   params,
@@ -307,9 +353,17 @@ export default async function ProfilePage({
       <section className="flex flex-wrap items-center gap-2">
         <ShareButtons
           url={`/u/${encodeURIComponent(user.handle)}`}
-          title={`@${user.handle} on Carmunity`}
-          description={user.bio?.slice(0, 120) ?? `Profile for @${user.handle} on Carasta.`}
+          title={`${displayName} · @${user.handle}`}
+          description={
+            user.bio?.replace(/\s+/g, " ").trim().slice(0, 140) ||
+            `Carmunity profile — garage, posts, and discussions.`
+          }
           triggerClassName="border-primary/35 bg-primary/5 text-xs text-primary hover:bg-primary/10"
+          carmunityShareMeta={
+            currentUserId
+              ? { surface: "profile", profileUserId: user.id, handle: user.handle }
+              : undefined
+          }
         />
         {!isOwnProfile && currentUserId ? (
           <FollowButton targetUserId={user.id} initialFollowing={!!following} />

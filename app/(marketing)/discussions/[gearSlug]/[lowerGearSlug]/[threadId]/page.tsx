@@ -18,6 +18,7 @@ import { extractMentionHandles } from "@/lib/discussions/mentions";
 import { prisma } from "@/lib/db";
 import { getForumThreadDetail } from "@/lib/forums/forum-service";
 import { touchForumThreadSubscriptionViewed } from "@/lib/forums/thread-subscriptions";
+import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 
 export const dynamic = "force-dynamic";
 
@@ -25,13 +26,38 @@ type Props = {
   params: Promise<{ gearSlug: string; lowerGearSlug: string; threadId: string }>;
 };
 
+function threadDescriptionSnippet(body: string, max = 180) {
+  const plain = body.replace(/\s+/g, " ").trim();
+  if (plain.length <= max) return plain;
+  return `${plain.slice(0, max - 1)}…`;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { threadId } = await params;
   const detail = await getForumThreadDetail(threadId, { viewerIsAdmin: false });
   if (!detail?.ok) return { title: "Thread" };
+  const { thread } = detail;
+  const origin = getPublicSiteOrigin();
+  const path = `/discussions/${thread.category.space.slug}/${thread.category.slug}/${thread.id}`;
+  const url = `${origin}${path}`;
+  const description = threadDescriptionSnippet(thread.body);
+  const title = thread.title;
   return {
-    title: detail.thread.title,
-    description: detail.thread.body.slice(0, 160),
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "Carmunity by Carasta",
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
@@ -194,8 +220,13 @@ export default async function ThreadPage({ params }: Props) {
                 <ShareButtons
                   url={threadSharePath}
                   title={thread.title}
-                  description={`Discussion on Carasta — ${thread.category.space.title}`}
+                  description={`${thread.category.space.title} · ${thread.category.title}`}
                   triggerClassName="border-primary/35 bg-primary/5 text-xs text-primary hover:bg-primary/10"
+                  carmunityShareMeta={
+                    viewerId
+                      ? { surface: "discussion_thread", threadId: thread.id }
+                      : undefined
+                  }
                 />
                 {viewerId && viewerId !== thread.author.id ? (
                   <>

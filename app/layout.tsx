@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { CarastaLayout } from "@/components/carasta/CarastaLayout";
 import { Toaster } from "@/components/ui/toaster";
+import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,6 +23,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getPublicSiteOrigin()),
   title: {
     default: "Carmunity by Carasta | Social-first automotive platform",
     template: "%s | Carmunity by Carasta",

@@ -75,6 +75,15 @@ type FollowingFeedItem =
   | { type: "thread"; sortAt: string; thread: FollowingThreadPayload }
   | { type: "reply"; sortAt: string; reply: FollowingReplyPayload };
 
+function fireCarmunityClientEvent(type: string, meta?: Record<string, unknown>) {
+  void fetch("/api/carmunity/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, meta }),
+    keepalive: true,
+  });
+}
+
 export type TrendingDiscussionThreadLite = {
   id: string;
   title: string;
@@ -264,6 +273,14 @@ export function CommunityFeed({
                 <Link
                   href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
                   className="block py-2.5 text-sm text-neutral-200 transition hover:text-primary"
+                  onClick={() => {
+                    if (currentUserId) {
+                      fireCarmunityClientEvent("thread_open_feed", {
+                        threadId: t.id,
+                        surface: "explore_trending_strip",
+                      });
+                    }
+                  }}
                 >
                   <span className="line-clamp-2 font-medium">{t.title}</span>
                   <span className="mt-0.5 block text-[11px] text-muted-foreground">
@@ -357,15 +374,33 @@ function FollowingFeedList({
           );
         }
         if (item.type === "thread") {
-          return <FollowingThreadCard key={`thread-${item.thread.id}`} thread={item.thread} />;
+          return (
+            <FollowingThreadCard
+              key={`thread-${item.thread.id}`}
+              thread={item.thread}
+              currentUserId={currentUserId}
+            />
+          );
         }
-        return <FollowingReplyCard key={`reply-${item.reply.id}`} reply={item.reply} />;
+        return (
+          <FollowingReplyCard
+            key={`reply-${item.reply.id}`}
+            reply={item.reply}
+            currentUserId={currentUserId}
+          />
+        );
       })}
     </div>
   );
 }
 
-function FollowingThreadCard({ thread }: { thread: FollowingThreadPayload }) {
+function FollowingThreadCard({
+  thread,
+  currentUserId,
+}: {
+  thread: FollowingThreadPayload;
+  currentUserId: string | null;
+}) {
   const reduceMotion = usePrefersReducedMotion();
   const displayName = thread.author.name?.trim() || `@${thread.author.handle}`;
   const meta = `@${thread.author.handle} · ${formatPostTime(thread.createdAt)}`;
@@ -403,7 +438,18 @@ function FollowingThreadCard({ thread }: { thread: FollowingThreadPayload }) {
           </div>
         </div>
         <div className="px-4 pb-4">
-          <Link href={thread.href} className="block group">
+          <Link
+            href={thread.href}
+            className="block group"
+            onClick={() => {
+              if (currentUserId) {
+                fireCarmunityClientEvent("thread_open_feed", {
+                  threadId: thread.id,
+                  surface: "following_thread_card",
+                });
+              }
+            }}
+          >
             <h3 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100 group-hover:text-primary">
               {thread.title}
             </h3>
@@ -421,7 +467,13 @@ function FollowingThreadCard({ thread }: { thread: FollowingThreadPayload }) {
   );
 }
 
-function FollowingReplyCard({ reply }: { reply: FollowingReplyPayload }) {
+function FollowingReplyCard({
+  reply,
+  currentUserId,
+}: {
+  reply: FollowingReplyPayload;
+  currentUserId: string | null;
+}) {
   const reduceMotion = usePrefersReducedMotion();
   const displayName = reply.author.name?.trim() || `@${reply.author.handle}`;
   const meta = `@${reply.author.handle} · ${formatPostTime(reply.createdAt)}`;
@@ -456,7 +508,18 @@ function FollowingReplyCard({ reply }: { reply: FollowingReplyPayload }) {
           </div>
         </div>
         <div className="px-4 pb-4">
-          <Link href={reply.href} className="block group">
+          <Link
+            href={reply.href}
+            className="block group"
+            onClick={() => {
+              if (currentUserId) {
+                fireCarmunityClientEvent("thread_open_feed", {
+                  threadId: reply.threadId,
+                  surface: "following_reply_card",
+                });
+              }
+            }}
+          >
             <p className="text-sm text-muted-foreground">
               Replied in{" "}
               <span className="font-medium text-neutral-200 group-hover:text-primary">

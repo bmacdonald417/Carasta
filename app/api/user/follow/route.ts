@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getSession } from "@/lib/auth";
+import { logCarmunityEvent } from "@/lib/carmunity/carmunity-analytics";
 import { followCarmunityUser, unfollowCarmunityUser } from "@/lib/carmunity/engagement-service";
 import { prisma } from "@/lib/db";
 import { notifyUserFollowed } from "@/lib/notifications/carmunity-retention-notifications";
@@ -59,6 +60,11 @@ export async function POST(req: Request) {
         actorName: actor.name,
       });
     }
+    logCarmunityEvent({
+      type: "follow_user",
+      userId: followerId,
+      meta: { followingId },
+    });
   }
 
   return NextResponse.json({ ok: true });

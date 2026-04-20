@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getSession } from "@/lib/auth";
+import { logCarmunityEvent } from "@/lib/carmunity/carmunity-analytics";
 import {
   completeCarmunityOnboarding,
   getCarmunityOnboardingState,
+  resetCarmunityOnboarding,
   saveCarmunityOnboardingPrefs,
 } from "@/lib/carmunity/onboarding-service";
 
@@ -22,6 +24,8 @@ const patchSchema = z.object({
     .max(24)
     .optional(),
   complete: z.boolean().optional(),
+  /** Clears completion so onboarding can run again (prefs unchanged unless sent). */
+  resetOnboarding: z.boolean().optional(),
 });
 
 export async function GET() {
@@ -56,7 +60,12 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ message: "Invalid payload." }, { status: 400 });
   }
 
-  const { gearSlugs, lowerCategories, complete } = parsed.data;
+  const { gearSlugs, lowerCategories, complete, resetOnboarding } = parsed.data;
+
+  if (resetOnboarding) {
+    await resetCarmunityOnboarding(userId);
+    logCarmunityEvent({ type: "carmunity_onboarding_reset", userId });
+  }
 
   if (gearSlugs !== undefined || lowerCategories !== undefined) {
     await saveCarmunityOnboardingPrefs({
@@ -68,8 +77,9 @@ export async function PATCH(req: Request) {
     });
   }
 
-  if (complete) {
+  if (complete && !resetOnboarding) {
     await completeCarmunityOnboarding(userId);
+    logCarmunityEvent({ type: "carmunity_onboarding_completed", userId });
   }
 
   const st = await getCarmunityOnboardingState(userId);

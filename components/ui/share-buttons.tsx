@@ -23,6 +23,15 @@ const SHARE_LINKS = {
     `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`,
 };
 
+function fireCarmunityShareEvent(meta: Record<string, unknown>) {
+  void fetch("/api/carmunity/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "share_action", meta }),
+    keepalive: true,
+  });
+}
+
 export function ShareButtons({
   url,
   title,
@@ -30,6 +39,7 @@ export function ShareButtons({
   auctionId,
   trackMarketing = false,
   triggerClassName,
+  carmunityShareMeta,
 }: {
   url: string;
   title: string;
@@ -39,6 +49,8 @@ export function ShareButtons({
   trackMarketing?: boolean;
   /** Optional classes for the trigger button (e.g. Carmunity copper outline). */
   triggerClassName?: string;
+  /** Lightweight Carmunity share attribution (Phase L). */
+  carmunityShareMeta?: Record<string, unknown>;
 }) {
   const [copied, setCopied] = useState(false);
   const fullUrl = typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
@@ -69,8 +81,17 @@ export function ShareButtons({
       await navigator.clipboard.writeText(fullUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      if (carmunityShareMeta) {
+        fireCarmunityShareEvent({ ...carmunityShareMeta, channel: "copy_link" });
+      }
     } catch {
       // fallback
+    }
+  }
+
+  function emitCarmunitySocial(channel: string) {
+    if (carmunityShareMeta) {
+      fireCarmunityShareEvent({ ...carmunityShareMeta, channel });
     }
   }
 
@@ -98,7 +119,10 @@ export function ShareButtons({
             href={SHARE_LINKS.twitter(fullUrl, shareText)}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => emitShareClick("twitter")}
+            onClick={() => {
+              emitShareClick("twitter");
+              emitCarmunitySocial("twitter");
+            }}
           >
             Share on X
           </a>
@@ -108,7 +132,10 @@ export function ShareButtons({
             href={SHARE_LINKS.facebook(fullUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => emitShareClick("facebook")}
+            onClick={() => {
+              emitShareClick("facebook");
+              emitCarmunitySocial("facebook");
+            }}
           >
             Share on Facebook
           </a>
@@ -118,7 +145,10 @@ export function ShareButtons({
             href={SHARE_LINKS.linkedin(fullUrl, shareText)}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => emitShareClick("linkedin")}
+            onClick={() => {
+              emitShareClick("linkedin");
+              emitCarmunitySocial("linkedin");
+            }}
           >
             Share on LinkedIn
           </a>

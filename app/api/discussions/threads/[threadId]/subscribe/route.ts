@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getSession } from "@/lib/auth";
+import { logCarmunityEvent } from "@/lib/carmunity/carmunity-analytics";
 import { prisma } from "@/lib/db";
 import { usersAreBlockedEitherWay } from "@/lib/user-safety";
 
@@ -36,6 +37,11 @@ export async function POST(
     return NextResponse.json({ message: "You can’t save this thread." }, { status: 400 });
   }
 
+  const existing = await prisma.forumThreadSubscription.findUnique({
+    where: { userId_threadId: { userId, threadId } },
+    select: { id: true },
+  });
+
   await prisma.forumThreadSubscription.upsert({
     where: {
       userId_threadId: { userId, threadId },
@@ -43,6 +49,10 @@ export async function POST(
     create: { userId, threadId },
     update: {},
   });
+
+  if (!existing) {
+    logCarmunityEvent({ type: "save_thread", userId, meta: { threadId } });
+  }
 
   return NextResponse.json({ ok: true });
 }

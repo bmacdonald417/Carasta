@@ -1,6 +1,11 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import {
+  getCarmunityOnboardingState,
+  listOnboardingSpaceOptions,
+} from "@/lib/carmunity/onboarding-service";
+import { CarmunitySettingsSection } from "./carmunity-settings-section";
 import { SettingsForm } from "./settings-form";
 
 export default async function SettingsPage() {
@@ -25,6 +30,11 @@ export default async function SettingsPage() {
   });
   if (!user) redirect("/auth/sign-in");
 
+  const [carmunitySpaces, carmunityState] = await Promise.all([
+    listOnboardingSpaceOptions(),
+    getCarmunityOnboardingState((session.user as { id: string }).id),
+  ]);
+
   return (
     <div className="carasta-container max-w-xl py-8">
       <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
@@ -46,6 +56,14 @@ export default async function SettingsPage() {
           twitterUrl={user.twitterUrl ?? ""}
           tiktokUrl={user.tiktokUrl ?? ""}
           weeklyMarketingDigestOptIn={user.weeklyMarketingDigestOptIn}
+        />
+      </div>
+
+      <div className="mt-8">
+        <CarmunitySettingsSection
+          spaces={carmunitySpaces}
+          initialPrefs={carmunityState.prefs}
+          onboardingCompleted={Boolean(carmunityState.completedAt)}
         />
       </div>
     </div>
