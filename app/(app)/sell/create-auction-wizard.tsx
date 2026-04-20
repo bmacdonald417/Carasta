@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ import { useToast } from "@/components/ui/use-toast";
 import type { ConditionGrade } from "@prisma/client";
 import { Plus, Trash2 } from "lucide-react";
 import { ListingAiAssistant } from "@/components/sell/listing-ai-assistant";
+import { ListingAiFieldImprove } from "@/components/sell/listing-ai-field-improve";
 
 const DEFAULT_DAYS = 7;
 const BUY_NOW_HOURS = 24;
@@ -133,6 +134,38 @@ export function CreateAuctionWizard({
       ),
     });
   }
+
+  const listingRewriteContext = useMemo(
+    () => ({
+      year: form.year,
+      make: form.make,
+      model: form.model,
+      trim: form.trim,
+      mileage:
+        form.mileage === "" || Number.isNaN(Number(form.mileage))
+          ? undefined
+          : Number(form.mileage),
+      vin: form.vin,
+      title: form.title,
+      description: form.description,
+      conditionSummary: form.conditionSummary,
+      conditionGrade: form.conditionGrade
+        ? String(form.conditionGrade)
+        : undefined,
+    }),
+    [
+      form.conditionGrade,
+      form.conditionSummary,
+      form.description,
+      form.make,
+      form.mileage,
+      form.model,
+      form.title,
+      form.trim,
+      form.vin,
+      form.year,
+    ]
+  );
 
   function buildPayload(isDraft = false) {
     const year = Number(form.year);
@@ -258,7 +291,16 @@ export function CreateAuctionWizard({
           <div className="space-y-4">
             <h2 className="font-display text-lg font-semibold">Vehicle basics</h2>
             <div>
-              <Label htmlFor="title">Title</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="title">Title</Label>
+                <ListingAiFieldImprove
+                  enabled={listingAiEnabled}
+                  field="title"
+                  context={listingRewriteContext}
+                  currentText={form.title}
+                  onReplace={(t) => update({ title: t })}
+                />
+              </div>
               <Input
                 id="title"
                 value={form.title}
@@ -268,7 +310,16 @@ export function CreateAuctionWizard({
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="description">Description</Label>
+                <ListingAiFieldImprove
+                  enabled={listingAiEnabled}
+                  field="description"
+                  context={listingRewriteContext}
+                  currentText={form.description}
+                  onReplace={(t) => update({ description: t })}
+                />
+              </div>
               <Textarea
                 id="description"
                 value={form.description}
@@ -474,7 +525,16 @@ export function CreateAuctionWizard({
               </Select>
             </div>
             <div>
-              <Label htmlFor="conditionSummary">Condition summary</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="conditionSummary">Condition summary</Label>
+                <ListingAiFieldImprove
+                  enabled={listingAiEnabled}
+                  field="conditionSummary"
+                  context={listingRewriteContext}
+                  currentText={form.conditionSummary}
+                  onReplace={(t) => update({ conditionSummary: t })}
+                />
+              </div>
               <Textarea
                 id="conditionSummary"
                 value={form.conditionSummary}

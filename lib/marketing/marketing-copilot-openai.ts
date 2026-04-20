@@ -17,6 +17,10 @@ export function getMarketingCopilotModel(): string {
 export async function openAiChatJsonObject(params: {
   system: string;
   user: string;
+  /** Defaults to MARKETING_COPILOT_MODEL / gpt-4o-mini. */
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
 }): Promise<unknown> {
   const key = process.env.OPENAI_API_KEY?.trim();
   if (!key) {
@@ -30,9 +34,9 @@ export async function openAiChatJsonObject(params: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: getMarketingCopilotModel(),
-      temperature: 0.55,
-      max_tokens: 4096,
+      model: params.model ?? getMarketingCopilotModel(),
+      temperature: params.temperature ?? 0.55,
+      max_tokens: params.maxTokens ?? 4096,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: params.system },

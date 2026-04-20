@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ListingAiAssistant, type ListingAiApplyPatch } from "@/components/sell/listing-ai-assistant";
+import { ListingAiFieldImprove } from "@/components/sell/listing-ai-field-improve";
 import { updateDraftListingCopy } from "@/lib/listings/update-draft-listing-copy";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -107,6 +108,32 @@ export function ListingsAiRefineDialog({
               ) : null}
             </DialogDescription>
           </DialogHeader>
+          <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-4">
+            <span className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              Quick improve
+            </span>
+            <ListingAiFieldImprove
+              enabled
+              field="title"
+              auctionId={row.id}
+              listingStatus={row.status}
+              currentText={row.title}
+            />
+            <ListingAiFieldImprove
+              enabled
+              field="description"
+              auctionId={row.id}
+              listingStatus={row.status}
+              currentText={row.description ?? ""}
+            />
+            <ListingAiFieldImprove
+              enabled
+              field="conditionSummary"
+              auctionId={row.id}
+              listingStatus={row.status}
+              currentText={row.conditionSummary ?? ""}
+            />
+          </div>
           <ListingAiAssistant
             enabled
             scope="full"
