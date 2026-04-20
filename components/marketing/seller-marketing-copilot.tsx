@@ -13,6 +13,7 @@ import {
   type MarketingCopilotStructuredResult,
 } from "@/lib/validations/marketing-copilot";
 import { MarketingCopilotIntakeMetricsPanel } from "@/components/marketing/marketing-copilot-intake-metrics-panel";
+import { MarketingCopilotRunHistory } from "@/components/marketing/marketing-copilot-run-history";
 import type { MarketingCopilotIntakeMetricsSnapshot } from "@/lib/marketing/marketing-copilot-intake-metrics";
 
 const OBJECTIVE_OPTIONS = [
@@ -106,6 +107,7 @@ export function SellerMarketingCopilot({
   const [lastIntake, setLastIntake] = useState<MarketingCopilotGenerateBody | null>(null);
   const [regenTaskIdx, setRegenTaskIdx] = useState<number | null>(null);
   const [regenArtIdx, setRegenArtIdx] = useState<number | null>(null);
+  const [historyTick, setHistoryTick] = useState(0);
 
   const vehicleLine = useMemo(
     () =>
@@ -255,6 +257,7 @@ export function SellerMarketingCopilot({
       setRunId(j.runId ?? null);
       setLastIntake(intake);
       setStep("review");
+      setHistoryTick((t) => t + 1);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Generation failed.");
     } finally {
@@ -286,6 +289,7 @@ export function SellerMarketingCopilot({
           block: "start",
         });
       }, 200);
+      setHistoryTick((t) => t + 1);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Apply failed.");
     } finally {
@@ -320,6 +324,7 @@ export function SellerMarketingCopilot({
         if (!j.task) throw new Error("Missing task.");
         updateTaskRow(idx, j.task);
         if (j.runId) setRunId(j.runId);
+        setHistoryTick((t) => t + 1);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Regeneration failed.");
       } finally {
@@ -356,6 +361,7 @@ export function SellerMarketingCopilot({
         if (!j.artifact) throw new Error("Missing artifact.");
         updateArtifactRow(idx, j.artifact);
         if (j.runId) setRunId(j.runId);
+        setHistoryTick((t) => t + 1);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Regeneration failed.");
       } finally {
@@ -859,6 +865,8 @@ export function SellerMarketingCopilot({
           ) : null}
         </div>
       ) : null}
+
+      <MarketingCopilotRunHistory auctionId={auctionId} enabled={true} refreshKey={historyTick} />
     </div>
   );
 }
