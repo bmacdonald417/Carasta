@@ -43,6 +43,8 @@ import { CampaignStatusBadge } from "@/components/marketing/campaign-status-badg
 import { campaignTypeLabel } from "@/components/marketing/campaign-type-label";
 import { Button } from "@/components/ui/button";
 import { MarketingCampaignStatus, MarketingTrafficEventType } from "@prisma/client";
+import { serializeWorkspacePlan } from "@/lib/marketing/listing-marketing-workspace-serialize";
+import { SellerMarketingWorkspace } from "@/components/marketing/seller-marketing-workspace";
 
 function ProportionBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -74,12 +76,19 @@ export default async function MarketingAuctionDetailPage({
 
   await ensureSellerMarketingNotifications(user.id, user.handle);
 
-  const [detail, auctionCampaigns, presets, marketingAlertRows] =
+  const [detail, auctionCampaigns, presets, marketingAlertRows, listingWorkspacePlan] =
     await Promise.all([
       getSellerMarketingAuctionDetail(auctionId, user.id),
       getAuctionCampaignsForSeller(user.id, auctionId),
       getMarketingPresetsForUser(user.id),
       getSellerMarketingNotifications(user.id, 24),
+      prisma.listingMarketingPlan.findUnique({
+        where: { auctionId },
+        include: {
+          tasks: { orderBy: { sortOrder: "asc" } },
+          artifacts: { orderBy: { createdAt: "desc" }, take: 50 },
+        },
+      }),
     ]);
   if (!detail) notFound();
 
@@ -189,6 +198,10 @@ export default async function MarketingAuctionDetailPage({
       icon: Radio,
     },
   ];
+
+  const initialWorkspacePlan = listingWorkspacePlan
+    ? serializeWorkspacePlan(listingWorkspacePlan)
+    : null;
 
   const kpiActivity = [
     {
@@ -335,6 +348,12 @@ export default async function MarketingAuctionDetailPage({
           context="auction"
         />
       </div>
+
+      <SellerMarketingWorkspace
+        key={auction.id}
+        auctionId={auction.id}
+        initialPlan={initialWorkspacePlan}
+      />
 
       <div className="mt-10">
         <ShareAndPromotePanel

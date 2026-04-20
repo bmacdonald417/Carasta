@@ -75,6 +75,27 @@ enum MarketingCampaignStatus {
   ENDED
 }
 
+/// Seller workspace checklist row — distinct from [Campaign] outreach records.
+enum ListingMarketingTaskStatus {
+  PENDING
+  COMPLETED
+}
+
+enum ListingMarketingTaskType {
+  CHECKLIST
+  REMINDER
+  MILESTONE
+  CUSTOM
+}
+
+enum ListingMarketingArtifactType {
+  CAPTION
+  HEADLINE
+  BODY
+  HASHTAGS
+  OTHER
+}
+
 /// Discussion reactions (threads & replies). Distinct from feed Post [Like].
 enum DiscussionReactionKind {
   LIKE
@@ -186,6 +207,9 @@ model User {
   carmunityOnboardingCompletedAt DateTime?
   /// Phase K: JSON { gearSlugs?: string[], lowerCategories?: { spaceSlug: string; slug: string }[] }
   carmunityInterestPrefs Json?
+
+  /// P1 seller marketing workspace plans this user created (seller-owned listing scope).
+  listingMarketingPlansCreated ListingMarketingPlan[] @relation("ListingMarketingPlanCreator")
 }
 
 /// Top-level Carmunity forum area (e.g. Mechanics Corner, Gear Interests). Distinct from feed [Post].
@@ -623,6 +647,8 @@ model Auction {
   watches            AuctionWatch[]
   /// Phase M: Carmunity discussion threads anchored to this listing (nullable FK on ForumThread).
   discussionThreads  ForumThread[]
+  /// P1: at most one structured marketing plan per listing (workspace foundation).
+  listingMarketingPlan ListingMarketingPlan?
 
   @@index([sellerId])
   @@index([buyerId])
@@ -820,6 +846,58 @@ model CampaignEvent {
 
   @@index([campaignId])
   @@index([campaignId, createdAt])
+}
+
+/// Structured seller marketing workspace for a single listing — additive to [Campaign] / analytics.
+model ListingMarketingPlan {
+  id          String   @id @default(cuid())
+  auctionId  String   @unique
+  createdById String
+  objective   String   @default("") @db.Text
+  audience    String   @default("") @db.Text
+  positioning String   @default("") @db.Text
+  /// Selected channel keys, e.g. ["carmunity","instagram"] — evolve without enum churn.
+  channels    Json     @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  auction   Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  createdBy User    @relation("ListingMarketingPlanCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  tasks     ListingMarketingTask[]
+  artifacts ListingMarketingArtifact[]
+
+  @@index([createdById])
+}
+
+model ListingMarketingTask {
+  id          String                     @id @default(cuid())
+  planId      String
+  type        ListingMarketingTaskType   @default(CHECKLIST)
+  title       String
+  description String                     @default("") @db.Text
+  channel     String?
+  status      ListingMarketingTaskStatus   @default(PENDING)
+  sortOrder   Int                        @default(0)
+  completedAt DateTime?
+
+  plan ListingMarketingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId, sortOrder])
+}
+
+model ListingMarketingArtifact {
+  id        String                       @id @default(cuid())
+  planId    String
+  type      ListingMarketingArtifactType @default(OTHER)
+  channel   String                       @default("")
+  content   String                       @db.Text
+  version   Int                          @default(1)
+  createdAt DateTime                     @default(now())
+
+  plan ListingMarketingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId, createdAt])
 }
 
 /// Site element feedback (Element Feedback Kit). Table name `feedback` for SQL parity with the kit.

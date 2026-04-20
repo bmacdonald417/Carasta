@@ -1,0 +1,454 @@
+"use client";
+
+import { useCallback, useMemo, useState } from "react";
+import {
+  ListingMarketingArtifactType,
+  ListingMarketingTaskStatus,
+} from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+export type WorkspacePlanState = {
+  id: string;
+  auctionId: string;
+  createdById: string;
+  objective: string;
+  audience: string;
+  positioning: string;
+  channels: unknown;
+  createdAt: string;
+  updatedAt: string;
+  tasks?: WorkspaceTaskState[];
+  artifacts?: WorkspaceArtifactState[];
+};
+
+export type WorkspaceTaskState = {
+  id: string;
+  planId: string;
+  type: string;
+  title: string;
+  description: string;
+  channel: string | null;
+  status: string;
+  sortOrder: number;
+  completedAt: string | null;
+};
+
+export type WorkspaceArtifactState = {
+  id: string;
+  planId: string;
+  type: string;
+  channel: string;
+  content: string;
+  version: number;
+  createdAt: string;
+};
+
+function channelsToInput(channels: unknown): string {
+  if (Array.isArray(channels)) {
+    return (channels as string[]).join(", ");
+  }
+  if (typeof channels === "string") return channels;
+  return "";
+}
+
+const ARTIFACT_TYPES = Object.values(ListingMarketingArtifactType);
+
+type Props = {
+  auctionId: string;
+  initialPlan: WorkspacePlanState | null;
+};
+
+export function SellerMarketingWorkspace({ auctionId, initialPlan }: Props) {
+  const [plan, setPlan] = useState<WorkspacePlanState | null>(initialPlan);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [draftObjective, setDraftObjective] = useState(initialPlan?.objective ?? "");
+  const [draftAudience, setDraftAudience] = useState(initialPlan?.audience ?? "");
+  const [draftPositioning, setDraftPositioning] = useState(initialPlan?.positioning ?? "");
+  const [draftChannels, setDraftChannels] = useState(
+    channelsToInput(initialPlan?.channels)
+  );
+
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskDescription, setNewTaskDescription] = useState("");
+
+  const [artifactType, setArtifactType] = useState<ListingMarketingArtifactType>(
+    ListingMarketingArtifactType.CAPTION
+  );
+  const [artifactChannel, setArtifactChannel] = useState("");
+  const [artifactContent, setArtifactContent] = useState("");
+
+  const refreshPlan = useCallback(async () => {
+    const res = await fetch(`/api/marketing/plan/auction/${auctionId}`);
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error((j as { message?: string }).message ?? "Failed to load plan.");
+    }
+    const j = (await res.json()) as { plan: WorkspacePlanState | null };
+    setPlan(j.plan);
+    if (j.plan) {
+      setDraftObjective(j.plan.objective);
+      setDraftAudience(j.plan.audience);
+      setDraftPositioning(j.plan.positioning);
+      setDraftChannels(channelsToInput(j.plan.channels));
+    }
+  }, [auctionId]);
+
+  const run = useCallback(async (fn: () => Promise<void>) => {
+    setError(null);
+    setBusy(true);
+    try {
+      await fn();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong.");
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  const createPlan = () =>
+    run(async () => {
+      const channels = draftChannels
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const res = await fetch("/api/marketing/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auctionId,
+          objective: draftObjective,
+          audience: draftAudience,
+          positioning: draftPositioning,
+          channels,
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error((j as { message?: string }).message ?? "Could not create plan.");
+      }
+      const j = (await res.json()) as { plan: WorkspacePlanState };
+      setPlan(j.plan);
+    });
+
+  const savePlan = () =>
+    run(async () => {
+      if (!plan) return;
+      const channels = draftChannels
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const res = await fetch(`/api/marketing/plan/${plan.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          objective: draftObjective,
+          audience: draftAudience,
+          positioning: draftPositioning,
+          channels,
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error((j as { message?: string }).message ?? "Could not save plan.");
+      }
+      const j = (await res.json()) as { plan: WorkspacePlanState };
+      setPlan(j.plan);
+    });
+
+  const addTask = () =>
+    run(async () => {
+      if (!plan) return;
+      const title = newTaskTitle.trim();
+      if (!title) throw new Error("Task title is required.");
+      const res = await fetch("/api/marketing/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId: plan.id,
+          title,
+          description: newTaskDescription.trim(),
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error((j as { message?: string }).message ?? "Could not add task.");
+      }
+      setNewTaskTitle("");
+      setNewTaskDescription("");
+      await refreshPlan();
+    });
+
+  const toggleTask = (task: WorkspaceTaskState) =>
+    run(async () => {
+      const next =
+        task.status === ListingMarketingTaskStatus.COMPLETED
+          ? ListingMarketingTaskStatus.PENDING
+          : ListingMarketingTaskStatus.COMPLETED;
+      const res = await fetch(`/api/marketing/tasks/${task.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: next }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error((j as { message?: string }).message ?? "Could not update task.");
+      }
+      await refreshPlan();
+    });
+
+  const saveArtifact = () =>
+    run(async () => {
+      if (!plan) return;
+      const content = artifactContent.trim();
+      if (!content) throw new Error("Draft content is required.");
+      const res = await fetch("/api/marketing/artifacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId: plan.id,
+          type: artifactType,
+          channel: artifactChannel.trim(),
+          content,
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error((j as { message?: string }).message ?? "Could not save draft.");
+      }
+      setArtifactContent("");
+      await refreshPlan();
+    });
+
+  const tasks = plan?.tasks ?? [];
+  const artifacts = plan?.artifacts ?? [];
+
+  const sortedArtifacts = useMemo(
+    () => [...artifacts].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [artifacts]
+  );
+
+  return (
+    <div className="mt-10 space-y-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+      <div>
+        <h2 className="font-display text-lg font-semibold text-neutral-100">
+          Marketing workspace
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Structured plan, checklist, and versioned drafts for this listing. Separate
+          from campaigns and analytics.
+        </p>
+      </div>
+
+      {error ? (
+        <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+          {error}
+        </p>
+      ) : null}
+
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+          Marketing plan
+        </h3>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="md:col-span-2 space-y-2">
+            <p className="text-xs text-neutral-500">Objective</p>
+            <Textarea
+              value={draftObjective}
+              onChange={(e) => setDraftObjective(e.target.value)}
+              rows={2}
+              className="resize-y bg-black/30"
+              placeholder="What you want this listing to achieve…"
+            />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs text-neutral-500">Audience</p>
+            <Textarea
+              value={draftAudience}
+              onChange={(e) => setDraftAudience(e.target.value)}
+              rows={3}
+              className="resize-y bg-black/30"
+              placeholder="Who should see this listing?"
+            />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs text-neutral-500">Positioning</p>
+            <Textarea
+              value={draftPositioning}
+              onChange={(e) => setDraftPositioning(e.target.value)}
+              rows={3}
+              className="resize-y bg-black/30"
+              placeholder="Why this car, why now…"
+            />
+          </div>
+          <div className="md:col-span-2 space-y-2">
+            <p className="text-xs text-neutral-500">Channels (comma-separated)</p>
+            <Input
+              value={draftChannels}
+              onChange={(e) => setDraftChannels(e.target.value)}
+              className="bg-black/30"
+              placeholder="carmunity, instagram, email"
+            />
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {!plan ? (
+            <Button type="button" size="sm" disabled={busy} onClick={() => void createPlan()}>
+              Create plan
+            </Button>
+          ) : (
+            <Button type="button" size="sm" variant="secondary" disabled={busy} onClick={() => void savePlan()}>
+              Save plan
+            </Button>
+          )}
+        </div>
+      </section>
+
+      {plan ? (
+        <section className="space-y-4 border-t border-white/10 pt-8">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+            Execution checklist
+          </h3>
+          <ul className="space-y-2">
+            {tasks.length === 0 ? (
+              <li className="text-sm text-neutral-500">No tasks yet.</li>
+            ) : (
+              tasks.map((t) => (
+                <li
+                  key={t.id}
+                  className="flex items-start gap-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2"
+                >
+                  <input
+                    type="checkbox"
+                    className="mt-1 h-4 w-4 shrink-0 accent-[#ff3b5c]"
+                    checked={t.status === ListingMarketingTaskStatus.COMPLETED}
+                    disabled={busy}
+                    onChange={() => void toggleTask(t)}
+                    aria-label={`Complete: ${t.title}`}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={`text-sm font-medium text-neutral-100 ${
+                        t.status === ListingMarketingTaskStatus.COMPLETED
+                          ? "text-neutral-500 line-through"
+                          : ""
+                      }`}
+                    >
+                      {t.title}
+                    </p>
+                    {t.description ? (
+                      <p className="mt-0.5 text-xs text-neutral-500">{t.description}</p>
+                    ) : null}
+                    {t.channel ? (
+                      <p className="mt-0.5 text-[10px] uppercase text-neutral-600">
+                        {t.channel}
+                      </p>
+                    ) : null}
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-xs text-neutral-500">New task title</p>
+              <Input
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                className="bg-black/30"
+                placeholder="e.g. Post teaser to Instagram"
+              />
+            </div>
+            <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => void addTask()}>
+              Add task
+            </Button>
+          </div>
+          <Textarea
+            value={newTaskDescription}
+            onChange={(e) => setNewTaskDescription(e.target.value)}
+            rows={2}
+            className="resize-y bg-black/30"
+            placeholder="Optional details…"
+          />
+        </section>
+      ) : null}
+
+      {plan ? (
+        <section className="space-y-4 border-t border-white/10 pt-8">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+            Content drafts
+          </h3>
+          <p className="text-xs text-neutral-500">
+            Each save creates a new version for the same type + channel key.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1">
+              <p className="text-xs text-neutral-500">Type</p>
+              <select
+                className="h-10 w-full rounded-md border border-white/10 bg-black/30 px-2 text-sm text-neutral-100"
+                value={artifactType}
+                onChange={(e) =>
+                  setArtifactType(e.target.value as ListingMarketingArtifactType)
+                }
+              >
+                {ARTIFACT_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs text-neutral-500">Channel label (optional)</p>
+              <Input
+                value={artifactChannel}
+                onChange={(e) => setArtifactChannel(e.target.value)}
+                className="bg-black/30"
+                placeholder="instagram, carmunity, …"
+              />
+            </div>
+          </div>
+          <Textarea
+            value={artifactContent}
+            onChange={(e) => setArtifactContent(e.target.value)}
+            rows={5}
+            className="resize-y bg-black/30"
+            placeholder="Draft caption, headline, or notes…"
+          />
+          <Button type="button" size="sm" disabled={busy} onClick={() => void saveArtifact()}>
+            Save new version
+          </Button>
+
+          <div className="mt-4 space-y-3">
+            {sortedArtifacts.length === 0 ? (
+              <p className="text-sm text-neutral-500">No drafts yet.</p>
+            ) : (
+              sortedArtifacts.map((a) => (
+                <div
+                  key={a.id}
+                  className="rounded-lg border border-white/10 bg-black/25 p-3 text-sm"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
+                    <span>
+                      {a.type}
+                      {a.channel ? ` · ${a.channel}` : ""}
+                    </span>
+                    <span>
+                      v{a.version} · {new Date(a.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+                  <pre className="mt-2 whitespace-pre-wrap font-sans text-neutral-200">
+                    {a.content}
+                  </pre>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      ) : null}
+    </div>
+  );
+}
