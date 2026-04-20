@@ -5,7 +5,8 @@ import '../../../app/theme/app_spacing.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/services/push_notification_service.dart';
 
-/// In-app notifications (placeholder). [PushNotificationService] is the hook for real push later.
+/// Carmunity alerts — same conceptual inbox as the Carasta web header bell.
+/// [PushNotificationService] is the hook for device push later.
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
@@ -38,12 +39,14 @@ class NotificationsScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'In-app list',
+            'Live queue (parity)',
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'Phase 2 will call the same notification APIs as the website (e.g. GET /api/notifications/list) once mobile auth is defined.',
+            'Carasta keeps one notification model per account. On the web, open the bell in the header — '
+            'this screen will list the same Carmunity + listing items from the Carasta APIs as the mobile '
+            'inbox is wired to your session (no separate “app-only” inbox).',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
           ),
         ],

@@ -15,7 +15,7 @@ export function MarketingAlertsPanel({
 }) {
   const emptyCopy =
     context === "auction"
-      ? "Nothing flagged for this listing yet. Full alerts stay on Marketing home and in the bell menu."
+      ? "Nothing flagged for this listing yet. See all alerts on Marketing home or open the notifications bell in the header."
       : "You’re caught up. Alerts appear when traffic shifts, listings wind down, or campaigns start.";
 
   return (
@@ -38,8 +38,9 @@ export function MarketingAlertsPanel({
             ) : null}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            In-app only (same items as the header bell). Driven by your traffic
-            and campaigns.
+            Same queue as the notifications bell in the Carasta header — one account,
+            one inbox for seller marketing signals. Carmunity mobile will surface these
+            items from the same APIs as the list view catches up.
           </p>
         </div>
       </div>

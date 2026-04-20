@@ -167,6 +167,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                         <Link href="/admin">Admin</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
+                        <Link href="/dashboard/feedback">
+                          Element feedback
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
                         <Link href="/admin/marketing">
                           Seller marketing (review)
                         </Link>
@@ -223,8 +228,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="flex flex-col items-center gap-4 md:flex-row md:gap-6">
                 <div className="flex flex-col items-center gap-2">
-                  <p className="text-xs text-neutral-500">Download the app</p>
+                  <p className="text-xs text-neutral-500">Carmunity on mobile</p>
                   <AppStoreBadges />
+                  <p className="max-w-xs text-center text-[11px] leading-relaxed text-neutral-600">
+                    Same identity and social graph as carasta.com — the site is not a lesser client.
+                  </p>
                 </div>
               </div>
               <div className="text-center md:text-right">

@@ -259,13 +259,13 @@ class _SignedInBody extends StatelessWidget {
           context,
           'Garage',
           me.counts.garageCars == 0
-              ? 'Add cars on the website to show them in-app.'
+              ? 'Garage lives on your Carasta profile — add or edit cars on carasta.com today; the same collection appears here.'
               : '${me.counts.garageCars} car${me.counts.garageCars == 1 ? '' : 's'} on your profile',
         ),
         const SizedBox(height: AppSpacing.sm),
         _GarageShowcaseCard(
           count: me.counts.garageCars,
-          subtitle: 'Image-first collection — same data as the web garage.',
+          subtitle: 'Image-first collection — same profile data as Carasta web.',
           onOpen: () => context.push(AppRoutes.garage),
         ),
         const SizedBox(height: AppSpacing.xl),

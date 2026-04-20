@@ -178,6 +178,9 @@ model User {
   mutesReceived        UserMute[]  @relation("UserMuteMuted")
   forumThreadSubscriptions ForumThreadSubscription[]
 
+  /// In-app element feedback (site UX kit); distinct from auction peer feedback.
+  elementFeedbacks ElementFeedback[]
+
   /// Phase K: null until onboarding finished or skipped — existing users backfilled in migration.
   carmunityOnboardingCompletedAt DateTime?
   /// Phase K: JSON { gearSlugs?: string[], lowerCategories?: { spaceSlug: string; slug: string }[] }
@@ -798,4 +801,59 @@ model CampaignEvent {
 
   @@index([campaignId])
   @@index([campaignId, createdAt])
+}
+
+/// Site element feedback (Element Feedback Kit). Table name `feedback` for SQL parity with the kit.
+model ElementFeedback {
+  id                String    @id @default(cuid())
+  organizationId    String
+  userId            String?
+  content           String    @db.Text
+  category          String
+  pageUrl           String?
+  elementSelector   String?
+  elementText       String?   @db.Text
+  elementType       String?
+  elementIdAttr     String?
+  elementClassAttr  String?
+  status            String    @default("pending")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  resolvedAt        DateTime?
+  resolutionCommitSha String?
+  resolutionCommitUrl String?
+  resolutionSummary   String?   @db.Text
+  resolutionFiles     Json?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status, createdAt])
+  @@map("feedback")
+}
+
+model AgentRun {
+  id             String    @id @default(cuid())
+  organizationId String
+  type           String
+  status         String    @default("running")
+  createdAt      DateTime  @default(now())
+  completedAt    DateTime?
+
+  events AgentRunEvent[]
+
+  @@index([organizationId, status])
+  @@map("agent_runs")
+}
+
+model AgentRunEvent {
+  id        String   @id @default(cuid())
+  runId     String
+  kind      String
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  run AgentRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, createdAt])
+  @@map("agent_run_events")
 }

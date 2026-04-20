@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Inter, Oswald, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { CarastaLayout } from "@/components/carasta/CarastaLayout";
 import { Toaster } from "@/components/ui/toaster";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
+
+const FeedbackWidget = dynamic(
+  () => import("@/components/feedback/FeedbackWidget"),
+  { ssr: false }
+);
 
 const inter = Inter({
   subsets: ["latin"],
@@ -44,6 +50,7 @@ export default function RootLayout({
       >
         <Providers>
           <CarastaLayout>{children}</CarastaLayout>
+          <FeedbackWidget />
           <Toaster />
         </Providers>
       </body>

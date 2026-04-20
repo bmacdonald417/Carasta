@@ -6,9 +6,28 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+
+type PolicyModal = "terms" | "privacy" | "community" | null;
+
+const POLICY_CONFIG: Record<Exclude<PolicyModal, null>, { href: string; title: string; iframeTitle: string }> = {
+  terms: { href: "/terms", title: "Terms of Service", iframeTitle: "Terms of Service" },
+  privacy: { href: "/privacy", title: "Privacy Policy", iframeTitle: "Privacy Policy" },
+  community: {
+    href: "/community-guidelines",
+    title: "Community Guidelines",
+    iframeTitle: "Community Guidelines",
+  },
+};
 
 export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabled?: boolean; callbackUrl?: string }) {
   const router = useRouter();
@@ -22,6 +41,7 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
   const [acceptCommunityGuidelines, setAcceptCommunityGuidelines] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [policyModal, setPolicyModal] = useState<PolicyModal>(null);
 
   const consentComplete =
     acceptTerms && acceptPrivacy && acceptCommunityGuidelines;
@@ -68,6 +88,8 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
       setLoading(false);
     }
   }
+
+  const policyMeta = policyModal ? POLICY_CONFIG[policyModal] : null;
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -142,14 +164,9 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
           label={
             <>
               I agree to the{" "}
-              <Link
-                href="/terms"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline-offset-4 hover:underline"
-              >
+              <PolicyLinkButton onOpen={() => setPolicyModal("terms")}>
                 Terms of Service
-              </Link>
+              </PolicyLinkButton>
               .
             </>
           }
@@ -161,14 +178,9 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
           label={
             <>
               I agree to the{" "}
-              <Link
-                href="/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline-offset-4 hover:underline"
-              >
+              <PolicyLinkButton onOpen={() => setPolicyModal("privacy")}>
                 Privacy Policy
-              </Link>
+              </PolicyLinkButton>
               .
             </>
           }
@@ -180,19 +192,52 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
           label={
             <>
               I agree to the{" "}
-              <Link
-                href="/community-guidelines"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline-offset-4 hover:underline"
-              >
+              <PolicyLinkButton onOpen={() => setPolicyModal("community")}>
                 Community Guidelines
-              </Link>
+              </PolicyLinkButton>
               .
             </>
           }
         />
       </fieldset>
+
+      <Dialog open={policyModal != null} onOpenChange={(open) => !open && setPolicyModal(null)}>
+        <DialogContent
+          showClose
+          className="flex max-h-[90vh] max-w-3xl flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl"
+        >
+          {policyMeta ? (
+            <>
+              <DialogHeader className="shrink-0 border-b border-border px-6 py-4 text-left">
+                <DialogTitle>{policyMeta.title}</DialogTitle>
+                <DialogDescription className="sr-only">
+                  Full text of the {policyMeta.title}. Scroll inside the frame to read.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="min-h-0 flex-1 bg-muted/20 px-4 pb-4 pt-2 sm:px-6">
+                <iframe
+                  key={policyModal ?? "closed"}
+                  title={policyMeta.iframeTitle}
+                  src={policyMeta.href}
+                  className="h-[min(70vh,640px)] w-full rounded-xl border border-border bg-background"
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                />
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  <Link
+                    href={policyMeta.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline-offset-4 hover:underline"
+                  >
+                    Open in a full tab
+                  </Link>{" "}
+                  if you prefer.
+                </p>
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
 
       <Button
         type="submit"
@@ -238,6 +283,28 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
         </Link>
       </p>
     </form>
+  );
+}
+
+function PolicyLinkButton({
+  children,
+  onOpen,
+}: {
+  children: ReactNode;
+  onOpen: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onOpen();
+      }}
+      className="text-primary underline-offset-4 hover:underline"
+    >
+      {children}
+    </button>
   );
 }
 

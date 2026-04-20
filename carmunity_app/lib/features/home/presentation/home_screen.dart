@@ -38,7 +38,7 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            tooltip: 'Notifications',
+            tooltip: 'Carmunity alerts (same inbox as carasta.com)',
             onPressed: () => context.push(AppRoutes.notifications),
             icon: const Icon(Icons.notifications_none_rounded),
           ),

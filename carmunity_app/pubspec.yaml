@@ -1,5 +1,5 @@
 name: carmunity_app
-description: Carmunity by Carasta — social-first client for iOS and Windows.
+description: Carmunity by Carasta — companion client for iOS and Windows; same social identity and APIs as carasta.com.
 publish_to: "none"
 version: 0.1.0+1
 

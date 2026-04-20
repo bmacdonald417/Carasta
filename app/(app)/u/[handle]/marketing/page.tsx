@@ -111,6 +111,7 @@ export default async function MarketingPage({
             <Link href="/settings" className="text-[#ff3b5c]/90 hover:underline">
               Settings → Email
             </Link>
+            . Instant marketing alerts also appear in the header notifications bell (same queue as below).
           </p>
         </div>
         <Link

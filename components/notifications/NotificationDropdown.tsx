@@ -127,6 +127,7 @@ export function NotificationDropdown() {
           variant="ghost"
           size="icon"
           className="relative text-neutral-400 hover:text-neutral-100"
+          aria-label="Notifications — Carmunity and listing alerts"
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
@@ -140,13 +141,18 @@ export function NotificationDropdown() {
         align="end"
         className="w-80 border-white/10 bg-[#121218]/95 backdrop-blur-xl"
       >
-        <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
-          <span className="text-sm font-medium">Notifications</span>
+        <div className="flex items-start justify-between gap-2 border-b border-white/10 px-3 py-2">
+          <div className="min-w-0 pr-1">
+            <span className="text-sm font-medium">Notifications</span>
+            <p className="text-[11px] leading-snug text-neutral-500">
+              Carmunity + listing alerts for this account (same model as Carmunity mobile).
+            </p>
+          </div>
           {unreadCount > 0 && (
             <button
               type="button"
               onClick={handleMarkAllRead}
-              className="text-xs text-primary hover:underline"
+              className="shrink-0 pt-0.5 text-xs text-primary hover:underline"
             >
               Mark all read
             </button>
@@ -157,8 +163,8 @@ export function NotificationDropdown() {
             <div className="px-4 py-8 text-center">
               <p className="text-sm font-medium text-neutral-200">All caught up</p>
               <p className="mt-2 text-xs leading-relaxed text-neutral-500">
-                Mentions, follows, and saved-thread replies land here. Jump into Discussions or the feed to
-                stir the signal.
+                Mentions, follows, saved-thread replies, and seller marketing alerts (when enabled) land
+                here — not a separate “app-only” inbox. Open Discussions or the feed to stir the signal.
               </p>
               <div className="mt-4 flex flex-col gap-2">
                 <Button asChild variant="outline" size="sm" className="border-primary/35 text-primary hover:bg-primary/10">

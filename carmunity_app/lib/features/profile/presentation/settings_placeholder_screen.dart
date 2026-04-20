@@ -14,7 +14,8 @@ class SettingsPlaceholderScreen extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           Text(
-            'Account, notifications, and privacy settings will mirror platform preferences.',
+            'Account, notifications, and privacy settings stay aligned with Carasta on the web (Settings). '
+            'This screen will deepen parity as mobile preferences ship.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textSecondary),
           ),
         ],

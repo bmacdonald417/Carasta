@@ -5,7 +5,7 @@ class PushNotificationService {
   PushNotificationService._();
 
   static const String phase1Banner =
-      'Push is not enabled yet. This service exists so FCM / Windows notifications can plug in without restructuring the app.';
+      'Device push (FCM / Windows) is not wired yet — your Carasta account already has live notifications on carasta.com (header bell). This hook exists so mobile can subscribe without restructuring the app.';
 
   /// Future: initialize SDK, request permissions, bind token to Carasta user.
   static Future<void> initialize() async {}
