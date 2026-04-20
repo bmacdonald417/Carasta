@@ -125,6 +125,101 @@ enum DiscussionReportStatus {
   DISMISSED
 }
 
+/// Carasta Coin — wallet / ledger domain enums (centralized, token-ready).
+enum WalletTransactionKind {
+  GRANT
+  DEBIT
+  REVERSAL
+  HOLD
+  RELEASE
+  EXPIRATION
+  ADMIN_ADJUSTMENT
+  REDEMPTION
+}
+
+enum WalletTransactionStatus {
+  PENDING
+  POSTED
+  REVERSED
+  VOID
+}
+
+enum RewardEventSource {
+  SYSTEM
+  USER
+  ADMIN
+  CAMPAIGN
+}
+
+enum RewardEventStatus {
+  RECEIVED
+  HELD
+  AWARDED
+  DENIED
+  REVERSED
+}
+
+enum RewardReasonCode {
+  ACCOUNT_CREATED
+  PROFILE_VERIFIED
+  KYC_COMPLETED
+  FIRST_LISTING
+  LISTING_QUALITY
+  REFERRAL_SIGNUP
+  REFERRAL_ONBOARDING
+  REFERRAL_FIRST_LISTING
+  SALE_COMPLETED
+  COMMUNITY_CONTRIBUTION
+  PROMOTION_BONUS
+  ADMIN_MANUAL
+}
+
+enum RewardRuleStatus {
+  ACTIVE
+  PAUSED
+  DISABLED
+}
+
+enum RedemptionType {
+  FEATURED_LISTING_BOOST
+  SELLER_ANALYTICS_UNLOCK
+  PREMIUM_BADGE
+  LISTING_PLACEMENT_ENHANCEMENT
+  SELLER_FEE_CREDIT
+  PREMIUM_TOOL_ACCESS
+  EARLY_ACCESS_PERK
+  OTHER
+}
+
+enum RedemptionStatus {
+  REQUESTED
+  APPROVED
+  FULFILLED
+  DENIED
+  REVERSED
+}
+
+enum FraudFlagStatus {
+  OPEN
+  REVIEWING
+  ACTIONED
+  DISMISSED
+}
+
+enum FraudFlagSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RewardCampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ENDED
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -216,6 +311,22 @@ model User {
   /// Phase Q: messaging participation and sent messages.
   conversationParticipants ConversationParticipant[]
   messagesSent             Message[]
+
+  /// Carasta Coin — rewards wallet & audit trail.
+  wallet                UserWallet?
+  walletTransactions     WalletTransaction[]     @relation("WalletTransactionUser")
+  walletEvents           RewardEvent[]           @relation("RewardEventUser")
+  referralCode           ReferralCode?
+  referralsSent          ReferralRelationship[]  @relation("ReferralReferrer")
+  referralsReceived      ReferralRelationship[]  @relation("ReferralReferred")
+  fraudFlags             FraudFlag[]             @relation("FraudFlagUser")
+  adminAdjustmentsMade   AdminAdjustment[]       @relation("AdminAdjustmentActor")
+
+  /// Carasta Coin — redemptions and campaign participation.
+  redemptionRecords      RedemptionRecord[]
+  rewardCampaignParticipations RewardCampaignParticipation[]
+  fraudFlagsReviewed     FraudFlag[]            @relation("FraudFlagReviewer")
+  adminAdjustmentsReceived AdminAdjustment[]
 }
 
 /// Top-level Carmunity forum area (e.g. Mechanics Corner, Gear Interests). Distinct from feed [Post].
@@ -659,6 +770,8 @@ model Auction {
   marketingCopilotRuns MarketingCopilotRun[]
   /// Phase R: listing-scoped conversations (DMs tied to this auction).
   conversations Conversation[]
+  /// Carasta Coin — reward events tied to this listing.
+  rewardEvents RewardEvent[]
 
   @@index([sellerId])
   @@index([buyerId])
@@ -982,6 +1095,251 @@ model Message {
 
   @@index([conversationId, createdAt])
   @@index([senderId, createdAt])
+}
+
+/// Single wallet per user for Carasta Coin (cached balances; ledger is source of truth).
+model UserWallet {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  balanceAvailable Int      @default(0)
+  balancePending   Int      @default(0)
+  lifetimeEarned   Int      @default(0)
+  lifetimeSpent    Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+  redemptions  RedemptionRecord[]
+
+  @@index([userId])
+}
+
+/// Immutable ledger entry for every Carasta Coin movement.
+model WalletTransaction {
+  id               String                  @id @default(cuid())
+  walletId         String
+  userId           String
+  kind             WalletTransactionKind
+  status           WalletTransactionStatus @default(POSTED)
+  amount           Int
+  currency         String                  @default("CARASTA_COIN")
+  reasonCode       RewardReasonCode?
+  description      String?                 @db.VarChar(300)
+  idempotencyKey   String?
+  relatedEventId   String?
+  relatedTxnId     String?
+  rewardCampaignId       String?
+  redemptionId     String?
+  adminAdjustmentId String?
+  expiresAt        DateTime?
+  metadata         Json?
+  createdAt        DateTime                @default(now())
+
+  wallet     UserWallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  user       User                 @relation("WalletTransactionUser", fields: [userId], references: [id], onDelete: Cascade)
+  event      RewardEvent?         @relation(fields: [relatedEventId], references: [id], onDelete: SetNull)
+  relatedTxn WalletTransaction?   @relation("WalletTransactionRelated", fields: [relatedTxnId], references: [id], onDelete: SetNull)
+  reversals  WalletTransaction[]  @relation("WalletTransactionRelated")
+  rewardCampaign   RewardCampaign?            @relation(fields: [rewardCampaignId], references: [id], onDelete: SetNull)
+  redemption RedemptionRecord?    @relation(fields: [redemptionId], references: [id], onDelete: SetNull)
+  adminAdjustment AdminAdjustment? @relation(fields: [adminAdjustmentId], references: [id], onDelete: SetNull)
+
+  @@index([walletId, createdAt])
+  @@index([userId, createdAt])
+  @@index([kind, createdAt])
+  @@index([relatedEventId])
+  @@unique([userId, idempotencyKey])
+}
+
+/// Reward-triggering event (separate from ledger posting for idempotency & audit).
+model RewardEvent {
+  id             String            @id @default(cuid())
+  userId         String
+  source         RewardEventSource @default(SYSTEM)
+  reasonCode     RewardReasonCode
+  status         RewardEventStatus @default(RECEIVED)
+  idempotencyKey String
+  ruleId         String?
+  rewardCampaignId     String?
+  auctionId      String?
+  metadata       Json?
+  createdAt      DateTime          @default(now())
+  decidedAt      DateTime?
+
+  user     User        @relation("RewardEventUser", fields: [userId], references: [id], onDelete: Cascade)
+  rule     RewardRule? @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  rewardCampaign RewardCampaign?   @relation(fields: [rewardCampaignId], references: [id], onDelete: SetNull)
+  auction  Auction?    @relation(fields: [auctionId], references: [id], onDelete: SetNull)
+  txns     WalletTransaction[]
+
+  @@unique([userId, idempotencyKey])
+  @@index([userId, createdAt])
+  @@index([reasonCode, createdAt])
+  @@index([status, createdAt])
+}
+
+/// Configurable reward rule (admin-managed).
+model RewardRule {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  status      RewardRuleStatus @default(ACTIVE)
+  reasonCode  RewardReasonCode
+  amount      Int
+  isHold      Boolean          @default(false)
+  holdDays    Int?
+  maxAwardsPerUser Int?
+  cooldownSeconds Int?
+  startsAt    DateTime?
+  endsAt      DateTime?
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  events RewardEvent[]
+
+  @@index([status])
+  @@index([reasonCode])
+}
+
+/// Referral code per user (shareable).
+model ReferralCode {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  code      String   @unique
+  createdAt DateTime @default(now())
+  disabledAt DateTime?
+  metadata  Json?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relationships ReferralRelationship[]
+}
+
+/// Referral relationship (referrer -> referred).
+model ReferralRelationship {
+  id             String   @id @default(cuid())
+  referrerId     String
+  referredId     String   @unique
+  referralCodeId String?
+  createdAt      DateTime @default(now())
+  metadata       Json?
+
+  referrer User @relation("ReferralReferrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referred User @relation("ReferralReferred", fields: [referredId], references: [id], onDelete: Cascade)
+  referralCode ReferralCode? @relation(fields: [referralCodeId], references: [id], onDelete: SetNull)
+
+  @@unique([referrerId, referredId])
+  @@index([referrerId, createdAt])
+}
+
+model RedemptionOption {
+  id          String         @id @default(cuid())
+  code        String         @unique
+  type        RedemptionType
+  title       String
+  description String?        @db.Text
+  cost        Int
+  isActive    Boolean        @default(true)
+  metadata    Json?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  redemptions RedemptionRecord[]
+
+  @@index([isActive])
+  @@index([type])
+}
+
+model RedemptionRecord {
+  id          String           @id @default(cuid())
+  userId      String
+  walletId    String
+  optionId    String
+  status      RedemptionStatus @default(REQUESTED)
+  cost        Int
+  notes       String?          @db.Text
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+  decidedAt   DateTime?
+  fulfilledAt DateTime?
+
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet  UserWallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  option  RedemptionOption @relation(fields: [optionId], references: [id], onDelete: Restrict)
+  txns    WalletTransaction[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+model RewardCampaign {
+  id          String         @id @default(cuid())
+  code        String         @unique
+  title       String
+  description String?        @db.Text
+  status      RewardCampaignStatus @default(DRAFT)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  metadata    Json?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  participations RewardCampaignParticipation[]
+  events         RewardEvent[]
+  txns           WalletTransaction[]
+
+  @@index([status])
+}
+
+model RewardCampaignParticipation {
+  id         String   @id @default(cuid())
+  campaignId String
+  userId     String
+  joinedAt   DateTime @default(now())
+  metadata   Json?
+
+  campaign RewardCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, userId])
+  @@index([userId, joinedAt])
+}
+
+model FraudFlag {
+  id          String            @id @default(cuid())
+  userId      String
+  status      FraudFlagStatus   @default(OPEN)
+  severity    FraudFlagSeverity @default(MEDIUM)
+  reason      String
+  metadata    Json?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  reviewedAt  DateTime?
+  reviewedById String?
+
+  user       User   @relation("FraudFlagUser", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy User?  @relation("FraudFlagReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+model AdminAdjustment {
+  id        String   @id @default(cuid())
+  userId    String
+  actorId   String
+  kind      WalletTransactionKind
+  amount    Int
+  reason    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user  User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actor User @relation("AdminAdjustmentActor", fields: [actorId], references: [id], onDelete: Cascade)
+  txns  WalletTransaction[]
+
+  @@index([userId, createdAt])
+  @@index([actorId, createdAt])
 }
 
 /// Site element feedback (Element Feedback Kit). Table name `feedback` for SQL parity with the kit.
