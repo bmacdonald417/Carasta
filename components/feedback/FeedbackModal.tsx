@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,14 @@ export default function FeedbackModal({
   const [content, setContent] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setContent("");
+      setCategory("general");
+      setError(null);
+    }
+  }, [open]);
 
   async function handleSubmit() {
     setError(null);
@@ -145,9 +153,13 @@ export default function FeedbackModal({
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={5}
+              maxLength={5000}
               className="w-full resize-y rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
               placeholder="What happened? What did you expect?"
             />
+            <p className="mt-1 text-right text-[11px] text-neutral-600">
+              {content.length}/5000
+            </p>
           </div>
 
           {error ? (

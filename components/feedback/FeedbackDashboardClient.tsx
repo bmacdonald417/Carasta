@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import IncorporateFeedbackPanel from "./IncorporateFeedbackPanel";
 import type { FeedbackStatus } from "./types";
+import { useToast } from "@/components/ui/use-toast";
 import { ExternalLink } from "lucide-react";
 
 export type FeedbackRowVM = {
@@ -30,6 +31,8 @@ type Props = {
 
 export default function FeedbackDashboardClient({ initialRows }: Props) {
   const [rows, setRows] = useState(initialRows);
+  const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
 
   const counts = useMemo(() => {
     const base = { all: rows.length, pending: 0, reviewed: 0, resolved: 0 };
@@ -42,27 +45,43 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
   }, [rows]);
 
   async function patchStatus(id: string, status: FeedbackStatus) {
-    const res = await fetch("/api/feedback", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ id, status }),
-    });
-    if (!res.ok) {
-      const j = (await res.json().catch(() => null)) as { error?: string };
-      throw new Error(j?.error ?? `Update failed (${res.status})`);
-    }
-    setRows((prev) =>
-      prev.map((r) =>
+    if (loadingIds.has(id)) return;
+    setLoadingIds((prev) => new Set(prev).add(id));
+    const prev = rows.find((r) => r.id === id);
+    setRows((all) =>
+      all.map((r) =>
         r.id === id
-          ? {
-              ...r,
-              status,
-              resolvedAt: status === "resolved" ? new Date().toISOString() : null,
-            }
+          ? { ...r, status, resolvedAt: status === "resolved" ? new Date().toISOString() : r.resolvedAt }
           : r
       )
     );
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id, status }),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => null)) as { error?: string };
+        throw new Error(j?.error ?? `Update failed (${res.status})`);
+      }
+    } catch (e) {
+      if (prev) {
+        setRows((all) => all.map((r) => (r.id === id ? prev : r)));
+      }
+      toast({
+        title: "Update failed",
+        description: e instanceof Error ? e.message : "Could not update status.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
   }
 
   function filterRows(tab: FeedbackStatus | "all") {
@@ -156,9 +175,10 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
                           variant="outline"
                           size="sm"
                           className="rounded-2xl border-white/15"
+                          disabled={loadingIds.has(r.id)}
                           onClick={() => void patchStatus(r.id, "reviewed")}
                         >
-                          Mark reviewed
+                          {loadingIds.has(r.id) ? "Saving…" : "Mark reviewed"}
                         </Button>
                       ) : null}
                       {r.status !== "resolved" ? (
@@ -166,9 +186,10 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
                           type="button"
                           size="sm"
                           className="rounded-2xl"
+                          disabled={loadingIds.has(r.id)}
                           onClick={() => void patchStatus(r.id, "resolved")}
                         >
-                          Mark resolved
+                          {loadingIds.has(r.id) ? "Saving…" : "Mark resolved"}
                         </Button>
                       ) : null}
                     </div>

@@ -262,7 +262,7 @@ export function AuctionDetailClient({
           <p className="mt-1 text-xs text-muted-foreground">
             {live.reserveMeterPercent != null && live.reserveMeterPercent >= 100
               ? "Reserve met"
-              : `${live.reserveMeterPercent ?? 0}%`}
+              : `${Math.round(live.reserveMeterPercent ?? 0)}%`}
           </p>
         </div>
       ) : (
