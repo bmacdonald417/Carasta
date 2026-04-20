@@ -20,6 +20,7 @@ import { CarmunityActivitySection } from "@/components/profile/CarmunityActivity
 import type { CarmunityActivityItem } from "@/components/profile/CarmunityActivitySection";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { listProfileDiscussionActivityPage } from "@/lib/forums/profile-discussion-activity";
+import { listSavedThreadsForUser, savedThreadHref } from "@/lib/forums/thread-subscriptions";
 
 export default async function ProfilePage({
   params,
@@ -189,6 +190,11 @@ export default async function ProfilePage({
     ? `/u/${encodeURIComponent(user.handle)}?activityPage=${activityPage + 1}`
     : null;
 
+  const savedThreads =
+    isOwnProfile && currentUserId
+      ? await listSavedThreadsForUser({ prisma, userId: user.id, take: 12 })
+      : [];
+
   const displayName = user.name?.trim() || `@${user.handle}`;
   const garageTiles = garagePreviewCars.map((c) => ({
     id: c.id,
@@ -248,24 +254,48 @@ export default async function ProfilePage({
         <div className="grid grid-cols-3 border-t border-border/40 bg-muted/10 sm:grid-cols-6">
           {(
             [
-              { label: "Posts", value: user._count.posts },
-              { label: "Followers", value: user._count.followers },
-              { label: "Following", value: user._count.following },
-              { label: "Garage", value: user._count.garageCars },
-              { label: "Listings", value: user._count.auctions },
-              { label: "Bids", value: user._count.bids },
+              { label: "Posts", value: user._count.posts, href: null as string | null },
+              {
+                label: "Followers",
+                value: user._count.followers,
+                href: `/u/${encodeURIComponent(user.handle)}/followers`,
+              },
+              {
+                label: "Following",
+                value: user._count.following,
+                href: `/u/${encodeURIComponent(user.handle)}/following`,
+              },
+              { label: "Garage", value: user._count.garageCars, href: null },
+              { label: "Listings", value: user._count.auctions, href: null },
+              { label: "Bids", value: user._count.bids, href: null },
             ] as const
           ).map((s) => (
             <div
               key={s.label}
               className="border-border/30 px-2 py-4 text-center sm:border-r sm:border-border/30 sm:last:border-r-0"
             >
-              <p className="font-display text-lg font-semibold tabular-nums text-foreground sm:text-xl">
-                {s.value}
-              </p>
-              <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
-                {s.label}
-              </p>
+              {s.href ? (
+                <Link
+                  href={s.href}
+                  className="-m-2 block rounded-lg px-2 py-2 transition hover:bg-muted/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                >
+                  <p className="font-display text-lg font-semibold tabular-nums text-foreground sm:text-xl">
+                    {s.value}
+                  </p>
+                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-primary/90 sm:text-xs">
+                    {s.label}
+                  </p>
+                </Link>
+              ) : (
+                <>
+                  <p className="font-display text-lg font-semibold tabular-nums text-foreground sm:text-xl">
+                    {s.value}
+                  </p>
+                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
+                    {s.label}
+                  </p>
+                </>
+              )}
             </div>
           ))}
         </div>
@@ -317,6 +347,55 @@ export default async function ProfilePage({
         hasNextPage={activity.hasNextPage}
         nextPageHref={activityNextHref}
       />
+
+      {isOwnProfile ? (
+        <section className="space-y-3">
+          <div>
+            <h2 className="font-display text-lg font-semibold tracking-tight">Saved discussions</h2>
+            <p className="text-sm text-muted-foreground">
+              Threads you saved for quick return — same as &quot;Save thread&quot; in discussions.
+            </p>
+          </div>
+          {savedThreads.length === 0 ? (
+            <p className="rounded-xl border border-border/50 bg-card/40 px-4 py-4 text-sm text-muted-foreground">
+              Nothing saved yet. Open a thread and tap{" "}
+              <span className="font-medium text-primary">Save thread</span>.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {savedThreads.map((t) => (
+                <li key={t.id}>
+                  <Link
+                    href={savedThreadHref(t)}
+                    className="block rounded-xl border border-border/50 bg-card/40 px-4 py-3 transition hover:border-primary/35 hover:bg-muted/10"
+                  >
+                    <p className="font-medium text-neutral-100 line-clamp-2">{t.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t.gearSlug} / {t.lowerGearSlug} · last activity{" "}
+                      {t.lastActivityAt.toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ) : null}
+
+      {isOwnProfile ? (
+        <section className="rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-4 py-5">
+          <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-primary">
+            Following activity
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Placeholder for a future feed of fresh threads and replies from people you follow — kept
+            off the critical path for Phase I.
+          </p>
+        </section>
+      ) : null}
 
       {/* 3 — Garage spotlight */}
       <section className="space-y-3">

@@ -176,6 +176,7 @@ model User {
   blocksReceived       UserBlock[] @relation("UserBlockBlocked")
   mutesGiven           UserMute[]  @relation("UserMuteMuter")
   mutesReceived        UserMute[]  @relation("UserMuteMuted")
+  forumThreadSubscriptions ForumThreadSubscription[]
 }
 
 /// Top-level Carmunity forum area (e.g. Mechanics Corner, Gear Interests). Distinct from feed [Post].
@@ -239,9 +240,25 @@ model ForumThread {
   replies  ForumReply[]
   threadReactions ForumThreadReaction[]
   discussionReports DiscussionReport[]
+  subscriptions ForumThreadSubscription[]
 
   @@index([categoryId, lastActivityAt])
   @@index([authorId])
+}
+
+/// User saved / followed a thread for retention (Phase I). Distinct from auction watchlist.
+model ForumThreadSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  threadId  String
+  createdAt DateTime @default(now())
+
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, threadId])
+  @@index([userId])
+  @@index([threadId])
 }
 
 model ForumReply {

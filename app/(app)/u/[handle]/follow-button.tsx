@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { followUser, unfollowUser } from "@/app/(app)/u/[handle]/actions";
 
 export function FollowButton({
   targetUserId,
@@ -13,19 +13,28 @@ export function FollowButton({
   initialFollowing: boolean;
   className?: string;
 }) {
+  const router = useRouter();
   const [following, setFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    setFollowing(initialFollowing);
+  }, [initialFollowing]);
+
   async function toggle() {
     setLoading(true);
-    if (following) {
-      const result = await unfollowUser(targetUserId);
-      if (result.ok) setFollowing(false);
-    } else {
-      const result = await followUser(targetUserId);
-      if (result.ok) setFollowing(true);
+    try {
+      const res = await fetch("/api/user/follow", {
+        method: following ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: targetUserId }),
+      });
+      if (!res.ok) return;
+      setFollowing(!following);
+      router.refresh();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

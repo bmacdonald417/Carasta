@@ -15,6 +15,7 @@ import {
   notifyReplyToReply,
   notifyThreadReply,
 } from "@/lib/notifications/carmunity-discussion-notifications";
+import { notifySubscribedThreadNewReply } from "@/lib/notifications/carmunity-retention-notifications";
 
 export type ForumServiceError = { ok: false; error: string };
 export type ForumServiceOk<T extends object> = { ok: true } & T;
@@ -797,6 +798,20 @@ export async function createForumReply(input: {
         snippet: body,
       });
     }
+
+    await notifySubscribedThreadNewReply({
+      prisma,
+      threadId: input.threadId,
+      replyId: result.replyId,
+      actorId: input.authorId,
+      threadAuthorId: thread.authorId,
+      isDirectThreadReply: !parentForNotify,
+      gearSlug,
+      lowerGearSlug,
+      threadTitle: thread.title,
+      actorHandle: actor.handle,
+      actorName: actor.name,
+    });
   }
 
   return { ok: true, ...result };

@@ -6,7 +6,9 @@ import { AuthorHandleLink } from "@/components/discussions/AuthorHandleLink";
 import { DemoDiscussionsBanner } from "@/components/discussions/DemoDiscussionsBanner";
 import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
 import { DiscussionReactionPicker } from "@/components/discussions/DiscussionReactionPicker";
+import { FollowButton } from "@/app/(app)/u/[handle]/follow-button";
 import { DiscussionPeerSafetyMenu } from "@/components/discussions/DiscussionPeerSafetyMenu";
+import { DiscussionThreadSaveButton } from "@/components/discussions/DiscussionThreadSaveButton";
 import { DiscussionReportDialog } from "@/components/discussions/DiscussionReportDialog";
 import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
 import { DiscussionThreadRepliesPanel } from "@/components/discussions/DiscussionThreadRepliesPanel";
@@ -14,6 +16,7 @@ import { getSession } from "@/lib/auth";
 import { extractMentionHandles } from "@/lib/discussions/mentions";
 import { prisma } from "@/lib/db";
 import { getForumThreadDetail } from "@/lib/forums/forum-service";
+import { isUserSubscribedToThread } from "@/lib/forums/thread-subscriptions";
 
 export const dynamic = "force-dynamic";
 
@@ -104,6 +107,25 @@ export default async function ThreadPage({ params }: Props) {
         ])
       : null;
 
+  const threadSaved = viewerId
+    ? await isUserSubscribedToThread({ prisma, userId: viewerId, threadId: thread.id })
+    : false;
+
+  const viewerFollowsAuthor =
+    viewerId && viewerId !== thread.author.id
+      ? Boolean(
+          await prisma.follow.findUnique({
+            where: {
+              followerId_followingId: {
+                followerId: viewerId,
+                followingId: thread.author.id,
+              },
+            },
+            select: { id: true },
+          })
+        )
+      : false;
+
   const serializedReplies = thread.replies.map((r) => ({
     id: r.id,
     authorId: r.authorId,
@@ -173,10 +195,25 @@ export default async function ThreadPage({ params }: Props) {
                 <span className="text-neutral-500">· {thread.author.name}</span>
               ) : null}
               <span className="text-neutral-500">· {formatLong(thread.createdAt)}</span>
+              {viewerId && viewerId !== thread.author.id ? (
+                <span className="ml-1 inline-flex items-center gap-2">
+                  <span className="text-neutral-600">·</span>
+                  <FollowButton
+                    targetUserId={thread.author.id}
+                    initialFollowing={viewerFollowsAuthor}
+                    className="h-7 border-primary/35 bg-primary/5 px-2 text-[10px] font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
+                  />
+                </span>
+              ) : null}
             </div>
             <DiscussionAuthorBadges badges={thread.author.badges} className="mt-2" />
           </div>
           <div className="shrink-0 text-right">
+            {viewerId ? (
+              <div className="mb-2 flex justify-end">
+                <DiscussionThreadSaveButton threadId={thread.id} initialSaved={threadSaved} />
+              </div>
+            ) : null}
             <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">Reactions</p>
             <DiscussionReactionPicker
               target="thread"

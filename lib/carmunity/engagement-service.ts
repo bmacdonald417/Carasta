@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { usersAreBlockedEitherWay } from "@/lib/user-safety";
 
 export type CarmunityServiceError = { ok: false; error: string };
 export type CarmunityServiceSuccess = { ok: true };
@@ -128,6 +129,10 @@ export async function followCarmunityUser(input: {
 }): Promise<CarmunityServiceSuccess | CarmunityServiceError> {
   if (input.followerId === input.followingId) {
     return { ok: false, error: "Cannot follow yourself." };
+  }
+
+  if (await usersAreBlockedEitherWay(prisma, input.followerId, input.followingId)) {
+    return { ok: false, error: "You can’t follow this user." };
   }
 
   const target = await prisma.user.findUnique({

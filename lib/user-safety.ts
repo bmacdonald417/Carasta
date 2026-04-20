@@ -40,3 +40,52 @@ export async function recipientHasMutedActor(
   });
   return Boolean(row);
 }
+
+/** True if either user has blocked the other (Phase H + social rules). */
+export async function usersAreBlockedEitherWay(
+  prisma: PrismaClient,
+  userIdA: string,
+  userIdB: string
+): Promise<boolean> {
+  if (userIdA === userIdB) return false;
+  const row = await prisma.userBlock.findFirst({
+    where: {
+      OR: [
+        { blockerId: userIdA, blockedId: userIdB },
+        { blockerId: userIdB, blockedId: userIdA },
+      ],
+    },
+    select: { id: true },
+  });
+  return Boolean(row);
+}
+
+/**
+ * Among `candidateIds`, returns user ids the viewer should not see as a social peer
+ * (either direction block). Empty when signed out.
+ */
+export async function peerUserIdsHiddenFromViewer(
+  prisma: PrismaClient,
+  viewerId: string | null | undefined,
+  candidateIds: string[]
+): Promise<Set<string>> {
+  const hidden = new Set<string>();
+  if (!viewerId || candidateIds.length === 0) return hidden;
+  const uniq = Array.from(new Set(candidateIds)).filter((id) => id && id !== viewerId);
+  if (uniq.length === 0) return hidden;
+
+  const rows = await prisma.userBlock.findMany({
+    where: {
+      OR: [
+        { blockerId: viewerId, blockedId: { in: uniq } },
+        { blockerId: { in: uniq }, blockedId: viewerId },
+      ],
+    },
+    select: { blockerId: true, blockedId: true },
+  });
+  for (const r of rows) {
+    if (r.blockerId === viewerId) hidden.add(r.blockedId);
+    else hidden.add(r.blockerId);
+  }
+  return hidden;
+}
