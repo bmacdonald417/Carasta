@@ -9,6 +9,8 @@ import { formatCurrency } from "@/lib/utils";
 import { computeCurrentBidCents } from "@/lib/auction-metrics";
 import { ListingsFilters } from "./listings-filters";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
+import { isListingAiEnabled } from "@/lib/listing-ai/listing-ai-feature-flag";
+import { ListingsAiRefineDialog } from "@/components/sell/listings-ai-refine-dialog";
 
 const PAGE_SIZE = 20;
 const STATUSES = ["LIVE", "DRAFT", "SOLD", "ENDED"] as const;
@@ -55,6 +57,7 @@ export default async function ListingsPage({
   const hasMore = auctions.length > PAGE_SIZE;
   const items = hasMore ? auctions.slice(0, PAGE_SIZE) : auctions;
   const nextCursor = hasMore ? items[items.length - 1].id : null;
+  const listingAiEnabled = isListingAiEnabled();
 
   return (
     <div className="carasta-container max-w-6xl py-8">
@@ -92,64 +95,94 @@ export default async function ListingsPage({
           items.map((a) => {
             const highBidCents = computeCurrentBidCents(a.bids);
             return (
-            <Link key={a.id} href={`/auctions/${a.id}`}>
-              <Card className="overflow-hidden border-white/10 bg-white/5 transition-all hover:border-[#ff3b5c]/30">
-                <div className="relative aspect-video w-full overflow-hidden bg-neutral-900">
-                  <Image
-                    src={
-                      a.images[0]?.url ??
-                      "https://placehold.co/600x400/1a1a1a/666?text=No+image"
-                    }
-                    alt={a.title}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                  <div className="absolute left-3 top-3">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
-                        a.status === "LIVE"
-                          ? "border border-[#ff3b5c]/50 bg-[#ff3b5c]/90 text-white"
-                          : a.status === "SOLD"
-                            ? "border border-green-500/50 bg-green-500/20 text-green-400"
-                            : a.status === "DRAFT"
-                              ? "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400"
-                              : "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400"
-                      }`}
-                    >
-                      {a.status}
-                    </span>
-                  </div>
+            <Card
+              key={a.id}
+              className="overflow-hidden border-white/10 bg-white/5 transition-all hover:border-[#ff3b5c]/30"
+            >
+              <Link
+                href={`/auctions/${a.id}`}
+                className="relative block aspect-video w-full overflow-hidden bg-neutral-900"
+              >
+                <Image
+                  src={
+                    a.images[0]?.url ??
+                    "https://placehold.co/600x400/1a1a1a/666?text=No+image"
+                  }
+                  alt={a.title}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+                <div className="absolute left-3 top-3">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
+                      a.status === "LIVE"
+                        ? "border border-[#ff3b5c]/50 bg-[#ff3b5c]/90 text-white"
+                        : a.status === "SOLD"
+                          ? "border border-green-500/50 bg-green-500/20 text-green-400"
+                          : a.status === "DRAFT"
+                            ? "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400"
+                            : "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400"
+                    }`}
+                  >
+                    {a.status}
+                  </span>
                 </div>
-                <CardContent className="border-t border-white/5 p-4">
-                  <p className="text-xs text-neutral-500">
-                    {a.year} {a.make} {a.model}
-                  </p>
-                  <h2 className="mt-1 font-display font-semibold line-clamp-1 text-neutral-100">
+              </Link>
+              <CardContent className="border-t border-white/5 p-4">
+                <p className="text-xs text-neutral-500">
+                  {a.year} {a.make} {a.model}
+                </p>
+                <Link href={`/auctions/${a.id}`} className="block">
+                  <h2 className="mt-1 font-display font-semibold line-clamp-1 text-neutral-100 transition hover:text-[#ff3b5c]/90">
                     {a.title}
                   </h2>
-                  {a.status === "LIVE" && (
-                    <p className="mt-2 text-sm text-[#ff3b5c]">
-                      {formatCurrency(highBidCents)} high bid
-                      <span className="ml-1 text-neutral-500">
-                        · {a._count.bids} bids
-                      </span>
-                    </p>
-                  )}
-                  {a.status === "SOLD" && (
-                    <p className="mt-2 text-sm text-green-400">
-                      Sold
-                      {a.buyerId
-                        ? ` at ${formatCurrency(a.buyNowPriceCents ?? 0)}`
-                        : highBidCents > 0
-                          ? ` at ${formatCurrency(highBidCents)}`
-                          : ""}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </Link>
+                </Link>
+                {a.status === "LIVE" && (
+                  <p className="mt-2 text-sm text-[#ff3b5c]">
+                    {formatCurrency(highBidCents)} high bid
+                    <span className="ml-1 text-neutral-500">
+                      · {a._count.bids} bids
+                    </span>
+                  </p>
+                )}
+                {a.status === "SOLD" && (
+                  <p className="mt-2 text-sm text-green-400">
+                    Sold
+                    {a.buyerId
+                      ? ` at ${formatCurrency(a.buyNowPriceCents ?? 0)}`
+                      : highBidCents > 0
+                        ? ` at ${formatCurrency(highBidCents)}`
+                        : ""}
+                  </p>
+                )}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/auctions/${a.id}`}>View listing</Link>
+                  </Button>
+                  <ListingsAiRefineDialog
+                    listingAiEnabled={listingAiEnabled}
+                    row={{
+                      id: a.id,
+                      status: a.status,
+                      title: a.title,
+                      year: a.year,
+                      make: a.make,
+                      model: a.model,
+                      trim: a.trim,
+                      mileage: a.mileage,
+                      vin: a.vin,
+                      description: a.description,
+                      conditionSummary: a.conditionSummary,
+                      conditionGrade: a.conditionGrade
+                        ? String(a.conditionGrade)
+                        : null,
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           );
           })
         )}
