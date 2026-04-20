@@ -22,6 +22,7 @@ import { getSellerMarketingOverview } from "@/lib/marketing/get-seller-marketing
 import { getSellerMarketingAuctionRows } from "@/lib/marketing/get-seller-marketing-auction-rows";
 import { ensureSellerMarketingNotifications } from "@/lib/marketing/generate-marketing-notifications";
 import { getSellerMarketingNotifications } from "@/lib/marketing/get-seller-marketing-notifications";
+import { getMarketingPresetsForUser } from "@/lib/marketing/get-seller-marketing-presets";
 import { formatMarketingDate } from "@/lib/marketing/marketing-display";
 import { MarketingAlertsPanel } from "@/components/marketing/marketing-alerts-panel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,12 +46,16 @@ export default async function MarketingPage({
   if (!isOwn) notFound();
 
   await ensureSellerMarketingNotifications(user.id, user.handle);
-  const [overview, rows, recentCampaigns, marketingAlerts] = await Promise.all([
+  const [overview, rows, recentCampaigns, marketingAlerts, marketingPresets] = await Promise.all([
     getSellerMarketingOverview(user.id),
     getSellerMarketingAuctionRows(user.id),
     getRecentSellerCampaigns(user.id, 6),
     getSellerMarketingNotifications(user.id, 10),
+    getMarketingPresetsForUser(user.id),
   ]);
+
+  const defaultPresetForShare =
+    marketingPresets.find((p) => p.isDefault) ?? marketingPresets[0] ?? null;
 
   const inventoryCards = [
     {
@@ -301,6 +306,22 @@ export default async function MarketingPage({
                           AI copilot
                         </Link>
                       </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link
+                          href={`/u/${user.handle}/marketing/auctions/${c.auctionId}#marketing-share-promote`}
+                        >
+                          Share
+                        </Link>
+                      </Button>
+                      {defaultPresetForShare ? (
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link
+                            href={`/u/${user.handle}/marketing/auctions/${c.auctionId}?presetId=${encodeURIComponent(defaultPresetForShare.id)}`}
+                          >
+                            Share + preset
+                          </Link>
+                        </Button>
+                      ) : null}
                     </td>
                   </tr>
                 ))}
@@ -428,6 +449,22 @@ export default async function MarketingPage({
                         AI copilot
                       </Link>
                     </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link
+                        href={`/u/${user.handle}/marketing/auctions/${a.id}#marketing-share-promote`}
+                      >
+                        Share &amp; Promote
+                      </Link>
+                    </Button>
+                    {defaultPresetForShare ? (
+                      <Button variant="outline" size="sm" asChild>
+                        <Link
+                          href={`/u/${user.handle}/marketing/auctions/${a.id}?presetId=${encodeURIComponent(defaultPresetForShare.id)}`}
+                        >
+                          Share + preset
+                        </Link>
+                      </Button>
+                    ) : null}
                   </div>
                 </CardContent>
               </Card>

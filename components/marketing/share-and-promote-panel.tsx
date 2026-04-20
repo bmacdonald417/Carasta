@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 export type { MarketingLinkRowDef };
 
@@ -29,10 +29,27 @@ export type SharePromotePresetBundle = {
   copyVariant: "short" | "long" | "ending_soon";
 };
 
+function resolveInitialSelection(
+  initialFromUrl: "built_in" | string | null | undefined,
+  presetBundles: SharePromotePresetBundle[]
+): "built_in" | string {
+  if (initialFromUrl === "built_in") return "built_in";
+  if (
+    initialFromUrl &&
+    presetBundles.some((p) => p.id === initialFromUrl)
+  ) {
+    return initialFromUrl;
+  }
+  const d = presetBundles.find((p) => p.isDefault);
+  return d?.id ?? presetBundles[0]?.id ?? "built_in";
+}
+
 export function ShareAndPromotePanel({
   defaultBundle,
   presetBundles,
   managePresetsHref,
+  /** From `?presetId=` when valid (`built_in` or a saved preset id). */
+  initialSharePresetSelection = null,
 }: {
   defaultBundle: {
     linkRows: MarketingLinkRowDef[];
@@ -40,15 +57,16 @@ export function ShareAndPromotePanel({
   };
   presetBundles: SharePromotePresetBundle[];
   managePresetsHref: string;
+  initialSharePresetSelection?: "built_in" | string | null;
 }) {
-  const initialPresetId = useMemo(() => {
-    const d = presetBundles.find((p) => p.isDefault);
-    return d?.id ?? presetBundles[0]?.id ?? null;
-  }, [presetBundles]);
-
   const [selection, setSelection] = useState<"built_in" | string>(() =>
-    initialPresetId ? initialPresetId : "built_in"
+    resolveInitialSelection(initialSharePresetSelection, presetBundles)
   );
+
+  useEffect(() => {
+    if (initialSharePresetSelection == null) return;
+    setSelection(resolveInitialSelection(initialSharePresetSelection, presetBundles));
+  }, [initialSharePresetSelection, presetBundles]);
 
   const active =
     selection === "built_in"
@@ -86,6 +104,14 @@ export function ShareAndPromotePanel({
           <Link href={managePresetsHref}>Manage Presets</Link>
         </Button>
       </div>
+
+      <p className="mt-4 max-w-3xl text-xs text-neutral-600">
+        Deep link: append{" "}
+        <code className="rounded bg-black/40 px-1 text-[11px] text-neutral-300">?presetId=…</code>{" "}
+        to this page&apos;s URL (use a preset id from Manage Presets, or{" "}
+        <code className="rounded bg-black/40 px-1 text-[11px] text-neutral-300">built_in</code> for
+        the standard bundle) to open Share &amp; Promote with that selection.
+      </p>
 
       {hasPresets ? (
         <div className="mt-6 max-w-md">

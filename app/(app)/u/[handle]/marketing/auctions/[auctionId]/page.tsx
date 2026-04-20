@@ -48,6 +48,11 @@ import { SellerMarketingWorkspace } from "@/components/marketing/seller-marketin
 import { HashScrollIntoView } from "@/components/marketing/hash-scroll-into-view";
 import { MarketingAuctionStickyNav } from "@/components/marketing/marketing-auction-sticky-nav";
 import { buildMarketingCopilotIntakeMetricsFromDetail } from "@/lib/marketing/marketing-copilot-intake-metrics";
+import { ScrollMarketingSectionIntoView } from "@/components/marketing/scroll-marketing-section-into-view";
+import {
+  firstSearchParamValue,
+  parseSharePresetQueryParam,
+} from "@/lib/marketing/resolve-share-preset-query";
 
 function ProportionBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -63,8 +68,10 @@ function ProportionBar({ value, max }: { value: number; max: number }) {
 
 export default async function MarketingAuctionDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ handle: string; auctionId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   if (!isMarketingEnabled()) notFound();
 
@@ -155,6 +162,12 @@ export default async function MarketingAuctionDetailPage({
     presets
   );
 
+  const sp = searchParams != null ? await searchParams : {};
+  const rawPresetId = firstSearchParamValue(sp, "presetId");
+  const validPresetIds = new Set(presets.map((p) => p.id));
+  const initialSharePresetSelection = parseSharePresetQueryParam(rawPresetId, validPresetIds);
+  const scrollSharePromoteIntoView = initialSharePresetSelection != null;
+
   const carmunityDraft = generateCarmunityDraft({
     auction: {
       title: auction.title,
@@ -244,6 +257,11 @@ export default async function MarketingAuctionDetailPage({
   return (
     <div className="carasta-container max-w-6xl py-8">
       <HashScrollIntoView elementId="marketing-ai-copilot" hash="#marketing-ai-copilot" />
+      <HashScrollIntoView elementId="marketing-share-promote" hash="#marketing-share-promote" />
+      <ScrollMarketingSectionIntoView
+        elementId="marketing-share-promote"
+        active={scrollSharePromoteIntoView}
+      />
       <div className="mb-8 flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-0 flex-1">
           <Link
@@ -395,6 +413,7 @@ export default async function MarketingAuctionDetailPage({
           defaultBundle={defaultBundle}
           presetBundles={presetBundles}
           managePresetsHref={`/u/${user.handle}/marketing/presets`}
+          initialSharePresetSelection={initialSharePresetSelection}
         />
       </section>
 

@@ -6,6 +6,7 @@ import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { getMarketingPresetsForUser } from "@/lib/marketing/get-seller-marketing-presets";
 import { Button } from "@/components/ui/button";
 import { MarketingPresetDeleteButton } from "@/components/marketing/marketing-preset-delete-button";
+import { MarketingPresetQueryCopy } from "@/components/marketing/marketing-preset-query-copy";
 
 export default async function MarketingPresetsPage({
   params,
@@ -22,7 +23,14 @@ export default async function MarketingPresetsPage({
   if (!user) notFound();
   if ((session?.user as { id?: string } | null)?.id !== user.id) notFound();
 
-  const presets = await getMarketingPresetsForUser(user.id);
+  const [presets, exampleAuction] = await Promise.all([
+    getMarketingPresetsForUser(user.id),
+    prisma.auction.findFirst({
+      where: { sellerId: user.id },
+      orderBy: { updatedAt: "desc" },
+      select: { id: true },
+    }),
+  ]);
 
   return (
     <div className="carasta-container max-w-3xl py-8">
@@ -77,13 +85,20 @@ export default async function MarketingPresetsPage({
                   {p.isDefault ? " · default" : ""}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/u/${user.handle}/marketing/presets/${p.id}/edit`}>
-                    Edit
-                  </Link>
-                </Button>
-                <MarketingPresetDeleteButton handle={user.handle} presetId={p.id} />
+              <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+                <MarketingPresetQueryCopy
+                  handle={user.handle}
+                  presetId={p.id}
+                  exampleAuctionId={exampleAuction?.id ?? null}
+                />
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/u/${user.handle}/marketing/presets/${p.id}/edit`}>
+                      Edit
+                    </Link>
+                  </Button>
+                  <MarketingPresetDeleteButton handle={user.handle} presetId={p.id} />
+                </div>
               </div>
             </li>
           ))}
