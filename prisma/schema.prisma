@@ -657,6 +657,8 @@ model Auction {
   listingMarketingPlan ListingMarketingPlan?
   /// P3: AI copilot runs tied to this listing.
   marketingCopilotRuns MarketingCopilotRun[]
+  /// Phase R: listing-scoped conversations (DMs tied to this auction).
+  conversations Conversation[]
 
   @@index([sellerId])
   @@index([buyerId])
@@ -931,17 +933,23 @@ model MarketingCopilotRun {
 /// Phase Q: 1:1 messaging conversation container. A `directKey` is used to dedupe direct threads.
 model Conversation {
   id                 String    @id @default(cuid())
-  /// For direct 1:1 threads: `${minUserId}:${maxUserId}`. Null for future expansions.
+  /// Optional listing scope (Phase R). Null means generic DMs.
+  auctionId           String?
+  /// For direct 1:1 threads, includes scope:
+  /// - Generic: `${minUserId}:${maxUserId}:g`
+  /// - Listing: `${minUserId}:${maxUserId}:a:${auctionId}`
   directKey          String?   @unique
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
   lastMessageAt      DateTime?
   lastMessagePreview String?   @db.VarChar(240)
 
+  auction       Auction? @relation(fields: [auctionId], references: [id], onDelete: SetNull)
   participants ConversationParticipant[]
   messages      Message[]
 
   @@index([lastMessageAt])
+  @@index([auctionId])
 }
 
 model ConversationParticipant {

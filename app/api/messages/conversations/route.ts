@@ -11,10 +11,12 @@ export const runtime = "nodejs";
 
 const createConversationSchema = z.object({
   targetUserId: z.string().min(1),
+  auctionId: z.string().min(1).optional(),
 });
 
-function directKeyFor(userA: string, userB: string): string {
-  return userA < userB ? `${userA}:${userB}` : `${userB}:${userA}`;
+function directKeyFor(userA: string, userB: string, auctionId?: string): string {
+  const pair = userA < userB ? `${userA}:${userB}` : `${userB}:${userA}`;
+  return auctionId ? `${pair}:a:${auctionId}` : `${pair}:g`;
 }
 
 /**
@@ -103,6 +105,7 @@ export async function POST(req: NextRequest) {
   }
 
   const targetUserId = parsed.data.targetUserId;
+  const auctionId = parsed.data.auctionId;
   if (targetUserId === userId) {
     return NextResponse.json({ ok: false, error: "Cannot message yourself." }, { status: 400 });
   }
@@ -112,12 +115,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "You cannot message this user." }, { status: 403 });
   }
 
-  const dk = directKeyFor(userId, targetUserId);
+  let auctionRow: { id: string; sellerId: string; title: string; status: string } | null = null;
+  if (auctionId) {
+    auctionRow = await prisma.auction.findUnique({
+      where: { id: auctionId },
+      select: { id: true, sellerId: true, title: true, status: true },
+    });
+    if (!auctionRow) {
+      return NextResponse.json({ ok: false, error: "Listing not found." }, { status: 404 });
+    }
+    if (auctionRow.sellerId === userId) {
+      return NextResponse.json({ ok: false, error: "You cannot message yourself about your own listing." }, { status: 400 });
+    }
+    if (auctionRow.sellerId !== targetUserId) {
+      return NextResponse.json({ ok: false, error: "Target user is not the seller for this listing." }, { status: 400 });
+    }
+  }
+
+  const dk = directKeyFor(userId, targetUserId, auctionId);
 
   const convo = await prisma.conversation.upsert({
     where: { directKey: dk },
     create: {
       directKey: dk,
+      auctionId: auctionId ?? null,
       participants: {
         create: [{ userId }, { userId: targetUserId }],
       },

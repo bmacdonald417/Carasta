@@ -27,9 +27,24 @@ type MessageRow = {
 
 type ConversationPayload = {
   id: string;
+  auctionId?: string | null;
   lastMessageAt: string | null;
   lastMessagePreview: string | null;
   participants: Array<{ user: UserMini }>;
+  auction?: {
+    id: string;
+    title: string;
+    year: number;
+    make: string;
+    model: string;
+    trim: string | null;
+    status: string;
+    endAt: string;
+    buyNowPriceCents: number | null;
+    reservePriceCents: number | null;
+    images: Array<{ url: string }>;
+    seller: UserMini;
+  } | null;
 };
 
 export function ConversationClient({
@@ -163,6 +178,39 @@ export function ConversationClient({
           )}
         </div>
       </div>
+
+      {conversation?.auction ? (
+        <div className="border-b border-white/10 px-4 py-3">
+          <Link
+            href={`/auctions/${conversation.auction.id}`}
+            className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/20 p-3 hover:bg-black/30"
+          >
+            <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-black/30">
+              {conversation.auction.images?.[0]?.url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={conversation.auction.images[0].url}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : null}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-neutral-100">
+                {conversation.auction.title}
+              </p>
+              <p className="mt-0.5 truncate text-xs text-neutral-500">
+                {conversation.auction.year} {conversation.auction.make} {conversation.auction.model}
+                {conversation.auction.trim ? ` ${conversation.auction.trim}` : ""} ·{" "}
+                {conversation.auction.status}
+              </p>
+              <p className="mt-0.5 text-[11px] text-neutral-600">
+                View listing
+              </p>
+            </div>
+          </Link>
+        </div>
+      ) : null}
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
         <div className="space-y-3">

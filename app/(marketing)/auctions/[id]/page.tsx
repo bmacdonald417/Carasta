@@ -14,6 +14,7 @@ import { AuctionViewTracker } from "@/components/marketing/auction-view-tracker"
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { AuctionDiscussPanel } from "@/components/auction/AuctionDiscussPanel";
 import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
+import { MessageSellerButton } from "./message-seller-button";
 import {
   countAuctionDiscussionThreads,
   listAuctionDiscussionThreads,
@@ -188,6 +189,10 @@ export default async function AuctionDetailPage({
             isLoggedIn={!!session?.user}
             currentUserHandle={(session?.user as any)?.handle ?? null}
           />
+
+          {session?.user?.id && (session.user as any).id !== auction.sellerId ? (
+            <MessageSellerButton auctionId={auction.id} sellerId={auction.sellerId} />
+          ) : null}
 
           <div className="rounded-2xl border border-border/50 bg-card/80 p-4">
             <h3 className="font-display font-semibold">Buyer Protections</h3>

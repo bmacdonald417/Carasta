@@ -58,10 +58,27 @@ export async function GET(
     where: { id: conversationId },
     select: {
       id: true,
+      auctionId: true,
       lastMessageAt: true,
       lastMessagePreview: true,
       participants: {
         select: { user: { select: { id: true, handle: true, name: true, avatarUrl: true, image: true } } },
+      },
+      auction: {
+        select: {
+          id: true,
+          title: true,
+          year: true,
+          make: true,
+          model: true,
+          trim: true,
+          status: true,
+          endAt: true,
+          buyNowPriceCents: true,
+          reservePriceCents: true,
+          images: { take: 1, orderBy: { sortOrder: "asc" }, select: { url: true } },
+          seller: { select: { id: true, handle: true, name: true, avatarUrl: true, image: true } },
+        },
       },
     },
   });
