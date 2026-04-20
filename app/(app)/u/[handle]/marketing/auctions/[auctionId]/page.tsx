@@ -76,20 +76,30 @@ export default async function MarketingAuctionDetailPage({
 
   await ensureSellerMarketingNotifications(user.id, user.handle);
 
-  const [detail, auctionCampaigns, presets, marketingAlertRows, listingWorkspacePlan] =
-    await Promise.all([
-      getSellerMarketingAuctionDetail(auctionId, user.id),
-      getAuctionCampaignsForSeller(user.id, auctionId),
-      getMarketingPresetsForUser(user.id),
-      getSellerMarketingNotifications(user.id, 24),
-      prisma.listingMarketingPlan.findUnique({
-        where: { auctionId },
-        include: {
-          tasks: { orderBy: { sortOrder: "asc" } },
-          artifacts: { orderBy: { createdAt: "desc" }, take: 50 },
-        },
-      }),
-    ]);
+  const [
+    detail,
+    auctionCampaigns,
+    presets,
+    marketingAlertRows,
+    listingWorkspacePlan,
+    listingExtra,
+  ] = await Promise.all([
+    getSellerMarketingAuctionDetail(auctionId, user.id),
+    getAuctionCampaignsForSeller(user.id, auctionId),
+    getMarketingPresetsForUser(user.id),
+    getSellerMarketingNotifications(user.id, 24),
+    prisma.listingMarketingPlan.findUnique({
+      where: { auctionId },
+      include: {
+        tasks: { orderBy: { sortOrder: "asc" } },
+        artifacts: { orderBy: { createdAt: "desc" }, take: 50 },
+      },
+    }),
+    prisma.auction.findFirst({
+      where: { id: auctionId, sellerId: user.id },
+      select: { description: true, conditionSummary: true },
+    }),
+  ]);
   if (!detail) notFound();
 
   const { auction } = detail;
@@ -202,6 +212,21 @@ export default async function MarketingAuctionDetailPage({
   const initialWorkspacePlan = listingWorkspacePlan
     ? serializeWorkspacePlan(listingWorkspacePlan)
     : null;
+
+  const listingCapsule = {
+    title: auction.title,
+    year: auction.year,
+    make: auction.make,
+    model: auction.model,
+    trim: auction.trim,
+    mileage: auction.mileage,
+    status: auction.status,
+    description: listingExtra?.description ?? null,
+    conditionSummary: listingExtra?.conditionSummary ?? null,
+    sellerHandle: user.handle,
+  };
+
+  const copilotConfigured = Boolean(process.env.OPENAI_API_KEY?.trim());
 
   const kpiActivity = [
     {
@@ -353,6 +378,8 @@ export default async function MarketingAuctionDetailPage({
         key={auction.id}
         auctionId={auction.id}
         initialPlan={initialWorkspacePlan}
+        listingCapsule={listingCapsule}
+        copilotConfigured={copilotConfigured}
       />
 
       <div className="mt-10">

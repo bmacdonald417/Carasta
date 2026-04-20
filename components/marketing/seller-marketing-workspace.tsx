@@ -8,6 +8,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  SellerMarketingCopilot,
+  type SellerMarketingListingCapsule,
+} from "@/components/marketing/seller-marketing-copilot";
 
 export type WorkspacePlanState = {
   id: string;
@@ -58,9 +62,16 @@ const ARTIFACT_TYPES = Object.values(ListingMarketingArtifactType);
 type Props = {
   auctionId: string;
   initialPlan: WorkspacePlanState | null;
+  listingCapsule: SellerMarketingListingCapsule;
+  copilotConfigured: boolean;
 };
 
-export function SellerMarketingWorkspace({ auctionId, initialPlan }: Props) {
+export function SellerMarketingWorkspace({
+  auctionId,
+  initialPlan,
+  listingCapsule,
+  copilotConfigured,
+}: Props) {
   const [plan, setPlan] = useState<WorkspacePlanState | null>(initialPlan);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -248,6 +259,24 @@ export function SellerMarketingWorkspace({ auctionId, initialPlan }: Props) {
           {error}
         </p>
       ) : null}
+
+      <SellerMarketingCopilot
+        auctionId={auctionId}
+        listingCapsule={listingCapsule}
+        workspacePlan={
+          plan
+            ? {
+                id: plan.id,
+                objective: plan.objective,
+                audience: plan.audience,
+                positioning: plan.positioning,
+                channels: plan.channels,
+              }
+            : null
+        }
+        copilotConfigured={copilotConfigured}
+        onApplied={refreshPlan}
+      />
 
       <section className="space-y-4">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
