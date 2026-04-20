@@ -13,6 +13,7 @@ import { DiscussionReportDialog } from "@/components/discussions/DiscussionRepor
 import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
 import { DiscussionThreadRepliesPanel } from "@/components/discussions/DiscussionThreadRepliesPanel";
 import { ShareButtons } from "@/components/ui/share-buttons";
+import { DiscussionAuctionContextCard } from "@/components/discussions/DiscussionAuctionContextCard";
 import { getSession } from "@/lib/auth";
 import { extractMentionHandles } from "@/lib/discussions/mentions";
 import { prisma } from "@/lib/db";
@@ -208,6 +209,12 @@ export default async function ThreadPage({ params }: Props) {
       </nav>
 
       {thread.demoSeed ? <DemoDiscussionsBanner className="mt-4" /> : null}
+
+      {thread.auction ? (
+        <div className="mt-4">
+          <DiscussionAuctionContextCard auction={thread.auction} />
+        </div>
+      ) : null}
 
       <article className="mt-6 rounded-2xl border border-border/50 bg-card/60 p-5 shadow-glass-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">

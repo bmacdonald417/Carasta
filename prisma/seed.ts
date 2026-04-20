@@ -97,7 +97,32 @@ async function ensureForumSpacesAndCategories() {
     update: {},
   });
 
-  console.log("Forum spaces ensured:", mechanics.slug, gear.slug);
+  const listings = await prisma.forumSpace.upsert({
+    where: { slug: "listings-auctions" },
+    create: {
+      slug: "listings-auctions",
+      title: "Listings & auctions",
+      description: "Community discussion anchored to Carasta listings (Phase M).",
+      sortOrder: 2,
+      isActive: true,
+    },
+    update: {
+      title: "Listings & auctions",
+      description: "Community discussion anchored to Carasta listings (Phase M).",
+    },
+  });
+  await prisma.forumCategory.upsert({
+    where: { spaceId_slug: { spaceId: listings.id, slug: "listing-chat" } },
+    create: {
+      spaceId: listings.id,
+      slug: "listing-chat",
+      title: "Listing discussion",
+      sortOrder: 0,
+    },
+    update: { title: "Listing discussion" },
+  });
+
+  console.log("Forum spaces ensured:", mechanics.slug, gear.slug, listings.slug);
 }
 
 async function main() {

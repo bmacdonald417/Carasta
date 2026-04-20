@@ -12,6 +12,13 @@ import { AuctionFeedbackCard } from "@/components/auction/AuctionFeedbackCard";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 import { AuctionViewTracker } from "@/components/marketing/auction-view-tracker";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
+import { AuctionDiscussPanel } from "@/components/auction/AuctionDiscussPanel";
+import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
+import {
+  countAuctionDiscussionThreads,
+  listAuctionDiscussionThreads,
+  sumAuctionDiscussionThreadReactions,
+} from "@/lib/forums/auction-discussion";
 
 export default async function AuctionDetailPage({
   params,
@@ -28,7 +35,22 @@ export default async function AuctionDetailPage({
     include: {
       images: { orderBy: { sortOrder: "asc" } },
       damageImages: true,
-      seller: { select: { id: true, handle: true, name: true, avatarUrl: true, collectorTier: true } },
+      seller: {
+        select: {
+          id: true,
+          handle: true,
+          name: true,
+          avatarUrl: true,
+          collectorTier: true,
+          reputationScore: true,
+          userBadges: {
+            orderBy: { awardedAt: "desc" },
+            take: 8,
+            select: { badge: { select: { slug: true, name: true } } },
+          },
+          _count: { select: { forumThreads: true, forumReplies: true } },
+        },
+      },
       buyer: { select: { handle: true } },
       bids: {
         orderBy: { amountCents: "desc" },
@@ -42,6 +64,12 @@ export default async function AuctionDetailPage({
   });
 
   if (!auction) notFound();
+
+  const [discussionThreads, discussionThreadCount, discussionReactionTotal] = await Promise.all([
+    listAuctionDiscussionThreads(auction.id, { take: 3 }),
+    countAuctionDiscussionThreads(auction.id),
+    sumAuctionDiscussionThreadReactions(auction.id),
+  ]);
 
   if (auction.status === "DRAFT") {
     const currentUserId = (session?.user as any)?.id;
@@ -133,6 +161,16 @@ export default async function AuctionDetailPage({
             imperfections={auction.imperfections}
             damageImages={auction.damageImages}
           />
+          <div className="mt-8">
+            <AuctionDiscussPanel
+              auctionId={auction.id}
+              auctionTitle={auction.title}
+              threads={discussionThreads}
+              threadCount={discussionThreadCount}
+              threadReactionTotal={discussionReactionTotal}
+              isLoggedIn={Boolean(session?.user)}
+            />
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -206,11 +244,15 @@ export default async function AuctionDetailPage({
 
           <div className="rounded-2xl border border-border/50 bg-card/80 p-4">
             <h3 className="font-display font-semibold">Seller</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Same Carmunity identity as everywhere else — explore reputation and discussion history on
+              their profile.
+            </p>
             <Link
               href={`/u/${auction.seller.handle}`}
-              className="mt-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-accent"
+              className="mt-3 flex items-center gap-3 rounded-xl border border-transparent p-2 transition-colors hover:border-primary/25 hover:bg-primary/5"
             >
-              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted ring-1 ring-border/60">
                 {auction.seller.avatarUrl ? (
                   <Image
                     src={auction.seller.avatarUrl}
@@ -221,14 +263,25 @@ export default async function AuctionDetailPage({
                   />
                 ) : null}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="font-medium">@{auction.seller.handle}</p>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-medium text-neutral-100">@{auction.seller.handle}</p>
                   <ReputationBadge tier={auction.seller.collectorTier} />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {auction.seller.name ?? "Seller"}
+                <p className="text-sm text-muted-foreground">{auction.seller.name ?? "Seller"}</p>
+                <p className="mt-1 text-[11px] text-neutral-500">
+                  Reputation {auction.seller.reputationScore.toLocaleString()} ·{" "}
+                  {auction.seller._count.forumThreads} thread
+                  {auction.seller._count.forumThreads === 1 ? "" : "s"} · {auction.seller._count.forumReplies}{" "}
+                  repl{auction.seller._count.forumReplies === 1 ? "y" : "ies"} in Discussions (all time)
                 </p>
+                <DiscussionAuthorBadges
+                  className="mt-2"
+                  badges={auction.seller.userBadges.map((ub) => ({
+                    slug: ub.badge.slug,
+                    name: ub.badge.name,
+                  }))}
+                />
               </div>
             </Link>
           </div>

@@ -12,7 +12,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle } from "lucide-react";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import type { OnboardingPack } from "@/lib/carmunity/onboarding-service";
+import { DiscussedAuctionsStrip } from "@/components/explore/DiscussedAuctionsStrip";
 import { CarmunityOnboardingDialog } from "@/components/carmunity/CarmunityOnboardingDialog";
+import type { DiscussedLiveAuctionRow } from "@/lib/forums/auction-discussion";
 import { FeedEmptyState } from "@/components/carmunity/FeedEmptyState";
 import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
 import { likePost, unlikePost } from "./actions";
@@ -108,6 +110,7 @@ export function CommunityFeed({
   tab: initialTab,
   currentUserId,
   trendingDiscussionThreads = [],
+  discussedAuctions = [],
   needsCarmunityOnboarding = false,
   onboardingPack = null,
 }: {
@@ -115,6 +118,8 @@ export function CommunityFeed({
   currentUserId: string | null;
   /** Shown above the feed tabs — reuses Phase I discovery on the server. */
   trendingDiscussionThreads?: TrendingDiscussionThreadLite[];
+  /** Phase M: LIVE auctions with linked discussion (real counts). */
+  discussedAuctions?: DiscussedLiveAuctionRow[];
   needsCarmunityOnboarding?: boolean;
   onboardingPack?: OnboardingPack | null;
 }) {
@@ -249,6 +254,7 @@ export function CommunityFeed({
 
   return (
     <div className="mt-8">
+      <DiscussedAuctionsStrip items={discussedAuctions} />
       {trendingDiscussionThreads.length > 0 ? (
         <section className="mb-8 space-y-3 rounded-2xl border border-border/50 bg-card/40 p-4">
           <div className="flex flex-wrap items-end justify-between gap-2">

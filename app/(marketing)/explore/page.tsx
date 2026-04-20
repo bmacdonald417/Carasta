@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { getSession } from "@/lib/auth";
 import { buildOnboardingPack, getCarmunityOnboardingState } from "@/lib/carmunity/onboarding-service";
+import { listDiscussedLiveAuctions } from "@/lib/forums/auction-discussion";
 import { listTrendingThreadsGlobal } from "@/lib/forums/discussions-discovery";
 import { CommunityFeed } from "./community-feed";
 import { TrendingDreamGarage } from "./TrendingDreamGarage";
@@ -18,7 +19,10 @@ export default async function ExplorePage({
   const session = await getSession();
   const currentUserId = (session?.user as any)?.id;
 
-  const trendingThreads = await listTrendingThreadsGlobal({ take: 4 }).catch(() => []);
+  const [trendingThreads, discussedAuctions] = await Promise.all([
+    listTrendingThreadsGlobal({ take: 4 }).catch(() => []),
+    listDiscussedLiveAuctions({ take: 3 }).catch(() => []),
+  ]);
 
   let needsCarmunityOnboarding = false;
   let onboardingPack: Awaited<ReturnType<typeof buildOnboardingPack>> | null = null;
@@ -52,6 +56,7 @@ export default async function ExplorePage({
         tab={tab}
         currentUserId={currentUserId}
         trendingDiscussionThreads={trendingThreads}
+        discussedAuctions={discussedAuctions}
         needsCarmunityOnboarding={needsCarmunityOnboarding}
         onboardingPack={onboardingPack}
       />

@@ -225,6 +225,8 @@ model ForumThread {
   id             String   @id @default(cuid())
   categoryId     String
   authorId       String
+  /// Phase M: optional link to a Carasta listing — canonical discussion anchor for that auction.
+  auctionId      String?
   title          String
   body           String   @db.Text
   replyCount     Int      @default(0)
@@ -241,6 +243,7 @@ model ForumThread {
 
   category ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  auction  Auction?      @relation(fields: [auctionId], references: [id], onDelete: SetNull)
   hiddenBy User?         @relation("ForumThreadHiddenBy", fields: [hiddenById], references: [id], onDelete: SetNull)
   replies  ForumReply[]
   threadReactions ForumThreadReaction[]
@@ -249,6 +252,7 @@ model ForumThread {
 
   @@index([categoryId, lastActivityAt])
   @@index([authorId])
+  @@index([auctionId])
 }
 
 /// User saved / followed a thread for retention (Phase I). Distinct from auction watchlist.
@@ -595,6 +599,8 @@ model Auction {
   auctionAnalytics   AuctionAnalytics[]
   promoPosts         Post[]           @relation("AuctionPromoPosts")
   watches            AuctionWatch[]
+  /// Phase M: Carmunity discussion threads anchored to this listing (nullable FK on ForumThread).
+  discussionThreads  ForumThread[]
 
   @@index([sellerId])
   @@index([buyerId])

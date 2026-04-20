@@ -519,6 +519,18 @@ export async function getForumThreadDetail(
         title: string;
         space: { id: string; slug: string; title: string };
       };
+      auction: null | {
+        id: string;
+        title: string;
+        status: string;
+        endAt: string;
+        year: number;
+        make: string;
+        model: string;
+        leadImageUrl: string | null;
+        highBidCents: number;
+        reservePriceCents: number | null;
+      };
       author: {
         id: string;
         handle: string;
@@ -548,6 +560,20 @@ export async function getForumThreadDetail(
           slug: true,
           title: true,
           space: { select: { id: true, slug: true, title: true } },
+        },
+      },
+      auction: {
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          endAt: true,
+          year: true,
+          make: true,
+          model: true,
+          reservePriceCents: true,
+          images: { orderBy: { sortOrder: "asc" }, take: 1, select: { url: true } },
+          bids: { orderBy: { amountCents: "desc" }, take: 1, select: { amountCents: true } },
         },
       },
     },
@@ -606,6 +632,20 @@ export async function getForumThreadDetail(
           title: thread.category.space.title,
         },
       },
+      auction: thread.auction
+        ? {
+            id: thread.auction.id,
+            title: thread.auction.title,
+            status: thread.auction.status,
+            endAt: thread.auction.endAt.toISOString(),
+            year: thread.auction.year,
+            make: thread.auction.make,
+            model: thread.auction.model,
+            leadImageUrl: thread.auction.images[0]?.url ?? null,
+            highBidCents: thread.auction.bids[0]?.amountCents ?? 0,
+            reservePriceCents: thread.auction.reservePriceCents,
+          }
+        : null,
       demoSeed: thread.isDemoSeed,
       reactionSummary: threadRx.get(thread.id) ?? emptyReactionSummary(),
       viewerReactionKind: viewerThreadRx?.kind ?? null,
