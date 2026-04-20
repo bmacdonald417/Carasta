@@ -21,6 +21,7 @@ const mainNav = [
   { href: "/", label: "Home", icon: LayoutGrid },
   { href: "/explore", label: "Carmunity", icon: Users },
   { href: "/discussions", label: "Discussions", icon: MessageSquare },
+  { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/sell", label: "Sell", icon: PlusCircle },
 ] as const;

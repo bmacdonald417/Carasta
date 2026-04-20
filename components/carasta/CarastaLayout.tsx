@@ -31,6 +31,7 @@ const appNav = [
   { href: "/discussions", label: "Discussions" },
   { href: "/auctions", label: "Auctions" },
   { href: "/sell", label: "Sell" },
+  { href: "/messages", label: "Messages" },
 ];
 
 export function CarastaLayout({ children }: { children: React.ReactNode }) {

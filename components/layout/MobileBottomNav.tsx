@@ -14,6 +14,7 @@ const navItems = [
   { href: "/", label: "Home", icon: LayoutGrid },
   { href: "/explore", label: "Carmunity", icon: Users },
   { href: "/discussions", label: "Discussions", icon: MessageSquare },
+  { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/auctions", label: "Auctions", icon: Gavel },
   { href: "/merch", label: "Merch", icon: ShoppingBag },
 ] as const;
