@@ -29,6 +29,7 @@ export function ShareButtons({
   description,
   auctionId,
   trackMarketing = false,
+  triggerClassName,
 }: {
   url: string;
   title: string;
@@ -36,6 +37,8 @@ export function ShareButtons({
   /** When set with `trackMarketing`, records SHARE_CLICK for auction analytics. */
   auctionId?: string;
   trackMarketing?: boolean;
+  /** Optional classes for the trigger button (e.g. Carmunity copper outline). */
+  triggerClassName?: string;
 }) {
   const [copied, setCopied] = useState(false);
   const fullUrl = typeof window !== "undefined" ? `${window.location.origin}${url}` : url;
@@ -77,7 +80,10 @@ export function ShareButtons({
         <Button
           variant="outline"
           size="sm"
-          className="border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10 hover:text-neutral-100"
+          className={
+            triggerClassName ??
+            "border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10 hover:text-neutral-100"
+          }
         >
           <Share2 className="mr-2 h-4 w-4" />
           Share

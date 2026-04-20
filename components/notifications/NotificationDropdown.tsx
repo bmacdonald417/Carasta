@@ -154,9 +154,21 @@ export function NotificationDropdown() {
         </div>
         <div className="max-h-[320px] overflow-y-auto">
           {items.length === 0 ? (
-            <p className="px-3 py-6 text-center text-sm text-neutral-500">
-              No notifications yet.
-            </p>
+            <div className="px-4 py-8 text-center">
+              <p className="text-sm font-medium text-neutral-200">All caught up</p>
+              <p className="mt-2 text-xs leading-relaxed text-neutral-500">
+                Mentions, follows, and saved-thread replies land here. Jump into Discussions or the feed to
+                stir the signal.
+              </p>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button asChild variant="outline" size="sm" className="border-primary/35 text-primary hover:bg-primary/10">
+                  <Link href="/explore">Open Carmunity</Link>
+                </Button>
+                <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+                  <Link href="/discussions">Browse discussions</Link>
+                </Button>
+              </div>
+            </div>
           ) : (
             <>
               <ul className="divide-y divide-white/5">

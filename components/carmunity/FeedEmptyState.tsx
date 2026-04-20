@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 /**
- * Aspirational empty state for explore feed — primary + secondary CTAs.
+ * Premium empty states for Carmunity feed — primary + secondary CTAs.
  */
 export function FeedEmptyState({
   variant,
@@ -14,14 +14,14 @@ export function FeedEmptyState({
   const isFollowing = variant === "following";
 
   return (
-    <div className="rounded-2xl border border-dashed border-border/60 bg-gradient-to-b from-muted/25 to-muted/10 px-6 py-12 text-center sm:px-10">
-      <p className="font-display text-lg font-semibold tracking-tight text-foreground">
-        {isFollowing ? "Your Following feed is open road" : "The feed is ready for the first lap"}
+    <div className="rounded-2xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/10 via-muted/15 to-muted/5 px-6 py-12 text-center sm:px-10">
+      <p className="font-display text-lg font-semibold tracking-tight text-neutral-100">
+        {isFollowing ? "Line up who you want in your lane" : "The grid is quiet — set the pace"}
       </p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
         {isFollowing
-          ? "Follow people you care about — their posts and discussion threads show up here together. Catch broader momentum in Trending, or open Discussions."
-          : "Share a build update, a garage moment, or a find. Quiet feeds are a chance to set the tone."}
+          ? "Following blends posts and discussions from people you choose. Follow a few builders, then refresh this tab — or open Discussions to scout voices first."
+          : "Trending rewards momentum: a photo drop, a sharp question, a garage flex. Lead with something real — the community meets you where you are."}
       </p>
       <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
         {currentUserId ? (
@@ -34,12 +34,17 @@ export function FeedEmptyState({
           </Button>
         )}
         <Button variant="outline" asChild className="sm:min-w-[180px]">
-          <Link href={isFollowing ? "/explore?tab=trending" : "/discussions"}>
-            {isFollowing ? "Browse Trending" : "Open Discussions"}
+          <Link href={isFollowing ? "/discussions" : "/explore?tab=trending"}>
+            {isFollowing ? "Find people in Discussions" : "See what’s trending"}
           </Link>
         </Button>
       </div>
-      {currentUserId ? (
+      {isFollowing && currentUserId ? (
+        <p className="mt-4 text-xs text-muted-foreground">
+          Tip: the first-run panel on Carmunity can suggest follows — reopen Explore after sign-up if you skipped it.
+        </p>
+      ) : null}
+      {currentUserId && !isFollowing ? (
         <p className="mt-4 text-xs text-muted-foreground">
           Jump to the composer at the top, or tap “Write a post” to scroll there.
         </p>

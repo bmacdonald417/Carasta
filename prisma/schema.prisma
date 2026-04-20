@@ -177,6 +177,11 @@ model User {
   mutesGiven           UserMute[]  @relation("UserMuteMuter")
   mutesReceived        UserMute[]  @relation("UserMuteMuted")
   forumThreadSubscriptions ForumThreadSubscription[]
+
+  /// Phase K: null until onboarding finished or skipped — existing users backfilled in migration.
+  carmunityOnboardingCompletedAt DateTime?
+  /// Phase K: JSON { gearSlugs?: string[], lowerCategories?: { spaceSlug: string; slug: string }[] }
+  carmunityInterestPrefs Json?
 }
 
 /// Top-level Carmunity forum area (e.g. Mechanics Corner, Gear Interests). Distinct from feed [Post].

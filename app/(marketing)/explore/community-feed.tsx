@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle } from "lucide-react";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
+import type { OnboardingPack } from "@/lib/carmunity/onboarding-service";
+import { CarmunityOnboardingDialog } from "@/components/carmunity/CarmunityOnboardingDialog";
 import { FeedEmptyState } from "@/components/carmunity/FeedEmptyState";
 import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
 import { likePost, unlikePost } from "./actions";
@@ -97,17 +99,28 @@ export function CommunityFeed({
   tab: initialTab,
   currentUserId,
   trendingDiscussionThreads = [],
+  needsCarmunityOnboarding = false,
+  onboardingPack = null,
 }: {
   tab: string;
   currentUserId: string | null;
   /** Shown above the feed tabs — reuses Phase I discovery on the server. */
   trendingDiscussionThreads?: TrendingDiscussionThreadLite[];
+  needsCarmunityOnboarding?: boolean;
+  onboardingPack?: OnboardingPack | null;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState(initialTab);
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
   const [followingItems, setFollowingItems] = useState<FollowingFeedItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [onboardingOpen, setOnboardingOpen] = useState(
+    Boolean(needsCarmunityOnboarding && onboardingPack)
+  );
+
+  useEffect(() => {
+    setOnboardingOpen(Boolean(needsCarmunityOnboarding && onboardingPack));
+  }, [needsCarmunityOnboarding, onboardingPack]);
 
   useEffect(() => {
     let cancelled = false;
@@ -308,6 +321,12 @@ export function CommunityFeed({
           )}
         </TabsContent>
       </Tabs>
+
+      <CarmunityOnboardingDialog
+        pack={onboardingPack}
+        open={onboardingOpen}
+        onOpenChange={setOnboardingOpen}
+      />
     </div>
   );
 }

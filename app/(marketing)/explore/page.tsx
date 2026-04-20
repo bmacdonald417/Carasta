@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { getSession } from "@/lib/auth";
+import { buildOnboardingPack, getCarmunityOnboardingState } from "@/lib/carmunity/onboarding-service";
 import { listTrendingThreadsGlobal } from "@/lib/forums/discussions-discovery";
 import { CommunityFeed } from "./community-feed";
 import { TrendingDreamGarage } from "./TrendingDreamGarage";
@@ -18,6 +19,16 @@ export default async function ExplorePage({
   const currentUserId = (session?.user as any)?.id;
 
   const trendingThreads = await listTrendingThreadsGlobal({ take: 4 }).catch(() => []);
+
+  let needsCarmunityOnboarding = false;
+  let onboardingPack: Awaited<ReturnType<typeof buildOnboardingPack>> | null = null;
+  if (currentUserId) {
+    const st = await getCarmunityOnboardingState(currentUserId);
+    needsCarmunityOnboarding = !st.completedAt;
+    if (needsCarmunityOnboarding) {
+      onboardingPack = await buildOnboardingPack({ viewerUserId: currentUserId });
+    }
+  }
 
   return (
     <div className="carasta-container max-w-2xl py-10 pb-16">
@@ -41,6 +52,8 @@ export default async function ExplorePage({
         tab={tab}
         currentUserId={currentUserId}
         trendingDiscussionThreads={trendingThreads}
+        needsCarmunityOnboarding={needsCarmunityOnboarding}
+        onboardingPack={onboardingPack}
       />
     </div>
   );

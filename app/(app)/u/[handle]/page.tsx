@@ -13,6 +13,8 @@ import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { ProfilePostPreview } from "@/components/profile/ProfilePostPreview";
 import { ProfileGaragePreviewGrid } from "@/components/profile/ProfileGaragePreviewGrid";
 import { ProfilePostsEmpty } from "@/components/carmunity/ProfilePostsEmpty";
+import { ProfileCarmunitySetupStrip } from "@/components/profile/ProfileCarmunitySetupStrip";
+import { ShareButtons } from "@/components/ui/share-buttons";
 import { DemoProfileBanner } from "@/components/discussions/DemoProfileBanner";
 import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
 import { DiscussionPeerSafetyMenu } from "@/components/discussions/DiscussionPeerSafetyMenu";
@@ -303,6 +305,12 @@ export default async function ProfilePage({
 
       {/* 2 — Action row */}
       <section className="flex flex-wrap items-center gap-2">
+        <ShareButtons
+          url={`/u/${encodeURIComponent(user.handle)}`}
+          title={`@${user.handle} on Carmunity`}
+          description={user.bio?.slice(0, 120) ?? `Profile for @${user.handle} on Carasta.`}
+          triggerClassName="border-primary/35 bg-primary/5 text-xs text-primary hover:bg-primary/10"
+        />
         {!isOwnProfile && currentUserId ? (
           <FollowButton targetUserId={user.id} initialFollowing={!!following} />
         ) : null}
@@ -348,6 +356,13 @@ export default async function ProfilePage({
         nextPageHref={activityNextHref}
       />
 
+      {isOwnProfile &&
+      user._count.posts === 0 &&
+      user._count.garageCars === 0 &&
+      activityItems.length === 0 ? (
+        <ProfileCarmunitySetupStrip handle={user.handle} />
+      ) : null}
+
       {isOwnProfile ? (
         <section className="space-y-3">
           <div>
@@ -357,10 +372,24 @@ export default async function ProfilePage({
             </p>
           </div>
           {savedThreads.length === 0 ? (
-            <p className="rounded-xl border border-border/50 bg-card/40 px-4 py-4 text-sm text-muted-foreground">
-              Nothing saved yet. Open a thread and tap{" "}
-              <span className="font-medium text-primary">Save thread</span>.
-            </p>
+            <div className="rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-5 py-8 text-center">
+              <p className="font-display text-base font-semibold tracking-tight text-neutral-100">
+                Saved threads are your reading list
+              </p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+                When a build thread or tech debate deserves a bookmark, tap{" "}
+                <span className="font-medium text-primary">Save thread</span> — we’ll surface light
+                activity hints here when there’s fresh discussion.
+              </p>
+              <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+                <Button asChild size="sm" className="border-primary/30 bg-primary/15 text-primary hover:bg-primary/25">
+                  <Link href="/discussions">Browse discussions</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline" className="border-border/60">
+                  <Link href="/explore?tab=following">Open Following feed</Link>
+                </Button>
+              </div>
+            </div>
           ) : (
             <ul className="space-y-2">
               {savedThreads.map((t) => (

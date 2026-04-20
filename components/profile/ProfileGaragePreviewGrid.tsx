@@ -27,22 +27,23 @@ export function ProfileGaragePreviewGrid({
 
   if (cars.length === 0) {
     return (
-      <div className="flex flex-col gap-4 rounded-xl border border-dashed border-border/60 bg-gradient-to-b from-muted/25 to-muted/10 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/10 via-muted/15 to-muted/5 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-foreground">Garage portfolio</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Garage</p>
+          <p className="mt-1 text-sm font-semibold text-neutral-100">Show the collection behind the handle</p>
           <p className="mt-1 max-w-md text-xs leading-relaxed text-muted-foreground">
             {isOwnProfile
-              ? "Your collection is empty — add a car on the web to make this grid shine."
+              ? "Add a hero car on the web — this grid becomes your rolling portfolio for buyers and friends alike."
               : "No public garage cars yet — when they add rides, thumbnails appear here."}
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           {isOwnProfile ? (
-            <Button size="sm" asChild>
+            <Button size="sm" asChild className="border-primary/30 bg-primary/15 text-primary hover:bg-primary/25">
               <Link href="/garage/add">Add a car</Link>
             </Button>
           ) : null}
-          <Button size="sm" variant="outline" asChild>
+          <Button size="sm" variant="outline" asChild className="border-border/60">
             <Link href={href}>Open garage</Link>
           </Button>
         </div>

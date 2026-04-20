@@ -12,6 +12,7 @@ import { DiscussionThreadSaveButton } from "@/components/discussions/DiscussionT
 import { DiscussionReportDialog } from "@/components/discussions/DiscussionReportDialog";
 import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
 import { DiscussionThreadRepliesPanel } from "@/components/discussions/DiscussionThreadRepliesPanel";
+import { ShareButtons } from "@/components/ui/share-buttons";
 import { getSession } from "@/lib/auth";
 import { extractMentionHandles } from "@/lib/discussions/mentions";
 import { prisma } from "@/lib/db";
@@ -77,6 +78,7 @@ export default async function ThreadPage({ params }: Props) {
   if (!detail?.ok) notFound();
 
   const { thread } = detail;
+  const threadSharePath = `/discussions/${thread.category.space.slug}/${thread.category.slug}/${thread.id}`;
   if (
     thread.category.space.slug !== gearSlug ||
     thread.category.slug !== lowerGearSlug
@@ -188,25 +190,33 @@ export default async function ThreadPage({ params }: Props) {
               <h1 className="font-display text-xl font-bold uppercase tracking-wide text-neutral-100 md:text-2xl">
                 {thread.title}
               </h1>
-              {viewerId && viewerId !== thread.author.id ? (
-                <div className="flex shrink-0 flex-col items-end gap-2">
-                  <DiscussionReportDialog
-                    target="thread"
-                    threadId={thread.id}
-                    contentLabel={`Reporting “${thread.title.slice(0, 120)}${thread.title.length > 120 ? "…" : ""}”`}
-                    variant="outline"
-                    className="border-border/60"
-                  />
-                  {peerSafety ? (
-                    <DiscussionPeerSafetyMenu
-                      targetUserId={thread.author.id}
-                      targetHandle={thread.author.handle}
-                      initialBlocked={Boolean(peerSafety[0])}
-                      initialMuted={Boolean(peerSafety[1])}
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                <ShareButtons
+                  url={threadSharePath}
+                  title={thread.title}
+                  description={`Discussion on Carasta — ${thread.category.space.title}`}
+                  triggerClassName="border-primary/35 bg-primary/5 text-xs text-primary hover:bg-primary/10"
+                />
+                {viewerId && viewerId !== thread.author.id ? (
+                  <>
+                    <DiscussionReportDialog
+                      target="thread"
+                      threadId={thread.id}
+                      contentLabel={`Reporting “${thread.title.slice(0, 120)}${thread.title.length > 120 ? "…" : ""}”`}
+                      variant="outline"
+                      className="border-border/60"
                     />
-                  ) : null}
-                </div>
-              ) : null}
+                    {peerSafety ? (
+                      <DiscussionPeerSafetyMenu
+                        targetUserId={thread.author.id}
+                        targetHandle={thread.author.handle}
+                        initialBlocked={Boolean(peerSafety[0])}
+                        initialMuted={Boolean(peerSafety[1])}
+                      />
+                    ) : null}
+                  </>
+                ) : null}
+              </div>
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
               <AuthorHandleLink handle={thread.author.handle} className="text-sm" />

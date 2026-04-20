@@ -149,3 +149,38 @@ export async function listSuggestedDiscussionUsers(input?: {
     activityScore: Number(r.score),
   }));
 }
+
+/** Recent threads in the viewer’s preferred Gears (Phase K) — simple same-Gear surfacing. */
+export async function listThreadsForPreferredGears(input: {
+  gearSlugs: string[];
+  take?: number;
+}): Promise<TrendingThreadRow[]> {
+  const take = Math.min(Math.max(input.take ?? 8, 1), 16);
+  const slugs = Array.from(new Set(input.gearSlugs.filter(Boolean)));
+  if (slugs.length === 0) return [];
+
+  const rows = await prisma.forumThread.findMany({
+    where: {
+      isHidden: false,
+      category: { space: { isActive: true, slug: { in: slugs } } },
+    },
+    orderBy: { lastActivityAt: "desc" },
+    take,
+    select: {
+      id: true,
+      title: true,
+      replyCount: true,
+      lastActivityAt: true,
+      category: { select: { slug: true, space: { select: { slug: true } } } },
+    },
+  });
+
+  return rows.map((t) => ({
+    id: t.id,
+    title: t.title,
+    replyCount: t.replyCount,
+    lastActivityAt: t.lastActivityAt,
+    gearSlug: t.category.space.slug,
+    lowerGearSlug: t.category.slug,
+  }));
+}

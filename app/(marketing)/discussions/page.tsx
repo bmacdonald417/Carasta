@@ -3,9 +3,11 @@ import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
+import { getCarmunityOnboardingState } from "@/lib/carmunity/onboarding-service";
 import {
   listRecommendedGears,
   listSuggestedDiscussionUsers,
+  listThreadsForPreferredGears,
   listTrendingThreadsGlobal,
 } from "@/lib/forums/discussions-discovery";
 import { listForumSpaces } from "@/lib/forums/forum-service";
@@ -40,6 +42,17 @@ export default async function DiscussionsPage() {
     listSuggestedDiscussionUsers({ take: 6, excludeUserId: viewerId }).catch(() => []),
     listFollowedThreadsForViewer(viewerId, { take: 6 }).catch(() => []),
   ]);
+
+  let interestThreads: Awaited<ReturnType<typeof listThreadsForPreferredGears>> = [];
+  if (viewerId) {
+    const st = await getCarmunityOnboardingState(viewerId);
+    const slugs = (st.prefs.gearSlugs ?? []).filter(Boolean);
+    if (slugs.length > 0) {
+      interestThreads = await listThreadsForPreferredGears({ gearSlugs: slugs, take: 6 }).catch(
+        () => []
+      );
+    }
+  }
 
   try {
     const result = await listForumSpaces();
@@ -93,6 +106,40 @@ export default async function DiscussionsPage() {
                   <span className="line-clamp-2 font-medium text-neutral-100">{t.title}</span>
                   <span className="text-[11px] text-muted-foreground">
                     @{t.authorHandle} · {t.gearSlug} / {t.lowerGearSlug}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {interestThreads.length > 0 ? (
+        <section className="mt-8 space-y-3 rounded-2xl border border-border/50 bg-card/40 p-4">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
+                For you
+              </p>
+              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100">
+                Threads in your Gears
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Pulled from the Gears you highlighted in Carmunity onboarding — same identity, tighter
+                routing into the threads you signaled you care about.
+              </p>
+            </div>
+          </div>
+          <ul className="divide-y divide-white/5">
+            {interestThreads.map((t) => (
+              <li key={t.id}>
+                <Link
+                  href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
+                  className="block py-2.5 text-sm text-neutral-200 transition hover:text-primary"
+                >
+                  <span className="line-clamp-2 font-medium">{t.title}</span>
+                  <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                    {t.gearSlug} / {t.lowerGearSlug}
                   </span>
                 </Link>
               </li>
