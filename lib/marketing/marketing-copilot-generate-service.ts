@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { MARKETING_COPILOT_SYSTEM_PROMPT } from "@/lib/marketing/marketing-copilot-prompt";
 import { openAiChatJsonObject } from "@/lib/marketing/marketing-copilot-openai";
+import type { CopilotLightMetrics } from "@/lib/marketing/marketing-copilot-analytics-context";
+import { sanitizeCopilotStructuredResult } from "@/lib/marketing/marketing-copilot-sanitize";
 import {
   marketingCopilotStructuredResultSchema,
   type MarketingCopilotGenerateBody,
@@ -23,7 +25,10 @@ export type ListingContextForCopilot = {
   seller: { handle: string; name: string | null };
 };
 
-async function loadListingContext(auctionId: string, sellerId: string): Promise<ListingContextForCopilot | null> {
+export async function loadListingContext(
+  auctionId: string,
+  sellerId: string
+): Promise<ListingContextForCopilot | null> {
   const row = await prisma.auction.findFirst({
     where: { id: auctionId, sellerId },
     select: {
@@ -63,6 +68,7 @@ async function loadListingContext(auctionId: string, sellerId: string): Promise<
 function buildUserPrompt(input: {
   listing: ListingContextForCopilot;
   intake: MarketingCopilotGenerateBody;
+  metrics: CopilotLightMetrics | null;
 }): string {
   const schemaHint = `Respond with a single JSON object exactly in this shape:
 {
@@ -91,13 +97,17 @@ Constraints:
 - Map each selected channel to at least one task or artifact where practical; use "channel" on tasks/artifacts as a short slug matching the channel key (e.g. "instagram", "carmunity").
 - For artifacts, use type CAPTION for social captions, HEADLINE for short hooks, BODY for longer forum/email drafts, HASHTAGS for hashtag/CTA lines, OTHER for misc.
 - "plan.channels" should list the same logical channels the seller selected (use their keys: carmunity, facebook, instagram, x, google, forums, email).
-- Do not claim reserve is met or not unless reserve is explicitly provided in listing context (reservePriceCents may be null).`;
+- Do not claim reserve is met or not unless reserve is explicitly provided in listing context (reservePriceCents may be null).
+- LIGHT_METRICS_JSON is for tone and cadence suggestions only — never promise performance based on these numbers.`;
 
   return [
     schemaHint,
     "",
     "LISTING_CONTEXT_JSON:",
     JSON.stringify(input.listing),
+    "",
+    "LIGHT_METRICS_JSON:",
+    JSON.stringify(input.metrics ?? {}),
     "",
     "SELLER_INTAKE_JSON:",
     JSON.stringify({
@@ -117,6 +127,7 @@ export async function generateMarketingCopilotStructured(params: {
   auctionId: string;
   sellerId: string;
   intake: MarketingCopilotGenerateBody;
+  metrics: CopilotLightMetrics | null;
 }): Promise<{ listing: ListingContextForCopilot; result: MarketingCopilotStructuredResult }> {
   const listing = await loadListingContext(params.auctionId, params.sellerId);
   if (!listing) {
@@ -125,7 +136,7 @@ export async function generateMarketingCopilotStructured(params: {
 
   const raw = await openAiChatJsonObject({
     system: MARKETING_COPILOT_SYSTEM_PROMPT,
-    user: buildUserPrompt({ listing, intake: params.intake }),
+    user: buildUserPrompt({ listing, intake: params.intake, metrics: params.metrics }),
   });
 
   const parsed = marketingCopilotStructuredResultSchema.safeParse(raw);
@@ -135,5 +146,5 @@ export async function generateMarketingCopilotStructured(params: {
     throw err;
   }
 
-  return { listing, result: parsed.data };
+  return { listing, result: sanitizeCopilotStructuredResult(parsed.data) };
 }

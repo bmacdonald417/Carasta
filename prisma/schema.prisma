@@ -210,6 +210,8 @@ model User {
 
   /// P1 seller marketing workspace plans this user created (seller-owned listing scope).
   listingMarketingPlansCreated ListingMarketingPlan[] @relation("ListingMarketingPlanCreator")
+  /// P3: auditable AI copilot generations for this user.
+  marketingCopilotRuns MarketingCopilotRun[]
 }
 
 /// Top-level Carmunity forum area (e.g. Mechanics Corner, Gear Interests). Distinct from feed [Post].
@@ -649,6 +651,8 @@ model Auction {
   discussionThreads  ForumThread[]
   /// P1: at most one structured marketing plan per listing (workspace foundation).
   listingMarketingPlan ListingMarketingPlan?
+  /// P3: AI copilot runs tied to this listing.
+  marketingCopilotRuns MarketingCopilotRun[]
 
   @@index([sellerId])
   @@index([buyerId])
@@ -898,6 +902,26 @@ model ListingMarketingArtifact {
   plan ListingMarketingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@index([planId, createdAt])
+}
+
+/// P3: persisted AI copilot generation for audit, rate limits, and optional apply linkage.
+model MarketingCopilotRun {
+  id          String    @id @default(cuid())
+  auctionId   String
+  createdById String
+  intakeJson  Json
+  outputJson  Json
+  inputHash   String
+  outputHash  String
+  model       String
+  createdAt   DateTime  @default(now())
+  appliedAt   DateTime?
+
+  auction   Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  createdBy User    @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([createdById, createdAt])
+  @@index([auctionId, createdAt])
 }
 
 /// Site element feedback (Element Feedback Kit). Table name `feedback` for SQL parity with the kit.

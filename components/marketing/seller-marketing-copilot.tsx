@@ -1,13 +1,15 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Copy, FileDown, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { ListingMarketingArtifactType, ListingMarketingTaskType } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   MARKETING_COPILOT_CHANNEL_KEYS,
   type MarketingCopilotChannelKey,
+  type MarketingCopilotGenerateBody,
   type MarketingCopilotStructuredResult,
 } from "@/lib/validations/marketing-copilot";
 
@@ -95,6 +97,10 @@ export function SellerMarketingCopilot({
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState<MarketingCopilotStructuredResult | null>(null);
+  const [runId, setRunId] = useState<string | null>(null);
+  const [lastIntake, setLastIntake] = useState<MarketingCopilotGenerateBody | null>(null);
+  const [regenTaskIdx, setRegenTaskIdx] = useState<number | null>(null);
+  const [regenArtIdx, setRegenArtIdx] = useState<number | null>(null);
 
   const vehicleLine = useMemo(
     () =>
@@ -117,43 +123,24 @@ export function SellerMarketingCopilot({
     setStep("idle");
     setDraft(null);
     setError(null);
+    setRunId(null);
+    setLastIntake(null);
+    setRegenTaskIdx(null);
+    setRegenArtIdx(null);
   }, []);
 
-  const generate = useCallback(async () => {
-    if (selectedChannels.size === 0) {
-      setError("Pick at least one channel.");
-      return;
-    }
-    setError(null);
-    setGenerating(true);
-    try {
-      const res = await fetch("/api/marketing/copilot/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          auctionId,
-          objectiveGoal,
-          audience,
-          positioning,
-          channels: Array.from(selectedChannels),
-          tone,
-          budgetLevel,
-          urgency,
-          listingHighlights,
-        }),
-      });
-      const j = (await res.json()) as { copilot?: MarketingCopilotStructuredResult; message?: string };
-      if (!res.ok) {
-        throw new Error(j.message ?? "Generation failed.");
-      }
-      if (!j.copilot) throw new Error("Missing copilot payload.");
-      setDraft(j.copilot);
-      setStep("review");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Generation failed.");
-    } finally {
-      setGenerating(false);
-    }
+  const buildIntakePayload = useCallback((): MarketingCopilotGenerateBody => {
+    return {
+      auctionId,
+      objectiveGoal,
+      audience,
+      positioning,
+      channels: Array.from(selectedChannels) as MarketingCopilotGenerateBody["channels"],
+      tone,
+      budgetLevel,
+      urgency,
+      listingHighlights,
+    };
   }, [
     auctionId,
     audience,
@@ -166,6 +153,110 @@ export function SellerMarketingCopilot({
     urgency,
   ]);
 
+  const updatePlanField = useCallback(
+    (key: keyof MarketingCopilotStructuredResult["plan"], value: string | string[]) => {
+      setDraft((d) => {
+        if (!d) return d;
+        return { ...d, plan: { ...d.plan, [key]: value } as typeof d.plan };
+      });
+    },
+    []
+  );
+
+  const updateTaskRow = useCallback((idx: number, patch: Partial<MarketingCopilotStructuredResult["tasks"][number]>) => {
+    setDraft((d) => {
+      if (!d) return d;
+      const tasks = d.tasks.map((t, i) => (i === idx ? { ...t, ...patch } : t));
+      return { ...d, tasks };
+    });
+  }, []);
+
+  const updateArtifactRow = useCallback(
+    (idx: number, patch: Partial<MarketingCopilotStructuredResult["artifacts"][number]>) => {
+      setDraft((d) => {
+        if (!d) return d;
+        const artifacts = d.artifacts.map((a, i) => (i === idx ? { ...a, ...patch } : a));
+        return { ...d, artifacts };
+      });
+    },
+    []
+  );
+
+  const copyText = useCallback(async (label: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      setError(`Could not copy ${label}.`);
+    }
+  }, []);
+
+  const downloadTextFile = useCallback((filename: string, contents: string, mime: string) => {
+    const blob = new Blob([contents], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, []);
+
+  const exportDraftJson = useCallback(() => {
+    if (!draft) return;
+    downloadTextFile(
+      `copilot-draft-${auctionId}.json`,
+      JSON.stringify({ runId, intake: lastIntake, copilot: draft }, null, 2),
+      "application/json"
+    );
+  }, [auctionId, downloadTextFile, draft, lastIntake, runId]);
+
+  const exportDraftMarkdown = useCallback(() => {
+    if (!draft) return;
+    const lines: string[] = [];
+    lines.push(`# Copilot draft`, ``, `## Plan`, `- Objective: ${draft.plan.objective}`, `- Audience: ${draft.plan.audience}`, `- Positioning: ${draft.plan.positioning}`, `- Channels: ${draft.plan.channels.join(", ")}`, ``, `### Strategy`, draft.plan.summaryStrategy, ``, `## Tasks`);
+    draft.tasks.forEach((t, i) => {
+      lines.push(`${i + 1}. **${t.title}**`, t.description ? `   ${t.description}` : "", t.channel ? `   _${t.channel}_` : "");
+    });
+    lines.push(``, `## Artifacts`);
+    draft.artifacts.forEach((a, i) => {
+      lines.push(`### ${i + 1}. ${a.type}${a.channel ? ` · ${a.channel}` : ""}`, "```", a.content, "```", "");
+    });
+    downloadTextFile(`copilot-draft-${auctionId}.md`, lines.join("\n"), "text/markdown;charset=utf-8");
+  }, [auctionId, downloadTextFile, draft]);
+
+  const generate = useCallback(async () => {
+    if (selectedChannels.size === 0) {
+      setError("Pick at least one channel.");
+      return;
+    }
+    setError(null);
+    setGenerating(true);
+    try {
+      const intake = buildIntakePayload();
+      const res = await fetch("/api/marketing/copilot/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(intake),
+      });
+      const j = (await res.json()) as {
+        copilot?: MarketingCopilotStructuredResult;
+        runId?: string;
+        message?: string;
+      };
+      if (!res.ok) {
+        throw new Error(j.message ?? "Generation failed.");
+      }
+      if (!j.copilot) throw new Error("Missing copilot payload.");
+      setDraft(j.copilot);
+      setRunId(j.runId ?? null);
+      setLastIntake(intake);
+      setStep("review");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Generation failed.");
+    } finally {
+      setGenerating(false);
+    }
+  }, [buildIntakePayload, selectedChannels]);
+
   const apply = useCallback(async () => {
     if (!draft) return;
     setError(null);
@@ -174,7 +265,11 @@ export function SellerMarketingCopilot({
       const res = await fetch("/api/marketing/copilot/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ auctionId, copilot: draft }),
+        body: JSON.stringify({
+          auctionId,
+          copilot: draft,
+          ...(runId ? { runId } : {}),
+        }),
       });
       const j = (await res.json()) as { message?: string };
       if (!res.ok) throw new Error(j.message ?? "Apply failed.");
@@ -185,7 +280,79 @@ export function SellerMarketingCopilot({
     } finally {
       setApplying(false);
     }
-  }, [auctionId, draft, onApplied, resetToIdle]);
+  }, [auctionId, draft, onApplied, resetToIdle, runId]);
+
+  const regenerateTask = useCallback(
+    async (idx: number) => {
+      if (!draft || !lastIntake) {
+        setError("Generate a draft first before regenerating a single task.");
+        return;
+      }
+      setError(null);
+      setRegenTaskIdx(idx);
+      try {
+        const res = await fetch("/api/marketing/copilot/regenerate-task", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            auctionId,
+            intake: lastIntake,
+            task: draft.tasks[idx],
+          }),
+        });
+        const j = (await res.json()) as {
+          task?: MarketingCopilotStructuredResult["tasks"][number];
+          runId?: string;
+          message?: string;
+        };
+        if (!res.ok) throw new Error(j.message ?? "Regeneration failed.");
+        if (!j.task) throw new Error("Missing task.");
+        updateTaskRow(idx, j.task);
+        if (j.runId) setRunId(j.runId);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Regeneration failed.");
+      } finally {
+        setRegenTaskIdx(null);
+      }
+    },
+    [auctionId, draft, lastIntake, updateTaskRow]
+  );
+
+  const regenerateArtifact = useCallback(
+    async (idx: number) => {
+      if (!draft || !lastIntake) {
+        setError("Generate a draft first before regenerating a single draft.");
+        return;
+      }
+      setError(null);
+      setRegenArtIdx(idx);
+      try {
+        const res = await fetch("/api/marketing/copilot/regenerate-artifact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            auctionId,
+            intake: lastIntake,
+            artifact: draft.artifacts[idx],
+          }),
+        });
+        const j = (await res.json()) as {
+          artifact?: MarketingCopilotStructuredResult["artifacts"][number];
+          runId?: string;
+          message?: string;
+        };
+        if (!res.ok) throw new Error(j.message ?? "Regeneration failed.");
+        if (!j.artifact) throw new Error("Missing artifact.");
+        updateArtifactRow(idx, j.artifact);
+        if (j.runId) setRunId(j.runId);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Regeneration failed.");
+      } finally {
+        setRegenArtIdx(null);
+      }
+    },
+    [auctionId, draft, lastIntake, updateArtifactRow]
+  );
 
   return (
     <div className="rounded-2xl border border-[#ff3b5c]/25 bg-gradient-to-b from-[#ff3b5c]/[0.07] to-transparent p-6">
@@ -384,45 +551,173 @@ export function SellerMarketingCopilot({
                 Step 2 — Review before saving
               </p>
               <p className="text-xs text-neutral-500">
-                Outputs are suggestions, not guarantees. Applying updates your workspace plan, appends
-                AI-labeled checklist items, and adds new draft versions — existing history is kept.
+                Outputs are suggestions, not guarantees. Edit anything below before applying. Trackable
+                listing links are added on apply. Applying updates your workspace plan, appends AI-labeled
+                checklist items, and adds new draft versions — existing history is kept.
               </p>
+
+              {runId ? (
+                <p className="text-[11px] text-neutral-600">
+                  Audit run ID: <span className="font-mono text-neutral-400">{runId}</span>
+                </p>
+              ) : null}
+
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" size="sm" variant="outline" onClick={() => void exportDraftJson()}>
+                  <FileDown className="mr-1.5 h-3.5 w-3.5" />
+                  Export JSON
+                </Button>
+                <Button type="button" size="sm" variant="outline" onClick={() => void exportDraftMarkdown()}>
+                  <FileDown className="mr-1.5 h-3.5 w-3.5" />
+                  Export Markdown
+                </Button>
+              </div>
 
               <section className="rounded-xl border border-white/10 bg-black/20 p-4">
                 <h3 className="text-sm font-semibold text-neutral-100">Plan</h3>
-                <p className="mt-2 text-sm text-neutral-300">{draft.plan.summaryStrategy}</p>
-                <dl className="mt-4 grid gap-3 text-sm text-neutral-400 md:grid-cols-2">
-                  <div>
-                    <dt className="text-xs uppercase text-neutral-600">Objective</dt>
-                    <dd className="mt-1 text-neutral-200">{draft.plan.objective}</dd>
+                <div className="mt-3 space-y-3">
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-neutral-500">Strategy summary</p>
+                    <Textarea
+                      rows={4}
+                      className="resize-y bg-black/30 text-sm"
+                      value={draft.plan.summaryStrategy}
+                      onChange={(e) => updatePlanField("summaryStrategy", e.target.value)}
+                    />
                   </div>
-                  <div>
-                    <dt className="text-xs uppercase text-neutral-600">Audience</dt>
-                    <dd className="mt-1 text-neutral-200">{draft.plan.audience}</dd>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-neutral-500">Objective</p>
+                      <Textarea
+                        rows={3}
+                        className="resize-y bg-black/30 text-sm"
+                        value={draft.plan.objective}
+                        onChange={(e) => updatePlanField("objective", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-neutral-500">Audience</p>
+                      <Textarea
+                        rows={3}
+                        className="resize-y bg-black/30 text-sm"
+                        value={draft.plan.audience}
+                        onChange={(e) => updatePlanField("audience", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1 md:col-span-2">
+                      <p className="text-xs font-medium text-neutral-500">Positioning</p>
+                      <Textarea
+                        rows={3}
+                        className="resize-y bg-black/30 text-sm"
+                        value={draft.plan.positioning}
+                        onChange={(e) => updatePlanField("positioning", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1 md:col-span-2">
+                      <p className="text-xs font-medium text-neutral-500">Channels (comma-separated)</p>
+                      <Input
+                        className="bg-black/30 text-sm"
+                        value={draft.plan.channels.join(", ")}
+                        onChange={(e) => {
+                          const parts = e.target.value
+                            .split(/[,;]/)
+                            .map((s) => s.trim())
+                            .filter(Boolean);
+                          updatePlanField("channels", parts.length > 0 ? parts : draft.plan.channels);
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="md:col-span-2">
-                    <dt className="text-xs uppercase text-neutral-600">Positioning</dt>
-                    <dd className="mt-1 text-neutral-200">{draft.plan.positioning}</dd>
-                  </div>
-                  <div className="md:col-span-2">
-                    <dt className="text-xs uppercase text-neutral-600">Channels</dt>
-                    <dd className="mt-1 text-neutral-200">{draft.plan.channels.join(", ")}</dd>
-                  </div>
-                </dl>
+                </div>
               </section>
 
               <section className="rounded-xl border border-white/10 bg-black/20 p-4">
                 <h3 className="text-sm font-semibold text-neutral-100">Checklist ({draft.tasks.length})</h3>
-                <ul className="mt-3 space-y-2 text-sm text-neutral-300">
+                <ul className="mt-3 space-y-4 text-sm text-neutral-300">
                   {draft.tasks.map((t, i) => (
-                    <li key={i} className="rounded-lg border border-white/5 bg-black/30 px-3 py-2">
-                      <span className="font-medium text-neutral-100">{t.title}</span>
-                      {t.description ? (
-                        <p className="mt-1 text-xs text-neutral-500">{t.description}</p>
-                      ) : null}
-                      {t.channel ? (
-                        <p className="mt-1 text-[10px] uppercase text-neutral-600">{t.channel}</p>
-                      ) : null}
+                    <li key={`task-${i}`} className="rounded-lg border border-white/5 bg-black/30 p-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-[10px] uppercase text-neutral-600">Task {i + 1}</p>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2 text-xs"
+                            onClick={() =>
+                              void copyText(
+                                "task",
+                                [t.title, t.description, t.channel].filter(Boolean).join("\n\n")
+                              )
+                            }
+                          >
+                            <Copy className="mr-1 h-3.5 w-3.5" />
+                            Copy
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="h-8 px-2 text-xs"
+                            disabled={
+                              !copilotConfigured ||
+                              !lastIntake ||
+                              regenTaskIdx !== null ||
+                              regenArtIdx !== null ||
+                              applying
+                            }
+                            onClick={() => void regenerateTask(i)}
+                          >
+                            {regenTaskIdx === i ? (
+                              <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <RefreshCw className="mr-1 h-3.5 w-3.5" />
+                            )}
+                            Regenerate
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-2 space-y-2">
+                        <Input
+                          className="bg-black/40 text-sm font-medium"
+                          value={t.title}
+                          onChange={(e) => updateTaskRow(i, { title: e.target.value })}
+                        />
+                        <Textarea
+                          rows={3}
+                          className="resize-y bg-black/40 text-xs"
+                          value={t.description ?? ""}
+                          onChange={(e) => updateTaskRow(i, { description: e.target.value })}
+                        />
+                        <div className="grid gap-2 md:grid-cols-2">
+                          <div className="space-y-1">
+                            <p className="text-[10px] uppercase text-neutral-600">Channel hint</p>
+                            <Input
+                              className="bg-black/40 text-xs"
+                              value={t.channel ?? ""}
+                              onChange={(e) =>
+                                updateTaskRow(i, { channel: e.target.value.trim() ? e.target.value : null })
+                              }
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-[10px] uppercase text-neutral-600">Type</p>
+                            <select
+                              className="h-9 w-full rounded-md border border-white/10 bg-black/40 px-2 text-xs text-neutral-100"
+                              value={t.type ?? ListingMarketingTaskType.CHECKLIST}
+                              onChange={(e) =>
+                                updateTaskRow(i, { type: e.target.value as ListingMarketingTaskType })
+                              }
+                            >
+                              {Object.values(ListingMarketingTaskType).map((v) => (
+                                <option key={v} value={v}>
+                                  {v}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -430,19 +725,83 @@ export function SellerMarketingCopilot({
 
               <section className="rounded-xl border border-white/10 bg-black/20 p-4">
                 <h3 className="text-sm font-semibold text-neutral-100">Drafts ({draft.artifacts.length})</h3>
-                <ul className="mt-3 space-y-3">
+                <ul className="mt-3 space-y-4">
                   {draft.artifacts.map((a, i) => (
                     <li
-                      key={i}
+                      key={`artifact-${i}`}
                       className="rounded-lg border border-white/5 bg-black/30 p-3 text-sm text-neutral-300"
                     >
-                      <p className="text-xs text-neutral-500">
-                        {a.type}
-                        {a.channel ? ` · ${a.channel}` : ""}
-                      </p>
-                      <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap font-sans text-xs text-neutral-200">
-                        {a.content}
-                      </pre>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-xs text-neutral-500">
+                          Draft {i + 1}
+                          {a.channel ? ` · ${a.channel}` : ""}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2 text-xs"
+                            onClick={() => void copyText("artifact", a.content)}
+                          >
+                            <Copy className="mr-1 h-3.5 w-3.5" />
+                            Copy
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="h-8 px-2 text-xs"
+                            disabled={
+                              !copilotConfigured ||
+                              !lastIntake ||
+                              regenTaskIdx !== null ||
+                              regenArtIdx !== null ||
+                              applying
+                            }
+                            onClick={() => void regenerateArtifact(i)}
+                          >
+                            {regenArtIdx === i ? (
+                              <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <RefreshCw className="mr-1 h-3.5 w-3.5" />
+                            )}
+                            Regenerate
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-2 grid gap-2 md:grid-cols-2">
+                        <div className="space-y-1">
+                          <p className="text-[10px] uppercase text-neutral-600">Type</p>
+                          <select
+                            className="h-9 w-full rounded-md border border-white/10 bg-black/40 px-2 text-xs text-neutral-100"
+                            value={a.type}
+                            onChange={(e) =>
+                              updateArtifactRow(i, { type: e.target.value as ListingMarketingArtifactType })
+                            }
+                          >
+                            {Object.values(ListingMarketingArtifactType).map((v) => (
+                              <option key={v} value={v}>
+                                {v}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] uppercase text-neutral-600">Channel</p>
+                          <Input
+                            className="bg-black/40 text-xs"
+                            value={a.channel}
+                            onChange={(e) => updateArtifactRow(i, { channel: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                      <Textarea
+                        rows={8}
+                        className="mt-2 max-h-64 resize-y bg-black/40 font-sans text-xs text-neutral-200"
+                        value={a.content}
+                        onChange={(e) => updateArtifactRow(i, { content: e.target.value })}
+                      />
                     </li>
                   ))}
                 </ul>

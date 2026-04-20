@@ -3,8 +3,11 @@ import {
   assertAuctionOwnedBySeller,
   requireMarketingWorkspaceSession,
 } from "@/lib/marketing/marketing-workspace-auth";
-import { isMarketingCopilotConfigured } from "@/lib/marketing/marketing-copilot-openai";
+import { isMarketingCopilotConfigured, getMarketingCopilotModel } from "@/lib/marketing/marketing-copilot-openai";
 import { generateMarketingCopilotStructured } from "@/lib/marketing/marketing-copilot-generate-service";
+import { loadCopilotLightMetrics } from "@/lib/marketing/marketing-copilot-analytics-context";
+import { assertCopilotOpenAiAllowed } from "@/lib/marketing/marketing-copilot-rate-limit";
+import { createMarketingCopilotRun } from "@/lib/marketing/marketing-copilot-run-service";
 import { marketingCopilotGenerateBodySchema } from "@/lib/validations/marketing-copilot";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +15,7 @@ export const runtime = "nodejs";
 
 /**
  * POST /api/marketing/copilot/generate
- * Returns structured plan/tasks/artifacts for client review (does not persist).
+ * Persists an auditable MarketingCopilotRun; returns structured draft for review (not workspace apply).
  */
 export async function POST(req: Request) {
   const auth = await requireMarketingWorkspaceSession();
@@ -46,14 +49,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Listing not found." }, { status: 404 });
   }
 
+  const rl = await assertCopilotOpenAiAllowed(auth.user.id);
+  if (!rl.ok) {
+    return NextResponse.json({ message: rl.message }, { status: rl.status });
+  }
+
   try {
+    const metrics = await loadCopilotLightMetrics(body.auctionId, auth.user.id);
     const { listing, result } = await generateMarketingCopilotStructured({
       auctionId: body.auctionId,
       sellerId: auth.user.id,
       intake: body,
+      metrics,
+    });
+
+    const run = await createMarketingCopilotRun({
+      auctionId: body.auctionId,
+      createdById: auth.user.id,
+      intake: { _runKind: "GENERATE", ...body },
+      output: result,
+      model: getMarketingCopilotModel(),
     });
 
     return NextResponse.json({
+      runId: run.id,
       listing: {
         id: listing.id,
         title: listing.title,

@@ -61,9 +61,25 @@ export const marketingCopilotStructuredResultSchema = z.object({
 
 export const marketingCopilotApplyBodySchema = z.object({
   auctionId: z.string().min(1),
+  /** Optional: marks a persisted run as applied when present and valid. */
+  runId: z.string().min(1).optional(),
   /** Client-reviewed structured output from generate (re-validated server-side). */
   copilot: marketingCopilotStructuredResultSchema,
 });
 
+export const marketingCopilotRegenerateTaskBodySchema = z.object({
+  auctionId: z.string().min(1),
+  intake: marketingCopilotGenerateBodySchema,
+  task: marketingCopilotTaskBlockSchema,
+});
+
+export const marketingCopilotRegenerateArtifactBodySchema = z.object({
+  auctionId: z.string().min(1),
+  intake: marketingCopilotGenerateBodySchema,
+  artifact: marketingCopilotArtifactBlockSchema,
+});
+
 export type MarketingCopilotStructuredResult = z.infer<typeof marketingCopilotStructuredResultSchema>;
 export type MarketingCopilotGenerateBody = z.infer<typeof marketingCopilotGenerateBodySchema>;
+export type MarketingCopilotTaskBlock = z.infer<typeof marketingCopilotTaskBlockSchema>;
+export type MarketingCopilotArtifactBlock = z.infer<typeof marketingCopilotArtifactBlockSchema>;

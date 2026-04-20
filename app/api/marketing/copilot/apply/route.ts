@@ -7,6 +7,11 @@ import { marketingCopilotApplyBodySchema } from "@/lib/validations/marketing-cop
 import { applyCopilotToWorkspace } from "@/lib/marketing/marketing-copilot-apply-service";
 import { serializeWorkspacePlan } from "@/lib/marketing/listing-marketing-workspace-serialize";
 import { prisma } from "@/lib/db";
+import { injectLinkKitIntoArtifacts } from "@/lib/marketing/marketing-copilot-link-inject";
+import {
+  assertCopilotRunForApply,
+  markCopilotRunApplied,
+} from "@/lib/marketing/marketing-copilot-run-service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -39,10 +44,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Invalid payload." }, { status: 400 });
   }
 
-  const { auctionId, copilot } = parsed.data;
+  const { auctionId, copilot, runId } = parsed.data;
   const owned = await assertAuctionOwnedBySeller(auctionId, auth.user.id);
   if (!owned) {
     return NextResponse.json({ message: "Listing not found." }, { status: 404 });
+  }
+
+  if (runId) {
+    const ok = await assertCopilotRunForApply({
+      runId,
+      userId: auth.user.id,
+      auctionId,
+    });
+    if (!ok) {
+      return NextResponse.json({ message: "Run not found for this listing." }, { status: 404 });
+    }
   }
 
   const copilotForSave = {
@@ -56,6 +72,11 @@ export async function POST(req: Request) {
     },
   };
 
+  const artifactsWithLinks = injectLinkKitIntoArtifacts(
+    copilotForSave.artifacts,
+    auctionId
+  );
+
   try {
     const { planId } = await applyCopilotToWorkspace({
       sellerId: auth.user.id,
@@ -67,8 +88,12 @@ export async function POST(req: Request) {
         channels: copilotForSave.plan.channels,
       },
       tasks: copilotForSave.tasks,
-      artifacts: copilotForSave.artifacts,
+      artifacts: artifactsWithLinks,
     });
+
+    if (runId) {
+      await markCopilotRunApplied({ runId, userId: auth.user.id, auctionId });
+    }
 
     const plan = await prisma.listingMarketingPlan.findUnique({
       where: { id: planId },
