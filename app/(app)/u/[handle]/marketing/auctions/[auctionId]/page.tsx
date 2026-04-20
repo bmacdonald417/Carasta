@@ -46,6 +46,7 @@ import { MarketingCampaignStatus, MarketingTrafficEventType } from "@prisma/clie
 import { serializeWorkspacePlan } from "@/lib/marketing/listing-marketing-workspace-serialize";
 import { SellerMarketingWorkspace } from "@/components/marketing/seller-marketing-workspace";
 import { HashScrollIntoView } from "@/components/marketing/hash-scroll-into-view";
+import { MarketingAuctionStickyNav } from "@/components/marketing/marketing-auction-sticky-nav";
 
 function ProportionBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -288,7 +289,9 @@ export default async function MarketingAuctionDetailPage({
         </div>
       </div>
 
-      <div className="space-y-8">
+      <MarketingAuctionStickyNav />
+
+      <section id="marketing-overview" className="scroll-mt-32 space-y-8">
         <div>
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
             Totals
@@ -366,15 +369,15 @@ export default async function MarketingAuctionDetailPage({
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="mt-8">
+      <section id="marketing-alerts" className="scroll-mt-32 mt-8">
         <MarketingAlertsPanel
           items={auctionMarketingAlerts.slice(0, 6)}
           compact
           context="auction"
         />
-      </div>
+      </section>
 
       <SellerMarketingWorkspace
         key={auction.id}
@@ -384,15 +387,15 @@ export default async function MarketingAuctionDetailPage({
         copilotConfigured={copilotConfigured}
       />
 
-      <div className="mt-10">
+      <section id="marketing-share-promote" className="scroll-mt-32 mt-10">
         <ShareAndPromotePanel
           defaultBundle={defaultBundle}
           presetBundles={presetBundles}
           managePresetsHref={`/u/${user.handle}/marketing/presets`}
         />
-      </div>
+      </section>
 
-      <div className="mt-10">
+      <section id="marketing-carmunity" className="scroll-mt-32 mt-10">
         <CarmunityPromoPanel
           handle={user.handle}
           auctionId={auction.id}
@@ -400,11 +403,16 @@ export default async function MarketingAuctionDetailPage({
           displayName={user.name}
           avatarUrl={user.avatarUrl ?? user.image}
         />
-      </div>
+      </section>
 
-      <AuctionLinkedPromoPostsSection posts={detail.linkedPromoPosts} />
+      <section id="marketing-promo-posts" className="scroll-mt-32 mt-10">
+        <AuctionLinkedPromoPostsSection posts={detail.linkedPromoPosts} />
+      </section>
 
-      <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+      <section
+        id="marketing-campaigns"
+        className="scroll-mt-32 mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+      >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="font-display text-lg font-semibold text-neutral-100">
@@ -484,9 +492,10 @@ export default async function MarketingAuctionDetailPage({
             Manage Campaigns
           </Link>
         </p>
-      </div>
+      </section>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-2">
+      <section id="marketing-analytics" className="scroll-mt-32 mt-10 space-y-8">
+        <div className="grid gap-8 lg:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <h2 className="font-display text-lg font-semibold text-neutral-100">
             Traffic sources
@@ -534,9 +543,9 @@ export default async function MarketingAuctionDetailPage({
             ))}
           </ul>
         </div>
-      </div>
+        </div>
 
-      {detail.shareTargetCounts.length > 0 ? (
+        {detail.shareTargetCounts.length > 0 ? (
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
           <h2 className="font-display text-lg font-semibold text-neutral-100">
             Share actions
@@ -558,9 +567,13 @@ export default async function MarketingAuctionDetailPage({
             ))}
           </ul>
         </div>
-      ) : null}
+        ) : null}
+      </section>
 
-      <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+      <section
+        id="marketing-activity"
+        className="scroll-mt-32 mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+      >
         <h2 className="font-display text-lg font-semibold text-neutral-100">
           Recent activity
         </h2>
@@ -613,7 +626,7 @@ export default async function MarketingAuctionDetailPage({
             </table>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

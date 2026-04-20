@@ -357,7 +357,7 @@ export function SellerMarketingCopilot({
   return (
     <div
       id="marketing-ai-copilot"
-      className="scroll-mt-24 rounded-2xl border border-[#ff3b5c]/25 bg-gradient-to-b from-[#ff3b5c]/[0.07] to-transparent p-6"
+      className="scroll-mt-32 rounded-2xl border border-[#ff3b5c]/25 bg-gradient-to-b from-[#ff3b5c]/[0.07] to-transparent p-6"
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
