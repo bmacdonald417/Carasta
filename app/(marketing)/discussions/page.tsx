@@ -9,6 +9,7 @@ import {
   listTrendingThreadsGlobal,
 } from "@/lib/forums/discussions-discovery";
 import { listForumSpaces } from "@/lib/forums/forum-service";
+import { listFollowedThreadsForViewer } from "@/lib/carmunity/following-feed";
 import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -33,10 +34,11 @@ export default async function DiscussionsPage() {
   }> = [];
   let loadError: string | null = null;
 
-  const [recommendedGears, trendingThreads, suggestedUsers] = await Promise.all([
+  const [recommendedGears, trendingThreads, suggestedUsers, followedThreads] = await Promise.all([
     listRecommendedGears({ take: 4 }).catch(() => []),
     listTrendingThreadsGlobal({ take: 6 }).catch(() => []),
     listSuggestedDiscussionUsers({ take: 6, excludeUserId: viewerId }).catch(() => []),
+    listFollowedThreadsForViewer(viewerId, { take: 6 }).catch(() => []),
   ]);
 
   try {
@@ -62,6 +64,42 @@ export default async function DiscussionsPage() {
         links to the same <span className="text-neutral-200">/u/[handle]</span>{" "}
         profile.
       </p>
+
+      {followedThreads.length > 0 ? (
+        <section className="mt-8 space-y-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-4">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
+                Your graph
+              </p>
+              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100">
+                Threads from people you follow
+              </h2>
+            </div>
+            <Link
+              href="/explore?tab=following"
+              className="text-xs font-semibold uppercase tracking-wide text-primary hover:underline"
+            >
+              Following feed
+            </Link>
+          </div>
+          <ul className="divide-y divide-white/10">
+            {followedThreads.map((t) => (
+              <li key={t.id}>
+                <Link
+                  href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
+                  className="flex flex-col gap-0.5 py-2.5 text-sm text-neutral-200 transition hover:text-primary"
+                >
+                  <span className="line-clamp-2 font-medium text-neutral-100">{t.title}</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    @{t.authorHandle} · {t.gearSlug} / {t.lowerGearSlug}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {(recommendedGears.length > 0 || trendingThreads.length > 0 || suggestedUsers.length > 0) && (
         <div className="mt-10 space-y-10">

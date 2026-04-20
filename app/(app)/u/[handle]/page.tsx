@@ -367,9 +367,16 @@ export default async function ProfilePage({
                 <li key={t.id}>
                   <Link
                     href={savedThreadHref(t)}
-                    className="block rounded-xl border border-border/50 bg-card/40 px-4 py-3 transition hover:border-primary/35 hover:bg-muted/10"
+                    className="relative block rounded-xl border border-border/50 bg-card/40 px-4 py-3 transition hover:border-primary/35 hover:bg-muted/10"
                   >
-                    <p className="font-medium text-neutral-100 line-clamp-2">{t.title}</p>
+                    {t.hasNewActivity ? (
+                      <span
+                        className="absolute right-3 top-3 h-2 w-2 rounded-full bg-primary shadow-sm shadow-primary/30"
+                        title="New activity since you last opened this thread"
+                        aria-hidden
+                      />
+                    ) : null}
+                    <p className="pr-6 font-medium text-neutral-100 line-clamp-2">{t.title}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {t.gearSlug} / {t.lowerGearSlug} · last activity{" "}
                       {t.lastActivityAt.toLocaleDateString(undefined, {
@@ -391,8 +398,8 @@ export default async function ProfilePage({
             Following activity
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Placeholder for a future feed of fresh threads and replies from people you follow — kept
-            off the critical path for Phase I.
+            Use <span className="font-medium text-primary">Carmunity → Following</span> for a unified
+            stream of posts plus discussion threads and replies from people you follow.
           </p>
         </section>
       ) : null}

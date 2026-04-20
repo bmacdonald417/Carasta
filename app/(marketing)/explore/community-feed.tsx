@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle } from "lucide-react";
+import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { FeedEmptyState } from "@/components/carmunity/FeedEmptyState";
 import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
 import { likePost, unlikePost } from "./actions";
@@ -30,6 +31,55 @@ type Post = {
   liked?: boolean;
 };
 
+type FollowingThreadPayload = {
+  id: string;
+  title: string;
+  snippet: string;
+  createdAt: string;
+  replyCount: number;
+  reactionCount: number;
+  gearSlug: string;
+  lowerGearSlug: string;
+  lowerGearTitle: string;
+  gearTitle: string;
+  href: string;
+  author: {
+    id: string;
+    handle: string;
+    name: string | null;
+    avatarUrl: string | null;
+  };
+};
+
+type FollowingReplyPayload = {
+  id: string;
+  snippet: string;
+  createdAt: string;
+  threadId: string;
+  threadTitle: string;
+  gearSlug: string;
+  lowerGearSlug: string;
+  href: string;
+  author: {
+    id: string;
+    handle: string;
+    name: string | null;
+    avatarUrl: string | null;
+  };
+};
+
+type FollowingFeedItem =
+  | { type: "post"; sortAt: string; post: Post }
+  | { type: "thread"; sortAt: string; thread: FollowingThreadPayload }
+  | { type: "reply"; sortAt: string; reply: FollowingReplyPayload };
+
+export type TrendingDiscussionThreadLite = {
+  id: string;
+  title: string;
+  gearSlug: string;
+  lowerGearSlug: string;
+};
+
 function formatPostTime(iso: string): string {
   const d = new Date(iso);
   const diffMs = Date.now() - d.getTime();
@@ -46,28 +96,57 @@ function formatPostTime(iso: string): string {
 export function CommunityFeed({
   tab: initialTab,
   currentUserId,
+  trendingDiscussionThreads = [],
 }: {
   tab: string;
   currentUserId: string | null;
+  /** Shown above the feed tabs — reuses Phase I discovery on the server. */
+  trendingDiscussionThreads?: TrendingDiscussionThreadLite[];
 }) {
   const router = useRouter();
   const [tab, setTab] = useState(initialTab);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
+  const [followingItems, setFollowingItems] = useState<FollowingFeedItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    async function fetchPosts() {
+    setLoading(true);
+    void (async () => {
+      if (tab === "following") {
+        if (!currentUserId) {
+          if (!cancelled) {
+            setFollowingItems([]);
+            setLoading(false);
+          }
+          return;
+        }
+        const res = await fetch("/api/carmunity/feed?mode=following");
+        if (cancelled) return;
+        if (!res.ok) {
+          setFollowingItems([]);
+          setLoading(false);
+          return;
+        }
+        const data = (await res.json()) as { items?: FollowingFeedItem[] };
+        setFollowingItems(Array.isArray(data.items) ? data.items : []);
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch(
         `/api/explore/feed?tab=${tab}${currentUserId ? `&userId=${currentUserId}` : ""}`
       );
-      if (!res.ok || cancelled) return;
+      if (cancelled) return;
+      if (!res.ok) {
+        setTrendingPosts([]);
+        setLoading(false);
+        return;
+      }
       const data = await res.json();
-      if (!cancelled) setPosts(data.posts ?? []);
+      setTrendingPosts(data.posts ?? []);
       setLoading(false);
-    }
-    setLoading(true);
-    fetchPosts();
+    })();
     return () => {
       cancelled = true;
     };
@@ -83,7 +162,7 @@ export function CommunityFeed({
     } else {
       await likePost(postId);
     }
-    setPosts((prev) =>
+    setTrendingPosts((prev) =>
       prev.map((p) =>
         p.id === postId
           ? {
@@ -97,21 +176,93 @@ export function CommunityFeed({
           : p
       )
     );
+    setFollowingItems((prev) =>
+      prev.map((item) => {
+        if (item.type !== "post" || item.post.id !== postId) return item;
+        return {
+          ...item,
+          post: {
+            ...item.post,
+            liked: !currentlyLiked,
+            _count: {
+              ...item.post._count,
+              likes: item.post._count.likes + (currentlyLiked ? -1 : 1),
+            },
+          },
+        };
+      })
+    );
     router.refresh();
   }
 
   function onPostCreated() {
     router.refresh();
-    setPosts((prev) => []);
     setLoading(true);
-    fetch(`/api/explore/feed?tab=${tab}${currentUserId ? `&userId=${currentUserId}` : ""}`)
-      .then((r) => r.json())
-      .then((d) => setPosts(d.posts ?? []))
-      .finally(() => setLoading(false));
+    void (async () => {
+      if (tab === "following" && currentUserId) {
+        const res = await fetch("/api/carmunity/feed?mode=following");
+        if (!res.ok) {
+          setFollowingItems([]);
+          setLoading(false);
+          return;
+        }
+        const data = (await res.json()) as { items?: FollowingFeedItem[] };
+        setFollowingItems(Array.isArray(data.items) ? data.items : []);
+        setLoading(false);
+        return;
+      }
+      const res = await fetch(
+        `/api/explore/feed?tab=${tab}${currentUserId ? `&userId=${currentUserId}` : ""}`
+      );
+      if (!res.ok) {
+        setTrendingPosts([]);
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      setTrendingPosts(data.posts ?? []);
+      setLoading(false);
+    })();
   }
 
   return (
     <div className="mt-8">
+      {trendingDiscussionThreads.length > 0 ? (
+        <section className="mb-8 space-y-3 rounded-2xl border border-border/50 bg-card/40 p-4">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
+                From discussions
+              </p>
+              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100">
+                Trending threads
+              </h2>
+            </div>
+            <Link
+              href="/discussions"
+              className="text-xs font-semibold uppercase tracking-wide text-primary hover:underline"
+            >
+              Browse all
+            </Link>
+          </div>
+          <ul className="divide-y divide-white/5">
+            {trendingDiscussionThreads.map((t) => (
+              <li key={t.id}>
+                <Link
+                  href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
+                  className="block py-2.5 text-sm text-neutral-200 transition hover:text-primary"
+                >
+                  <span className="line-clamp-2 font-medium">{t.title}</span>
+                  <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                    {t.gearSlug} / {t.lowerGearSlug}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {currentUserId && (
         <CreatePostForm onCreated={onPostCreated} className="mb-8" />
       )}
@@ -137,7 +288,7 @@ export function CommunityFeed({
           ) : (
             <PostList
               variant="trending"
-              posts={posts}
+              posts={trendingPosts}
               currentUserId={currentUserId}
               onToggleLike={toggleLike}
             />
@@ -146,10 +297,11 @@ export function CommunityFeed({
         <TabsContent value="following" className="mt-6">
           {loading ? (
             <FeedSkeletonList count={2} />
+          ) : !currentUserId ? (
+            <FeedEmptyState variant="following" currentUserId={null} />
           ) : (
-            <PostList
-              variant="following"
-              posts={posts}
+            <FollowingFeedList
+              items={followingItems}
               currentUserId={currentUserId}
               onToggleLike={toggleLike}
             />
@@ -157,6 +309,149 @@ export function CommunityFeed({
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function FollowingFeedList({
+  items,
+  currentUserId,
+  onToggleLike,
+}: {
+  items: FollowingFeedItem[];
+  currentUserId: string | null;
+  onToggleLike: (postId: string, currentlyLiked: boolean) => void;
+}) {
+  if (items.length === 0) {
+    return <FeedEmptyState variant="following" currentUserId={currentUserId} />;
+  }
+  return (
+    <div className="space-y-6">
+      {items.map((item) => {
+        if (item.type === "post") {
+          return (
+            <PostCard
+              key={`post-${item.post.id}`}
+              post={item.post}
+              currentUserId={currentUserId}
+              onToggleLike={onToggleLike}
+            />
+          );
+        }
+        if (item.type === "thread") {
+          return <FollowingThreadCard key={`thread-${item.thread.id}`} thread={item.thread} />;
+        }
+        return <FollowingReplyCard key={`reply-${item.reply.id}`} reply={item.reply} />;
+      })}
+    </div>
+  );
+}
+
+function FollowingThreadCard({ thread }: { thread: FollowingThreadPayload }) {
+  const reduceMotion = usePrefersReducedMotion();
+  const displayName = thread.author.name?.trim() || `@${thread.author.handle}`;
+  const meta = `@${thread.author.handle} · ${formatPostTime(thread.createdAt)}`;
+
+  return (
+    <motion.article
+      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
+    >
+      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
+        <div className="flex items-start gap-3 px-4 pt-4 pb-2">
+          <Link href={`/u/${thread.author.handle}`} className="shrink-0">
+            <Avatar className="h-11 w-11 ring-1 ring-border/60">
+              <AvatarImage src={thread.author.avatarUrl ?? undefined} alt="" />
+              <AvatarFallback className="bg-muted text-sm font-medium">
+                {(thread.author.name ?? thread.author.handle).slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-primary/90">
+              Discussion · new thread
+            </p>
+            <Link
+              href={`/u/${thread.author.handle}`}
+              className="mt-0.5 block truncate text-sm font-semibold tracking-tight text-foreground hover:text-primary"
+            >
+              {displayName}
+            </Link>
+            <p className="truncate text-xs text-muted-foreground">{meta}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {thread.gearTitle} · {thread.lowerGearTitle}
+            </p>
+          </div>
+        </div>
+        <div className="px-4 pb-4">
+          <Link href={thread.href} className="block group">
+            <h3 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100 group-hover:text-primary">
+              {thread.title}
+            </h3>
+            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-foreground/85">{thread.snippet}</p>
+          </Link>
+          <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+            <span>
+              {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
+            </span>
+            <span>{thread.reactionCount} reactions</span>
+          </div>
+        </div>
+      </Card>
+    </motion.article>
+  );
+}
+
+function FollowingReplyCard({ reply }: { reply: FollowingReplyPayload }) {
+  const reduceMotion = usePrefersReducedMotion();
+  const displayName = reply.author.name?.trim() || `@${reply.author.handle}`;
+  const meta = `@${reply.author.handle} · ${formatPostTime(reply.createdAt)}`;
+
+  return (
+    <motion.article
+      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
+    >
+      <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
+        <div className="flex items-start gap-3 px-4 pt-4 pb-2">
+          <Link href={`/u/${reply.author.handle}`} className="shrink-0">
+            <Avatar className="h-11 w-11 ring-1 ring-border/60">
+              <AvatarImage src={reply.author.avatarUrl ?? undefined} alt="" />
+              <AvatarFallback className="bg-muted text-sm font-medium">
+                {(reply.author.name ?? reply.author.handle).slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-primary/90">
+              Discussion · reply
+            </p>
+            <Link
+              href={`/u/${reply.author.handle}`}
+              className="mt-0.5 block truncate text-sm font-semibold tracking-tight text-foreground hover:text-primary"
+            >
+              {displayName}
+            </Link>
+            <p className="truncate text-xs text-muted-foreground">{meta}</p>
+          </div>
+        </div>
+        <div className="px-4 pb-4">
+          <Link href={reply.href} className="block group">
+            <p className="text-sm text-muted-foreground">
+              Replied in{" "}
+              <span className="font-medium text-neutral-200 group-hover:text-primary">
+                {reply.threadTitle}
+              </span>
+            </p>
+            <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-foreground/85">{reply.snippet}</p>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              {reply.gearSlug} / {reply.lowerGearSlug}
+            </p>
+          </Link>
+        </div>
+      </Card>
+    </motion.article>
   );
 }
 
@@ -230,8 +525,7 @@ function PostCard({
   const reduceMotion = usePrefersReducedMotion();
   const hasImage = Boolean(post.imageUrl?.trim());
   const hasContent = Boolean(post.content?.trim());
-  const displayName =
-    post.author.name?.trim() || `@${post.author.handle}`;
+  const displayName = post.author.name?.trim() || `@${post.author.handle}`;
   const metaLine = `@${post.author.handle} · ${formatPostTime(post.createdAt)}`;
 
   return (
@@ -241,7 +535,6 @@ function PostCard({
       transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
     >
       <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
-        {/* 1 — Author row */}
         <div className="flex items-start gap-3 px-4 pt-4 pb-3">
           <Link href={`/u/${post.author.handle}`} className="shrink-0">
             <Avatar className="h-11 w-11 ring-1 ring-border/60">
@@ -252,9 +545,10 @@ function PostCard({
             </Avatar>
           </Link>
           <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-primary/90">Post</p>
             <Link
               href={`/u/${post.author.handle}`}
-              className="block truncate text-sm font-semibold tracking-tight text-foreground hover:text-primary"
+              className="mt-0.5 block truncate text-sm font-semibold tracking-tight text-foreground hover:text-primary"
             >
               {displayName}
             </Link>
@@ -262,7 +556,6 @@ function PostCard({
           </div>
         </div>
 
-        {/* 2 — Media (image-forward, edge-to-edge in card) */}
         {hasImage && (
           <Link
             href={`/explore/post/${post.id}`}
@@ -278,7 +571,6 @@ function PostCard({
           </Link>
         )}
 
-        {/* 3 — Caption + 4 — metadata (caption only; time is in author row) */}
         {(hasContent || !hasImage) && (
           <div className="px-4 pb-1 pt-2">
             {hasContent ? (
@@ -298,7 +590,6 @@ function PostCard({
           </div>
         )}
 
-        {/* 5 — Social action row */}
         <div className="flex items-center gap-1 border-t border-border/40 px-2 py-2">
           <Button
             type="button"
@@ -313,9 +604,7 @@ function PostCard({
             <Heart
               className={`h-[18px] w-[18px] shrink-0 ${post.liked ? "fill-primary text-primary" : ""}`}
             />
-            <span className="min-w-[1ch] tabular-nums text-xs font-medium">
-              {post._count.likes}
-            </span>
+            <span className="min-w-[1ch] tabular-nums text-xs font-medium">{post._count.likes}</span>
           </Button>
           <Button
             variant="ghost"
@@ -325,9 +614,7 @@ function PostCard({
           >
             <Link href={`/explore/post/${post.id}`}>
               <MessageCircle className="h-[18px] w-[18px] shrink-0" />
-              <span className="min-w-[1ch] tabular-nums text-xs font-medium">
-                {post._count.comments}
-              </span>
+              <span className="min-w-[1ch] tabular-nums text-xs font-medium">{post._count.comments}</span>
             </Link>
           </Button>
           {!currentUserId && (

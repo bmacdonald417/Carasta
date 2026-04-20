@@ -16,7 +16,7 @@ import { getSession } from "@/lib/auth";
 import { extractMentionHandles } from "@/lib/discussions/mentions";
 import { prisma } from "@/lib/db";
 import { getForumThreadDetail } from "@/lib/forums/forum-service";
-import { isUserSubscribedToThread } from "@/lib/forums/thread-subscriptions";
+import { touchForumThreadSubscriptionViewed } from "@/lib/forums/thread-subscriptions";
 
 export const dynamic = "force-dynamic";
 
@@ -107,9 +107,28 @@ export default async function ThreadPage({ params }: Props) {
         ])
       : null;
 
-  const threadSaved = viewerId
-    ? await isUserSubscribedToThread({ prisma, userId: viewerId, threadId: thread.id })
-    : false;
+  const subscriptionRow =
+    viewerId
+      ? await prisma.forumThreadSubscription.findUnique({
+          where: {
+            userId_threadId: { userId: viewerId, threadId: thread.id },
+          },
+          select: { createdAt: true, lastViewedAt: true },
+        })
+      : null;
+  const threadSaved = Boolean(subscriptionRow);
+  const lastActivityMs = new Date(thread.lastActivityAt).getTime();
+  const savedThreadHasNew =
+    subscriptionRow != null &&
+    lastActivityMs > (subscriptionRow.lastViewedAt ?? subscriptionRow.createdAt).getTime();
+
+  if (subscriptionRow && viewerId) {
+    await touchForumThreadSubscriptionViewed({
+      prisma,
+      userId: viewerId,
+      threadId: thread.id,
+    });
+  }
 
   const viewerFollowsAuthor =
     viewerId && viewerId !== thread.author.id
@@ -211,7 +230,11 @@ export default async function ThreadPage({ params }: Props) {
           <div className="shrink-0 text-right">
             {viewerId ? (
               <div className="mb-2 flex justify-end">
-                <DiscussionThreadSaveButton threadId={thread.id} initialSaved={threadSaved} />
+                <DiscussionThreadSaveButton
+                  threadId={thread.id}
+                  initialSaved={threadSaved}
+                  showNewActivityDot={savedThreadHasNew}
+                />
               </div>
             ) : null}
             <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">Reactions</p>

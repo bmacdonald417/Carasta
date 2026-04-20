@@ -28,6 +28,7 @@ export async function listSavedThreadsForUser(input: {
     lowerGearSlug: string;
     lastActivityAt: Date;
     subscribedAt: Date;
+    hasNewActivity: boolean;
   }>
 > {
   const take = Math.min(Math.max(input.take ?? 20, 1), 50);
@@ -37,6 +38,7 @@ export async function listSavedThreadsForUser(input: {
     take,
     select: {
       createdAt: true,
+      lastViewedAt: true,
       thread: {
         select: {
           id: true,
@@ -52,14 +54,31 @@ export async function listSavedThreadsForUser(input: {
   });
   return rows
     .filter((r) => !r.thread.isHidden)
-    .map((r) => ({
-      id: r.thread.id,
-      title: r.thread.title,
-      gearSlug: r.thread.category.space.slug,
-      lowerGearSlug: r.thread.category.slug,
-      lastActivityAt: r.thread.lastActivityAt,
-      subscribedAt: r.createdAt,
-    }));
+    .map((r) => {
+      const baseline = r.lastViewedAt ?? r.createdAt;
+      const hasNewActivity = r.thread.lastActivityAt.getTime() > baseline.getTime();
+      return {
+        id: r.thread.id,
+        title: r.thread.title,
+        gearSlug: r.thread.category.space.slug,
+        lowerGearSlug: r.thread.category.slug,
+        lastActivityAt: r.thread.lastActivityAt,
+        subscribedAt: r.createdAt,
+        hasNewActivity,
+      };
+    });
+}
+
+/** Marks a saved thread as “seen” for lightweight new-activity badges (Phase J). */
+export async function touchForumThreadSubscriptionViewed(input: {
+  prisma: PrismaClient;
+  userId: string;
+  threadId: string;
+}): Promise<void> {
+  await input.prisma.forumThreadSubscription.updateMany({
+    where: { userId: input.userId, threadId: input.threadId },
+    data: { lastViewedAt: new Date() },
+  });
 }
 
 export function savedThreadHref(row: { gearSlug: string; lowerGearSlug: string; id: string }): string {

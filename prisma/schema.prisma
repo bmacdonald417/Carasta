@@ -252,6 +252,8 @@ model ForumThreadSubscription {
   userId    String
   threadId  String
   createdAt DateTime @default(now())
+  /// Last time the subscriber opened the thread (Phase J); used for lightweight “new activity” on saves.
+  lastViewedAt DateTime?
 
   user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)

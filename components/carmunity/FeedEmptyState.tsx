@@ -20,7 +20,7 @@ export function FeedEmptyState({
       </p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
         {isFollowing
-          ? "Follow collectors you care about — their posts land here. Meanwhile, catch momentum in Trending."
+          ? "Follow people you care about — their posts and discussion threads show up here together. Catch broader momentum in Trending, or open Discussions."
           : "Share a build update, a garage moment, or a find. Quiet feeds are a chance to set the tone."}
       </p>
       <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
@@ -34,8 +34,8 @@ export function FeedEmptyState({
           </Button>
         )}
         <Button variant="outline" asChild className="sm:min-w-[180px]">
-          <Link href={isFollowing ? "/explore?tab=trending" : "/forums"}>
-            {isFollowing ? "Browse Trending" : "Open Forums"}
+          <Link href={isFollowing ? "/explore?tab=trending" : "/discussions"}>
+            {isFollowing ? "Browse Trending" : "Open Discussions"}
           </Link>
         </Button>
       </div>

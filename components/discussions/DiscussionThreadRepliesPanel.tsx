@@ -9,6 +9,7 @@ import { DiscussionReactionPicker } from "@/components/discussions/DiscussionRea
 import { DiscussionReportDialog } from "@/components/discussions/DiscussionReportDialog";
 import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
 import { DiscussionThreadReplyComposer } from "@/components/discussions/DiscussionThreadReplyComposer";
+import { discussionReplyAnchorId } from "@/lib/discussions/discussion-paths";
 import type { DiscussionReactionTotals } from "@/lib/forums/forum-service";
 import { Button } from "@/components/ui/button";
 
@@ -66,6 +67,15 @@ export function DiscussionThreadRepliesPanel({
     setNextCursor(initialNextCursor);
   }, [initialReplies, initialNextCursor]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash.replace(/^#/, "");
+    if (!hash.startsWith("discussion-reply-")) return;
+    const el = document.getElementById(hash);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, []);
+
   const parentPreview = useMemo(() => {
     if (!parentReplyId) return null;
     return replies.find((r) => r.id === parentReplyId) ?? null;
@@ -106,7 +116,8 @@ export function DiscussionThreadRepliesPanel({
           replies.map((r) => (
             <li
               key={r.id}
-              className="rounded-2xl border border-border/50 bg-card/45 px-4 py-3 shadow-sm"
+              id={discussionReplyAnchorId(r.id)}
+              className="rounded-2xl border border-border/50 bg-card/45 px-4 py-3 shadow-sm scroll-mt-24"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <p className="text-xs text-muted-foreground">
