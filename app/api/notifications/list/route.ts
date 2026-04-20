@@ -1,22 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import { z } from "zod";
 
+import { getJwtSubjectUserId } from "@/lib/auth/api-user";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 /** @deprecated Prefer GET /api/notifications — kept for older clients. */
 export async function GET(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  if (!token?.sub) return NextResponse.json({ items: [], nextCursor: null });
+  const userId = await getJwtSubjectUserId(req);
+  if (!userId) return NextResponse.json({ items: [], nextCursor: null });
 
   const { searchParams } = new URL(req.url);
   const take = z.coerce.number().min(1).max(50).safeParse(searchParams.get("take") ?? "10");
   const limit = take.success ? take.data : 10;
 
   const notifications = await prisma.notification.findMany({
-    where: { userId: token.sub },
+    where: { userId },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: limit,
     select: { id: true, type: true, payloadJson: true, readAt: true, createdAt: true },

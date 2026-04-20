@@ -3,6 +3,7 @@ import '../../../core/network/api_exception.dart';
 import '../dto/forum_space_dto.dart';
 import '../dto/forum_thread_detail_dto.dart';
 import '../dto/forum_thread_summary_dto.dart';
+import '../dto/saved_thread_subscription_dto.dart';
 
 /// Carmunity forums — Carasta JSON APIs only (`FORUMS_API_CONTRACT.md`).
 class ForumRepository {
@@ -114,6 +115,56 @@ class ForumRepository {
       throw ApiException(message: 'Invalid create thread response', statusCode: res.statusCode);
     }
     return id;
+  }
+
+  static const _meSaved = '$_base/me/saved-threads';
+
+  Future<
+      ({
+        List<SavedThreadSubscriptionDto> rows,
+        String? nextCursorCreatedAt,
+        String? nextCursorId,
+      })> fetchSavedThreadSubscriptions({
+    int take = 25,
+    String? cursorCreatedAt,
+    String? cursorId,
+  }) async {
+    final res = await _client.get<Map<String, dynamic>>(
+      _meSaved,
+      queryParameters: <String, dynamic>{
+        'take': take,
+        if (cursorCreatedAt != null) 'cursorCreatedAt': cursorCreatedAt,
+        if (cursorId != null) 'cursorId': cursorId,
+      },
+    );
+    final data = res.data;
+    if (data == null) {
+      throw ApiException(message: 'Empty response', statusCode: res.statusCode);
+    }
+    if (data['ok'] != true) {
+      final msg = data['message'];
+      throw ApiException(
+        message: msg is String ? msg : 'Request failed',
+        statusCode: res.statusCode,
+      );
+    }
+    final raw = data['subscriptions'];
+    if (raw is! List) {
+      throw ApiException(message: 'Invalid saved threads payload', statusCode: res.statusCode);
+    }
+    final rows = raw
+        .whereType<Map>()
+        .map((e) => SavedThreadSubscriptionDto.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+    final nc = data['nextCursor'];
+    if (nc is Map) {
+      final ca = nc['createdAt'];
+      final id = nc['id'];
+      if (ca is String && id is String) {
+        return (rows: rows, nextCursorCreatedAt: ca, nextCursorId: id);
+      }
+    }
+    return (rows: rows, nextCursorCreatedAt: null, nextCursorId: null);
   }
 
   Future<({String replyId, int replyCount})> createReply({

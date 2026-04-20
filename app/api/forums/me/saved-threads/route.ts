@@ -7,13 +7,13 @@ import { prisma } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/notifications?take=&cursorCreatedAt=&cursorId=
- * Returns `{ items, nextCursor }` for Carmunity + legacy in-app notifications.
+ * GET /api/forums/me/saved-threads?take=&cursorCreatedAt=&cursorId=
+ * Saved discussion threads for the signed-in user (ForumThreadSubscription).
  */
 export async function GET(req: NextRequest) {
   const userId = await getJwtSubjectUserId(req);
   if (!userId) {
-    return NextResponse.json({ items: [], nextCursor: null });
+    return NextResponse.json({ message: "Sign in required." }, { status: 401 });
   }
 
   const { searchParams } = new URL(req.url);
@@ -28,9 +28,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Invalid cursor." }, { status: 400 });
   }
 
-  const notifications = await prisma.notification.findMany({
+  const rows = await prisma.forumThreadSubscription.findMany({
     where: {
       userId,
+      thread: { isHidden: false },
       ...(hasCursor && cursorCreatedAt
         ? {
             OR: [
@@ -42,29 +43,49 @@ export async function GET(req: NextRequest) {
     },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: limit + 1,
-    select: { id: true, type: true, payloadJson: true, readAt: true, createdAt: true },
+    select: {
+      id: true,
+      createdAt: true,
+      lastViewedAt: true,
+      thread: {
+        select: {
+          id: true,
+          title: true,
+          replyCount: true,
+          lastActivityAt: true,
+          category: {
+            select: {
+              slug: true,
+              space: { select: { slug: true, title: true } },
+            },
+          },
+        },
+      },
+    },
   });
 
-  const hasNext = notifications.length > limit;
-  const slice = hasNext ? notifications.slice(0, limit) : notifications;
+  const hasNext = rows.length > limit;
+  const slice = hasNext ? rows.slice(0, limit) : rows;
   const last = slice[slice.length - 1];
 
-  const items = slice.map((n) => {
-    let payload: Record<string, unknown> = {};
-    try {
-      payload = JSON.parse(n.payloadJson) as Record<string, unknown>;
-    } catch (_) {}
-    return {
-      id: n.id,
-      type: n.type,
-      payload,
-      readAt: n.readAt?.toISOString() ?? null,
-      createdAt: n.createdAt.toISOString(),
-    };
-  });
+  const subscriptions = slice.map((s) => ({
+    subscriptionId: s.id,
+    subscribedAt: s.createdAt.toISOString(),
+    lastViewedAt: s.lastViewedAt?.toISOString() ?? null,
+    thread: {
+      id: s.thread.id,
+      title: s.thread.title,
+      replyCount: s.thread.replyCount,
+      lastActivityAt: s.thread.lastActivityAt.toISOString(),
+      spaceSlug: s.thread.category.space.slug,
+      spaceTitle: s.thread.category.space.title,
+      categorySlug: s.thread.category.slug,
+    },
+  }));
 
   return NextResponse.json({
-    items,
+    ok: true,
+    subscriptions,
     nextCursor:
       hasNext && last
         ? { createdAt: last.createdAt.toISOString(), id: last.id }

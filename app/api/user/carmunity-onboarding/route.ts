@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getSession } from "@/lib/auth";
+import { getJwtSubjectUserId } from "@/lib/auth/api-user";
 import { logCarmunityEvent } from "@/lib/carmunity/carmunity-analytics";
 import {
   completeCarmunityOnboarding,
@@ -28,9 +28,8 @@ const patchSchema = z.object({
   resetOnboarding: z.boolean().optional(),
 });
 
-export async function GET() {
-  const session = await getSession();
-  const userId = (session?.user as { id?: string } | undefined)?.id;
+export async function GET(req: NextRequest) {
+  const userId = await getJwtSubjectUserId(req);
   if (!userId) {
     return NextResponse.json({ message: "Sign in required." }, { status: 401 });
   }
@@ -41,9 +40,8 @@ export async function GET() {
   });
 }
 
-export async function PATCH(req: Request) {
-  const session = await getSession();
-  const userId = (session?.user as { id?: string } | undefined)?.id;
+export async function PATCH(req: NextRequest) {
+  const userId = await getJwtSubjectUserId(req);
   if (!userId) {
     return NextResponse.json({ message: "Sign in required." }, { status: 401 });
   }

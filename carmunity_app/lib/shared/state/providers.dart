@@ -10,7 +10,9 @@ import '../../features/auctions/dto/auction_filter_state.dart';
 import '../../features/auctions/dto/auction_watch_summary_dto.dart';
 import '../../features/forums/data/forum_repository.dart';
 import '../../features/forums/dto/forum_space_dto.dart';
+import '../../features/forums/dto/saved_thread_subscription_dto.dart';
 import '../../features/home/data/carmunity_repository.dart';
+import '../../features/notifications/data/notifications_repository.dart';
 import '../../shared/dto/carmunity_me_dto.dart';
 import '../../shared/dto/demo_account_dto.dart';
 import '../../shared/dto/post_summary.dart';
@@ -60,6 +62,26 @@ final auctionWatchlistProvider = FutureProvider.autoDispose<List<AuctionWatchSum
 
 final forumRepositoryProvider = Provider<ForumRepository>((ref) {
   return ForumRepository(client: ref.watch(apiClientProvider));
+});
+
+final notificationsRepositoryProvider = Provider<NotificationsRepository>((ref) {
+  return NotificationsRepository(client: ref.watch(apiClientProvider));
+});
+
+/// Unread count — same source as web `/api/notifications/unread-count`.
+final notificationUnreadCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  final auth = ref.watch(authServiceProvider);
+  if (!auth.canPerformMutations) return 0;
+  return ref.read(notificationsRepositoryProvider).fetchUnreadCount();
+});
+
+/// First page of saved discussion threads (`GET /api/forums/me/saved-threads`).
+final savedThreadSubscriptionsProvider =
+    FutureProvider.autoDispose<List<SavedThreadSubscriptionDto>>((ref) async {
+  final auth = ref.watch(authServiceProvider);
+  if (!auth.canPerformMutations) return [];
+  final page = await ref.read(forumRepositoryProvider).fetchSavedThreadSubscriptions(take: 25);
+  return page.rows;
 });
 
 /// Active forum spaces (Mechanics Corner, Gear Interests, …).
@@ -118,6 +140,6 @@ final homeFeedProvider = FutureProvider.autoDispose<List<PostSummary>>((ref) asy
       if (uid == null) return [];
       return repo.fetchFollowing(userId: uid);
     case HomeFeedKind.latest:
-      return [];
+      return repo.fetchLatest(userIdForLiked: auth.userId);
   }
 });

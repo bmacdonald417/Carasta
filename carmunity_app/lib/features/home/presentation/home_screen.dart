@@ -37,10 +37,24 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         actions: [
-          IconButton(
-            tooltip: 'Carmunity alerts (same inbox as carasta.com)',
-            onPressed: () => context.push(AppRoutes.notifications),
-            icon: const Icon(Icons.notifications_none_rounded),
+          Consumer(
+            builder: (context, ref, _) {
+              final auth = ref.watch(authServiceProvider);
+              final unreadAsync = ref.watch(notificationUnreadCountProvider);
+              final count = unreadAsync.maybeWhen(data: (c) => c, orElse: () => 0);
+              return IconButton(
+                tooltip: 'Notifications — same inbox as carasta.com',
+                onPressed: () {
+                  ref.invalidate(notificationUnreadCountProvider);
+                  context.push(AppRoutes.notifications);
+                },
+                icon: Badge(
+                  isLabelVisible: auth.canPerformMutations && count > 0,
+                  label: Text(count > 99 ? '99+' : '$count'),
+                  child: const Icon(Icons.notifications_none_rounded),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -61,14 +75,6 @@ class HomeScreen extends ConsumerWidget {
               },
             ),
           ),
-          if (kind == HomeFeedKind.latest)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: hPad),
-              child: _InfoBanner(
-                message:
-                    'Chronological “Latest” needs a server sort parameter. This tab stays empty until the platform exposes it.',
-              ),
-            ),
           if (kind == HomeFeedKind.following && auth.userId == null)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: hPad),
@@ -142,29 +148,6 @@ class _FeedBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (kind == HomeFeedKind.latest) {
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.fromLTRB(
-          horizontalPadding,
-          AppSpacing.md,
-          horizontalPadding,
-          AppSpacing.xxl,
-        ),
-        children: [
-          Text(
-            'Latest posts',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Pull to refresh once the backend adds a chronological mode (e.g. tab=latest).',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
-      );
-    }
-
     return feedAsync.when(
       data: (posts) {
         if (kind == HomeFeedKind.following && posts.isEmpty) {

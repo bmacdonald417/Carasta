@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 
+import { getJwtSubjectUserId } from "@/lib/auth/api-user";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -9,8 +9,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const userId = token?.sub;
+  const userId = await getJwtSubjectUserId(req);
   if (!userId) {
     return NextResponse.json({ message: "Sign in required." }, { status: 401 });
   }

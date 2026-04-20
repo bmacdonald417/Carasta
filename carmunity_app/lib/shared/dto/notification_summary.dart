@@ -1,4 +1,4 @@
-/// In-app notification row (align with notifications API when wired).
+/// In-app notification row — mirrors `GET /api/notifications` items.
 class NotificationSummary {
   const NotificationSummary({
     required this.id,
@@ -15,4 +15,17 @@ class NotificationSummary {
   final Map<String, dynamic> payload;
 
   bool get isUnread => readAt == null;
+
+  factory NotificationSummary.fromJson(Map<String, dynamic> json) {
+    final createdRaw = json['createdAt'];
+    final readRaw = json['readAt'];
+    final payloadRaw = json['payload'];
+    return NotificationSummary(
+      id: json['id'] as String,
+      type: json['type'] as String,
+      createdAt: DateTime.parse(createdRaw as String),
+      readAt: readRaw == null ? null : DateTime.parse(readRaw as String),
+      payload: payloadRaw is Map ? Map<String, dynamic>.from(payloadRaw as Map) : const {},
+    );
+  }
 }

@@ -33,6 +33,57 @@ class CarmunityRepository {
     return _fetchPosts(query);
   }
 
+  /// Latest feed — chronological `createdAt` desc (same as web `tab=latest`).
+  Future<List<PostSummary>> fetchLatest({String? userIdForLiked}) async {
+    final query = <String, dynamic>{
+      'tab': 'latest',
+      if (userIdForLiked != null) 'userId': userIdForLiked,
+    };
+    return _fetchPosts(query);
+  }
+
+  /// GET /api/user/carmunity-onboarding
+  Future<({bool completed, Map<String, dynamic>? prefs})> fetchCarmunityOnboarding() async {
+    final res = await _client.raw.get<Map<String, dynamic>>(
+      '/api/user/carmunity-onboarding',
+      options: Options(validateStatus: (s) => s == 200 || s == 401),
+    );
+    if (res.statusCode == 401) {
+      throw ApiException(message: 'Sign in required', statusCode: 401);
+    }
+    final data = res.data;
+    if (data == null) {
+      throw ApiException(message: 'Empty response', statusCode: res.statusCode);
+    }
+    final prefsRaw = data['prefs'];
+    final prefs = prefsRaw is Map ? Map<String, dynamic>.from(prefsRaw as Map) : null;
+    return (completed: data['completed'] == true, prefs: prefs);
+  }
+
+  /// PATCH /api/user/carmunity-onboarding — same contract as web settings.
+  Future<({bool completed, Map<String, dynamic>? prefs})> patchCarmunityOnboarding(
+    Map<String, dynamic> body,
+  ) async {
+    final res = await _client.patch<Map<String, dynamic>>(
+      '/api/user/carmunity-onboarding',
+      data: body,
+    );
+    final data = res.data;
+    if (data == null) {
+      throw ApiException(message: 'Empty response', statusCode: res.statusCode);
+    }
+    if (data['ok'] != true) {
+      final err = data['message'] ?? data['error'];
+      throw ApiException(
+        message: err is String ? err : 'Update failed',
+        statusCode: res.statusCode,
+      );
+    }
+    final prefsRaw = data['prefs'];
+    final prefs = prefsRaw is Map ? Map<String, dynamic>.from(prefsRaw as Map) : null;
+    return (completed: data['completed'] == true, prefs: prefs);
+  }
+
   /// GET /api/carmunity/posts/[id]
   Future<PostDetailDto> fetchPostDetail(String postId) async {
     final res = await _client.get<Map<String, dynamic>>('/api/carmunity/posts/$postId');

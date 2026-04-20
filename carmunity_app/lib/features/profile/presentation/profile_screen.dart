@@ -157,13 +157,13 @@ class _GuestBody extends StatelessWidget {
   }
 }
 
-class _SignedInBody extends StatelessWidget {
+class _SignedInBody extends ConsumerWidget {
   const _SignedInBody({required this.me});
 
   final CarmunityMeDto me;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final h = pageHorizontalPadding(context);
     final displayName = me.name?.trim().isNotEmpty == true ? me.name!.trim() : me.handle;
 
@@ -254,6 +254,49 @@ class _SignedInBody extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: AppSpacing.xl),
+        _SectionLabel(
+          context,
+          'Saved discussions',
+          'Same saved threads as Carasta web — pulled from your account.',
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        ref.watch(savedThreadSubscriptionsProvider).when(
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                child: LinearProgressIndicator(minHeight: 2),
+              ),
+              error: (e, _) => Text(
+                'Could not load saved threads.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              ),
+              data: (rows) {
+                if (rows.isEmpty) {
+                  return Text(
+                    'No saved threads yet. Save a thread from Discussions to see it here.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                  );
+                }
+                return Column(
+                  children: [
+                    for (final r in rows)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          r.threadTitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          '${r.spaceTitle} · ${r.replyCount} replies',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textTertiary),
+                        ),
+                        onTap: () => context.push(AppRoutes.forumThread(r.threadId)),
+                      ),
+                  ],
+                );
+              },
+            ),
         const SizedBox(height: AppSpacing.xl),
         _SectionLabel(
           context,

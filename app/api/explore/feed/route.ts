@@ -6,6 +6,35 @@ export async function GET(req: Request) {
   const tab = searchParams.get("tab") ?? "trending";
   const userId = searchParams.get("userId");
 
+  if (tab === "latest") {
+    const posts = await prisma.post.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 50,
+      include: {
+        author: {
+          select: { id: true, handle: true, name: true, avatarUrl: true },
+        },
+        _count: { select: { likes: true, comments: true } },
+      },
+    });
+    const likedPostIds = userId
+      ? new Set(
+          (
+            await prisma.like.findMany({
+              where: { userId, postId: { in: posts.map((p) => p.id) } },
+              select: { postId: true },
+            })
+          ).map((l) => l.postId)
+        )
+      : new Set<string>();
+    const withLiked = posts.map((p) => ({
+      ...p,
+      liked: likedPostIds.has(p.id),
+      _count: p._count,
+    }));
+    return NextResponse.json({ posts: withLiked });
+  }
+
   if (tab === "following" && userId) {
     const following = await prisma.follow.findMany({
       where: { followerId: userId },
