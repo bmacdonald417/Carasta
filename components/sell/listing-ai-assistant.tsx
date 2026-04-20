@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import type { ListingAiWizardScope } from "@/lib/validations/listing-ai";
 
 export type ListingAiIntakeSnapshot = {
   year: number;
@@ -17,21 +18,48 @@ export type ListingAiIntakeSnapshot = {
   title: string;
   description: string;
   conditionSummary: string;
+  /** When set (condition scope), sent as model context */
+  conditionGrade?: string;
 };
+
+export type ListingAiApplyPatch = Partial<{
+  title: string;
+  description: string;
+  conditionSummary: string;
+}>;
+
+type ImperfectionRow = { location: string; description: string; severity: string };
+
+function serializeImperfections(items: ImperfectionRow[]): string {
+  const rows = items
+    .filter((i) => i.description.trim())
+    .map(
+      (i) =>
+        `- [${i.severity}] ${i.location.trim() || "Area"}: ${i.description.trim()}`
+    );
+  return rows.length ? rows.join("\n") : "";
+}
 
 type Props = {
   enabled: boolean;
   /** When refining server-backed draft/live listing. */
   auctionId?: string | null;
+  /** full = step 1 listing draft; condition / imperfections = step 4 scoped helpers */
+  scope?: ListingAiWizardScope;
+  /** For scope "imperfections" — rows from the wizard; serialized into model context */
+  imperfectionsForAi?: ImperfectionRow[];
   intake: ListingAiIntakeSnapshot;
-  onApply: (patch: {
-    title: string;
-    description: string;
-    conditionSummary: string;
-  }) => void;
+  onApply: (patch: ListingAiApplyPatch) => void;
 };
 
-export function ListingAiAssistant({ enabled, auctionId, intake, onApply }: Props) {
+export function ListingAiAssistant({
+  enabled,
+  auctionId,
+  scope = "full",
+  imperfectionsForAi,
+  intake,
+  onApply,
+}: Props) {
   const [highlights, setHighlights] = useState("");
   const [tone, setTone] = useState("");
   const [audience, setAudience] = useState("");
@@ -43,11 +71,22 @@ export function ListingAiAssistant({ enabled, auctionId, intake, onApply }: Prop
     conditionSummary?: string;
   } | null>(null);
 
+  const imperfectionBlock = useMemo(
+    () => serializeImperfections(imperfectionsForAi ?? []),
+    [imperfectionsForAi]
+  );
+
   const buildBody = useCallback(() => {
     const mileage =
       intake.mileage === "" ? undefined : Number(intake.mileage);
+    const mergedHighlights =
+      scope === "imperfections"
+        ? [imperfectionBlock, highlights.trim()].filter(Boolean).join("\n\n")
+        : highlights.trim() || undefined;
+
     return {
       ...(auctionId ? { auctionId } : {}),
+      wizardScope: scope,
       year: intake.year,
       make: intake.make.trim() || "TBD",
       model: intake.model.trim() || "TBD",
@@ -57,14 +96,27 @@ export function ListingAiAssistant({ enabled, auctionId, intake, onApply }: Prop
       title: intake.title.trim() || undefined,
       description: intake.description.trim() || undefined,
       conditionSummary: intake.conditionSummary.trim() || undefined,
-      highlights: highlights.trim() || undefined,
+      conditionGrade: intake.conditionGrade?.trim() || undefined,
+      highlights: mergedHighlights,
       tone: tone.trim() || undefined,
-      audience: audience.trim() || undefined,
+      audience: scope === "imperfections" ? undefined : audience.trim() || undefined,
     };
-  }, [auctionId, audience, highlights, intake, tone]);
+  }, [
+    auctionId,
+    audience,
+    highlights,
+    imperfectionBlock,
+    intake,
+    scope,
+    tone,
+  ]);
 
   const generate = useCallback(async () => {
     setError(null);
+    if (scope === "imperfections" && !imperfectionBlock.trim() && !highlights.trim()) {
+      setError("Add at least one imperfection or notes in the box below before generating.");
+      return;
+    }
     setBusy(true);
     try {
       const res = await fetch("/api/listings/ai/generate", {
@@ -85,7 +137,54 @@ export function ListingAiAssistant({ enabled, auctionId, intake, onApply }: Prop
     } finally {
       setBusy(false);
     }
-  }, [buildBody]);
+  }, [buildBody, highlights, imperfectionBlock, scope]);
+
+  const heading =
+    scope === "condition"
+      ? "AI condition summary"
+      : scope === "imperfections"
+        ? "AI disclosures in description"
+        : "AI listing assistant";
+
+  const hint =
+    scope === "condition"
+      ? "Improves your condition summary from vehicle context and grade. Title and description stay as-is when already filled."
+      : scope === "imperfections"
+        ? "Rewrites the listing description to honestly incorporate your imperfection rows. Title and condition summary are preserved when already set."
+        : "Draft title, description, and condition summary from your basics. Review before applying — nothing publishes until you submit the listing.";
+
+  const generateLabel =
+    scope === "condition"
+      ? "Generate condition copy"
+      : scope === "imperfections"
+        ? "Refresh description"
+        : "Generate draft";
+
+  const applyLabel =
+    scope === "condition"
+      ? "Apply condition summary"
+      : scope === "imperfections"
+        ? "Apply description"
+        : "Apply to form";
+
+  const handleApply = useCallback(() => {
+    if (!preview) return;
+    if (scope === "condition") {
+      onApply({
+        conditionSummary: preview.conditionSummary ?? intake.conditionSummary,
+      });
+      return;
+    }
+    if (scope === "imperfections") {
+      onApply({ description: preview.description });
+      return;
+    }
+    onApply({
+      title: preview.title,
+      description: preview.description,
+      conditionSummary: preview.conditionSummary ?? "",
+    });
+  }, [intake.conditionSummary, onApply, preview, scope]);
 
   if (!enabled) return null;
 
@@ -95,14 +194,9 @@ export function ListingAiAssistant({ enabled, auctionId, intake, onApply }: Prop
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-[#ff3b5c]">
             <Sparkles className="h-5 w-5 shrink-0" />
-            <h3 className="font-display text-base font-semibold text-neutral-100">
-              AI listing assistant
-            </h3>
+            <h3 className="font-display text-base font-semibold text-neutral-100">{heading}</h3>
           </div>
-          <p className="mt-1 text-xs text-neutral-500">
-            Draft title, description, and condition summary from your basics. Review before
-            applying — nothing publishes until you submit the listing.
-          </p>
+          <p className="mt-1 text-xs text-neutral-500">{hint}</p>
         </div>
         <Button
           type="button"
@@ -117,43 +211,74 @@ export function ListingAiAssistant({ enabled, auctionId, intake, onApply }: Prop
               Generating…
             </>
           ) : (
-            "Generate draft"
+            generateLabel
           )}
         </Button>
       </div>
 
       <div className="mt-4 grid gap-3 border-t border-white/10 pt-4 md:grid-cols-2">
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="listing-ai-highlights">Highlights / bullets (optional)</Label>
-          <Textarea
-            id="listing-ai-highlights"
-            rows={3}
-            className="resize-y bg-black/30"
-            value={highlights}
-            onChange={(e) => setHighlights(e.target.value)}
-            placeholder="Mods, recent service, paint film, track days, ownership…"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="listing-ai-tone">Tone (optional)</Label>
-          <Input
-            id="listing-ai-tone"
-            className="bg-black/30"
-            value={tone}
-            onChange={(e) => setTone(e.target.value)}
-            placeholder="e.g. technical, warm, concise"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="listing-ai-audience">Audience (optional)</Label>
-          <Input
-            id="listing-ai-audience"
-            className="bg-black/30"
-            value={audience}
-            onChange={(e) => setAudience(e.target.value)}
-            placeholder="e.g. track-day buyers, collectors"
-          />
-        </div>
+        {scope !== "imperfections" ? (
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="listing-ai-highlights">Highlights / bullets (optional)</Label>
+            <Textarea
+              id="listing-ai-highlights"
+              rows={3}
+              className="resize-y bg-black/30"
+              value={highlights}
+              onChange={(e) => setHighlights(e.target.value)}
+              placeholder="Mods, recent service, paint film, track days, ownership…"
+            />
+          </div>
+        ) : (
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="listing-ai-imperfection-notes">
+              Extra notes for disclosures (optional)
+            </Label>
+            <Textarea
+              id="listing-ai-imperfection-notes"
+              rows={2}
+              className="resize-y bg-black/30"
+              value={highlights}
+              onChange={(e) => setHighlights(e.target.value)}
+              placeholder="Anything not captured in the rows above (e.g. prior paint work)…"
+            />
+          </div>
+        )}
+        {scope === "full" ? (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="listing-ai-tone">Tone (optional)</Label>
+              <Input
+                id="listing-ai-tone"
+                className="bg-black/30"
+                value={tone}
+                onChange={(e) => setTone(e.target.value)}
+                placeholder="e.g. technical, warm, concise"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="listing-ai-audience">Audience (optional)</Label>
+              <Input
+                id="listing-ai-audience"
+                className="bg-black/30"
+                value={audience}
+                onChange={(e) => setAudience(e.target.value)}
+                placeholder="e.g. track-day buyers, collectors"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="listing-ai-tone-scoped">Tone (optional)</Label>
+            <Input
+              id="listing-ai-tone-scoped"
+              className="bg-black/30"
+              value={tone}
+              onChange={(e) => setTone(e.target.value)}
+              placeholder="e.g. transparent, matter-of-fact"
+            />
+          </div>
+        )}
       </div>
 
       {error ? (
@@ -167,34 +292,47 @@ export function ListingAiAssistant({ enabled, auctionId, intake, onApply }: Prop
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
             Preview
           </p>
-          <div>
-            <p className="text-xs text-neutral-500">Title</p>
-            <p className="mt-0.5 font-medium text-neutral-100">{preview.title}</p>
-          </div>
-          <div>
-            <p className="text-xs text-neutral-500">Description</p>
-            <p className="mt-0.5 whitespace-pre-wrap text-neutral-300">{preview.description}</p>
-          </div>
-          {preview.conditionSummary ? (
+          {scope === "full" ? (
+            <>
+              <div>
+                <p className="text-xs text-neutral-500">Title</p>
+                <p className="mt-0.5 font-medium text-neutral-100">{preview.title}</p>
+              </div>
+              <div>
+                <p className="text-xs text-neutral-500">Description</p>
+                <p className="mt-0.5 whitespace-pre-wrap text-neutral-300">{preview.description}</p>
+              </div>
+              {preview.conditionSummary ? (
+                <div>
+                  <p className="text-xs text-neutral-500">Condition summary</p>
+                  <p className="mt-0.5 text-neutral-300">{preview.conditionSummary}</p>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+          {scope === "condition" ? (
             <div>
-              <p className="text-xs text-neutral-500">Condition summary</p>
-              <p className="mt-0.5 text-neutral-300">{preview.conditionSummary}</p>
+              <p className="text-xs text-neutral-500">Condition summary (will apply)</p>
+              <p className="mt-0.5 whitespace-pre-wrap text-neutral-300">
+                {preview.conditionSummary?.trim() || "—"}
+              </p>
+              <p className="mt-2 text-xs text-neutral-600">
+                Title and description are not changed when you apply from this step.
+              </p>
+            </div>
+          ) : null}
+          {scope === "imperfections" ? (
+            <div>
+              <p className="text-xs text-neutral-500">Description (will apply)</p>
+              <p className="mt-0.5 whitespace-pre-wrap text-neutral-300">{preview.description}</p>
+              <p className="mt-2 text-xs text-neutral-600">
+                Title and condition summary are not changed when you apply from this block.
+              </p>
             </div>
           ) : null}
           <div className="flex flex-wrap gap-2 pt-1">
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              onClick={() =>
-                onApply({
-                  title: preview.title,
-                  description: preview.description,
-                  conditionSummary: preview.conditionSummary ?? "",
-                })
-              }
-            >
-              Apply to form
+            <Button type="button" size="sm" variant="secondary" onClick={handleApply}>
+              {applyLabel}
             </Button>
             <Button type="button" size="sm" variant="outline" onClick={() => setPreview(null)}>
               Discard preview

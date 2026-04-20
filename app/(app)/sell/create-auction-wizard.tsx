@@ -341,6 +341,7 @@ export function CreateAuctionWizard({
             </div>
             <ListingAiAssistant
               enabled={listingAiEnabled}
+              scope="full"
               intake={{
                 year: form.year,
                 make: form.make,
@@ -354,9 +355,11 @@ export function CreateAuctionWizard({
               }}
               onApply={(patch) =>
                 update({
-                  title: patch.title,
-                  description: patch.description,
-                  conditionSummary: patch.conditionSummary,
+                  ...(patch.title !== undefined ? { title: patch.title } : {}),
+                  ...(patch.description !== undefined ? { description: patch.description } : {}),
+                  ...(patch.conditionSummary !== undefined
+                    ? { conditionSummary: patch.conditionSummary }
+                    : {}),
                 })
               }
             />
@@ -480,6 +483,29 @@ export function CreateAuctionWizard({
                 className="mt-1"
               />
             </div>
+            <ListingAiAssistant
+              enabled={listingAiEnabled}
+              scope="condition"
+              intake={{
+                year: form.year,
+                make: form.make,
+                model: form.model,
+                trim: form.trim,
+                mileage: form.mileage,
+                vin: form.vin,
+                title: form.title,
+                description: form.description,
+                conditionSummary: form.conditionSummary,
+                conditionGrade: form.conditionGrade || undefined,
+              }}
+              onApply={(patch) =>
+                update({
+                  ...(patch.conditionSummary !== undefined
+                    ? { conditionSummary: patch.conditionSummary }
+                    : {}),
+                })
+              }
+            />
             <div>
               <div className="flex items-center justify-between">
                 <Label>Imperfections</Label>
@@ -548,6 +574,27 @@ export function CreateAuctionWizard({
                 ))}
               </div>
             </div>
+            <ListingAiAssistant
+              enabled={listingAiEnabled}
+              scope="imperfections"
+              imperfectionsForAi={form.imperfections}
+              intake={{
+                year: form.year,
+                make: form.make,
+                model: form.model,
+                trim: form.trim,
+                mileage: form.mileage,
+                vin: form.vin,
+                title: form.title,
+                description: form.description,
+                conditionSummary: form.conditionSummary,
+              }}
+              onApply={(patch) =>
+                update({
+                  ...(patch.description !== undefined ? { description: patch.description } : {}),
+                })
+              }
+            />
             <div>
               <div className="flex items-center justify-between">
                 <Label>Damage images</Label>

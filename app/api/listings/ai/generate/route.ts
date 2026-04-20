@@ -68,6 +68,7 @@ export async function POST(req: Request) {
         mileage: true,
         vin: true,
         conditionSummary: true,
+        conditionGrade: true,
       },
     });
     if (!owned) {
@@ -84,6 +85,9 @@ export async function POST(req: Request) {
     if (!intake.description?.trim() && owned.description) intake.description = owned.description;
     if (!intake.conditionSummary?.trim() && owned.conditionSummary) {
       intake.conditionSummary = owned.conditionSummary;
+    }
+    if (!intake.conditionGrade && owned.conditionGrade) {
+      intake.conditionGrade = owned.conditionGrade;
     }
   }
 
