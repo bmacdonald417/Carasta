@@ -307,6 +307,8 @@ model User {
   listingMarketingPlansCreated ListingMarketingPlan[] @relation("ListingMarketingPlanCreator")
   /// P3: auditable AI copilot generations for this user.
   marketingCopilotRuns MarketingCopilotRun[]
+  /// Seller listing copy AI (sell wizard / optional draft scope).
+  listingAiRuns ListingAiRun[]
 
   /// Phase Q: messaging participation and sent messages.
   conversationParticipants ConversationParticipant[]
@@ -768,6 +770,8 @@ model Auction {
   listingMarketingPlan ListingMarketingPlan?
   /// P3: AI copilot runs tied to this listing.
   marketingCopilotRuns MarketingCopilotRun[]
+  /// Listing copy AI runs optionally tied to this auction (draft or live).
+  listingAiRuns ListingAiRun[]
   /// Phase R: listing-scoped conversations (DMs tied to this auction).
   conversations Conversation[]
   /// Carasta Coin — reward events tied to this listing.
@@ -1038,6 +1042,24 @@ model MarketingCopilotRun {
 
   auction   Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
   createdBy User    @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([createdById, createdAt])
+  @@index([auctionId, createdAt])
+}
+
+/// Auditable OpenAI-backed listing copy generations (sell flow / draft refine).
+model ListingAiRun {
+  id          String   @id @default(cuid())
+  createdById String
+  /// When refining an existing saved draft or listing; null for wizard-only runs.
+  auctionId   String?
+  intakeJson  Json
+  outputJson  Json
+  model       String
+  createdAt   DateTime @default(now())
+
+  createdBy User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  auction   Auction? @relation(fields: [auctionId], references: [id], onDelete: SetNull)
 
   @@index([createdById, createdAt])
   @@index([auctionId, createdAt])

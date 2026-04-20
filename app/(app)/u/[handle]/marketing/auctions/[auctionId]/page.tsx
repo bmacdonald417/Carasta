@@ -45,6 +45,7 @@ import { Button } from "@/components/ui/button";
 import { MarketingCampaignStatus, MarketingTrafficEventType } from "@prisma/client";
 import { serializeWorkspacePlan } from "@/lib/marketing/listing-marketing-workspace-serialize";
 import { SellerMarketingWorkspace } from "@/components/marketing/seller-marketing-workspace";
+import { HashScrollIntoView } from "@/components/marketing/hash-scroll-into-view";
 
 function ProportionBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -239,6 +240,7 @@ export default async function MarketingAuctionDetailPage({
 
   return (
     <div className="carasta-container max-w-6xl py-8">
+      <HashScrollIntoView elementId="marketing-ai-copilot" hash="#marketing-ai-copilot" />
       <div className="mb-8 flex flex-wrap items-start justify-between gap-6">
         <div className="min-w-0 flex-1">
           <Link

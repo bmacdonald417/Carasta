@@ -113,6 +113,16 @@ export default async function MarketingPage({
             </Link>
             . Instant marketing alerts also appear in the header notifications bell (same queue as below).
           </p>
+          <div className="mt-4 max-w-2xl rounded-xl border border-[#ff3b5c]/20 bg-[#ff3b5c]/[0.06] px-4 py-3 text-sm text-neutral-300">
+            <p className="font-medium text-neutral-100">AI marketing copilot</p>
+            <p className="mt-1 text-xs text-neutral-400">
+              Use <span className="text-neutral-200">AI copilot</span> on a listing card below to jump
+              straight to the copilot block, or open{" "}
+              <span className="text-neutral-200">Open marketing</span> for the full page. Generation
+              needs <code className="rounded bg-black/40 px-1 text-neutral-200">OPENAI_API_KEY</code>{" "}
+              on the server (see <span className="text-neutral-200">.env.example</span>).
+            </p>
+          </div>
         </div>
         <Link
           href={`/u/${user.handle}`}
@@ -284,6 +294,13 @@ export default async function MarketingPage({
                           Open marketing
                         </Link>
                       </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link
+                          href={`/u/${user.handle}/marketing/auctions/${c.auctionId}#marketing-ai-copilot`}
+                        >
+                          AI copilot
+                        </Link>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -402,6 +419,13 @@ export default async function MarketingPage({
                     <Button variant="secondary" size="sm" asChild>
                       <Link href={`/u/${user.handle}/marketing/auctions/${a.id}`}>
                         Open marketing
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link
+                        href={`/u/${user.handle}/marketing/auctions/${a.id}#marketing-ai-copilot`}
+                      >
+                        AI copilot
                       </Link>
                     </Button>
                   </div>

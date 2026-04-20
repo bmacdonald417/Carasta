@@ -17,6 +17,7 @@ import { createAuction, saveAuctionDraft } from "./actions";
 import { useToast } from "@/components/ui/use-toast";
 import type { ConditionGrade } from "@prisma/client";
 import { Plus, Trash2 } from "lucide-react";
+import { ListingAiAssistant } from "@/components/sell/listing-ai-assistant";
 
 const DEFAULT_DAYS = 7;
 const BUY_NOW_HOURS = 24;
@@ -47,7 +48,13 @@ function genId() {
   return Math.random().toString(36).slice(2);
 }
 
-export function CreateAuctionWizard({ className }: { className?: string }) {
+export function CreateAuctionWizard({
+  className,
+  listingAiEnabled = false,
+}: {
+  className?: string;
+  listingAiEnabled?: boolean;
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
@@ -332,6 +339,27 @@ export function CreateAuctionWizard({ className }: { className?: string }) {
                 className="mt-1"
               />
             </div>
+            <ListingAiAssistant
+              enabled={listingAiEnabled}
+              intake={{
+                year: form.year,
+                make: form.make,
+                model: form.model,
+                trim: form.trim,
+                mileage: form.mileage,
+                vin: form.vin,
+                title: form.title,
+                description: form.description,
+                conditionSummary: form.conditionSummary,
+              }}
+              onApply={(patch) =>
+                update({
+                  title: patch.title,
+                  description: patch.description,
+                  conditionSummary: patch.conditionSummary,
+                })
+              }
+            />
             <div className="flex gap-2 pt-2">
               <Button variant="outline" onClick={saveDraft} disabled={loading} className="flex-1">
                 Save draft
