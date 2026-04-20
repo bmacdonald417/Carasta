@@ -58,7 +58,9 @@ When discussing deploys, migrations, or env vars, default assumptions must be:
 "build:core": "prisma generate && npx ts-node -P tsconfig.scripts.json scripts/revert-enum-if-needed.ts && prisma db push && prisma db seed && next build"
 ```
 
-The **`build-with-public-db`** wrapper sets `DATABASE_URL` to **`DATABASE_PUBLIC_URL`** for the build subprocess when the latter is set. Railway’s **Nixpacks build network** often cannot reach **`postgres-*.railway.internal`**, so the **web service** should set **`DATABASE_PUBLIC_URL`** to the Postgres plugin’s **public / proxy** connection string while keeping **`DATABASE_URL`** as the **private** URL for **runtime**.
+The **`build-with-public-db`** wrapper assigns **`DATABASE_URL` from `DATABASE_PUBLIC_URL`** in the **same Node process** before `execSync("npm run build:core")`, so every Prisma step sees the public proxy host. Railway’s **Nixpacks build phase** cannot use **private networking** (`postgres-*.railway.internal` per [Railway private networking](https://docs.railway.com/guides/private-networking)).
+
+**Critical:** `DATABASE_PUBLIC_URL` must exist on the **web** service that runs the build—not only on the Postgres service. Add it via **Variables → New Variable → Reference** from Postgres (`DATABASE_PUBLIC_URL`), or paste the public connection string. If the build log still shows `railway.internal`, the public URL was not present in that service’s **build** environment (re-check the variable is on Carasta, not only the database card).
 
 So a **default `npm run build`** on Railway **already** runs **`prisma db push`** and **`prisma db seed`** (after `prisma generate` and the enum helper script). This is **not** `prisma migrate deploy`; the project relies on **`db push`** for deploy-time schema sync.
 
