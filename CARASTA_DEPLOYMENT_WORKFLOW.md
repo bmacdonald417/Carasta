@@ -66,6 +66,21 @@ The **`build-with-public-db`** wrapper assigns **`DATABASE_URL` from `DATABASE_P
 
 So a **default `npm run build`** on Railway **already** runs **`prisma db push`** and **`prisma db seed`** (after `prisma generate` and the enum helper script). This is **not** `prisma migrate deploy`; the project relies on **`db push`** for deploy-time schema sync.
 
+### Build failure: `FATAL: sorry, too many clients already` (Postgres)
+
+`next build` prerenders many routes in parallel. Each worker can open a Prisma pool against Postgres; on small Railway plans the **public proxy** can hit **`max_connections`** quickly.
+
+**In-repo mitigations (ship with the repo; no Railway UI change required):**
+
+- `scripts/build-with-public-db.cjs` appends Prisma URL params **`connection_limit`** (default `3`) and **`pool_timeout`** to `DATABASE_URL` for the build subprocess when they are absent. Override with Railway variable **`DATABASE_BUILD_CONNECTION_LIMIT`** (digits only) if you need a lower cap.
+- `next.config.js` sets **`experimental.staticGenerationMinPagesPerWorker`** high so static generation uses **fewer workers**, reducing concurrent pools.
+
+**Optional Railway-only tweaks (no code):**
+
+- Point **`DATABASE_PUBLIC_URL`** at a **pooled** connection string if your Postgres plugin exposes one (preferred when available).
+- Or append your own limits to the URL in Variables, e.g. `…?connection_limit=2&pool_timeout=60` (matches Prisma’s URL semantics).
+- Upgrade Postgres / increase **`max_connections`** if traffic and parallel builds justify it.
+
 ### Recommendations
 
 1. **Carasta Railway service** must use a build that includes the steps above (typically **`npm run build`** / **`railway run npm run build`** equivalent). If the Carasta service overrides the build command and **omits** `db push` / seed, the new tables will be missing and forum/watchlist features will fail at runtime.

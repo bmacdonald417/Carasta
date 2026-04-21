@@ -13,6 +13,32 @@
  */
 const { execSync } = require("child_process");
 
+/**
+ * Small Postgres plans + public proxy: `next build` static generation can open many
+ * concurrent Prisma pools (one per worker process). Append Prisma URL params so each
+ * pool stays tiny unless the operator already set them on Railway.
+ *
+ * Override cap: DATABASE_BUILD_CONNECTION_LIMIT (digits only).
+ */
+function withBuildPostgresConnectionGuards(urlString) {
+  if (!urlString) return urlString;
+  try {
+    const u = new URL(urlString);
+    const proto = u.protocol.toLowerCase();
+    if (proto !== "postgres:" && proto !== "postgresql:") return urlString;
+    const cap = String(process.env.DATABASE_BUILD_CONNECTION_LIMIT || "3").trim();
+    if (!u.searchParams.has("connection_limit") && /^\d+$/.test(cap)) {
+      u.searchParams.set("connection_limit", cap);
+    }
+    if (!u.searchParams.has("pool_timeout")) {
+      u.searchParams.set("pool_timeout", "60");
+    }
+    return u.toString();
+  } catch {
+    return urlString;
+  }
+}
+
 function maskDbUrl(url) {
   try {
     const u = new URL(url);
@@ -46,6 +72,14 @@ if (publicUrl) {
   console.log(
     "[build-with-public-db] DATABASE_PUBLIC_URL unset; using DATABASE_URL for build:",
     maskDbUrl(process.env.DATABASE_URL || "")
+  );
+}
+
+const guarded = withBuildPostgresConnectionGuards(process.env.DATABASE_URL);
+if (guarded && guarded !== process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = guarded;
+  console.log(
+    "[build-with-public-db] Applied Prisma connection guards to DATABASE_URL for build (connection_limit / pool_timeout)."
   );
 }
 
