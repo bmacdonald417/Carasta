@@ -1,16 +1,15 @@
 /**
- * Railway / Nixpacks build runs on a network that cannot reach
- * `postgres-*.railway.internal` (private networking is not available during build).
- * Prisma CLI during `npm run build` must use the TCP proxy URL.
+ * Railway / Nixpacks build often cannot reach `postgres-*.railway.internal`.
+ * Prisma CLI during `npm run build` needs a TCP-reachable URL.
  *
- * On the **web** service (the service that runs `npm run build`), set:
- *   DATABASE_PUBLIC_URL = Postgres plugin “public” / proxy connection string
- * and keep:
- *   DATABASE_URL = private URL for **runtime** (Next + Prisma at `npm start`).
+ * Simplified setup: set **only** `DATABASE_PUBLIC_URL` (public proxy) on the web
+ * service. This script assigns `process.env.DATABASE_URL` from it for the build
+ * subprocess so `prisma generate` / `db push` / `seed` / `next build` all see it.
  *
- * Railway must expose DATABASE_PUBLIC_URL to the **build** environment for that
- * service (same Variables list as DATABASE_URL). If it exists only on the Postgres
- * service, add a **reference** or paste the public URL on the web service.
+ * Split setup (optional): private `DATABASE_URL` for runtime + public
+ * `DATABASE_PUBLIC_URL` for build. If `DATABASE_PUBLIC_URL` is set, it wins for
+ * this build process. At `next start`, `lib/db-env.ts` mirrors public →
+ * `DATABASE_URL` when `DATABASE_URL` is unset.
  */
 const { execSync } = require("child_process");
 

@@ -32,9 +32,9 @@ A premium collector car auction and community web app (Next.js 14 App Router, Ty
 
    Database:
 
-   - **Local / Cursor:** Prefer `DATABASE_PUBLIC_URL` (Railway’s public TCP proxy URL). With `DATABASE_URL` left unset, `npm run dev` and `npm run db:*` use `scripts/run-with-local-db.cjs` to pass a `DATABASE_URL` to Prisma for that command only.
-   - **Alternatively:** Set `DATABASE_URL` in `.env` to the same public URL if you want a single key locally (still gitignored).
-   - **Railway runtime:** The web service still needs **`DATABASE_URL`** set to the **private** Postgres URL for `next start` / Prisma; keep private URLs off local machines and out of CI.
+   - **Local / Cursor:** Prefer **`DATABASE_PUBLIC_URL`** (Railway’s public TCP proxy). Leave **`DATABASE_URL`** unset; `npm run dev` / `npm run db:*` use `scripts/run-with-local-db.cjs`, and the app uses `lib/db-env.ts` so Prisma still receives a `DATABASE_URL` in-process.
+   - **Alternatively:** Set **`DATABASE_URL`** in `.env` to the same public URL if you want one line locally (gitignored).
+   - **Railway:** You can set **only** `DATABASE_PUBLIC_URL` on the web service; runtime picks it up via `lib/db-env.ts`. A separate private `DATABASE_URL` is optional if you prefer private networking on Railway later.
 
    Also set:
 
@@ -65,9 +65,9 @@ A premium collector car auction and community web app (Next.js 14 App Router, Ty
 
 ## Deploy (Railway)
 
-- **Build:** `pnpm build` (or `npm run build`) — uses `scripts/build-with-public-db.cjs` when `DATABASE_URL` uses `*.railway.internal` (see `.env.example` database section).
+- **Build:** `pnpm build` (or `npm run build`) — `scripts/build-with-public-db.cjs` ensures Prisma sees a reachable URL (uses `DATABASE_PUBLIC_URL` when set, or `DATABASE_URL` if it is already public).
 - **Start:** `pnpm start` (or `npm start`)
-- On the **web** service: set private `DATABASE_URL`, `DATABASE_PUBLIC_URL` (for build), `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, and other keys from your `.env` template. Do not commit real values.
+- On the **web** service: at minimum **`DATABASE_PUBLIC_URL`**, **`NEXTAUTH_URL`**, **`NEXTAUTH_SECRET`**, plus the other keys you keep in `.env`. Do not commit real values.
 
 ## Scripts
 

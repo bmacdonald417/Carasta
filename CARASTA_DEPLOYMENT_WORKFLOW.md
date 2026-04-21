@@ -62,7 +62,7 @@ The **`build-with-public-db`** wrapper assigns **`DATABASE_URL` from `DATABASE_P
 
 **Critical:** `DATABASE_PUBLIC_URL` must exist on the **web** service that runs the build—not only on the Postgres service. Add it via **Variables → New Variable → Reference** from Postgres (`DATABASE_PUBLIC_URL`), or paste the public connection string. If the build log still shows `railway.internal`, the public URL was not present in that service’s **build** environment (re-check the variable is on Carasta, not only the database card).
 
-**Do not remove `DATABASE_URL` from the Railway web service:** Prisma’s datasource is `env("DATABASE_URL")`, so the running Next.js process must still receive the **private** URL at **runtime** (`npm start`). The security goal is to keep that private value **off** laptops, Cursor global env, CI logs, and git — not to delete the variable from Railway.
+**Simplified Railway setup:** you may set **only** `DATABASE_PUBLIC_URL` on the Carasta web service (no separate private `DATABASE_URL`). The build wrapper and `lib/db-env.ts` (loaded via `@/lib/db`) mirror that value into `DATABASE_URL` for Prisma. If you still use a private `DATABASE_URL` for runtime, keep it **only** on Railway—never in git or Cursor.
 
 So a **default `npm run build`** on Railway **already** runs **`prisma db push`** and **`prisma db seed`** (after `prisma generate` and the enum helper script). This is **not** `prisma migrate deploy`; the project relies on **`db push`** for deploy-time schema sync.
 
@@ -70,7 +70,7 @@ So a **default `npm run build`** on Railway **already** runs **`prisma db push`*
 
 1. **Carasta Railway service** must use a build that includes the steps above (typically **`npm run build`** / **`railway run npm run build`** equivalent). If the Carasta service overrides the build command and **omits** `db push` / seed, the new tables will be missing and forum/watchlist features will fail at runtime.
 2. **`prisma migrate dev`** / **`npm run db:migrate`** are oriented toward **local** migration workflow; **this merge did not add new migration SQL** for the forum/watchlist work—**do not assume `migrate deploy` is the primary path** unless you introduce migrations and change the deploy pipeline.
-3. **Seed:** Running seed after deploy is **required** for **forum space/category bootstrap** (Mechanics Corner / Gear Interests). The build already runs seed; if you run seed manually, use the **Carasta** `DATABASE_URL` only.
+3. **Seed:** Running seed after deploy is **required** for **forum space/category bootstrap** (Mechanics Corner / Gear Interests). The build already runs seed; if you run seed manually, use the same DB URL you use for the app (`DATABASE_PUBLIC_URL`-only setups are fine via `npm run db:seed`).
 4. **Production data:** `seed.ts` still **skips demo auction/user seeding** when the DB already has auctions; the new forum bootstrap runs **before** that check—safe for a DB that already has production auctions **as long as** tables exist (i.e. `db push` has run).
 
 ---
