@@ -17,12 +17,14 @@ type AssistantReply = {
   answer: string;
   confidence: "high" | "medium" | "low";
   shouldEscalate: boolean;
+  fallbackReason?: string;
   suggestedQuestions: string[];
   citations: Array<{
     sourceId: string;
     title: string;
     href: string;
     heading?: string;
+    category?: string;
   }>;
 };
 
@@ -179,6 +181,12 @@ export function CarastaAssistantLauncher() {
                     </span>
                   ) : null}
                 </div>
+                {reply.confidence !== "high" ? (
+                  <p className="mt-3 text-xs text-neutral-500">
+                    This answer is intentionally cautious and may be routing you
+                    to the most relevant source rather than claiming certainty.
+                  </p>
+                ) : null}
                 <div className="mt-4 whitespace-pre-wrap text-sm leading-7 text-neutral-700">
                   {reply.answer}
                 </div>
@@ -199,6 +207,11 @@ export function CarastaAssistantLauncher() {
                         <span className="font-semibold text-neutral-950">
                           {citation.title}
                         </span>
+                        {citation.category ? (
+                          <span className="ml-2 text-neutral-400">
+                            [{citation.category}]
+                          </span>
+                        ) : null}
                         {citation.heading ? (
                           <span className="ml-2 text-neutral-500">
                             · {citation.heading}
@@ -233,6 +246,27 @@ export function CarastaAssistantLauncher() {
                       </Button>
                     ))}
                   </div>
+                </div>
+              ) : null}
+
+              {reply.shouldEscalate ? (
+                <div className="rounded-[1.5rem] border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+                  <p className="font-semibold">Need more help?</p>
+                  <p className="mt-2 leading-6">
+                    If this question needs support beyond general product
+                    guidance, the safest next step is usually{" "}
+                    <a href="/contact" className="font-semibold underline">
+                      Contact
+                    </a>
+                    ,{" "}
+                    <a
+                      href="/resources/trust-and-safety"
+                      className="font-semibold underline"
+                    >
+                      Trust &amp; Safety
+                    </a>
+                    , or the relevant Resources page above.
+                  </p>
                 </div>
               ) : null}
             </div>

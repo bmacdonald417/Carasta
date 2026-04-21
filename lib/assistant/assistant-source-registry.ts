@@ -11,6 +11,9 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     filePath: path.join(docsRoot, "platform-overview.md"),
     href: "/resources/what-is-carasta",
     summary: "What Carasta is, what it is for, and how Carmunity, marketplace, and seller tools fit together.",
+    category: "platform",
+    tags: ["carasta", "platform", "what is carasta", "overview", "product"],
+    aliases: ["site", "website", "product", "app"],
   },
   {
     id: "community-and-conversation",
@@ -18,6 +21,9 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     filePath: path.join(docsRoot, "community-and-conversation.md"),
     href: "/resources/what-is-carmunity",
     summary: "What Carmunity, Discussions, and Messages mean and how they fit into the platform.",
+    category: "community",
+    tags: ["carmunity", "discussions", "messages", "conversation", "community"],
+    aliases: ["forum", "forums", "dm", "dms", "direct message", "chat"],
   },
   {
     id: "identity-and-garage",
@@ -25,6 +31,9 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     filePath: path.join(docsRoot, "identity-and-garage.md"),
     href: "/resources/profiles-and-garage",
     summary: "How profiles and Garage fit into identity, trust, and participation.",
+    category: "identity",
+    tags: ["profile", "profiles", "garage", "identity", "dream garage"],
+    aliases: ["account profile", "my profile", "cars"],
   },
   {
     id: "auctions-buying-and-selling",
@@ -32,6 +41,9 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     filePath: path.join(docsRoot, "auctions-buying-and-selling.md"),
     href: "/resources/auction-basics",
     summary: "Auction basics plus general buyer and seller workflow framing.",
+    category: "auctions",
+    tags: ["auction", "auctions", "buying", "selling", "bid", "reserve"],
+    aliases: ["bidding", "buyer", "seller", "sell", "buy"],
   },
   {
     id: "trust-safety-and-help",
@@ -39,6 +51,9 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     filePath: path.join(docsRoot, "trust-safety-and-help.md"),
     href: "/resources/trust-and-safety",
     summary: "Trust boundaries, public help paths, and what the platform is and is not claiming.",
+    category: "trust",
+    tags: ["trust", "safety", "help", "support", "privacy", "terms", "guidelines"],
+    aliases: ["legal", "policy", "contact", "moderation", "safe"],
   },
   {
     id: "seller-workspace-and-ai",
@@ -46,6 +61,9 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     filePath: path.join(docsRoot, "seller-workspace-and-ai.md"),
     href: "/u/[handle]/marketing",
     summary: "What the seller growth workspace and seller AI systems are for at a general level.",
+    category: "seller",
+    tags: ["seller", "workspace", "marketing", "listing ai", "copilot", "seller tools"],
+    aliases: ["dashboard", "campaign", "ai", "marketing workspace"],
   },
   {
     id: "faq-and-glossary",
@@ -53,5 +71,18 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     filePath: path.join(docsRoot, "faq-and-glossary.md"),
     href: "/resources/faq",
     summary: "High-signal FAQ answers and glossary terms for the core product vocabulary.",
+    category: "faq",
+    tags: ["faq", "glossary", "definitions", "terms", "vocabulary"],
+    aliases: ["what does", "mean", "define"],
+  },
+  {
+    id: "help-routing",
+    title: "Help Routing",
+    filePath: path.join(docsRoot, "help-routing.md"),
+    href: "/contact",
+    summary: "How to route users to Resources, Trust and Safety, or Contact based on the type of help they need.",
+    category: "trust",
+    tags: ["help", "contact", "support", "escalation", "where do i go"],
+    aliases: ["where do i go", "who should i contact", "support route"],
   },
 ];

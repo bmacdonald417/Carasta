@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 
+import { normalizeAssistantQuestion, preferredSourceIdsForIntent, classifyAssistantQuestion } from "@/lib/assistant/assistant-query-analysis";
 import { assistantSourceRegistry } from "@/lib/assistant/assistant-source-registry";
 import type { AssistantChunk } from "@/lib/assistant/assistant-types";
 
@@ -18,20 +19,43 @@ function tokenize(text: string) {
 }
 
 function scoreChunk(query: string, chunk: AssistantChunk) {
-  const queryTokens = tokenize(query);
-  const content = normalize([chunk.title, chunk.heading, chunk.content].join(" "));
+  const intent = classifyAssistantQuestion(query);
+  const preferredIds = new Set(preferredSourceIdsForIntent(intent));
+  const queryTokens = tokenize(normalizeAssistantQuestion(query));
+  const source = assistantSourceRegistry.find((item) => item.id === chunk.sourceId);
+  const title = normalize(chunk.title);
+  const heading = normalize(chunk.heading);
+  const summary = normalize(source?.summary ?? "");
+  const tags = normalize([...(source?.tags ?? []), ...(source?.aliases ?? [])].join(" "));
+  const content = normalize([chunk.title, chunk.heading, chunk.content, source?.summary ?? ""].join(" "));
   let score = 0;
+  const matchedTerms: string[] = [];
 
   for (const token of queryTokens) {
-    if (content.includes(token)) score += 2;
+    if (content.includes(token)) {
+      score += 1;
+      matchedTerms.push(token);
+    }
+    if (title.includes(token)) score += 4;
+    if (heading.includes(token)) score += 3;
+    if (summary.includes(token)) score += 3;
+    if (tags.includes(token)) score += 5;
   }
 
-  const phrase = normalize(query);
-  if (phrase && content.includes(phrase)) score += 6;
-  if (normalize(chunk.title).includes(phrase)) score += 4;
-  if (normalize(chunk.heading).includes(phrase)) score += 3;
+  const phrase = normalizeAssistantQuestion(query);
+  if (phrase && content.includes(phrase)) score += 8;
+  if (phrase && title.includes(phrase)) score += 6;
+  if (phrase && heading.includes(phrase)) score += 5;
+  if (phrase && summary.includes(phrase)) score += 5;
+  if (phrase && tags.includes(phrase)) score += 6;
 
-  return score;
+  if (preferredIds.has(chunk.sourceId)) score += 2;
+  if (intent === "definition" && source?.category === "faq") score += 2;
+  if (intent === "trust" && source?.category === "trust") score += 3;
+  if (intent === "seller" && source?.category === "seller") score += 3;
+  if (intent === "workflow" && source?.category === "auctions") score += 2;
+
+  return { score, matchedTerms: Array.from(new Set(matchedTerms)) };
 }
 
 function chunkMarkdown(sourceId: string, title: string, href: string, content: string) {
@@ -61,7 +85,7 @@ function chunkMarkdown(sourceId: string, title: string, href: string, content: s
       currentHeading = line.replace(/^#+\s*/, "").trim() || title;
       continue;
     }
-    if (line.trim() === "") {
+    if (line.trim() === "" && buffer.length >= 4) {
       flush();
       continue;
     }
@@ -91,7 +115,10 @@ export async function loadAssistantChunks(): Promise<AssistantChunk[]> {
 export async function retrieveAssistantChunks(query: string, take = 5) {
   const chunks = await loadAssistantChunks();
   return chunks
-    .map((chunk) => ({ ...chunk, score: scoreChunk(query, chunk) }))
+    .map((chunk) => {
+      const scored = scoreChunk(query, chunk);
+      return { ...chunk, score: scored.score, matchedTerms: scored.matchedTerms };
+    })
     .filter((chunk) => (chunk.score ?? 0) > 0)
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
     .slice(0, take);

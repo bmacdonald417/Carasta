@@ -33,8 +33,11 @@ export async function POST(req: Request) {
       question: parsed.data.question,
       confidence: answer.confidence,
       shouldEscalate: answer.shouldEscalate,
+      fallbackReason: answer.fallbackReason ?? null,
       sourceIds: matchedChunks.map((chunk) => chunk.sourceId),
       chunkIds: matchedChunks.map((chunk) => chunk.chunkId),
+      scores: matchedChunks.map((chunk) => chunk.score ?? 0),
+      matchedTerms: matchedChunks.flatMap((chunk) => chunk.matchedTerms ?? []),
       createdAt: new Date().toISOString(),
     });
 
