@@ -62,6 +62,8 @@ The **`build-with-public-db`** wrapper assigns **`DATABASE_URL` from `DATABASE_P
 
 **Critical:** `DATABASE_PUBLIC_URL` must exist on the **web** service that runs the build—not only on the Postgres service. Add it via **Variables → New Variable → Reference** from Postgres (`DATABASE_PUBLIC_URL`), or paste the public connection string. If the build log still shows `railway.internal`, the public URL was not present in that service’s **build** environment (re-check the variable is on Carasta, not only the database card).
 
+**Do not remove `DATABASE_URL` from the Railway web service:** Prisma’s datasource is `env("DATABASE_URL")`, so the running Next.js process must still receive the **private** URL at **runtime** (`npm start`). The security goal is to keep that private value **off** laptops, Cursor global env, CI logs, and git — not to delete the variable from Railway.
+
 So a **default `npm run build`** on Railway **already** runs **`prisma db push`** and **`prisma db seed`** (after `prisma generate` and the enum helper script). This is **not** `prisma migrate deploy`; the project relies on **`db push`** for deploy-time schema sync.
 
 ### Recommendations
