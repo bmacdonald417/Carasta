@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { markAllNotificationsRead } from "@/app/(app)/notifications/actions";
 import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 
@@ -128,29 +130,34 @@ export function NotificationDropdown() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-neutral-400 hover:text-foreground"
+          className="relative text-muted-foreground hover:text-foreground"
           aria-label="Notifications — Carmunity and listing alerts"
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow-sm shadow-primary/30">
+            <Badge
+              className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center border-0 px-1 py-0 text-[10px] font-bold leading-none shadow-e1"
+              variant="default"
+            >
               {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
+            </Badge>
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-80 border-white/10 bg-[#121218]/95 backdrop-blur-xl"
+        className="w-80 border border-border bg-popover text-popover-foreground shadow-e2 backdrop-blur-xl"
       >
-        <div className="flex items-start justify-between gap-2 border-b border-white/10 px-3 py-2">
+        <div className="flex items-start justify-between gap-2 border-b border-border px-3 py-2">
           <div className="min-w-0 pr-1">
-            <span className="text-sm font-medium">Notifications</span>
-            <p className="text-[11px] leading-snug text-neutral-500">
+            <span className="text-sm font-medium text-foreground">
+              Notifications
+            </span>
+            <p className="text-[11px] leading-snug text-muted-foreground">
               Carmunity + listing alerts for this account (same model as Carmunity mobile).
             </p>
             {reviewMode ? (
-              <p className="mt-1 text-[11px] text-amber-300">
+              <p className="mt-1 rounded-md border border-caution/30 bg-caution-soft/30 px-2 py-1 text-[11px] text-caution-foreground">
                 Review mode: notification actions are preview-only.
               </p>
             ) : null}
@@ -159,7 +166,7 @@ export function NotificationDropdown() {
             <button
               type="button"
               onClick={handleMarkAllRead}
-              className="shrink-0 pt-0.5 text-xs text-primary hover:underline"
+              className="shrink-0 rounded-md pt-0.5 text-xs font-medium text-primary hover:bg-muted/60 hover:underline"
             >
               Mark all read
             </button>
@@ -168,39 +175,52 @@ export function NotificationDropdown() {
         <div className="max-h-[320px] overflow-y-auto">
           {items.length === 0 ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-sm font-medium text-neutral-200">All caught up</p>
-              <p className="mt-2 text-xs leading-relaxed text-neutral-500">
+              <p className="text-sm font-medium text-foreground">All caught up</p>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                 Mentions, follows, saved-thread replies, and seller marketing alerts (when enabled) land
                 here — not a separate “app-only” inbox. Open Discussions or the feed to stir the signal.
               </p>
               <div className="mt-4 flex flex-col gap-2">
-                <Button asChild variant="outline" size="sm" className="border-primary/35 text-primary hover:bg-primary/10">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="border-border text-primary hover:bg-primary/10"
+                >
                   <Link href="/explore">Open Carmunity</Link>
                 </Button>
-                <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                >
                   <Link href="/discussions">Browse discussions</Link>
                 </Button>
               </div>
             </div>
           ) : (
             <>
-              <ul className="divide-y divide-white/5">
+              <ul className="divide-y divide-border">
                 {items.map((n) => (
                   <li
                     key={n.id}
-                    className={`px-3 py-2.5 text-sm ${!n.readAt ? "bg-white/5" : ""}`}
+                    className={cn(
+                      "px-3 py-2.5 text-sm",
+                      !n.readAt && "bg-muted/50"
+                    )}
                   >
                     <NotificationRow item={n} onNavigate={fetchData} />
                   </li>
                 ))}
               </ul>
               {nextCursor ? (
-                <div className="border-t border-white/5 p-2">
+                <div className="border-t border-border p-2">
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="w-full text-xs font-semibold uppercase tracking-wide text-primary hover:bg-white/5"
+                    className="w-full text-xs font-medium text-primary hover:bg-muted/60"
                     disabled={loadingMore}
                     onClick={() => void loadMore()}
                   >
@@ -254,7 +274,7 @@ function NotificationRow({
   }
 
   const content = (
-    <span className="line-clamp-2 text-neutral-300">{title}</span>
+    <span className="line-clamp-2 text-foreground">{title}</span>
   );
 
   if (href) {
@@ -264,10 +284,10 @@ function NotificationRow({
         onClick={() => {
           void markRead();
         }}
-        className="block hover:text-foreground"
+        className="block rounded-md hover:bg-muted/40 hover:text-foreground"
       >
         {content}
-        <span className="mt-0.5 block text-xs text-neutral-500">
+        <span className="mt-0.5 block text-xs text-muted-foreground">
           {formatTime(item.createdAt)}
         </span>
       </Link>
@@ -277,7 +297,7 @@ function NotificationRow({
   return (
     <div>
       {content}
-      <span className="mt-0.5 block text-xs text-neutral-500">
+      <span className="mt-0.5 block text-xs text-muted-foreground">
         {formatTime(item.createdAt)}
       </span>
     </div>

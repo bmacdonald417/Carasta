@@ -5,6 +5,15 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { hoverScale, tapScale } from "@/lib/motion";
+import { cn } from "@/lib/utils";
+import {
+  shellSidebarActive,
+  shellSidebarInactive,
+  shellSidebarRowBase,
+  shellSidebarSubActive,
+  shellSidebarSubInactive,
+  shellSidebarSubRowBase,
+} from "@/lib/shell-nav-styles";
 import {
   Gavel,
   Users,
@@ -36,7 +45,7 @@ export function AppSidebar() {
   );
 
   return (
-    <aside className="hidden w-56 shrink-0 border-r border-border/60 bg-card/40 backdrop-blur-sm lg:block">
+    <aside className="hidden w-56 shrink-0 border-r border-border bg-card/50 backdrop-blur-sm lg:block">
       <nav className="sticky top-20 space-y-1 p-4">
         {mainNav.map(({ href, label, icon: Icon }) => {
           const isActive =
@@ -53,11 +62,12 @@ export function AppSidebar() {
               <div key={href} className="space-y-0.5">
                 <Link href={href}>
                   <motion.div
-                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                    className={cn(
+                      shellSidebarRowBase,
                       isActive && !listingsActive && !marketingActive
-                        ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
-                        : "text-neutral-400 hover:bg-white/5 hover:text-foreground"
-                    }`}
+                        ? shellSidebarActive
+                        : shellSidebarInactive
+                    )}
                     whileHover={hoverScale}
                     whileTap={tapScale}
                   >
@@ -68,11 +78,12 @@ export function AppSidebar() {
                 {listingsHref && (
                   <Link href={listingsHref}>
                     <motion.div
-                      className={`flex items-center gap-2 rounded-lg py-2 pl-9 pr-3 text-xs font-medium transition ${
+                      className={cn(
+                        shellSidebarSubRowBase,
                         listingsActive
-                          ? "bg-primary/90 text-primary-foreground shadow-md shadow-black/30"
-                          : "text-neutral-500 hover:bg-white/5 hover:text-neutral-200"
-                      }`}
+                          ? shellSidebarSubActive
+                          : shellSidebarSubInactive
+                      )}
                       whileHover={hoverScale}
                       whileTap={tapScale}
                     >
@@ -84,11 +95,12 @@ export function AppSidebar() {
                 {marketingHref && (
                   <Link href={marketingHref}>
                     <motion.div
-                      className={`flex items-center gap-2 rounded-lg py-2 pl-9 pr-3 text-xs font-medium transition ${
+                      className={cn(
+                        shellSidebarSubRowBase,
                         marketingActive
-                          ? "bg-primary/90 text-primary-foreground shadow-md shadow-black/30"
-                          : "text-neutral-500 hover:bg-white/5 hover:text-neutral-200"
-                      }`}
+                          ? shellSidebarSubActive
+                          : shellSidebarSubInactive
+                      )}
                       whileHover={hoverScale}
                       whileTap={tapScale}
                     >
@@ -103,11 +115,10 @@ export function AppSidebar() {
           return (
             <Link key={href} href={href}>
               <motion.div
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
-                    : "text-neutral-400 hover:bg-white/5 hover:text-foreground"
-                }`}
+                className={cn(
+                  shellSidebarRowBase,
+                  isActive ? shellSidebarActive : shellSidebarInactive
+                )}
                 whileHover={hoverScale}
                 whileTap={tapScale}
               >
@@ -126,11 +137,12 @@ export function AppSidebar() {
           }
         >
           <motion.div
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+            className={cn(
+              shellSidebarRowBase,
               pathname.includes("/garage")
-                ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
-                : "text-neutral-400 hover:bg-white/5 hover:text-foreground"
-            }`}
+                ? shellSidebarActive
+                : shellSidebarInactive
+            )}
             whileHover={hoverScale}
             whileTap={tapScale}
           >
@@ -140,11 +152,12 @@ export function AppSidebar() {
         </Link>
         <Link href="/merch">
           <motion.div
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+            className={cn(
+              shellSidebarRowBase,
               pathname.startsWith("/merch")
-                ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
-                : "text-neutral-400 hover:bg-white/5 hover:text-foreground"
-            }`}
+                ? shellSidebarActive
+                : shellSidebarInactive
+            )}
             whileHover={hoverScale}
             whileTap={tapScale}
           >

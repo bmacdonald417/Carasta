@@ -16,6 +16,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import {
+  shellHeaderAppActive,
+  shellHeaderAppInactive,
+  shellHeaderAppLinkBase,
+  shellHeaderMarketingActive,
+  shellHeaderMarketingInactive,
+  shellHeaderMarketingLinkBase,
+} from "@/lib/shell-nav-styles";
 
 const marketingNav = [
   { href: "/", label: "Home" },
@@ -73,22 +82,23 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
           <div className="hidden min-w-0 flex-1 items-center justify-between gap-4 lg:flex">
-            <nav className="flex min-w-0 items-center gap-1 text-[13px]">
+            <nav className="flex min-w-0 items-center gap-1">
               {marketingNav.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
-                  className={`rounded-full px-3 py-2 font-medium transition ${
+                  className={cn(
+                    shellHeaderMarketingLinkBase,
                     pathname === href
-                      ? "bg-muted text-foreground"
-                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
-                  }`}
+                      ? shellHeaderMarketingActive
+                      : shellHeaderMarketingInactive
+                  )}
                 >
                   {label}
                 </Link>
               ))}
             </nav>
-            <nav className="flex items-center gap-1 text-[13px]">
+            <nav className="flex items-center gap-1">
               {appNav.map(({ href, label }) => {
                 const appActive = pathname.startsWith(href);
                 return (
@@ -96,11 +106,10 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     key={href}
                     href={href}
                     data-active={appActive ? "true" : "false"}
-                    className={`carmunity-nav-link rounded-full px-3 py-2 font-medium transition ${
-                      appActive
-                        ? "bg-primary/15 text-primary"
-                        : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
-                    }`}
+                    className={cn(
+                      shellHeaderAppLinkBase,
+                      appActive ? shellHeaderAppActive : shellHeaderAppInactive
+                    )}
                   >
                     {label}
                   </Link>
@@ -115,17 +124,20 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               <>
                 <Link
                   href="/messages"
-                  className={`hidden rounded-full px-3 py-2 text-[13px] font-medium transition xl:inline-flex ${
+                  data-active={pathname.startsWith("/messages") ? "true" : "false"}
+                  className={cn(
+                    "hidden xl:inline-flex",
+                    shellHeaderAppLinkBase,
                     pathname.startsWith("/messages")
-                      ? "bg-primary/15 text-primary"
-                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
-                  }`}
+                      ? shellHeaderAppActive
+                      : shellHeaderAppInactive
+                  )}
                 >
                   Messages
                 </Link>
                 <NotificationDropdown />
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-background focus:ring-2 focus:ring-ring">
+                  <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring">
                     <Avatar className="h-8 w-8 border border-border">
                       <AvatarImage src={session.user?.image ?? undefined} />
                       <AvatarFallback className="bg-muted text-xs text-muted-foreground">
@@ -135,7 +147,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="min-w-[180px] border-border bg-popover/95 text-popover-foreground backdrop-blur-xl"
+                    className="min-w-[180px] border border-border bg-popover text-popover-foreground shadow-e2 backdrop-blur-xl"
                   >
                     <DropdownMenuItem asChild>
                       <Link

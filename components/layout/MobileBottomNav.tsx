@@ -9,6 +9,12 @@ import {
   MessageSquare,
   PlusCircle,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  shellMobileActive,
+  shellMobileInactive,
+  shellMobileItemBase,
+} from "@/lib/shell-nav-styles";
 
 const navItems = [
   { href: "/", label: "Home", icon: LayoutGrid },
@@ -41,11 +47,10 @@ export function MobileBottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 px-1 py-1.5 text-[10px] font-medium transition sm:text-xs ${
-                isActive
-                  ? "text-primary"
-                  : "text-neutral-500 hover:text-neutral-300"
-              }`}
+              className={cn(
+                shellMobileItemBase,
+                isActive ? shellMobileActive : shellMobileInactive
+              )}
             >
               <Icon className="h-5 w-5 shrink-0" />
               <span className="truncate">{label}</span>
