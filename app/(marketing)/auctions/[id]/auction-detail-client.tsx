@@ -234,10 +234,10 @@ export function AuctionDetailClient({
   }
 
   return (
-    <div className="space-y-6 rounded-2xl border border-border/50 bg-card/80 p-6">
+    <div className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-e1">
       <div>
         <p className="text-sm text-muted-foreground">High bid</p>
-        <p className="font-display text-3xl font-bold text-[hsl(var(--performance-red))]">
+        <p className="text-3xl font-semibold tabular-nums tracking-tight text-foreground">
           {formatCurrency(live.highBidCents)}
         </p>
         {live.highBidderHandle && (
@@ -251,7 +251,7 @@ export function AuctionDetailClient({
         <p className="text-sm text-muted-foreground">Time remaining</p>
         <CountdownTimer
           endAt={live.endAt}
-          className="font-display text-xl font-semibold"
+          className="text-xl font-semibold"
         />
       </div>
 
@@ -266,16 +266,16 @@ export function AuctionDetailClient({
           </p>
         </div>
       ) : (
-        <p className="rounded-xl bg-muted/50 px-3 py-2 text-sm font-medium text-[hsl(var(--reserve-emerald))]">
-          No Reserve
+        <p className="rounded-xl border border-success/25 bg-success-soft px-3 py-2 text-sm font-medium text-success-foreground">
+          No reserve
         </p>
       )}
 
       {!isEnded && (
         <>
           {!isLoggedIn ? (
-            <div className="space-y-4 rounded-xl border border-border/50 bg-muted/30 p-4">
-              <Button asChild variant="performance" size="lg" className="w-full">
+            <div className="space-y-4 rounded-xl border border-border bg-muted/40 p-4">
+              <Button asChild variant="default" size="lg" className="w-full">
                 <Link
                   href={signUpHref}
                   onClick={() => trackBidClickIntent(auctionId, "signup_cta")}
@@ -295,7 +295,7 @@ export function AuctionDetailClient({
               </details>
               <Link
                 href="/how-it-works"
-                className="block text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                className="block text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Learn how bidding works
               </Link>
@@ -304,7 +304,7 @@ export function AuctionDetailClient({
           <>
           <div className="flex flex-col gap-2">
             <Button
-              variant="performance"
+              variant="default"
               size="lg"
               className="w-full"
               disabled={loading}

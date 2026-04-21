@@ -48,7 +48,11 @@ export function MessageSellerButton(props: {
         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MessageSquare className="mr-2 h-4 w-4" />}
         Message Seller
       </Button>
-      {error ? <p className="mt-2 text-xs text-red-300">{error}</p> : null}
+      {error ? (
+        <p className="mt-2 text-xs text-destructive" role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

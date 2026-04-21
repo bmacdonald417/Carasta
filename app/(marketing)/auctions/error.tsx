@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function AuctionsError({
   error,
@@ -15,21 +16,21 @@ export default function AuctionsError({
 
   return (
     <div className="carasta-container max-w-6xl py-16 text-center">
-      <h1 className="font-display text-2xl font-bold text-foreground">
-        Something went wrong
-      </h1>
+      <h1 className="text-2xl font-semibold text-foreground">Something went wrong</h1>
       <p className="mt-2 text-muted-foreground">
         {error.message || "Failed to load auctions."}
       </p>
-      <p className="mt-1 text-xs text-neutral-500">
+      <p className="mt-1 text-xs text-muted-foreground">
         Digest: {error.digest ?? "—"}
       </p>
-      <button
-        onClick={reset}
-        className="mt-6 rounded-lg bg-[#ff3b5c]/20 px-4 py-2 text-sm font-medium text-[#ff3b5c] hover:bg-[#ff3b5c]/30"
+      <Button
+        type="button"
+        variant="outline"
+        className="mt-6"
+        onClick={() => reset()}
       >
         Try again
-      </button>
+      </Button>
     </div>
   );
 }

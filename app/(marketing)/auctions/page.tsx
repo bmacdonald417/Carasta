@@ -16,7 +16,7 @@ const AuctionsMapView = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[500px] items-center justify-center rounded-2xl border border-border/50 bg-muted/30">
+      <div className="flex h-[500px] items-center justify-center rounded-2xl border border-border bg-muted/40 text-sm text-muted-foreground shadow-e1">
         Loading map…
       </div>
     ),
@@ -213,12 +213,14 @@ export default async function AuctionsPage({
 
   return (
     <div className="carasta-container max-w-6xl py-8">
-      <h1 className="font-display text-3xl font-bold tracking-tight">
-        {status === "LIVE" ? "Live" : status === "ENDED" ? "Ended" : "Sold"} Auctions
-      </h1>
-      <p className="mt-1 text-muted-foreground">
-        Bid on collector cars. Reserve meter, auto-bid, buy now.
-      </p>
+      <header className="border-b border-border pb-6">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          {status === "LIVE" ? "Live" : status === "ENDED" ? "Ended" : "Sold"} auctions
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Browse verified listings. Reserve progress, auto-bid, and buy-now when available.
+        </p>
+      </header>
 
       <AuctionFilters
         makes={makes}
@@ -271,19 +273,22 @@ export default async function AuctionsPage({
           />
           {auctions.filter((a) => a.latitude != null && a.longitude != null).length === 0 &&
             auctions.length > 0 && (
-              <p className="mt-4 text-center text-sm text-muted-foreground">
-                No auctions have location data. Add a zip when listing to see them on the map.
+              <p className="mt-4 rounded-xl border border-border bg-muted/30 px-4 py-3 text-center text-sm text-muted-foreground">
+                No listings in this result set include map coordinates. Sellers can add location when listing to appear here.
               </p>
             )}
         </div>
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {auctions.length === 0 ? (
-            <div className="col-span-full py-12 text-center">
-              <p className="text-muted-foreground">No auctions match your filters.</p>
+            <div className="col-span-full rounded-2xl border border-dashed border-border bg-card/60 px-6 py-14 text-center shadow-e1">
+              <p className="text-sm font-medium text-foreground">No listings match these filters</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Try widening year or price, clearing location, or switching status.
+              </p>
               <a
                 href="/auctions"
-                className="mt-3 inline-block text-sm font-medium text-[#ff3b5c] hover:underline"
+                className="mt-5 inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Clear filters
               </a>
@@ -344,7 +349,7 @@ export default async function AuctionsPage({
                 view,
                 page: page - 1,
               })}`}
-              className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
+              className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground shadow-e1 transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Previous
             </a>
@@ -353,7 +358,7 @@ export default async function AuctionsPage({
               Previous
             </span>
           )}
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm tabular-nums text-muted-foreground">
             Page {page} of {totalPages} ({pagination.total} listings
             {pagination.highBidSortTruncated ? "; highest-bid sort uses a capped sample" : ""})
           </span>
@@ -381,7 +386,7 @@ export default async function AuctionsPage({
                 view,
                 page: page + 1,
               })}`}
-              className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
+              className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground shadow-e1 transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Next
             </a>

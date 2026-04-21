@@ -114,14 +114,25 @@ export function AuctionFilters({
   if (noReserve) activePills.push({ key: "noReserve", label: "No reserve" });
   if (endingSoon) activePills.push({ key: "endingSoon", label: "Ending in 24h" });
   if (status && status !== "LIVE") activePills.push({ key: "status", label: `Status: ${status}` });
-  if (sort && sort !== "ending") activePills.push({ key: "sort", label: `Sort: ${sort === "newest" ? "Newest" : sort === "highest" ? "Highest bid" : "Ending soon"}` });
+  if (sort && sort !== "ending") {
+    const sortLabels: Record<string, string> = {
+      newest: "Newest",
+      highest: "Highest bid",
+      price_asc: "Price: low → high",
+      price_desc: "Price: high → low",
+    };
+    activePills.push({
+      key: "sort",
+      label: `Sort: ${sortLabels[sort] ?? sort}`,
+    });
+  }
   if (zip) activePills.push({ key: "zip", label: `Near ${zip}` });
   if (radius != null) activePills.push({ key: "radius", label: `Within ${radius} mi` });
   if (view && view !== "grid") activePills.push({ key: "view", label: "Map view" });
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="flex flex-wrap items-end gap-4 rounded-2xl border border-border/50 bg-card/50 p-4">
+      <div className="flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-card p-4 shadow-e1">
         <div className="w-full min-w-[140px] max-w-[200px]">
           <Label className="text-xs">Search</Label>
           <Input
@@ -350,13 +361,13 @@ export function AuctionFilters({
         </div>
         <div className="flex items-center gap-2">
           <Label className="text-xs">View</Label>
-          <div className="flex rounded-lg border border-border/50 p-0.5">
+          <div className="flex rounded-lg border border-border bg-muted/40 p-0.5">
             <button
               type="button"
               onClick={() => update("view", undefined)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                 (view ?? "grid") === "grid"
-                  ? "bg-accent text-foreground"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -365,9 +376,9 @@ export function AuctionFilters({
             <button
               type="button"
               onClick={() => update("view", "map")}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                 view === "map"
-                  ? "bg-accent text-foreground"
+                  ? "bg-card text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -410,7 +421,7 @@ export function AuctionFilters({
               key={key}
               type="button"
               onClick={() => removeFilter(key)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#ff3b5c]/40 bg-[#ff3b5c]/10 px-3 py-1 text-xs font-medium text-[#ff3b5c] transition hover:bg-[#ff3b5c]/20"
+              className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/8 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {label}
               <X className="h-3 w-3" />

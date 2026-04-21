@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { ReserveMeter } from "@/components/auction/ReserveMeter";
 import { CountdownTimer } from "@/components/auction/CountdownTimer";
@@ -55,21 +56,24 @@ export function AuctionCard({
 
   const href = requireAuth ? `/auth/sign-up?callbackUrl=${encodeURIComponent(`/auctions/${auction.id}`)}` : `/auctions/${auction.id}`;
   return (
-    <Link href={href}>
+    <Link
+      href={href}
+      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
       <motion.div
         custom={index}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <Card className="group overflow-hidden border-border/60 bg-card/50 transition-all duration-300 hover:border-signal/30 hover:shadow-lg">
-          <div className="relative aspect-video w-full overflow-hidden bg-neutral-900">
+        <Card className="group h-full overflow-hidden border border-border bg-card shadow-e1 transition-[border-color,box-shadow] duration-200 motion-reduce:transition-none hover:border-primary/30 hover:shadow-e2">
+          <div className="relative aspect-video w-full overflow-hidden bg-muted">
             <Image
               src={img}
               alt={auction.title}
               fill
               unoptimized
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 motion-reduce:transition-none group-hover:scale-[1.02]"
               sizes="(max-width: 768px) 100vw, 33vw"
             />
             {secondaryImg && (
@@ -78,47 +82,58 @@ export function AuctionCard({
                 alt=""
                 fill
                 unoptimized
-                className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                className="object-cover opacity-0 transition-opacity duration-300 motion-reduce:transition-none group-hover:opacity-100"
                 sizes="(max-width: 768px) 100vw, 33vw"
               />
             )}
-            {/* LIVE badge — futuristic pulse */}
             {isLive && (
-              <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-                <div className="live-pulse flex items-center gap-1.5 rounded-full border border-signal/50 bg-signal/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow-lg shadow-signal/30">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+              <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+                <Badge
+                  variant="default"
+                  className="gap-1.5 uppercase tracking-wide shadow-sm"
+                >
+                  <span
+                    className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary-foreground/90 motion-reduce:animate-none animate-pulse"
+                    aria-hidden
+                  />
                   Live
-                </div>
+                </Badge>
                 {isClosingSoon && (
-                  <div className="rounded-full border border-[#CCFF00]/50 bg-[#CCFF00]/20 px-3 py-1 text-xs font-semibold text-[#CCFF00]">
-                    Closing Soon
-                  </div>
+                  <Badge
+                    variant="outline"
+                    className="border-caution/35 bg-caution-soft text-caution-foreground uppercase tracking-wide"
+                  >
+                    Ending soon
+                  </Badge>
                 )}
               </div>
             )}
             {!isLive && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                <span className="rounded-xl border border-white/20 bg-neutral-900/90 px-4 py-2 font-display text-sm font-semibold uppercase text-neutral-300">
+              <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-[2px]">
+                <Badge variant="secondary" className="px-3 py-1.5 text-xs uppercase tracking-wide">
                   {auction.status}
-                </span>
+                </Badge>
               </div>
             )}
             {isLive && auction.conditionGrade && (
-              <div className="absolute right-3 top-3 rounded-full border border-white/20 bg-black/60 px-3 py-1 text-xs font-medium text-neutral-300">
+              <Badge
+                variant="outline"
+                className="absolute right-3 top-3 max-w-[min(100%,12rem)] truncate border-border/80 bg-card/95 font-medium text-muted-foreground shadow-sm backdrop-blur-sm"
+              >
                 {auction.conditionGrade.replace(/_/g, " ")}
-              </div>
+              </Badge>
             )}
           </div>
-          <CardContent className="border-t border-border/40 bg-card/40 p-4 backdrop-blur-sm">
-            <p className="text-xs text-neutral-500">
+          <CardContent className="border-t border-border bg-card p-4">
+            <p className="text-xs text-muted-foreground">
               {auction.year} {auction.make} {auction.model}
             </p>
-            <h2 className="mt-1 font-display text-lg font-semibold tracking-tight line-clamp-1 text-foreground">
+            <h2 className="mt-1 line-clamp-1 text-lg font-semibold tracking-tight text-foreground">
               {auction.title}
             </h2>
-            <p className="mt-2 text-lg font-semibold text-signal">
+            <p className="mt-2 text-lg font-semibold tabular-nums text-foreground">
               {formatCurrency(highBidCents)}
-              <span className="ml-1 text-sm font-normal text-neutral-500">
+              <span className="ml-1 text-sm font-normal text-muted-foreground">
                 high bid
               </span>
             </p>
@@ -130,11 +145,11 @@ export function AuctionCard({
                 />
               </div>
             )}
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
               <CountdownTimer endAt={end} />
               <div className="flex items-center gap-3">
                 <span>{bidCount} bids</span>
-                <span>@{auction.seller?.handle ?? "seller"}</span>
+                <span className="truncate">@{auction.seller?.handle ?? "seller"}</span>
               </div>
             </div>
           </CardContent>
