@@ -50,3 +50,17 @@
 .animate-auction-strip {
   animation: auction-strip-scroll 40s linear infinite;
 }
+
+.seller-workspace-shell {
+  background:
+    radial-gradient(circle at top right, rgba(97, 106, 246, 0.09), transparent 32%),
+    linear-gradient(180deg, hsl(var(--seller-canvas)) 0%, hsl(220 33% 99%) 100%);
+  color: hsl(var(--seller-foreground));
+}
+
+.seller-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+}

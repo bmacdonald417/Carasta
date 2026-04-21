@@ -8,8 +8,10 @@ import {
   ExternalLink,
   Eye,
   Hand,
+  Lightbulb,
   MousePointerClick,
   Radio,
+  Sparkles,
   Timer,
 } from "lucide-react";
 import { prisma } from "@/lib/db";
@@ -53,18 +55,15 @@ import {
   firstSearchParamValue,
   parseSharePresetQueryParam,
 } from "@/lib/marketing/resolve-share-preset-query";
-
-function ProportionBar({ value, max }: { value: number; max: number }) {
-  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
-  return (
-    <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-white/10">
-      <div
-        className="h-full rounded-full bg-[#ff3b5c]/70 transition-[width]"
-        style={{ width: `${pct}%` }}
-      />
-    </div>
-  );
-}
+import {
+  SellerInsightCard,
+  SellerKpiCard,
+  SellerMicroBar,
+  SellerSectionPanel,
+  SellerStatusBadge,
+  SellerTone,
+  SellerWorkspaceShell,
+} from "@/components/marketing/seller-workspace-primitives";
 
 export default async function MarketingAuctionDetailPage({
   params,
@@ -125,14 +124,14 @@ export default async function MarketingAuctionDetailPage({
     1
   );
 
-  const statusBadge =
+  const statusTone: SellerTone =
     auction.status === "LIVE"
-      ? "border border-[#ff3b5c]/50 bg-[#ff3b5c]/90 text-white"
+      ? detail.bidClicksLast24h > 0 || detail.viewsLast24h > 10
+        ? "success"
+        : "caution"
       : auction.status === "SOLD"
-        ? "border border-green-500/50 bg-green-500/20 text-green-400"
-        : auction.status === "DRAFT"
-          ? "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400"
-          : "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400";
+        ? "success"
+        : "neutral";
 
   const origin = getPublicSiteOrigin();
   const linkKit = buildMarketingLinkKit(auction.id, origin);
@@ -254,140 +253,213 @@ export default async function MarketingAuctionDetailPage({
     },
   ];
 
+  const endsInHours = Math.max(
+    0,
+    Math.round((auction.endAt.getTime() - Date.now()) / (1000 * 60 * 60))
+  );
+  const listingHealth =
+    detail.totalViews >= 80 || detail.totalBidClicks >= 4
+      ? "Healthy"
+      : detail.totalViews >= 30 || detail.totalShareClicks >= 3
+        ? "Building"
+        : "Needs attention";
+  const momentumSummary =
+    detail.bidClicksLast24h > 0 || detail.viewsLast24h > 10
+      ? "Momentum is active in the recent window."
+      : "Recent traction is quiet — use the next action layer to tighten promotion.";
+  const nextActionCards = [
+    endsInHours <= 24 && detail.totalBidClicks === 0
+      ? {
+          title: "Run a late-cycle share push",
+          body: `This auction closes in about ${endsInHours || 1} hour(s) and bid intent is still quiet. Prioritize share timing and direct CTA coverage now.`,
+          tone: "urgency" as const,
+          href: "#marketing-share-promote",
+          cta: "Open share plan",
+          icon: Lightbulb,
+        }
+      : null,
+    detail.totalShareClicks > detail.totalBidClicks * 2
+      ? {
+          title: "Translate attention into bid intent",
+          body: "Interest is showing up in share activity faster than bid-button taps. Tighten the call to action and use the AI workspace to sharpen urgency language.",
+          tone: "info" as const,
+          href: "#marketing-ai-copilot",
+          cta: "Open AI copilot",
+          icon: Sparkles,
+        }
+      : null,
+    {
+      title: "Review checklist readiness",
+      body: "Use the workspace plan, tasks, and artifacts together so the listing reads like one managed campaign instead of separate modules.",
+      tone: "success" as const,
+      href: "#marketing-workspace",
+      cta: "Open workspace",
+      icon: Lightbulb,
+    },
+  ].filter(Boolean) as Array<{
+    title: string;
+    body: string;
+    tone: SellerTone;
+    href: string;
+    cta: string;
+    icon: typeof Lightbulb;
+  }>;
+
   return (
-    <div className="carasta-container max-w-6xl py-8">
+    <SellerWorkspaceShell>
+      <div className="carasta-container max-w-7xl py-8">
       <HashScrollIntoView elementId="marketing-ai-copilot" hash="#marketing-ai-copilot" />
       <HashScrollIntoView elementId="marketing-share-promote" hash="#marketing-share-promote" />
       <ScrollMarketingSectionIntoView
         elementId="marketing-share-promote"
         active={scrollSharePromoteIntoView}
       />
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-6">
-        <div className="min-w-0 flex-1">
-          <Link
-            href={`/u/${user.handle}/marketing`}
-            className="mb-3 inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Marketing
-          </Link>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-2xl font-bold text-neutral-100">
-              {auction.title}
-            </h1>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${statusBadge}`}
+      <section className="rounded-[2rem] border border-[hsl(var(--seller-border))] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(240,244,255,0.96))] p-6 shadow-[0_24px_70px_-34px_hsl(var(--seller-shadow)/0.35)] md:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="min-w-0 flex-1">
+            <Link
+              href={`/u/${user.handle}/marketing`}
+              className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[hsl(var(--seller-info-foreground))] transition hover:opacity-85"
             >
-              {auction.status}
-            </span>
+              <ArrowLeft className="h-4 w-4" />
+              Back to Marketing
+            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-display text-3xl font-semibold tracking-[0.02em] text-[hsl(var(--seller-foreground))] md:text-4xl">
+                {auction.title}
+              </h1>
+              <SellerStatusBadge label={auction.status} tone={statusTone} />
+              <SellerStatusBadge label={listingHealth} tone={statusTone} />
+            </div>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-[hsl(var(--seller-muted))]">
+              One listing as a managed campaign workspace. The surface now
+              prioritizes status, momentum, next actions, AI support, and
+              execution context before long-tail analytics.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <a
+                  href={`/api/u/${user.handle}/marketing/export/auctions/${auction.id}`}
+                  download
+                  title="Download this listing’s marketing data as CSV"
+                >
+                  <Download className="mr-2 h-3.5 w-3.5" />
+                  Export CSV
+                </a>
+              </Button>
+              <Button variant="secondary" size="sm" asChild>
+                <Link
+                  href={`/auctions/${auction.id}`}
+                  className="inline-flex items-center gap-2"
+                >
+                  View public listing
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            </div>
           </div>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Views, shares, and bid-button intent for this listing (not completed
-            bids).
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <a
-                href={`/api/u/${user.handle}/marketing/export/auctions/${auction.id}`}
-                download
-                title="Download this listing’s marketing data as CSV"
-              >
-                <Download className="mr-2 h-3.5 w-3.5" />
-                Export CSV
-              </a>
-            </Button>
-            <Button variant="secondary" size="sm" asChild>
-              <Link
-                href={`/auctions/${auction.id}`}
-                className="inline-flex items-center gap-2"
-              >
-                View public listing
-                <ExternalLink className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
+          <div className="grid min-w-[280px] gap-3">
+            <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--seller-muted))]">
+                Auction state
+              </p>
+              <p className="mt-2 text-sm text-[hsl(var(--seller-foreground))]">
+                Ends {formatMarketingDate(auction.endAt)} · {momentumSummary}
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] border border-[hsl(var(--seller-info))]/15 bg-[hsl(var(--seller-info-soft))] p-4">
+              <p className="text-sm font-semibold text-[hsl(var(--seller-info-foreground))]">
+                Quick action
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[hsl(var(--seller-info-foreground))]">
+                Use the share plan, AI copilot, or checklist below to improve
+                the campaign without losing existing activity history.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <MarketingAuctionStickyNav />
 
-      <section id="marketing-overview" className="scroll-mt-32 space-y-8">
-        <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
-            Totals
-          </p>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {kpiTotals.map(({ label, value, icon: Icon }) => (
-              <div
-                key={label}
-                className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
-                    <Icon className="h-5 w-5 text-[#ff3b5c]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm text-neutral-500">{label}</p>
-                    <p className="text-2xl font-semibold text-neutral-100">
-                      {value}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+      <section id="marketing-overview" className="scroll-mt-32 mt-8 space-y-8">
+        <div className="grid gap-4 md:grid-cols-4">
+          {kpiTotals.map(({ label, value, icon: Icon }) => (
+            <SellerKpiCard
+              key={label}
+              label={label}
+              value={value}
+              icon={Icon}
+              tone={label === "Bid clicks" ? "success" : "info"}
+            />
+          ))}
+          {kpiActivity.map(({ label, value, icon: Icon }) => (
+            <SellerKpiCard
+              key={label}
+              label={label}
+              value={value}
+              icon={Icon}
+              tone="neutral"
+            />
+          ))}
         </div>
-        <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
-            Recent windows
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {kpiWindows.map(({ label, value, icon: Icon }) => (
-              <div
-                key={label}
-                className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
-                    <Icon className="h-5 w-5 text-[#ff3b5c]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm text-neutral-500">{label}</p>
-                    <p className="text-2xl font-semibold text-neutral-100">
-                      {value}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {kpiWindows.map(({ label, value, icon: Icon }) => (
+            <SellerKpiCard
+              key={label}
+              label={label}
+              value={value}
+              icon={Icon}
+              tone={label.includes("Bid") ? "success" : "neutral"}
+            />
+          ))}
         </div>
-        <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
-            Activity
-          </p>
-          <div className="grid max-w-md gap-4">
-            {kpiActivity.map(({ label, value, icon: Icon, isText }) => (
-              <div
-                key={label}
-                className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
-                    <Icon className="h-5 w-5 text-[#ff3b5c]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm text-neutral-500">{label}</p>
-                    <p
-                      className={`truncate font-semibold text-neutral-100 ${isText ? "text-base" : "text-2xl"}`}
-                    >
-                      {value}
-                    </p>
-                  </div>
-                </div>
+
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+          <SellerSectionPanel
+            title="Next best actions"
+            description="This layer is intentionally ahead of the deeper modules so the workspace helps sellers decide before they start scrolling."
+            tone="info"
+          >
+            <div className="grid gap-4 md:grid-cols-3">
+              {nextActionCards.map((item) => (
+                <SellerInsightCard
+                  key={item.title}
+                  title={item.title}
+                  body={item.body}
+                  tone={item.tone}
+                  ctaHref={item.href}
+                  ctaLabel={item.cta}
+                  icon={item.icon}
+                />
+              ))}
+            </div>
+          </SellerSectionPanel>
+
+          <SellerSectionPanel
+            title="Health and momentum"
+            description="A compact read on whether this listing needs more reach, more urgency, or steadier follow-through."
+          >
+            <div className="grid gap-4">
+              <SellerInsightCard
+                title={listingHealth}
+                body={momentumSummary}
+                tone={statusTone}
+                icon={statusTone === "success" ? Sparkles : Lightbulb}
+              />
+              <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--seller-muted))]">
+                  Time pressure
+                </p>
+                <p className="mt-2 text-sm text-[hsl(var(--seller-foreground))]">
+                  {auction.status === "LIVE"
+                    ? `Approx. ${endsInHours || 1} hour(s) remaining`
+                    : `Listing status is ${auction.status}`}
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+          </SellerSectionPanel>
         </div>
       </section>
 
@@ -431,19 +503,12 @@ export default async function MarketingAuctionDetailPage({
         <AuctionLinkedPromoPostsSection posts={detail.linkedPromoPosts} />
       </section>
 
-      <section
+      <SellerSectionPanel
         id="marketing-campaigns"
-        className="scroll-mt-32 mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="font-display text-lg font-semibold text-neutral-100">
-              Campaigns · this listing
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Outreach notes tied to this auction.
-            </p>
-          </div>
+        title="Channel plan and campaigns"
+        description="Outreach notes tied to this listing. Campaign tracking remains intact, but is now treated as one execution layer inside the broader workspace."
+        className="scroll-mt-32 mt-10"
+        actions={
           <Button asChild size="sm" variant="secondary">
             <Link
               href={`/u/${user.handle}/marketing/campaigns/new?auctionId=${auction.id}`}
@@ -451,13 +516,14 @@ export default async function MarketingAuctionDetailPage({
               New campaign
             </Link>
           </Button>
-        </div>
+        }
+      >
         {auctionCampaigns.length === 0 ? (
-          <div className="mt-6 rounded-xl border border-dashed border-white/15 bg-black/20 px-5 py-10 text-center">
-            <p className="text-sm text-neutral-400">
+          <div className="rounded-[1.5rem] border border-dashed border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-5 py-10 text-center">
+            <p className="text-sm text-[hsl(var(--seller-muted))]">
               No campaigns for this listing
             </p>
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="mt-1 text-xs text-[hsl(var(--seller-muted))]">
               Add one to log dates and status alongside Share &amp; Promote.
             </p>
             <Button className="mt-4" asChild size="sm" variant="outline">
@@ -469,15 +535,17 @@ export default async function MarketingAuctionDetailPage({
             </Button>
           </div>
         ) : (
-          <ul className="mt-4 space-y-3">
+          <ul className="space-y-3">
             {auctionCampaigns.map((c) => (
               <li
                 key={c.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-4 py-3"
               >
                 <div className="min-w-0">
-                  <p className="font-medium text-neutral-100">{c.name}</p>
-                  <p className="mt-1 text-xs text-neutral-500">
+                  <p className="font-medium text-[hsl(var(--seller-foreground))]">
+                    {c.name}
+                  </p>
+                  <p className="mt-1 text-xs text-[hsl(var(--seller-muted))]">
                     {campaignTypeLabel(c.type)}
                     {(c.startAt || c.endAt) && (
                       <>
@@ -506,134 +574,139 @@ export default async function MarketingAuctionDetailPage({
             ))}
           </ul>
         )}
-        <p className="mt-4 text-xs text-neutral-500">
+        <p className="mt-4 text-xs text-[hsl(var(--seller-muted))]">
           <Link
             href={`/u/${user.handle}/marketing/campaigns`}
-            className="font-medium text-[#ff3b5c]/90 hover:underline"
+            className="font-medium text-[hsl(var(--seller-info-foreground))] hover:underline"
           >
             Manage Campaigns
           </Link>
         </p>
-      </section>
+      </SellerSectionPanel>
 
-      <section id="marketing-analytics" className="scroll-mt-32 mt-10 space-y-8">
+      <SellerSectionPanel
+        id="marketing-analytics"
+        title="Campaign log and analytics detail"
+        description="Best-effort traffic and interaction breakdowns for diagnosing how attention is moving through this listing."
+        className="scroll-mt-32 mt-10"
+      >
         <div className="grid gap-8 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <h2 className="font-display text-lg font-semibold text-neutral-100">
-            Traffic sources
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Best-effort from UTM and referrer signals.
-          </p>
-          <ul className="mt-4 space-y-4">
-            {detail.bySource.map(({ source, count }) => (
-              <li key={source}>
-                <div className="flex items-center justify-between gap-2 text-sm">
-                  <span className="text-neutral-300">
-                    {marketingSourceLabel(source)}
-                  </span>
-                  <span className="shrink-0 font-medium text-neutral-100">
-                    {count}
-                  </span>
-                </div>
-                <ProportionBar value={count} max={maxSource} />
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-6">
+            <h2 className="font-display text-lg font-semibold text-[hsl(var(--seller-foreground))]">
+              Traffic sources
+            </h2>
+            <p className="mt-1 text-sm text-[hsl(var(--seller-muted))]">
+              Best-effort from UTM and referrer signals.
+            </p>
+            <ul className="mt-4 space-y-4">
+              {detail.bySource.map(({ source, count }) => (
+                <li key={source}>
+                  <div className="flex items-center justify-between gap-2 text-sm">
+                    <span className="text-[hsl(var(--seller-foreground))]">
+                      {marketingSourceLabel(source)}
+                    </span>
+                    <span className="shrink-0 font-medium text-[hsl(var(--seller-foreground))]">
+                      {count}
+                    </span>
+                  </div>
+                  <SellerMicroBar value={count} max={maxSource} tone="info" />
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <h2 className="font-display text-lg font-semibold text-neutral-100">
-            Event types
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Volume by tracked event type.
-          </p>
-          <ul className="mt-4 space-y-4">
-            {detail.byEventType.map(({ eventType, count }) => (
-              <li key={eventType}>
-                <div className="flex items-center justify-between gap-2 text-sm">
-                  <span className="text-neutral-300">
-                    {marketingEventTypeLabel(eventType)}
-                  </span>
-                  <span className="shrink-0 font-medium text-neutral-100">
-                    {count}
-                  </span>
-                </div>
-                <ProportionBar value={count} max={maxEvent} />
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-6">
+            <h2 className="font-display text-lg font-semibold text-[hsl(var(--seller-foreground))]">
+              Event types
+            </h2>
+            <p className="mt-1 text-sm text-[hsl(var(--seller-muted))]">
+              Volume by tracked event type.
+            </p>
+            <ul className="mt-4 space-y-4">
+              {detail.byEventType.map(({ eventType, count }) => (
+                <li key={eventType}>
+                  <div className="flex items-center justify-between gap-2 text-sm">
+                    <span className="text-[hsl(var(--seller-foreground))]">
+                      {marketingEventTypeLabel(eventType)}
+                    </span>
+                    <span className="shrink-0 font-medium text-[hsl(var(--seller-foreground))]">
+                      {count}
+                    </span>
+                  </div>
+                  <SellerMicroBar value={count} max={maxEvent} tone="info" />
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {detail.shareTargetCounts.length > 0 ? (
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <h2 className="font-display text-lg font-semibold text-neutral-100">
-            Share actions
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Share targets when we could record them.
-          </p>
-          <ul className="mt-4 max-w-xl space-y-3">
-            {detail.shareTargetCounts.map(({ target, count }) => (
-              <li key={target}>
-                <div className="flex items-center justify-between gap-2 text-sm">
-                  <span className="text-neutral-300">
-                    {shareTargetLabel(target)}
-                  </span>
-                  <span className="font-medium text-neutral-100">{count}</span>
-                </div>
-                <ProportionBar value={count} max={maxShareTarget} />
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div className="mt-8 rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-6">
+            <h2 className="font-display text-lg font-semibold text-[hsl(var(--seller-foreground))]">
+              Share actions
+            </h2>
+            <p className="mt-1 text-sm text-[hsl(var(--seller-muted))]">
+              Share targets when we could record them.
+            </p>
+            <ul className="mt-4 max-w-xl space-y-3">
+              {detail.shareTargetCounts.map(({ target, count }) => (
+                <li key={target}>
+                  <div className="flex items-center justify-between gap-2 text-sm">
+                    <span className="text-[hsl(var(--seller-foreground))]">
+                      {shareTargetLabel(target)}
+                    </span>
+                    <span className="font-medium text-[hsl(var(--seller-foreground))]">
+                      {count}
+                    </span>
+                  </div>
+                  <SellerMicroBar value={count} max={maxShareTarget} tone="success" />
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : null}
-      </section>
+      </SellerSectionPanel>
 
-      <section
+      <SellerSectionPanel
         id="marketing-activity"
-        className="scroll-mt-32 mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+        title="Activity and audit trail"
+        description="Newest events first, up to 50 records."
+        className="scroll-mt-32 mt-8"
       >
-        <h2 className="font-display text-lg font-semibold text-neutral-100">
-          Recent activity
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Newest events first (up to 50).
-        </p>
         {detail.recentEvents.length === 0 ? (
-          <div className="mt-8 rounded-xl border border-dashed border-white/15 bg-black/20 px-6 py-12 text-center">
-            <p className="font-medium text-neutral-200">No activity yet</p>
-            <p className="mt-2 text-sm text-neutral-500">
+          <div className="rounded-[1.5rem] border border-dashed border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-6 py-12 text-center">
+            <p className="font-medium text-[hsl(var(--seller-foreground))]">
+              No activity yet
+            </p>
+            <p className="mt-2 text-sm text-[hsl(var(--seller-muted))]">
               Traffic will show here once visitors view, share, or tap bid on
               the public listing.
             </p>
           </div>
         ) : (
-          <div className="mt-4 overflow-x-auto">
+          <div className="overflow-x-auto rounded-[1.5rem] border border-[hsl(var(--seller-border))]">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 bg-white/[0.04] text-xs font-medium uppercase tracking-wider text-neutral-500">
-                  <th className="pb-3 pr-4">Time</th>
-                  <th className="pb-3 pr-4">Event</th>
-                  <th className="pb-3 pr-4">Source</th>
-                  <th className="pb-3">Detail</th>
+                <tr className="border-b border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-xs font-medium uppercase tracking-[0.16em] text-[hsl(var(--seller-muted))]">
+                  <th className="px-4 py-3">Time</th>
+                  <th className="px-4 py-3">Event</th>
+                  <th className="px-4 py-3">Source</th>
+                  <th className="px-4 py-3">Detail</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-[hsl(var(--seller-border))] bg-white">
                 {detail.recentEvents.map((row) => (
-                  <tr key={row.id} className="text-neutral-300">
-                    <td className="py-3 pr-4 whitespace-nowrap text-neutral-400">
+                  <tr key={row.id} className="text-[hsl(var(--seller-foreground))]">
+                    <td className="px-4 py-3 whitespace-nowrap text-[hsl(var(--seller-muted))]">
                       {formatMarketingDateTime(row.createdAt)}
                     </td>
-                    <td className="py-3 pr-4">
+                    <td className="px-4 py-3">
                       {marketingEventTypeLabel(row.eventType)}
                     </td>
-                    <td className="py-3 pr-4">
+                    <td className="px-4 py-3">
                       {marketingSourceLabel(row.source)}
                     </td>
-                    <td className="py-3 text-neutral-500">
+                    <td className="px-4 py-3 text-[hsl(var(--seller-muted))]">
                       {row.eventType === MarketingTrafficEventType.SHARE_CLICK &&
                       row.shareTarget
                         ? shareTargetLabel(row.shareTarget)
@@ -648,7 +721,8 @@ export default async function MarketingAuctionDetailPage({
             </table>
           </div>
         )}
-      </section>
+      </SellerSectionPanel>
     </div>
+    </SellerWorkspaceShell>
   );
 }

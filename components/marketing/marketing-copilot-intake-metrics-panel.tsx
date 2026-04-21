@@ -49,7 +49,8 @@ function buildTimingHint(metrics: MarketingCopilotIntakeMetricsSnapshot): string
   return "";
 }
 
-const cell = "rounded-lg border border-white/10 bg-black/25 px-3 py-2";
+const cell =
+  "rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-3 py-3";
 
 type Props = {
   metrics: MarketingCopilotIntakeMetricsSnapshot;
@@ -64,13 +65,13 @@ export function MarketingCopilotIntakeMetricsPanel({ metrics, urgency, onApplyTi
   const timingHint = useMemo(() => buildTimingHint(metrics), [metrics]);
 
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-neutral-300">
+    <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-4 text-sm text-[hsl(var(--seller-foreground))]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[hsl(var(--seller-muted))]">
             Traffic snapshot
           </p>
-          <p className="mt-1 max-w-2xl text-xs text-neutral-500">
+          <p className="mt-1 max-w-2xl text-xs text-[hsl(var(--seller-muted))]">
             Same totals as your overview above. The model also receives server-side bid count and 7-day
             view rollups — keep claims aligned with these numbers.
           </p>
@@ -80,7 +81,7 @@ export function MarketingCopilotIntakeMetricsPanel({ metrics, urgency, onApplyTi
             type="button"
             size="sm"
             variant="outline"
-            className="shrink-0 border-white/15 text-xs"
+            className="shrink-0 border-[hsl(var(--seller-border))] bg-white text-xs text-[hsl(var(--seller-foreground))]"
             onClick={() => onApplyTimingHint(timingHint)}
           >
             {urgency.trim() ? "Replace urgency hint" : "Insert timing hint"}
@@ -90,49 +91,49 @@ export function MarketingCopilotIntakeMetricsPanel({ metrics, urgency, onApplyTi
 
       <dl className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <div className={cell}>
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Views (all)</dt>
-          <dd className="mt-0.5 text-lg font-semibold text-neutral-100">{metrics.totalViews.toLocaleString()}</dd>
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--seller-muted))]">Views (all)</dt>
+          <dd className="mt-0.5 text-lg font-semibold text-[hsl(var(--seller-foreground))]">{metrics.totalViews.toLocaleString()}</dd>
         </div>
         <div className={cell}>
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Share taps</dt>
-          <dd className="mt-0.5 text-lg font-semibold text-neutral-100">
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--seller-muted))]">Share taps</dt>
+          <dd className="mt-0.5 text-lg font-semibold text-[hsl(var(--seller-foreground))]">
             {metrics.totalShareClicks.toLocaleString()}
           </dd>
         </div>
         <div className={cell}>
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Bid-button taps</dt>
-          <dd className="mt-0.5 text-lg font-semibold text-neutral-100">
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--seller-muted))]">Bid-button taps</dt>
+          <dd className="mt-0.5 text-lg font-semibold text-[hsl(var(--seller-foreground))]">
             {metrics.totalBidClicks.toLocaleString()}
           </dd>
         </div>
         <div className={cell}>
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Current high bid</dt>
-          <dd className="mt-0.5 text-lg font-semibold text-neutral-100">{formatUsd0(metrics.highBidCents)}</dd>
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--seller-muted))]">Current high bid</dt>
+          <dd className="mt-0.5 text-lg font-semibold text-[hsl(var(--seller-foreground))]">{formatUsd0(metrics.highBidCents)}</dd>
         </div>
         <div className={cell}>
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Views (24h / 7d)</dt>
-          <dd className="mt-0.5 font-semibold text-neutral-100">
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--seller-muted))]">Views (24h / 7d)</dt>
+          <dd className="mt-0.5 font-semibold text-[hsl(var(--seller-foreground))]">
             {metrics.viewsLast24h.toLocaleString()} / {metrics.viewsLast7d.toLocaleString()}
           </dd>
         </div>
         <div className={cell}>
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Bid taps (24h / 7d)</dt>
-          <dd className="mt-0.5 font-semibold text-neutral-100">
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--seller-muted))]">Bid taps (24h / 7d)</dt>
+          <dd className="mt-0.5 font-semibold text-[hsl(var(--seller-foreground))]">
             {metrics.bidClicksLast24h.toLocaleString()} / {metrics.bidClicksLast7d.toLocaleString()}
           </dd>
         </div>
         <div className={cell}>
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Status · ends</dt>
-          <dd className="mt-0.5 font-semibold text-neutral-100">
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--seller-muted))]">Status · ends</dt>
+          <dd className="mt-0.5 font-semibold text-[hsl(var(--seller-foreground))]">
             {metrics.listingStatus}
-            <span className="block text-xs font-normal text-neutral-500">
+            <span className="block text-xs font-normal text-[hsl(var(--seller-muted))]">
               {formatShortDate(metrics.endAtIso)}
             </span>
           </dd>
         </div>
         <div className={cell}>
-          <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">Last activity</dt>
-          <dd className="mt-0.5 font-semibold text-neutral-100">{formatShortDate(metrics.lastActivityAtIso)}</dd>
+          <dt className="text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--seller-muted))]">Last activity</dt>
+          <dd className="mt-0.5 font-semibold text-[hsl(var(--seller-foreground))]">{formatShortDate(metrics.lastActivityAtIso)}</dd>
         </div>
       </dl>
     </div>

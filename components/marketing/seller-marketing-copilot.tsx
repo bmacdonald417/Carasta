@@ -374,23 +374,23 @@ export function SellerMarketingCopilot({
   return (
     <div
       id="marketing-ai-copilot"
-      className="scroll-mt-32 rounded-2xl border border-[#ff3b5c]/25 bg-gradient-to-b from-[#ff3b5c]/[0.07] to-transparent p-6"
+      className="scroll-mt-32 rounded-[1.75rem] border border-[hsl(var(--seller-info))]/18 bg-[linear-gradient(180deg,rgba(236,240,255,0.96),rgba(255,255,255,0.98))] p-6 shadow-[0_18px_44px_-28px_hsl(var(--seller-shadow)/0.28)]"
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[#ff3b5c]">
+          <div className="flex items-center gap-2 text-[hsl(var(--seller-info))]">
             <Sparkles className="h-5 w-5 shrink-0" />
-            <h2 className="font-display text-lg font-semibold text-neutral-100">
+            <h2 className="font-display text-lg font-semibold text-[hsl(var(--seller-foreground))]">
               AI marketing copilot
             </h2>
           </div>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          <p className="mt-1 max-w-2xl text-sm text-[hsl(var(--seller-muted))]">
             Listing-aware plan, checklist, and channel drafts. Review before saving — nothing is
             auto-posted.
           </p>
           {!copilotConfigured ? (
-            <p className="mt-2 text-xs text-amber-200/90">
-              Copilot is disabled until <code className="rounded bg-black/40 px-1">OPENAI_API_KEY</code>{" "}
+            <p className="mt-2 text-xs text-[hsl(var(--seller-caution-foreground))]">
+              Copilot is disabled until <code className="rounded bg-white px-1">OPENAI_API_KEY</code>{" "}
               is set on the server.
             </p>
           ) : null}
@@ -399,7 +399,7 @@ export function SellerMarketingCopilot({
           <Button
             type="button"
             size="sm"
-            className="shrink-0 bg-[#ff3b5c] text-white hover:bg-[#ff3b5c]/90"
+            className="shrink-0 bg-[hsl(var(--seller-info))] text-white hover:opacity-90"
             disabled={!copilotConfigured}
             onClick={() => {
               setError(null);
@@ -423,27 +423,27 @@ export function SellerMarketingCopilot({
       {step !== "idle" ? (
         <div className="mt-6 space-y-6 border-t border-white/10 pt-6">
           {error ? (
-            <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+            <p className="rounded-2xl border border-[hsl(var(--seller-urgency))]/20 bg-[hsl(var(--seller-urgency-soft))] px-3 py-2 text-sm text-[hsl(var(--seller-urgency-foreground))]">
               {error}
             </p>
           ) : null}
 
           {step === "intake" ? (
             <>
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-neutral-300">
-                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+              <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4 text-sm text-[hsl(var(--seller-foreground))]">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[hsl(var(--seller-muted))]">
                   Listing context (read-only)
                 </p>
-                <p className="mt-2 font-medium text-neutral-100">{listingCapsule.title}</p>
-                <p className="mt-1 text-neutral-400">{vehicleLine}</p>
-                <p className="mt-1 text-xs text-neutral-500">
+                <p className="mt-2 font-medium text-[hsl(var(--seller-foreground))]">{listingCapsule.title}</p>
+                <p className="mt-1 text-[hsl(var(--seller-muted))]">{vehicleLine}</p>
+                <p className="mt-1 text-xs text-[hsl(var(--seller-muted))]">
                   Status {listingCapsule.status}
                   {listingCapsule.mileage != null ? ` · ${listingCapsule.mileage.toLocaleString()} mi` : ""}
                 </p>
                 {listingCapsule.description ? (
-                  <p className="mt-3 line-clamp-4 text-neutral-400">{listingCapsule.description}</p>
+                  <p className="mt-3 line-clamp-4 text-[hsl(var(--seller-muted))]">{listingCapsule.description}</p>
                 ) : (
-                  <p className="mt-3 text-xs text-neutral-600">No description on file — add highlights below.</p>
+                  <p className="mt-3 text-xs text-[hsl(var(--seller-muted))]">No description on file — add highlights below.</p>
                 )}
               </div>
 
@@ -457,9 +457,9 @@ export function SellerMarketingCopilot({
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2 md:col-span-2">
-                  <p className="text-xs font-medium text-neutral-400">Primary goal</p>
+                  <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Primary goal</p>
                   <select
-                    className="h-10 w-full max-w-xl rounded-md border border-white/10 bg-black/30 px-2 text-sm text-neutral-100"
+                    className="h-10 w-full max-w-xl rounded-2xl border border-[hsl(var(--seller-border))] bg-white px-3 text-sm text-[hsl(var(--seller-foreground))]"
                     value={objectiveGoal}
                     onChange={(e) => setObjectiveGoal(e.target.value)}
                   >
@@ -471,36 +471,36 @@ export function SellerMarketingCopilot({
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-neutral-400">Audience</p>
+                  <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Audience</p>
                   <Textarea
                     rows={3}
-                    className="resize-y bg-black/30"
+                    className="resize-y border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
                     value={audience}
                     onChange={(e) => setAudience(e.target.value)}
                     placeholder="Who is the likely buyer?"
                   />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-neutral-400">Positioning angle</p>
+                  <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Positioning angle</p>
                   <Textarea
                     rows={3}
-                    className="resize-y bg-black/30"
+                    className="resize-y border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
                     value={positioning}
                     onChange={(e) => setPositioning(e.target.value)}
                     placeholder="Why this car, why buy from you…"
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <p className="text-xs font-medium text-neutral-400">Channels</p>
+                  <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Channels</p>
                   <div className="flex flex-wrap gap-3">
                     {MARKETING_COPILOT_CHANNEL_KEYS.map((key) => (
                       <label
                         key={key}
-                        className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-xs text-neutral-200 hover:bg-black/40"
+                        className="flex cursor-pointer items-center gap-2 rounded-2xl border border-[hsl(var(--seller-border))] bg-white px-3 py-2 text-xs text-[hsl(var(--seller-foreground))] hover:bg-[hsl(var(--seller-panel-muted))]"
                       >
                         <input
                           type="checkbox"
-                          className="accent-[#ff3b5c]"
+                          className="accent-[hsl(var(--seller-info))]"
                           checked={selectedChannels.has(key)}
                           onChange={() => toggleChannel(key)}
                         />
@@ -510,27 +510,27 @@ export function SellerMarketingCopilot({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-neutral-400">Tone (optional)</p>
+                  <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Tone (optional)</p>
                   <Input
-                    className="bg-black/30"
+                    className="border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
                     value={tone}
                     onChange={(e) => setTone(e.target.value)}
                     placeholder="e.g. confident, understated, technical"
                   />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-neutral-400">Budget level (optional)</p>
+                  <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Budget level (optional)</p>
                   <Input
-                    className="bg-black/30"
+                    className="border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
                     value={budgetLevel}
                     onChange={(e) => setBudgetLevel(e.target.value)}
                     placeholder="e.g. mostly organic, light paid boost"
                   />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-neutral-400">Urgency (optional)</p>
+                  <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Urgency (optional)</p>
                   <Input
-                    className="bg-black/30"
+                    className="border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
                     value={urgency}
                     onChange={(e) => setUrgency(e.target.value)}
                     placeholder="e.g. auction ends in 5 days"
@@ -542,7 +542,7 @@ export function SellerMarketingCopilot({
                   </p>
                   <Textarea
                     rows={3}
-                    className="resize-y bg-black/30"
+                    className="resize-y border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
                     value={listingHighlights}
                     onChange={(e) => setListingHighlights(e.target.value)}
                     placeholder="Service history, originality, recent work — only facts you can stand behind."
@@ -554,7 +554,7 @@ export function SellerMarketingCopilot({
                 <Button
                   type="button"
                   disabled={generating || !copilotConfigured}
-                  className="bg-[#ff3b5c] text-white hover:bg-[#ff3b5c]/90"
+                  className="bg-[hsl(var(--seller-info))] text-white hover:opacity-90"
                   onClick={() => void generate()}
                 >
                   {generating ? (
@@ -575,18 +575,18 @@ export function SellerMarketingCopilot({
 
           {step === "review" && draft ? (
             <div className="space-y-6">
-              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[hsl(var(--seller-muted))]">
                 Step 2 — Review before saving
               </p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-[hsl(var(--seller-muted))]">
                 Outputs are suggestions, not guarantees. Edit anything below before applying. Trackable
                 listing links are added on apply. Applying updates your workspace plan, appends AI-labeled
                 checklist items, and adds new draft versions — existing history is kept.
               </p>
 
               {runId ? (
-                <p className="text-[11px] text-neutral-600">
-                  Audit run ID: <span className="font-mono text-neutral-400">{runId}</span>
+                <p className="text-[11px] text-[hsl(var(--seller-muted))]">
+                  Audit run ID: <span className="font-mono text-[hsl(var(--seller-foreground))]">{runId}</span>
                 </p>
               ) : null}
 
@@ -601,50 +601,50 @@ export function SellerMarketingCopilot({
                 </Button>
               </div>
 
-              <section className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <h3 className="text-sm font-semibold text-neutral-100">Plan</h3>
+              <section className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+                <h3 className="text-sm font-semibold text-[hsl(var(--seller-foreground))]">Plan</h3>
                 <div className="mt-3 space-y-3">
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-neutral-500">Strategy summary</p>
+                    <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Strategy summary</p>
                     <Textarea
                       rows={4}
-                      className="resize-y bg-black/30 text-sm"
+                      className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-sm text-[hsl(var(--seller-foreground))]"
                       value={draft.plan.summaryStrategy}
                       onChange={(e) => updatePlanField("summaryStrategy", e.target.value)}
                     />
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="space-y-1">
-                      <p className="text-xs font-medium text-neutral-500">Objective</p>
+                      <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Objective</p>
                       <Textarea
                         rows={3}
-                        className="resize-y bg-black/30 text-sm"
+                        className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-sm text-[hsl(var(--seller-foreground))]"
                         value={draft.plan.objective}
                         onChange={(e) => updatePlanField("objective", e.target.value)}
                       />
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-medium text-neutral-500">Audience</p>
+                      <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Audience</p>
                       <Textarea
                         rows={3}
-                        className="resize-y bg-black/30 text-sm"
+                        className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-sm text-[hsl(var(--seller-foreground))]"
                         value={draft.plan.audience}
                         onChange={(e) => updatePlanField("audience", e.target.value)}
                       />
                     </div>
                     <div className="space-y-1 md:col-span-2">
-                      <p className="text-xs font-medium text-neutral-500">Positioning</p>
+                      <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Positioning</p>
                       <Textarea
                         rows={3}
-                        className="resize-y bg-black/30 text-sm"
+                        className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-sm text-[hsl(var(--seller-foreground))]"
                         value={draft.plan.positioning}
                         onChange={(e) => updatePlanField("positioning", e.target.value)}
                       />
                     </div>
                     <div className="space-y-1 md:col-span-2">
-                      <p className="text-xs font-medium text-neutral-500">Channels (comma-separated)</p>
+                      <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Channels (comma-separated)</p>
                       <Input
-                        className="bg-black/30 text-sm"
+                        className="border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-sm text-[hsl(var(--seller-foreground))]"
                         value={draft.plan.channels.join(", ")}
                         onChange={(e) => {
                           const parts = e.target.value
@@ -659,19 +659,19 @@ export function SellerMarketingCopilot({
                 </div>
               </section>
 
-              <section className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <h3 className="text-sm font-semibold text-neutral-100">Checklist ({draft.tasks.length})</h3>
-                <ul className="mt-3 space-y-4 text-sm text-neutral-300">
+              <section className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+                <h3 className="text-sm font-semibold text-[hsl(var(--seller-foreground))]">Checklist ({draft.tasks.length})</h3>
+                <ul className="mt-3 space-y-4 text-sm text-[hsl(var(--seller-foreground))]">
                   {draft.tasks.map((t, i) => (
-                    <li key={`task-${i}`} className="rounded-lg border border-white/5 bg-black/30 p-3">
+                    <li key={`task-${i}`} className="rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-[10px] uppercase text-neutral-600">Task {i + 1}</p>
+                        <p className="text-[10px] uppercase text-[hsl(var(--seller-muted))]">Task {i + 1}</p>
                         <div className="flex flex-wrap gap-2">
                           <Button
                             type="button"
                             size="sm"
                             variant="ghost"
-                            className="h-8 px-2 text-xs"
+                            className="h-8 px-2 text-xs border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
                             onClick={() =>
                               void copyText(
                                 "task",
@@ -707,21 +707,21 @@ export function SellerMarketingCopilot({
                       </div>
                       <div className="mt-2 space-y-2">
                         <Input
-                          className="bg-black/40 text-sm font-medium"
+                          className="border-[hsl(var(--seller-border))] bg-white text-sm font-medium text-[hsl(var(--seller-foreground))]"
                           value={t.title}
                           onChange={(e) => updateTaskRow(i, { title: e.target.value })}
                         />
                         <Textarea
                           rows={3}
-                          className="resize-y bg-black/40 text-xs"
+                          className="resize-y border-[hsl(var(--seller-border))] bg-white text-xs text-[hsl(var(--seller-foreground))]"
                           value={t.description ?? ""}
                           onChange={(e) => updateTaskRow(i, { description: e.target.value })}
                         />
                         <div className="grid gap-2 md:grid-cols-2">
                           <div className="space-y-1">
-                            <p className="text-[10px] uppercase text-neutral-600">Channel hint</p>
+                            <p className="text-[10px] uppercase text-[hsl(var(--seller-muted))]">Channel hint</p>
                             <Input
-                              className="bg-black/40 text-xs"
+                              className="border-[hsl(var(--seller-border))] bg-white text-xs text-[hsl(var(--seller-foreground))]"
                               value={t.channel ?? ""}
                               onChange={(e) =>
                                 updateTaskRow(i, { channel: e.target.value.trim() ? e.target.value : null })
@@ -729,9 +729,9 @@ export function SellerMarketingCopilot({
                             />
                           </div>
                           <div className="space-y-1">
-                            <p className="text-[10px] uppercase text-neutral-600">Type</p>
+                            <p className="text-[10px] uppercase text-[hsl(var(--seller-muted))]">Type</p>
                             <select
-                              className="h-9 w-full rounded-md border border-white/10 bg-black/40 px-2 text-xs text-neutral-100"
+                              className="h-9 w-full rounded-2xl border border-[hsl(var(--seller-border))] bg-white px-2 text-xs text-[hsl(var(--seller-foreground))]"
                               value={t.type ?? ListingMarketingTaskType.CHECKLIST}
                               onChange={(e) =>
                                 updateTaskRow(i, { type: e.target.value as ListingMarketingTaskType })
@@ -751,16 +751,16 @@ export function SellerMarketingCopilot({
                 </ul>
               </section>
 
-              <section className="rounded-xl border border-white/10 bg-black/20 p-4">
-                <h3 className="text-sm font-semibold text-neutral-100">Drafts ({draft.artifacts.length})</h3>
+              <section className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+                <h3 className="text-sm font-semibold text-[hsl(var(--seller-foreground))]">Drafts ({draft.artifacts.length})</h3>
                 <ul className="mt-3 space-y-4">
                   {draft.artifacts.map((a, i) => (
                     <li
                       key={`artifact-${i}`}
-                      className="rounded-lg border border-white/5 bg-black/30 p-3 text-sm text-neutral-300"
+                      className="rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3 text-sm text-[hsl(var(--seller-foreground))]"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-xs text-neutral-500">
+                        <p className="text-xs text-[hsl(var(--seller-muted))]">
                           Draft {i + 1}
                           {a.channel ? ` · ${a.channel}` : ""}
                         </p>
@@ -769,7 +769,7 @@ export function SellerMarketingCopilot({
                             type="button"
                             size="sm"
                             variant="ghost"
-                            className="h-8 px-2 text-xs"
+                            className="h-8 px-2 text-xs border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
                             onClick={() => void copyText("artifact", a.content)}
                           >
                             <Copy className="mr-1 h-3.5 w-3.5" />
@@ -800,9 +800,9 @@ export function SellerMarketingCopilot({
                       </div>
                       <div className="mt-2 grid gap-2 md:grid-cols-2">
                         <div className="space-y-1">
-                          <p className="text-[10px] uppercase text-neutral-600">Type</p>
+                            <p className="text-[10px] uppercase text-[hsl(var(--seller-muted))]">Type</p>
                           <select
-                            className="h-9 w-full rounded-md border border-white/10 bg-black/40 px-2 text-xs text-neutral-100"
+                              className="h-9 w-full rounded-2xl border border-[hsl(var(--seller-border))] bg-white px-2 text-xs text-[hsl(var(--seller-foreground))]"
                             value={a.type}
                             onChange={(e) =>
                               updateArtifactRow(i, { type: e.target.value as ListingMarketingArtifactType })
@@ -816,9 +816,9 @@ export function SellerMarketingCopilot({
                           </select>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[10px] uppercase text-neutral-600">Channel</p>
+                            <p className="text-[10px] uppercase text-[hsl(var(--seller-muted))]">Channel</p>
                           <Input
-                            className="bg-black/40 text-xs"
+                              className="border-[hsl(var(--seller-border))] bg-white text-xs text-[hsl(var(--seller-foreground))]"
                             value={a.channel}
                             onChange={(e) => updateArtifactRow(i, { channel: e.target.value })}
                           />
@@ -826,7 +826,7 @@ export function SellerMarketingCopilot({
                       </div>
                       <Textarea
                         rows={8}
-                        className="mt-2 max-h-64 resize-y bg-black/40 font-sans text-xs text-neutral-200"
+                        className="mt-2 max-h-64 resize-y border-[hsl(var(--seller-border))] bg-white font-sans text-xs text-[hsl(var(--seller-foreground))]"
                         value={a.content}
                         onChange={(e) => updateArtifactRow(i, { content: e.target.value })}
                       />
@@ -835,9 +835,9 @@ export function SellerMarketingCopilot({
                 </ul>
               </section>
 
-              <p className="text-[11px] text-neutral-600">
+              <p className="text-[11px] text-[hsl(var(--seller-muted))]">
                 After a successful save, we scroll you to the{" "}
-                <span className="text-neutral-400">Marketing workspace</span> block below so you can
+                <span className="text-[hsl(var(--seller-foreground))]">Marketing workspace</span> block below so you can
                 edit the plan, checklist, and drafts.
               </p>
 
@@ -847,7 +847,7 @@ export function SellerMarketingCopilot({
                 </Button>
                 <Button
                   type="button"
-                  className="bg-[#ff3b5c] text-white hover:bg-[#ff3b5c]/90"
+                  className="bg-[hsl(var(--seller-info))] text-white hover:opacity-90"
                   disabled={applying}
                   onClick={() => void apply()}
                 >

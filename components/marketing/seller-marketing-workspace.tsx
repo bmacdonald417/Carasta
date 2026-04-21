@@ -13,6 +13,7 @@ import {
   type SellerMarketingListingCapsule,
 } from "@/components/marketing/seller-marketing-copilot";
 import type { MarketingCopilotIntakeMetricsSnapshot } from "@/lib/marketing/marketing-copilot-intake-metrics";
+import { SellerSectionPanel } from "@/components/marketing/seller-workspace-primitives";
 
 export type WorkspacePlanState = {
   id: string;
@@ -239,30 +240,21 @@ export function SellerMarketingWorkspace({
     });
 
   const tasks = plan?.tasks ?? [];
-  const artifacts = plan?.artifacts ?? [];
 
   const sortedArtifacts = useMemo(
-    () => [...artifacts].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-    [artifacts]
+    () => [...(plan?.artifacts ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [plan?.artifacts]
   );
 
   return (
-    <div
+    <SellerSectionPanel
       id="marketing-workspace"
-      className="scroll-mt-32 mt-10 space-y-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+      title="Workspace plan, tasks, and content"
+      description="The listing workspace now acts like an execution layer: plan first, then checklist, then versioned content drafts."
+      className="scroll-mt-32 mt-10"
     >
-      <div>
-        <h2 className="font-display text-lg font-semibold text-neutral-100">
-          Marketing workspace
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Structured plan, checklist, and versioned drafts for this listing. Separate
-          from campaigns and analytics.
-        </p>
-      </div>
-
       {error ? (
-        <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+        <p className="rounded-2xl border border-[hsl(var(--seller-urgency))]/20 bg-[hsl(var(--seller-urgency-soft))] px-3 py-2 text-sm text-[hsl(var(--seller-urgency-foreground))]">
           {error}
         </p>
       ) : null}
@@ -287,46 +279,46 @@ export function SellerMarketingWorkspace({
       />
 
       <section className="space-y-4">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-[hsl(var(--seller-muted))]">
           Marketing plan
         </h3>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="md:col-span-2 space-y-2">
-            <p className="text-xs text-neutral-500">Objective</p>
+            <p className="text-xs text-[hsl(var(--seller-muted))]">Objective</p>
             <Textarea
               value={draftObjective}
               onChange={(e) => setDraftObjective(e.target.value)}
               rows={2}
-              className="resize-y bg-black/30"
+              className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-[hsl(var(--seller-foreground))]"
               placeholder="What you want this listing to achieve…"
             />
           </div>
           <div className="space-y-2">
-            <p className="text-xs text-neutral-500">Audience</p>
+            <p className="text-xs text-[hsl(var(--seller-muted))]">Audience</p>
             <Textarea
               value={draftAudience}
               onChange={(e) => setDraftAudience(e.target.value)}
               rows={3}
-              className="resize-y bg-black/30"
+              className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-[hsl(var(--seller-foreground))]"
               placeholder="Who should see this listing?"
             />
           </div>
           <div className="space-y-2">
-            <p className="text-xs text-neutral-500">Positioning</p>
+            <p className="text-xs text-[hsl(var(--seller-muted))]">Positioning</p>
             <Textarea
               value={draftPositioning}
               onChange={(e) => setDraftPositioning(e.target.value)}
               rows={3}
-              className="resize-y bg-black/30"
+              className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-[hsl(var(--seller-foreground))]"
               placeholder="Why this car, why now…"
             />
           </div>
           <div className="md:col-span-2 space-y-2">
-            <p className="text-xs text-neutral-500">Channels (comma-separated)</p>
+            <p className="text-xs text-[hsl(var(--seller-muted))]">Channels (comma-separated)</p>
             <Input
               value={draftChannels}
               onChange={(e) => setDraftChannels(e.target.value)}
-              className="bg-black/30"
+              className="border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-[hsl(var(--seller-foreground))]"
               placeholder="carmunity, instagram, email"
             />
           </div>
@@ -345,22 +337,22 @@ export function SellerMarketingWorkspace({
       </section>
 
       {plan ? (
-        <section className="space-y-4 border-t border-white/10 pt-8">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+        <section className="space-y-4 border-t border-[hsl(var(--seller-border))] pt-8">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-[hsl(var(--seller-muted))]">
             Execution checklist
           </h3>
           <ul className="space-y-2">
             {tasks.length === 0 ? (
-              <li className="text-sm text-neutral-500">No tasks yet.</li>
+              <li className="text-sm text-[hsl(var(--seller-muted))]">No tasks yet.</li>
             ) : (
               tasks.map((t) => (
                 <li
                   key={t.id}
-                  className="flex items-start gap-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2"
+                  className="flex items-start gap-3 rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-3 py-3"
                 >
                   <input
                     type="checkbox"
-                    className="mt-1 h-4 w-4 shrink-0 accent-[#ff3b5c]"
+                    className="mt-1 h-4 w-4 shrink-0 accent-[hsl(var(--seller-info))]"
                     checked={t.status === ListingMarketingTaskStatus.COMPLETED}
                     disabled={busy}
                     onChange={() => void toggleTask(t)}
@@ -368,19 +360,19 @@ export function SellerMarketingWorkspace({
                   />
                   <div className="min-w-0 flex-1">
                     <p
-                      className={`text-sm font-medium text-neutral-100 ${
+                      className={`text-sm font-medium text-[hsl(var(--seller-foreground))] ${
                         t.status === ListingMarketingTaskStatus.COMPLETED
-                          ? "text-neutral-500 line-through"
+                          ? "text-[hsl(var(--seller-muted))] line-through"
                           : ""
                       }`}
                     >
                       {t.title}
                     </p>
                     {t.description ? (
-                      <p className="mt-0.5 text-xs text-neutral-500">{t.description}</p>
+                      <p className="mt-0.5 text-xs text-[hsl(var(--seller-muted))]">{t.description}</p>
                     ) : null}
                     {t.channel ? (
-                      <p className="mt-0.5 text-[10px] uppercase text-neutral-600">
+                      <p className="mt-0.5 text-[10px] uppercase text-[hsl(var(--seller-muted))]">
                         {t.channel}
                       </p>
                     ) : null}
@@ -391,11 +383,11 @@ export function SellerMarketingWorkspace({
           </ul>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
             <div className="min-w-0 flex-1 space-y-1">
-              <p className="text-xs text-neutral-500">New task title</p>
+              <p className="text-xs text-[hsl(var(--seller-muted))]">New task title</p>
               <Input
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
-                className="bg-black/30"
+                className="border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-[hsl(var(--seller-foreground))]"
                 placeholder="e.g. Post teaser to Instagram"
               />
             </div>
@@ -407,25 +399,25 @@ export function SellerMarketingWorkspace({
             value={newTaskDescription}
             onChange={(e) => setNewTaskDescription(e.target.value)}
             rows={2}
-            className="resize-y bg-black/30"
+            className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-[hsl(var(--seller-foreground))]"
             placeholder="Optional details…"
           />
         </section>
       ) : null}
 
       {plan ? (
-        <section className="space-y-4 border-t border-white/10 pt-8">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+        <section className="space-y-4 border-t border-[hsl(var(--seller-border))] pt-8">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-[hsl(var(--seller-muted))]">
             Content drafts
           </h3>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-[hsl(var(--seller-muted))]">
             Each save creates a new version for the same type + channel key.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
-              <p className="text-xs text-neutral-500">Type</p>
+              <p className="text-xs text-[hsl(var(--seller-muted))]">Type</p>
               <select
-                className="h-10 w-full rounded-md border border-white/10 bg-black/30 px-2 text-sm text-neutral-100"
+                className="h-10 w-full rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-3 text-sm text-[hsl(var(--seller-foreground))]"
                 value={artifactType}
                 onChange={(e) =>
                   setArtifactType(e.target.value as ListingMarketingArtifactType)
@@ -439,11 +431,11 @@ export function SellerMarketingWorkspace({
               </select>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-neutral-500">Channel label (optional)</p>
+              <p className="text-xs text-[hsl(var(--seller-muted))]">Channel label (optional)</p>
               <Input
                 value={artifactChannel}
                 onChange={(e) => setArtifactChannel(e.target.value)}
-                className="bg-black/30"
+                className="border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-[hsl(var(--seller-foreground))]"
                 placeholder="instagram, carmunity, …"
               />
             </div>
@@ -452,7 +444,7 @@ export function SellerMarketingWorkspace({
             value={artifactContent}
             onChange={(e) => setArtifactContent(e.target.value)}
             rows={5}
-            className="resize-y bg-black/30"
+            className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-[hsl(var(--seller-foreground))]"
             placeholder="Draft caption, headline, or notes…"
           />
           <Button type="button" size="sm" disabled={busy} onClick={() => void saveArtifact()}>
@@ -461,14 +453,14 @@ export function SellerMarketingWorkspace({
 
           <div className="mt-4 space-y-3">
             {sortedArtifacts.length === 0 ? (
-              <p className="text-sm text-neutral-500">No drafts yet.</p>
+              <p className="text-sm text-[hsl(var(--seller-muted))]">No drafts yet.</p>
             ) : (
               sortedArtifacts.map((a) => (
                 <div
                   key={a.id}
-                  className="rounded-lg border border-white/10 bg-black/25 p-3 text-sm"
+                  className="rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3 text-sm"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-500">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[hsl(var(--seller-muted))]">
                     <span>
                       {a.type}
                       {a.channel ? ` · ${a.channel}` : ""}
@@ -477,7 +469,7 @@ export function SellerMarketingWorkspace({
                       v{a.version} · {new Date(a.createdAt).toLocaleString()}
                     </span>
                   </div>
-                  <pre className="mt-2 whitespace-pre-wrap font-sans text-neutral-200">
+                  <pre className="mt-2 whitespace-pre-wrap font-sans text-[hsl(var(--seller-foreground))]">
                     {a.content}
                   </pre>
                 </div>
@@ -486,6 +478,6 @@ export function SellerMarketingWorkspace({
           </div>
         </section>
       ) : null}
-    </div>
+    </SellerSectionPanel>
   );
 }

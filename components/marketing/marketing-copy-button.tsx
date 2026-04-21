@@ -38,7 +38,7 @@ export function MarketingCopyButton({
       type="button"
       variant="outline"
       size="sm"
-      className={className}
+      className={`border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))] hover:bg-[hsl(var(--seller-panel-muted))] ${className ?? ""}`}
       onClick={copy}
       aria-label={`Copy ${label}`}
     >

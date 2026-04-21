@@ -20,14 +20,14 @@ export function MarketingAuctionStickyNav() {
   return (
     <nav
       aria-label="On this page"
-      className="sticky top-16 z-30 -mx-px mb-8 rounded-xl border border-white/10 bg-[#0a0b10]/90 px-2 py-2 shadow-lg shadow-black/20 backdrop-blur-md sm:top-20"
+      className="sticky top-16 z-30 mb-8 rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white/90 px-2 py-2 shadow-[0_18px_50px_-30px_hsl(var(--seller-shadow)/0.4)] backdrop-blur-md sm:top-20"
     >
       <div className="flex gap-1 overflow-x-auto pb-0.5">
         {LINKS.map(({ href, label }) => (
           <a
             key={href}
             href={href}
-            className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-neutral-400 transition hover:bg-white/5 hover:text-[#ff3b5c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff3b5c]/50"
+            className="shrink-0 rounded-xl px-3 py-1.5 text-xs font-medium text-[hsl(var(--seller-muted))] transition hover:bg-[hsl(var(--seller-info-soft))] hover:text-[hsl(var(--seller-info-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--seller-info))]/40"
           >
             {label}
           </a>

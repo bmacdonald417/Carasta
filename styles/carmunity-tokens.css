@@ -38,4 +38,26 @@
   --neon-lime: 72 100% 50%;
   /* Legacy name: maps to auction signal */
   --neon-blue: 348 100% 60%;
+
+  /* Seller workspace sub-theme */
+  --seller-canvas: 220 30% 97%;
+  --seller-foreground: 224 32% 16%;
+  --seller-panel: 0 0% 100%;
+  --seller-panel-muted: 220 30% 99%;
+  --seller-panel-strong: 223 27% 19%;
+  --seller-border: 220 20% 88%;
+  --seller-muted: 220 12% 43%;
+  --seller-info: 228 86% 60%;
+  --seller-info-soft: 228 100% 97%;
+  --seller-info-foreground: 228 62% 34%;
+  --seller-success: 160 84% 39%;
+  --seller-success-soft: 150 60% 96%;
+  --seller-success-foreground: 160 52% 30%;
+  --seller-caution: 38 92% 50%;
+  --seller-caution-soft: 42 100% 96%;
+  --seller-caution-foreground: 30 80% 32%;
+  --seller-urgency: 0 84% 60%;
+  --seller-urgency-soft: 0 100% 97%;
+  --seller-urgency-foreground: 0 58% 38%;
+  --seller-shadow: 220 30% 12%;
 }

@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
+import { SellerSectionPanel } from "@/components/marketing/seller-workspace-primitives";
 
 export type { MarketingLinkRowDef };
 
@@ -83,44 +84,42 @@ export function ShareAndPromotePanel({
   const linkRows = active.linkRows;
 
   return (
-    <section className="rounded-2xl border border-[#ff3b5c]/20 bg-gradient-to-b from-[#ff3b5c]/5 to-transparent p-6 md:p-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
-            <Megaphone className="h-6 w-6 text-[#ff3b5c]" />
-          </div>
-          <div>
-            <h2 className="font-display text-xl font-semibold text-neutral-100">
-              Share &amp; Promote
-            </h2>
-            <p className="mt-1 max-w-3xl text-sm text-neutral-400">
-              Tracked links include UTM parameters so visits can appear in your
-              traffic breakdown. Saved presets reuse your campaign label and copy
-              preferences — everything stays manual.
-            </p>
-          </div>
-        </div>
+    <SellerSectionPanel
+      title="Share & Promote"
+      description="Tracked links include UTM parameters so visits can appear in your traffic breakdown. Saved presets reuse your campaign label and copy preferences while keeping execution manual."
+      tone="info"
+      actions={
         <Button asChild variant="outline" size="sm" className="shrink-0">
           <Link href={managePresetsHref}>Manage Presets</Link>
         </Button>
+      }
+    >
+      <div className="mb-4 flex items-center gap-3 rounded-[1.25rem] border border-[hsl(var(--seller-info))]/15 bg-[hsl(var(--seller-info-soft))] px-4 py-3 text-[hsl(var(--seller-info-foreground))]">
+        <div className="rounded-xl bg-white/75 p-2">
+          <Megaphone className="h-6 w-6" />
+        </div>
+        <p className="text-sm">
+          Use this as the listing&apos;s manual distribution kit: tracked links,
+          reusable captions, and copy variants that support faster execution.
+        </p>
       </div>
 
-      <p className="mt-4 max-w-3xl text-xs text-neutral-600">
+      <p className="max-w-3xl text-xs text-[hsl(var(--seller-muted))]">
         Deep link: append{" "}
-        <code className="rounded bg-black/40 px-1 text-[11px] text-neutral-300">?presetId=…</code>{" "}
+        <code className="rounded bg-white px-1 text-[11px] text-[hsl(var(--seller-foreground))]">?presetId=…</code>{" "}
         to this page&apos;s URL (use a preset id from Manage Presets, or{" "}
-        <code className="rounded bg-black/40 px-1 text-[11px] text-neutral-300">built_in</code> for
+        <code className="rounded bg-white px-1 text-[11px] text-[hsl(var(--seller-foreground))]">built_in</code> for
         the standard bundle) to open Share &amp; Promote with that selection.
       </p>
 
       {hasPresets ? (
         <div className="mt-6 max-w-md">
-          <Label className="text-neutral-300">Apply preset</Label>
+          <Label className="text-[hsl(var(--seller-foreground))]">Apply preset</Label>
           <Select
             value={selection}
             onValueChange={(v) => setSelection(v as "built_in" | string)}
           >
-            <SelectTrigger className="mt-2 border-white/10 bg-black/30 text-neutral-100">
+            <SelectTrigger className="mt-2 border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]">
               <SelectValue placeholder="Choose…" />
             </SelectTrigger>
             <SelectContent>
@@ -134,7 +133,7 @@ export function ShareAndPromotePanel({
             </SelectContent>
           </Select>
           {selection !== "built_in" && highlightVariant ? (
-            <p className="mt-2 text-xs text-neutral-500">
+            <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
               Highlighted caption matches your preset&apos;s preferred variant (
               {highlightVariant.replace("_", " ")}).
             </p>
@@ -144,10 +143,10 @@ export function ShareAndPromotePanel({
 
       <div className="mt-8 space-y-6">
         <div>
-          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-300">
+          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-[hsl(var(--seller-foreground))]">
             Link kit
           </h3>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-[hsl(var(--seller-muted))]">
             Copy and paste into bios, stories, DMs, or newsletters.
           </p>
           <div className="mt-4 flex flex-col gap-4">
@@ -158,7 +157,7 @@ export function ShareAndPromotePanel({
         </div>
 
         <div>
-          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-300">
+          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-[hsl(var(--seller-foreground))]">
             Social captions
           </h3>
           <div className="mt-4 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
@@ -187,7 +186,7 @@ export function ShareAndPromotePanel({
         </div>
 
         <div>
-          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-300">
+          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-[hsl(var(--seller-foreground))]">
             Email snippet
           </h3>
           <div className="mt-4 grid gap-4">
@@ -206,15 +205,15 @@ export function ShareAndPromotePanel({
         </div>
 
         <div>
-          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-300">
+          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-[hsl(var(--seller-foreground))]">
             Hashtags &amp; keywords
           </h3>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+            <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h4 className="font-medium text-neutral-200">Hashtags</h4>
-                  <p className="mt-0.5 text-xs text-neutral-500">
+                  <h4 className="font-medium text-[hsl(var(--seller-foreground))]">Hashtags</h4>
+                  <p className="mt-0.5 text-xs text-[hsl(var(--seller-muted))]">
                     Suggested tags — edit to fit your audience.
                   </p>
                 </div>
@@ -222,17 +221,17 @@ export function ShareAndPromotePanel({
                   <MarketingCopyButton text={copyPack.hashtagsLine} label="Hashtags" />
                 ) : null}
               </div>
-              <p className="mt-3 text-sm text-neutral-300">
+              <p className="mt-3 text-sm text-[hsl(var(--seller-foreground))]">
                 {copyPack.hashtagsLine || (
-                  <span className="text-neutral-500">Not included for this preset.</span>
+                  <span className="text-[hsl(var(--seller-muted))]">Not included for this preset.</span>
                 )}
               </p>
             </div>
-            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+            <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-4">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h4 className="font-medium text-neutral-200">Keywords</h4>
-                  <p className="mt-0.5 text-xs text-neutral-500">
+                  <h4 className="font-medium text-[hsl(var(--seller-foreground))]">Keywords</h4>
+                  <p className="mt-0.5 text-xs text-[hsl(var(--seller-muted))]">
                     For search or listing descriptions elsewhere.
                   </p>
                 </div>
@@ -240,15 +239,15 @@ export function ShareAndPromotePanel({
                   <MarketingCopyButton text={copyPack.keywordsLine} label="Keywords" />
                 ) : null}
               </div>
-              <p className="mt-3 text-sm text-neutral-300">
+              <p className="mt-3 text-sm text-[hsl(var(--seller-foreground))]">
                 {copyPack.keywordsLine || (
-                  <span className="text-neutral-500">Not included for this preset.</span>
+                  <span className="text-[hsl(var(--seller-muted))]">Not included for this preset.</span>
                 )}
               </p>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </SellerSectionPanel>
   );
 }

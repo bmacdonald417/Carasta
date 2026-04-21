@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Bell } from "lucide-react";
 import type { SellerMarketingNotificationRow } from "@/lib/marketing/get-seller-marketing-notifications";
 import { formatMarketingDateTime } from "@/lib/marketing/marketing-display";
+import { SellerSectionPanel } from "@/components/marketing/seller-workspace-primitives";
 
 export function MarketingAlertsPanel({
   items,
@@ -19,52 +20,42 @@ export function MarketingAlertsPanel({
       : "You’re caught up. Alerts appear when traffic shifts, listings wind down, or campaigns start.";
 
   return (
-    <div
-      className={`rounded-2xl border border-white/10 bg-white/[0.03] ${compact ? "p-4" : "p-6"}`}
+    <SellerSectionPanel
+      title={`Marketing alerts${context === "auction" ? " · this listing" : ""}`}
+      description="Same seller signal queue as the header notifications bell. Use this layer for issues, shifts, and reminders that need action."
+      tone="caution"
+      className={compact ? "p-0" : ""}
     >
-      <div className="flex items-start gap-3">
-        <div className="rounded-lg bg-[#ff3b5c]/15 p-2">
-          <Bell className="h-5 w-5 text-[#ff3b5c]" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h2
-            className={`font-display font-semibold text-neutral-100 ${compact ? "text-base" : "text-lg"}`}
-          >
-            Marketing Alerts
-            {context === "auction" ? (
-              <span className="ml-2 font-normal text-muted-foreground">
-                · this listing
-              </span>
-            ) : null}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Same queue as the notifications bell in the Carasta header — one account,
-            one inbox for seller marketing signals. Carmunity mobile will surface these
-            items from the same APIs as the list view catches up.
+      <div className={compact ? "-mt-2" : "-mt-1"}>
+        <div className="mb-4 flex items-center gap-3 rounded-[1.25rem] border border-[hsl(var(--seller-caution))]/15 bg-[hsl(var(--seller-caution-soft))] px-4 py-3 text-[hsl(var(--seller-caution-foreground))]">
+          <div className="rounded-xl bg-white/70 p-2">
+            <Bell className="h-5 w-5" />
+          </div>
+          <p className="text-sm">
+            One seller inbox for alerts, reminders, and marketing signals.
           </p>
         </div>
-      </div>
       {items.length === 0 ? (
-        <p className="mt-4 text-sm text-neutral-500">{emptyCopy}</p>
+        <p className="text-sm text-[hsl(var(--seller-muted))]">{emptyCopy}</p>
       ) : (
-        <ul className={`mt-4 divide-y divide-white/5 ${compact ? "space-y-0" : ""}`}>
+        <ul className={`divide-y divide-[hsl(var(--seller-border))] rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white ${compact ? "space-y-0" : ""}`}>
           {items.map((n) => (
-            <li key={n.id} className="py-3 first:pt-2">
+            <li key={n.id} className="px-4 py-3 first:pt-3">
               {n.marketingHref ? (
                 <Link
                   href={n.marketingHref}
-                  className="block text-sm text-neutral-200 hover:text-neutral-50"
+                  className="block text-sm text-[hsl(var(--seller-foreground))] hover:text-[hsl(var(--seller-info-foreground))]"
                 >
                   <span className="line-clamp-2">{n.title}</span>
-                  <span className="mt-1 block text-xs text-neutral-500">
+                  <span className="mt-1 block text-xs text-[hsl(var(--seller-muted))]">
                     {formatMarketingDateTime(n.createdAt)}
                     {!n.readAt ? " · unread" : ""}
                   </span>
                 </Link>
               ) : (
-                <div className="text-sm text-neutral-200">
+                <div className="text-sm text-[hsl(var(--seller-foreground))]">
                   <span className="line-clamp-2">{n.title}</span>
-                  <span className="mt-1 block text-xs text-neutral-500">
+                  <span className="mt-1 block text-xs text-[hsl(var(--seller-muted))]">
                     {formatMarketingDateTime(n.createdAt)}
                   </span>
                 </div>
@@ -73,6 +64,7 @@ export function MarketingAlertsPanel({
           ))}
         </ul>
       )}
-    </div>
+      </div>
+    </SellerSectionPanel>
   );
 }

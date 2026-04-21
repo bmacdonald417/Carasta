@@ -15,6 +15,7 @@ import {
   type CarmunityDraftPack,
   type CarmunityPromoTemplate,
 } from "@/lib/marketing/generate-carmunity-draft";
+import { SellerSectionPanel } from "@/components/marketing/seller-workspace-primitives";
 
 export function CarmunityPromoPanel({
   handle,
@@ -78,35 +79,34 @@ export function CarmunityPromoPanel({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-      <div className="flex flex-wrap items-start gap-3">
-        <div className="rounded-lg bg-[#ff3b5c]/15 p-2">
-          <Users className="h-6 w-6 text-[#ff3b5c]" />
+    <SellerSectionPanel
+      title="Promote to Carmunity"
+      description="Draft from this listing, edit, then publish. This stays manual by design so sellers can keep control over how listing promotion shows up in Carmunity."
+      tone="info"
+    >
+      <div className="mb-4 flex items-center gap-3 rounded-[1.25rem] border border-[hsl(var(--seller-info))]/15 bg-[hsl(var(--seller-info-soft))] px-4 py-3 text-[hsl(var(--seller-info-foreground))]">
+        <div className="rounded-xl bg-white/75 p-2">
+          <Users className="h-6 w-6" />
         </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="font-display text-lg font-semibold text-neutral-100">
-            Promote to Carmunity
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Draft from this listing, edit, then publish — manual only, no
-            scheduling.
-          </p>
-        </div>
+        <p className="text-sm">
+          Use this module when the listing needs community visibility, not just
+          a share link.
+        </p>
       </div>
 
       <div className="mt-6">
-        <Label className="text-neutral-200">Template</Label>
+        <Label className="text-[hsl(var(--seller-foreground))]">Template</Label>
         <Tabs
           value={template}
           onValueChange={(v) => applyTemplate(v as CarmunityPromoTemplate)}
           className="mt-2"
         >
-          <TabsList className="h-auto w-full flex-wrap justify-start gap-1 bg-black/40 p-1">
+          <TabsList className="h-auto w-full flex-wrap justify-start gap-1 bg-[hsl(var(--seller-panel-muted))] p-1">
             {CARMUNITY_PROMO_TEMPLATES.map((key) => (
               <TabsTrigger
                 key={key}
                 value={key}
-                className="text-xs data-[state=active]:bg-[#ff3b5c]/90 data-[state=active]:text-white sm:text-sm"
+                className="text-xs data-[state=active]:bg-[hsl(var(--seller-info))] data-[state=active]:text-white sm:text-sm"
               >
                 {draft.templates[key].label}
               </TabsTrigger>
@@ -114,7 +114,7 @@ export function CarmunityPromoPanel({
           </TabsList>
           {CARMUNITY_PROMO_TEMPLATES.map((key) => (
             <TabsContent key={key} value={key} className="mt-3">
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-[hsl(var(--seller-muted))]">
                 {draft.templates[key].description}
               </p>
             </TabsContent>
@@ -123,25 +123,25 @@ export function CarmunityPromoPanel({
       </div>
 
       <div className="mt-4">
-        <Label htmlFor="carmunity-caption" className="text-neutral-200">
+        <Label htmlFor="carmunity-caption" className="text-[hsl(var(--seller-foreground))]">
           Caption
         </Label>
         <Textarea
           id="carmunity-caption"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="mt-2 min-h-[160px] border-white/10 bg-black/30 text-neutral-100"
+          className="mt-2 min-h-[160px] border-[hsl(var(--seller-border))] bg-white text-[hsl(var(--seller-foreground))]"
           placeholder="Edit your post…"
         />
-        <p className="mt-2 text-xs text-neutral-500">
+        <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
           Listing link uses your Carmunity-tracked URL:{" "}
-          <span className="break-all text-neutral-400">{draft.listingUrl}</span>
+          <span className="break-all text-[hsl(var(--seller-foreground))]">{draft.listingUrl}</span>
         </p>
       </div>
 
       {draft.primaryImageUrl ? (
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start">
-          <div className="relative h-28 w-40 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/5">
+          <div className="relative h-28 w-40 shrink-0 overflow-hidden rounded-[1.25rem] border border-[hsl(var(--seller-border))] bg-white">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={draft.primaryImageUrl}
@@ -149,12 +149,12 @@ export function CarmunityPromoPanel({
               className="h-full w-full object-cover"
             />
           </div>
-          <label className="flex cursor-pointer items-start gap-2 text-sm text-neutral-300">
+          <label className="flex cursor-pointer items-start gap-2 text-sm text-[hsl(var(--seller-foreground))]">
             <input
               type="checkbox"
               checked={includeImage}
               onChange={(e) => setIncludeImage(e.target.checked)}
-              className="mt-1 rounded border-white/20 bg-black/40"
+              className="mt-1 rounded border-[hsl(var(--seller-border))] bg-white"
             />
             <span>
               Include listing photo on the post (same as community “image URL”
@@ -163,13 +163,13 @@ export function CarmunityPromoPanel({
           </label>
         </div>
       ) : (
-        <p className="mt-4 text-xs text-neutral-500">
+        <p className="mt-4 text-xs text-[hsl(var(--seller-muted))]">
           Add photos to this listing to attach an image to the community post.
         </p>
       )}
 
       <div className="mt-6">
-        <Label className="text-neutral-200">Preview</Label>
+        <Label className="text-[hsl(var(--seller-foreground))]">Preview</Label>
         <div className="mt-2 max-w-lg">
           <CarmunityPostPreview
             handle={handle}
@@ -199,6 +199,6 @@ export function CarmunityPromoPanel({
           <Link href="/explore">Open Carmunity feed</Link>
         </Button>
       </div>
-    </div>
+    </SellerSectionPanel>
   );
 }

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, ImageIcon } from "lucide-react";
 import { formatMarketingDateTime } from "@/lib/marketing/marketing-display";
+import { SellerSectionPanel } from "@/components/marketing/seller-workspace-primitives";
 
 export function AuctionLinkedPromoPostsSection({
   posts,
@@ -14,20 +15,17 @@ export function AuctionLinkedPromoPostsSection({
   }[];
 }) {
   return (
-    <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-      <h2 className="font-display text-lg font-semibold text-neutral-100">
-        Carmunity posts (linked)
-      </h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Promo posts you published from this page, tied to this listing.
-      </p>
+    <SellerSectionPanel
+      title="Carmunity posts"
+      description="Promo posts published from this workspace and linked back to this listing."
+    >
       {posts.length === 0 ? (
-        <div className="mt-6 rounded-xl border border-dashed border-white/15 bg-black/20 px-5 py-8 text-center">
-          <p className="text-sm text-neutral-400">
+        <div className="rounded-[1.5rem] border border-dashed border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-5 py-8 text-center">
+          <p className="text-sm text-[hsl(var(--seller-muted))]">
             No linked posts yet.
           </p>
-          <p className="mt-2 text-xs text-neutral-500">
-            Use <span className="font-medium text-neutral-400">Promote to Carmunity</span>{" "}
+          <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
+            Use <span className="font-medium text-[hsl(var(--seller-foreground))]">Promote to Carmunity</span>{" "}
             above to publish.
           </p>
         </div>
@@ -37,9 +35,9 @@ export function AuctionLinkedPromoPostsSection({
           {posts.map((p) => (
             <li
               key={p.id}
-              className="flex gap-3 rounded-xl border border-white/10 bg-black/20 p-3"
+              className="flex gap-3 rounded-[1.25rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3"
             >
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-neutral-800">
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100">
                 {p.imageUrl ? (
                   <Image
                     src={p.imageUrl}
@@ -50,25 +48,25 @@ export function AuctionLinkedPromoPostsSection({
                     sizes="56px"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-neutral-600">
+                  <div className="flex h-full w-full items-center justify-center text-[hsl(var(--seller-muted))]">
                     <ImageIcon className="h-6 w-6" aria-hidden />
                   </div>
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-[hsl(var(--seller-muted))]">
                   {formatMarketingDateTime(p.createdAt)}
                 </p>
                 {p.contentPreview ? (
-                  <p className="mt-1 line-clamp-2 text-sm text-neutral-300">
+                  <p className="mt-1 line-clamp-2 text-sm text-[hsl(var(--seller-foreground))]">
                     {p.contentPreview}
                   </p>
                 ) : (
-                  <p className="mt-1 text-sm text-neutral-500">Image post</p>
+                  <p className="mt-1 text-sm text-[hsl(var(--seller-muted))]">Image post</p>
                 )}
                 <Link
                   href={`/explore/post/${p.id}`}
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#ff3b5c]/90 hover:underline"
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[hsl(var(--seller-info-foreground))] hover:underline"
                 >
                   View on Carmunity
                   <ExternalLink className="h-3 w-3" />
@@ -78,7 +76,7 @@ export function AuctionLinkedPromoPostsSection({
           ))}
         </ul>
       ) : null}
-    </div>
+    </SellerSectionPanel>
   );
 }
 
