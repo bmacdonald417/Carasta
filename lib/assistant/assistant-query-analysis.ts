@@ -18,6 +18,10 @@ const synonymMap: Array<[RegExp, string]> = [
   [/\binbox\b/gi, "messages"],
   [/\bchat\b/gi, "messages"],
   [/\bmy cars?\b/gi, "garage"],
+  [/\bsaved auctions?\b/gi, "auction watchlist"],
+  [/\bwatchlist\b/gi, "auction watchlist"],
+  [/\bsettings\b/gi, "settings"],
+  [/\bnotifications?\b/gi, "notifications"],
   [/\bhelp desk\b/gi, "contact"],
   [/\bsell tools?\b/gi, "seller tools"],
   [/\bmarketing dashboard\b/gi, "seller workspace"],
@@ -79,6 +83,7 @@ export function preferredSourceIdsForIntent(intent: AssistantQuestionIntent) {
       return [
         "using-discussions-and-messages",
         "community-and-conversation",
+        "how-surfaces-fit-together",
         "identity-and-garage",
         "faq-and-glossary",
       ];
@@ -86,19 +91,27 @@ export function preferredSourceIdsForIntent(intent: AssistantQuestionIntent) {
       return [
         "navigation-and-help-paths",
         "help-routing",
+        "common-support-situations",
         "trust-safety-and-help",
         "faq-and-glossary",
       ];
     case "trust":
-      return ["trust-safety-and-help", "navigation-and-help-paths", "help-routing", "faq-and-glossary"];
+      return [
+        "trust-safety-and-help",
+        "navigation-and-help-paths",
+        "help-routing",
+        "common-support-situations",
+        "faq-and-glossary",
+      ];
     case "seller":
       return [
         "seller-workspace-and-ai",
         "navigation-and-help-paths",
+        "common-support-situations",
         "auctions-buying-and-selling",
       ];
     case "account_specific":
-      return ["trust-safety-and-help", "faq-and-glossary"];
+      return ["common-support-situations", "help-routing", "trust-safety-and-help", "faq-and-glossary"];
     default:
       return assistantSourceRegistry.map((source) => source.id);
   }

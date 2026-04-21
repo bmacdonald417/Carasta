@@ -4,6 +4,7 @@ import {
   normalizeAssistantQuestion,
   preferredSourceIdsForIntent,
 } from "@/lib/assistant/assistant-query-analysis";
+import { buildAssistantSupportRoutes } from "@/lib/assistant/assistant-support-routing";
 import { retrieveAssistantChunks } from "@/lib/assistant/assistant-retrieval";
 import { assistantSourceRegistry } from "@/lib/assistant/assistant-source-registry";
 import type { AssistantAnswer } from "@/lib/assistant/assistant-types";
@@ -31,6 +32,11 @@ function fallbackAnswer(question: string, reason = "low_retrieval"): AssistantAn
     confidence: "low",
     shouldEscalate: true,
     fallbackReason: reason,
+    recommendedRoutes: buildAssistantSupportRoutes({
+      intent,
+      question,
+      shouldEscalate: true,
+    }),
     suggestedQuestions: [
       "What is Carasta?",
       "What is Carmunity?",
@@ -191,6 +197,12 @@ Return one JSON object with:
       (retrievalAssessment.confidence === "high"
         ? undefined
         : retrievalAssessment.fallbackReason ?? undefined),
+    recommendedRoutes: buildAssistantSupportRoutes({
+      intent: classifyAssistantQuestion(question),
+      question,
+      shouldEscalate:
+        Boolean(data.shouldEscalate) || retrievalAssessment.confidence !== "high",
+    }),
     suggestedQuestions: Array.isArray(data.suggestedQuestions)
       ? data.suggestedQuestions.filter((q): q is string => typeof q === "string").slice(0, 4)
       : [],

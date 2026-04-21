@@ -18,6 +18,11 @@ type AssistantReply = {
   confidence: "high" | "medium" | "low";
   shouldEscalate: boolean;
   fallbackReason?: string;
+  recommendedRoutes?: Array<{
+    label: string;
+    href: string;
+    reason: string;
+  }>;
   suggestedQuestions: string[];
   citations: Array<{
     sourceId: string;
@@ -254,19 +259,24 @@ export function CarastaAssistantLauncher() {
                   <p className="font-semibold">Need more help?</p>
                   <p className="mt-2 leading-6">
                     If this question needs support beyond general product
-                    guidance, the safest next step is usually{" "}
-                    <a href="/contact" className="font-semibold underline">
-                      Contact
-                    </a>
-                    ,{" "}
-                    <a
-                      href="/resources/trust-and-safety"
-                      className="font-semibold underline"
-                    >
-                      Trust &amp; Safety
-                    </a>
-                    , or the relevant Resources page above.
+                    guidance, use the next step that best fits the situation.
                   </p>
+                  {reply.recommendedRoutes && reply.recommendedRoutes.length > 0 ? (
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      {reply.recommendedRoutes.map((route) => (
+                        <a
+                          key={`${route.href}:${route.label}`}
+                          href={route.href}
+                          className="rounded-2xl border border-amber-200 bg-white px-4 py-3 text-sm text-amber-900 transition hover:border-amber-300 hover:bg-amber-50"
+                        >
+                          <span className="block font-semibold">{route.label}</span>
+                          <span className="mt-1 block text-xs leading-5 text-amber-700">
+                            {route.reason}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </div>

@@ -8,6 +8,15 @@ import {
 export type AssistantLogAnalysis = {
   normalizedQuestion: string;
   intent: AssistantQuestionIntent;
+  topicArea:
+    | "platform"
+    | "community"
+    | "identity"
+    | "auctions"
+    | "seller"
+    | "trust"
+    | "support"
+    | "account_boundary";
   needsCorpusWork: boolean;
   coverageGap:
     | "account_specific_scope"
@@ -44,6 +53,20 @@ export function analyzeAssistantQuestionForLog(input: {
   return {
     normalizedQuestion,
     intent,
+    topicArea:
+      intent === "community"
+        ? "community"
+        : intent === "seller"
+          ? "seller"
+          : intent === "trust"
+            ? "trust"
+            : intent === "navigation"
+              ? "support"
+              : intent === "workflow"
+                ? "auctions"
+                : intent === "account_specific"
+                  ? "account_boundary"
+                  : "platform",
     needsCorpusWork:
       coverageGap === "weak_retrieval_score" ||
       coverageGap === "narrow_source_coverage" ||

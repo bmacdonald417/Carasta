@@ -32,6 +32,11 @@ export type AssistantAnswer = {
   confidence: "high" | "medium" | "low";
   shouldEscalate: boolean;
   fallbackReason?: string;
+  recommendedRoutes?: Array<{
+    label: string;
+    href: string;
+    reason: string;
+  }>;
   suggestedQuestions: string[];
   citations: Array<{
     sourceId: string;
