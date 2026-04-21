@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BadgeCheck, Gavel, ShieldCheck, Sparkles, Users } from "lucide-react";
 
+import { ResourceCardGrid } from "@/components/resources/ResourceCardGrid";
+import { pickResourceLinks } from "@/components/resources/resource-links";
+
 export const metadata: Metadata = {
   title: "Why Carasta",
   description:
@@ -36,6 +39,13 @@ const reasons = [
 ];
 
 export default function WhyCarastaPage() {
+  const relatedLinks = pickResourceLinks([
+    "/resources/what-is-carasta",
+    "/resources/what-is-carmunity",
+    "/resources/profiles-and-garage",
+    "/resources/trust-and-safety",
+  ]);
+
   return (
     <section className="min-h-screen bg-[linear-gradient(180deg,#fafaf7_0%,#ffffff_100%)] px-4 py-12 md:py-20">
       <div className="carasta-container max-w-5xl">
@@ -102,6 +112,22 @@ export default function WhyCarastaPage() {
             </div>
           </div>
         </div>
+
+        <section className="mt-12 rounded-[2rem] border border-neutral-200 bg-neutral-50 p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+            Learn the system
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-neutral-950">
+            The public content layer now explains the product in operational terms, not only marketing terms.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-neutral-600">
+            If this page explains the positioning, the guides below explain the
+            mechanics, concepts, and trust model that support it.
+          </p>
+          <div className="mt-8">
+            <ResourceCardGrid items={relatedLinks} compact />
+          </div>
+        </section>
 
         <div className="mt-12 flex flex-wrap gap-3">
           <Link

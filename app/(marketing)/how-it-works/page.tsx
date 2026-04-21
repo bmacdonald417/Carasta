@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { HowItWorksTimeline } from "@/components/how-it-works/HowItWorksTimeline";
+import { ResourceCardGrid } from "@/components/resources/ResourceCardGrid";
+import { pickResourceLinks } from "@/components/resources/resource-links";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
@@ -9,6 +11,13 @@ export const metadata = {
 };
 
 export default function HowItWorksPage() {
+  const relatedLinks = pickResourceLinks([
+    "/resources/what-is-carasta",
+    "/resources/what-is-carmunity",
+    "/resources/auction-basics",
+    "/resources/trust-and-safety",
+  ]);
+
   return (
     <section className="min-h-screen bg-[linear-gradient(180deg,#fafaf7_0%,#ffffff_100%)] px-4 py-12 md:py-20">
       <div className="carasta-container max-w-5xl">
@@ -60,6 +69,48 @@ export default function HowItWorksPage() {
         <div className="mt-12 rounded-[2rem] border border-neutral-200 bg-white p-6 shadow-sm md:mt-16 md:p-8">
           <HowItWorksTimeline />
         </div>
+
+        <div className="mt-12 grid gap-4 md:grid-cols-2">
+          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold text-neutral-950">
+              How the social side fits in
+            </h2>
+            <p className="mt-4 text-sm leading-6 text-neutral-600">
+              Carasta is designed so public identity, Carmunity, Discussions,
+              and Garage context help explain who is participating on the
+              platform. That makes the experience more legible than a purely
+              transactional site.
+            </p>
+          </section>
+          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <h2 className="text-2xl font-semibold text-neutral-950">
+              How the marketplace side fits in
+            </h2>
+            <p className="mt-4 text-sm leading-6 text-neutral-600">
+              Auctions, bidding, reserve visibility, and seller tools validate
+              that the marketplace is real. The public content system explains
+              those mechanics at a trustworthy high level, not as a substitute
+              for listing-specific detail.
+            </p>
+          </section>
+        </div>
+
+        <section className="mt-12 rounded-[2rem] border border-neutral-200 bg-neutral-50 p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+            Related guides
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-neutral-950">
+            Follow the parts of the product you need next.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-neutral-600">
+            These pages deepen the same system from different angles so users
+            can move from overview to specifics without hitting weak or
+            placeholder-level content.
+          </p>
+          <div className="mt-8">
+            <ResourceCardGrid items={relatedLinks} compact />
+          </div>
+        </section>
 
         <div className="mt-14 flex flex-col items-center gap-5 text-center md:mt-20">
           <p className="text-sm text-neutral-500">

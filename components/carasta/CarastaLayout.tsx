@@ -294,6 +294,27 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     ))}
                   </nav>
                 </div>
+                <div>
+                  <p className="font-display text-lg font-semibold text-neutral-100">
+                    Support
+                  </p>
+                  <nav className="mt-4 flex flex-col gap-3 text-sm text-neutral-400">
+                    {[
+                      { href: "/resources/faq", label: "FAQ" },
+                      { href: "/resources/glossary", label: "Glossary" },
+                      { href: "/resources/trust-and-safety", label: "Trust & Safety" },
+                      { href: "/contact", label: "Get Help" },
+                    ].map(({ href, label }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        className="transition hover:text-white"
+                      >
+                        {label}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
               </div>
               <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-1">
                 <div>

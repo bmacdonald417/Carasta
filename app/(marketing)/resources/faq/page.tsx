@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+
+import { ResourcePageLayout } from "@/components/resources/ResourcePageLayout";
+import { pickResourceLinks } from "@/components/resources/resource-links";
 
 export const metadata: Metadata = {
   title: "FAQ",
@@ -38,26 +40,41 @@ const faqs = [
     answer:
       "Carasta already has seller-facing workflows and is building toward stronger marketing support, analytics, and AI-assisted tooling. This public phase introduces that story without overbuilding the full workspace in marketing pages.",
   },
+  {
+    question: "How do profiles and Garage fit into the platform?",
+    answer:
+      "Profiles and Garage are part of Carasta's identity model. They help people show what they own, what they follow, and how they participate in the broader enthusiast ecosystem.",
+  },
+  {
+    question: "What role do Messages play?",
+    answer:
+      "Messages support one-to-one communication when a public conversation needs to become direct. They are part of the platform story, even though some support and trust content remains web-first.",
+  },
+  {
+    question: "Where should I go for help or trust questions?",
+    answer:
+      "Start with Resources for the product guides, glossary, and trust pages. If you still need help, use the contact page to reach the Carasta team.",
+  },
+  {
+    question: "Are the Terms and Privacy pages final legal documents?",
+    answer:
+      "No. They are still draft public structures pending legal review. They are written to clarify current expectations and support paths, not to overstate legal finality.",
+  },
 ];
 
 export default function ResourcesFaqPage() {
   return (
-    <section className="min-h-screen bg-[linear-gradient(180deg,#fafaf7_0%,#ffffff_100%)] px-4 py-12 md:py-20">
-      <div className="carasta-container max-w-4xl">
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
-            FAQ
-          </p>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-neutral-950 md:text-5xl">
-            Quick answers about the public product story.
-          </h1>
-          <p className="mt-5 text-base leading-7 text-neutral-600 md:text-lg">
-            This FAQ is intentionally lightweight for Phase 1. It gives the
-            public site a stronger support path now and creates a clean home for
-            later trust and knowledge expansion.
-          </p>
-        </div>
-
+    <ResourcePageLayout
+      eyebrow="FAQ"
+      title="Quick answers about the platform, trust layer, and product language."
+      description="This FAQ is written to be useful for both visitors and future assistant retrieval. It keeps the core Carasta concepts short, direct, and low-ambiguity."
+      relatedLinks={pickResourceLinks([
+        "/resources/what-is-carasta",
+        "/resources/glossary",
+        "/resources/trust-and-safety",
+        "/contact",
+      ])}
+    >
         <div className="mt-12 space-y-4">
           {faqs.map(({ question, answer }) => (
             <div
@@ -73,22 +90,6 @@ export default function ResourcesFaqPage() {
             </div>
           ))}
         </div>
-
-        <div className="mt-12 flex flex-wrap gap-3">
-          <Link
-            href="/resources"
-            className="inline-flex items-center rounded-2xl bg-neutral-950 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
-          >
-            Back to resources
-          </Link>
-          <Link
-            href="/contact"
-            className="inline-flex items-center rounded-2xl border border-neutral-300 bg-white px-6 py-3.5 text-sm font-semibold text-neutral-900 transition hover:border-neutral-400 hover:bg-neutral-50"
-          >
-            Contact Carasta
-          </Link>
-        </div>
-      </div>
-    </section>
+    </ResourcePageLayout>
   );
 }

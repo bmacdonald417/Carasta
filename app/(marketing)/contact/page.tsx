@@ -46,6 +46,17 @@ export default function ContactPage() {
               Visit resources
             </Link>
           </div>
+          <div className="rounded-3xl border border-neutral-200 bg-neutral-50 p-5">
+            <p className="text-sm font-semibold text-neutral-950">
+              Common reasons to contact us
+            </p>
+            <ul className="mt-3 space-y-2 text-sm leading-6 text-neutral-600">
+              <li>Support questions that are not answered in Resources</li>
+              <li>Partnership or press inquiries</li>
+              <li>Trust or moderation concerns that need escalation</li>
+              <li>Questions about listings, buying, or selling basics</li>
+            </ul>
+          </div>
         </div>
         <Card className="border-neutral-200 bg-white shadow-sm">
           <div className="p-6 md:p-8">
