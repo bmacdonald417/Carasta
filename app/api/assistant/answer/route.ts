@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { answerCarastaAssistantQuestion } from "@/lib/assistant/assistant-answer-service";
+import { analyzeAssistantQuestionForLog } from "@/lib/assistant/assistant-log-analysis";
 import { appendAssistantLog } from "@/lib/assistant/assistant-log";
 
 export const dynamic = "force-dynamic";
@@ -28,12 +29,22 @@ export async function POST(req: Request) {
     const { answer, matchedChunks } = await answerCarastaAssistantQuestion(
       parsed.data.question
     );
+    const analysis = analyzeAssistantQuestionForLog({
+      question: parsed.data.question,
+      fallbackReason: answer.fallbackReason ?? null,
+      confidence: answer.confidence,
+    });
 
     await appendAssistantLog({
       question: parsed.data.question,
+      normalizedQuestion: analysis.normalizedQuestion,
+      intent: analysis.intent,
       confidence: answer.confidence,
       shouldEscalate: answer.shouldEscalate,
       fallbackReason: answer.fallbackReason ?? null,
+      needsCorpusWork: analysis.needsCorpusWork,
+      coverageGap: analysis.coverageGap,
+      recommendedSourceIds: analysis.recommendedSourceIds,
       sourceIds: matchedChunks.map((chunk) => chunk.sourceId),
       chunkIds: matchedChunks.map((chunk) => chunk.chunkId),
       scores: matchedChunks.map((chunk) => chunk.score ?? 0),
@@ -43,10 +54,22 @@ export async function POST(req: Request) {
 
     return NextResponse.json(answer);
   } catch (error) {
+    const analysis = analyzeAssistantQuestionForLog({
+      question: parsed.data.question,
+      fallbackReason: "no_relevant_sources",
+      confidence: "low",
+    });
+
     await appendAssistantLog({
       question: parsed.data.question,
+      normalizedQuestion: analysis.normalizedQuestion,
+      intent: analysis.intent,
       confidence: "low",
       shouldEscalate: true,
+      fallbackReason: "no_relevant_sources",
+      needsCorpusWork: analysis.needsCorpusWork,
+      coverageGap: analysis.coverageGap,
+      recommendedSourceIds: analysis.recommendedSourceIds,
       sourceIds: [],
       chunkIds: [],
       error: error instanceof Error ? error.message : "UNKNOWN",

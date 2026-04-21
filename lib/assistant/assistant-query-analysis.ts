@@ -12,12 +12,15 @@ export type AssistantQuestionIntent =
 
 const synonymMap: Array<[RegExp, string]> = [
   [/\bforums?\b/gi, "discussions"],
+  [/\bthreads?\b/gi, "discussions"],
   [/\bdms?\b/gi, "messages"],
   [/\bdirect messages?\b/gi, "messages"],
+  [/\binbox\b/gi, "messages"],
   [/\bchat\b/gi, "messages"],
   [/\bmy cars?\b/gi, "garage"],
   [/\bhelp desk\b/gi, "contact"],
   [/\bsell tools?\b/gi, "seller tools"],
+  [/\bmarketing dashboard\b/gi, "seller workspace"],
 ];
 
 export function normalizeAssistantQuestion(question: string) {
@@ -74,16 +77,26 @@ export function preferredSourceIdsForIntent(intent: AssistantQuestionIntent) {
       return ["auctions-buying-and-selling", "platform-overview", "seller-workspace-and-ai"];
     case "community":
       return [
+        "using-discussions-and-messages",
         "community-and-conversation",
         "identity-and-garage",
         "faq-and-glossary",
       ];
     case "navigation":
-      return ["trust-safety-and-help", "faq-and-glossary", "platform-overview"];
+      return [
+        "navigation-and-help-paths",
+        "help-routing",
+        "trust-safety-and-help",
+        "faq-and-glossary",
+      ];
     case "trust":
-      return ["trust-safety-and-help", "faq-and-glossary"];
+      return ["trust-safety-and-help", "navigation-and-help-paths", "help-routing", "faq-and-glossary"];
     case "seller":
-      return ["seller-workspace-and-ai", "auctions-buying-and-selling"];
+      return [
+        "seller-workspace-and-ai",
+        "navigation-and-help-paths",
+        "auctions-buying-and-selling",
+      ];
     case "account_specific":
       return ["trust-safety-and-help", "faq-and-glossary"];
     default:

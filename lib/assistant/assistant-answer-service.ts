@@ -78,7 +78,7 @@ function assessRetrievalConfidence(
     !exactishMatch &&
     !(
       topSourceIsPreferred &&
-      ((intent === "trust" && top >= 20) ||
+      (((intent === "trust" || intent === "navigation") && top >= 18) ||
         (intent === "community" && top >= 18) ||
         top >= 24)
     )
@@ -119,6 +119,7 @@ Rules:
 - Do not give legal advice.
 - Do not fabricate policy certainty, fees, account-specific state, or moderation decisions.
 - If the sources are insufficient, say so clearly and prefer a low-confidence fallback.
+- If the retrieved sources directly answer a straightforward definition or routing question, use high confidence and shouldEscalate=false.
 - Cite only sourceId values that appear in the retrieved source list.
 - Keep the answer concise, helpful, and specific to Carasta.
 

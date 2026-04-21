@@ -26,6 +26,16 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     aliases: ["forum", "forums", "dm", "dms", "direct message", "chat"],
   },
   {
+    id: "using-discussions-and-messages",
+    title: "Using Discussions And Messages",
+    filePath: path.join(docsRoot, "using-discussions-and-messages.md"),
+    href: "/resources/discussions-basics",
+    summary: "How to use Discussions, when to move to Messages, and how forum-style questions map to Carasta vocabulary.",
+    category: "community",
+    tags: ["discussions", "messages", "forums", "threads", "participation", "public conversation"],
+    aliases: ["how do forums work", "how do discussions work", "how do i use messages"],
+  },
+  {
     id: "identity-and-garage",
     title: "Identity And Garage",
     filePath: path.join(docsRoot, "identity-and-garage.md"),
@@ -84,5 +94,15 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     category: "trust",
     tags: ["help", "contact", "support", "escalation", "where do i go"],
     aliases: ["where do i go", "who should i contact", "support route"],
+  },
+  {
+    id: "navigation-and-help-paths",
+    title: "Navigation And Help Paths",
+    filePath: path.join(docsRoot, "navigation-and-help-paths.md"),
+    href: "/resources",
+    summary: "Where to start for product understanding, trust questions, direct help, and seller tool navigation.",
+    category: "trust",
+    tags: ["navigation", "help", "support", "where do i find", "where should i go"],
+    aliases: ["where do i find", "where can i find", "how do i get to", "navigation"],
   },
 ];

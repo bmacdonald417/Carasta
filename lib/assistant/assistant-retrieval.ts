@@ -65,6 +65,18 @@ function chunkMarkdown(sourceId: string, title: string, href: string, content: s
   let buffer: string[] = [];
   let index = 0;
 
+  const source = assistantSourceRegistry.find((item) => item.id === sourceId);
+  if (source?.summary) {
+    chunks.push({
+      chunkId: `${sourceId}:summary`,
+      sourceId,
+      title,
+      href,
+      heading: `${title} summary`,
+      content: source.summary,
+    });
+  }
+
   function flush() {
     const body = buffer.join("\n").trim();
     if (!body) return;

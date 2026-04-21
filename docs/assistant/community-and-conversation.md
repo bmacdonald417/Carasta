@@ -20,6 +20,15 @@ The public site standardizes on Discussions to reduce vocabulary drift and make 
 - The same user identity appears across Carmunity, Discussions, profiles, and Garage-related participation
 - Messages provide the private one-to-one layer when a public conversation needs to become direct
 
+## What Discussions are good for
+- public questions with broader value
+- enthusiast conversation that should stay visible
+- topic-based threads
+- project or ownership discussion that benefits more than one user
+
+## What people mean by forums
+If someone asks about forums on Carasta, the public product term is Discussions. The assistant should route forum-style questions into the Discussions concept unless the user clearly means something else.
+
 ## What Messages are for
 Messages let people continue a conversation directly when a public post or Discussion needs one-to-one follow-up. Messages are part of the same platform identity model as the rest of Carasta.
 
