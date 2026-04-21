@@ -44,7 +44,28 @@ export function sanitizeCopilotStructuredResult(
       positioning: scrub(input.plan.positioning, 20_000),
       channels: input.plan.channels.map((c) => scrub(c, 64)).slice(0, 32),
       summaryStrategy: scrub(input.plan.summaryStrategy, 20_000),
+      whyNow: scrub(input.plan.whyNow ?? "", 8_000),
+      workflowMode: input.plan.workflowMode ?? "launch",
     },
+    priorityActions: (input.priorityActions ?? []).map((a) => ({
+      ...a,
+      title: scrub(a.title, 500),
+      actionNow: scrub(a.actionNow, 10_000),
+      whyThisMatters: scrub(a.whyThisMatters, 10_000),
+      channel: a.channel == null ? null : scrub(String(a.channel), 64),
+      tone: a.tone ?? "info",
+    })),
+    channelPlaybooks: (input.channelPlaybooks ?? []).map((p) => ({
+      ...p,
+      audienceFit: scrub(p.audienceFit, 10_000),
+      whyThisChannel: scrub(p.whyThisChannel, 10_000),
+      cadence: scrub(p.cadence, 10_000),
+      messagingAngle: scrub(p.messagingAngle, 10_000),
+      ctaGuidance: scrub(p.ctaGuidance, 10_000),
+      assetSuggestions: (p.assetSuggestions ?? []).map((v) => scrub(v, 500)).slice(0, 8),
+      doNotes: (p.doNotes ?? []).map((v) => scrub(v, 500)).slice(0, 8),
+      avoidNotes: (p.avoidNotes ?? []).map((v) => scrub(v, 500)).slice(0, 8),
+    })),
     tasks: input.tasks.map((t) => ({
       ...t,
       title: scrub(t.title, 500),
@@ -55,6 +76,15 @@ export function sanitizeCopilotStructuredResult(
       ...a,
       channel: scrub(a.channel ?? "", 64),
       content: scrub(a.content, 100_000),
+    })),
+    watchouts: (input.watchouts ?? []).map((w) => ({
+      title: scrub(w.title, 300),
+      detail: scrub(w.detail, 10_000),
+    })),
+    measurementPlan: (input.measurementPlan ?? []).map((m) => ({
+      metric: scrub(m.metric, 300),
+      whyThisMatters: scrub(m.whyThisMatters, 10_000),
+      targetSignal: scrub(m.targetSignal ?? "", 500),
     })),
   };
 

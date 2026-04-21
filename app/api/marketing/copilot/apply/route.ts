@@ -89,6 +89,10 @@ export async function POST(req: Request) {
       },
       tasks: copilotForSave.tasks,
       artifacts: artifactsWithLinks,
+      priorityActions: copilotForSave.priorityActions,
+      channelPlaybooks: copilotForSave.channelPlaybooks,
+      watchouts: copilotForSave.watchouts,
+      measurementPlan: copilotForSave.measurementPlan,
     });
 
     if (runId) {

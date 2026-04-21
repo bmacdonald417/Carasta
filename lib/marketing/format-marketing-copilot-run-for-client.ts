@@ -23,10 +23,16 @@ function buildPreview(output: unknown, kind: MarketingCopilotRunKind): string {
     const plan = asRecord(o.plan);
     const summary =
       typeof plan?.summaryStrategy === "string" ? plan.summaryStrategy.slice(0, 220) : "";
+    const priorityActions = Array.isArray(o.priorityActions) ? o.priorityActions : [];
+    const firstPriority = priorityActions[0] != null ? asRecord(priorityActions[0]) : null;
+    const p1 =
+      firstPriority && typeof firstPriority.title === "string"
+        ? firstPriority.title
+        : "";
     const tasks = Array.isArray(o.tasks) ? o.tasks : [];
     const first = tasks[0] != null ? asRecord(tasks[0]) : null;
     const t1 = first && typeof first.title === "string" ? first.title : "";
-    return [summary, t1].filter(Boolean).join("\n\n").slice(0, 500);
+    return [summary, p1, t1].filter(Boolean).join("\n\n").slice(0, 500);
   }
   if (kind === "REGEN_TASK") {
     const t = asRecord(o.task);
@@ -51,7 +57,10 @@ function summarizeIntake(intake: unknown): string | null {
   if (k === "GENERATE") {
     const ch = Array.isArray(o.channels) ? (o.channels as string[]).join(", ") : "";
     const g = typeof o.objectiveGoal === "string" ? o.objectiveGoal.slice(0, 72) : "";
+    const mode =
+      typeof o.workflowMode === "string" ? `mode=${o.workflowMode}` : "";
     const parts = [`channels=${ch}`];
+    if (mode) parts.push(mode);
     if (g) parts.push(`goal=${g}`);
     return parts.join(" · ");
   }

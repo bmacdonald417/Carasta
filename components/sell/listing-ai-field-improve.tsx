@@ -20,6 +20,13 @@ export type ListingAiRewriteContext = Pick<
   | "description"
   | "conditionSummary"
   | "conditionGrade"
+  | "audiencePreset"
+  | "ownershipDuration"
+  | "serviceHistoryConfidence"
+  | "modifications"
+  | "originality"
+  | "documentationAvailable"
+  | "sellingReason"
 >;
 
 type Field = "title" | "description" | "conditionSummary";
@@ -56,6 +63,12 @@ export function ListingAiFieldImprove({
       const body: Record<string, unknown> = {
         field,
         currentText,
+        instruction:
+          field === "title"
+            ? "Tighten this title, keep it factual, and make it scan-friendly."
+            : field === "conditionSummary"
+              ? "Make this more disclosure-forward, clearer, and easier to scan without sounding certain about unknowns."
+              : "Improve scanability, disclosure clarity, and buyer trust while keeping unknowns explicit.",
         ...(auctionId ? { auctionId } : {}),
       };
       if (!auctionId && context) {
@@ -70,6 +83,13 @@ export function ListingAiFieldImprove({
           description: context.description,
           conditionSummary: context.conditionSummary,
           conditionGrade: context.conditionGrade ?? undefined,
+          audiencePreset: context.audiencePreset ?? undefined,
+          ownershipDuration: context.ownershipDuration ?? undefined,
+          serviceHistoryConfidence: context.serviceHistoryConfidence ?? undefined,
+          modifications: context.modifications ?? undefined,
+          originality: context.originality ?? undefined,
+          documentationAvailable: context.documentationAvailable ?? undefined,
+          sellingReason: context.sellingReason ?? undefined,
         });
       }
       const res = await fetch("/api/listings/ai/rewrite-field", {

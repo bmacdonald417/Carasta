@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import type { ListingAiWizardScope } from "@/lib/validations/listing-ai";
+import type {
+  ListingAiAudiencePreset,
+  ListingAiStructuredResult,
+  ListingAiWizardScope,
+} from "@/lib/validations/listing-ai";
 
 export type ListingAiIntakeSnapshot = {
   year: number;
@@ -20,6 +24,13 @@ export type ListingAiIntakeSnapshot = {
   conditionSummary: string;
   /** When set (condition scope), sent as model context */
   conditionGrade?: string;
+  audiencePreset?: ListingAiAudiencePreset;
+  ownershipDuration?: string;
+  serviceHistoryConfidence?: "documented" | "partial" | "unknown";
+  modifications?: string;
+  originality?: string;
+  documentationAvailable?: string;
+  sellingReason?: string;
 };
 
 export type ListingAiApplyPatch = Partial<{
@@ -63,12 +74,34 @@ export function ListingAiAssistant({
   const [highlights, setHighlights] = useState("");
   const [tone, setTone] = useState("");
   const [audience, setAudience] = useState("");
+  const [audiencePreset, setAudiencePreset] = useState<ListingAiAudiencePreset>(
+    intake.audiencePreset ?? "collector"
+  );
+  const [ownershipDuration, setOwnershipDuration] = useState(
+    intake.ownershipDuration ?? ""
+  );
+  const [serviceHistoryConfidence, setServiceHistoryConfidence] = useState<
+    "documented" | "partial" | "unknown"
+  >(intake.serviceHistoryConfidence ?? "unknown");
+  const [modifications, setModifications] = useState(intake.modifications ?? "");
+  const [originality, setOriginality] = useState(intake.originality ?? "");
+  const [documentationAvailable, setDocumentationAvailable] = useState(
+    intake.documentationAvailable ?? ""
+  );
+  const [sellingReason, setSellingReason] = useState(intake.sellingReason ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<{
     title: string;
+    titleOptions?: string[];
+    shortSummary?: string;
     description: string;
-    conditionSummary?: string;
+    conditionSummary?: string | null;
+    missingInfo?: string[];
+    riskFlags?: string[];
+    readinessScore?: number;
+    readinessReasons?: string[];
+    disclosureSuggestions?: string[];
   } | null>(null);
 
   const imperfectionBlock = useMemo(
@@ -100,13 +133,29 @@ export function ListingAiAssistant({
       highlights: mergedHighlights,
       tone: tone.trim() || undefined,
       audience: scope === "imperfections" ? undefined : audience.trim() || undefined,
+      audiencePreset: scope === "full" ? audiencePreset : undefined,
+      ownershipDuration: scope === "full" ? ownershipDuration.trim() || undefined : undefined,
+      serviceHistoryConfidence:
+        scope === "full" ? serviceHistoryConfidence || undefined : undefined,
+      modifications: scope === "full" ? modifications.trim() || undefined : undefined,
+      originality: scope === "full" ? originality.trim() || undefined : undefined,
+      documentationAvailable:
+        scope === "full" ? documentationAvailable.trim() || undefined : undefined,
+      sellingReason: scope === "full" ? sellingReason.trim() || undefined : undefined,
     };
   }, [
     auctionId,
     audience,
+    audiencePreset,
     highlights,
     imperfectionBlock,
     intake,
+    modifications,
+    originality,
+    ownershipDuration,
+    serviceHistoryConfidence,
+    documentationAvailable,
+    sellingReason,
     scope,
     tone,
   ]);
@@ -125,7 +174,7 @@ export function ListingAiAssistant({
         body: JSON.stringify(buildBody()),
       });
       const j = (await res.json()) as {
-        listing?: { title: string; description: string; conditionSummary?: string };
+        listing?: ListingAiStructuredResult;
         message?: string;
       };
       if (!res.ok) throw new Error(j.message ?? "Generation failed.");
@@ -266,6 +315,95 @@ export function ListingAiAssistant({
                 placeholder="e.g. track-day buyers, collectors"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="listing-ai-audience-preset">Audience preset</Label>
+              <select
+                id="listing-ai-audience-preset"
+                className="h-10 w-full rounded-2xl border border-white/10 bg-black/30 px-3 text-sm text-neutral-100"
+                value={audiencePreset}
+                onChange={(e) =>
+                  setAudiencePreset(e.target.value as ListingAiAudiencePreset)
+                }
+              >
+                <option value="collector">Collector</option>
+                <option value="performance_buyer">Performance buyer</option>
+                <option value="daily_driver">Daily driver buyer</option>
+                <option value="project_car">Project-car buyer</option>
+                <option value="weekend_enthusiast">Weekend enthusiast</option>
+              </select>
+              <p className="text-[11px] text-neutral-500">
+                Audience emphasis comes from the current intake snapshot.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="listing-ai-ownership-duration">Ownership duration</Label>
+              <Input
+                id="listing-ai-ownership-duration"
+                className="bg-black/30"
+                value={ownershipDuration}
+                onChange={(e) => setOwnershipDuration(e.target.value)}
+                placeholder="e.g. 4 years"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="listing-ai-history-confidence">Service history confidence</Label>
+              <select
+                id="listing-ai-history-confidence"
+                className="h-10 w-full rounded-2xl border border-white/10 bg-black/30 px-3 text-sm text-neutral-100"
+                value={serviceHistoryConfidence}
+                onChange={(e) =>
+                  setServiceHistoryConfidence(
+                    e.target.value as "documented" | "partial" | "unknown"
+                  )
+                }
+              >
+                <option value="documented">Documented</option>
+                <option value="partial">Partial</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="listing-ai-docs">Documentation available</Label>
+              <Input
+                id="listing-ai-docs"
+                className="bg-black/30"
+                value={documentationAvailable}
+                onChange={(e) => setDocumentationAvailable(e.target.value)}
+                placeholder="Records, manuals, receipts…"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="listing-ai-modifications">Modifications</Label>
+              <Textarea
+                id="listing-ai-modifications"
+                rows={2}
+                className="resize-y bg-black/30"
+                value={modifications}
+                onChange={(e) => setModifications(e.target.value)}
+                placeholder="Major modifications, if any…"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="listing-ai-originality">Originality</Label>
+              <Textarea
+                id="listing-ai-originality"
+                rows={2}
+                className="resize-y bg-black/30"
+                value={originality}
+                onChange={(e) => setOriginality(e.target.value)}
+                placeholder="Original paint, stock drivetrain, preserved details…"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="listing-ai-selling-reason">Selling reason</Label>
+              <Input
+                id="listing-ai-selling-reason"
+                className="bg-black/30"
+                value={sellingReason}
+                onChange={(e) => setSellingReason(e.target.value)}
+                placeholder="Why are you selling?"
+              />
+            </div>
           </>
         ) : (
           <div className="space-y-2 md:col-span-2">
@@ -298,6 +436,22 @@ export function ListingAiAssistant({
                 <p className="text-xs text-neutral-500">Title</p>
                 <p className="mt-0.5 font-medium text-neutral-100">{preview.title}</p>
               </div>
+              {preview.titleOptions && preview.titleOptions.length > 0 ? (
+                <div>
+                  <p className="text-xs text-neutral-500">Title options</p>
+                  <ul className="mt-1 space-y-1 text-neutral-300">
+                    {preview.titleOptions.map((option) => (
+                      <li key={option}>• {option}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {preview.shortSummary ? (
+                <div>
+                  <p className="text-xs text-neutral-500">Short summary</p>
+                  <p className="mt-0.5 text-neutral-300">{preview.shortSummary}</p>
+                </div>
+              ) : null}
               <div>
                 <p className="text-xs text-neutral-500">Description</p>
                 <p className="mt-0.5 whitespace-pre-wrap text-neutral-300">{preview.description}</p>
@@ -306,6 +460,53 @@ export function ListingAiAssistant({
                 <div>
                   <p className="text-xs text-neutral-500">Condition summary</p>
                   <p className="mt-0.5 text-neutral-300">{preview.conditionSummary}</p>
+                </div>
+              ) : null}
+              <div className="grid gap-3 md:grid-cols-2">
+                <div>
+                  <p className="text-xs text-neutral-500">Readiness</p>
+                  <p className="mt-0.5 text-neutral-100">
+                    {preview.readinessScore ?? 0}/100
+                  </p>
+                  {preview.readinessReasons?.length ? (
+                    <ul className="mt-2 space-y-1 text-xs text-neutral-400">
+                      {preview.readinessReasons.map((item) => (
+                        <li key={item}>• {item}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+                <div>
+                  {preview.missingInfo?.length ? (
+                    <>
+                      <p className="text-xs text-neutral-500">Missing info</p>
+                      <ul className="mt-2 space-y-1 text-xs text-neutral-400">
+                        {preview.missingInfo.map((item) => (
+                          <li key={item}>• {item}</li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : null}
+                  {preview.riskFlags?.length ? (
+                    <>
+                      <p className="mt-3 text-xs text-neutral-500">Risk flags</p>
+                      <ul className="mt-2 space-y-1 text-xs text-neutral-400">
+                        {preview.riskFlags.map((item) => (
+                          <li key={item}>• {item}</li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+              {preview.disclosureSuggestions?.length ? (
+                <div>
+                  <p className="text-xs text-neutral-500">Disclosure suggestions</p>
+                  <ul className="mt-2 space-y-1 text-xs text-neutral-400">
+                    {preview.disclosureSuggestions.map((item) => (
+                      <li key={item}>• {item}</li>
+                    ))}
+                  </ul>
                 </div>
               ) : null}
             </>

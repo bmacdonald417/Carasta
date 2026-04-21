@@ -15,6 +15,13 @@ export const MARKETING_COPILOT_CHANNEL_KEYS = [
 export type MarketingCopilotChannelKey = (typeof MARKETING_COPILOT_CHANNEL_KEYS)[number];
 
 export const marketingCopilotChannelKeySchema = z.enum(MARKETING_COPILOT_CHANNEL_KEYS);
+export const marketingCopilotWorkflowModeSchema = z.enum([
+  "launch",
+  "low_traction_recovery",
+  "ending_soon_push",
+  "channel_expansion",
+  "content_refresh",
+]);
 
 export const marketingCopilotGenerateBodySchema = z.object({
   auctionId: z.string().min(1),
@@ -28,6 +35,8 @@ export const marketingCopilotGenerateBodySchema = z.object({
   urgency: z.string().max(120).optional().default(""),
   /** Seller-supplied differentiators; never required to duplicate title/make/model. */
   listingHighlights: z.string().max(20_000).optional().default(""),
+  workflowMode: marketingCopilotWorkflowModeSchema.optional().default("launch"),
+  previousStrategySummary: z.string().max(10_000).optional().default(""),
 });
 
 export const marketingCopilotPlanBlockSchema = z.object({
@@ -36,6 +45,8 @@ export const marketingCopilotPlanBlockSchema = z.object({
   positioning: z.string().max(20_000),
   channels: z.array(z.string().min(1).max(64)).max(32),
   summaryStrategy: z.string().max(20_000),
+  whyNow: z.string().max(8_000).optional().default(""),
+  workflowMode: marketingCopilotWorkflowModeSchema.optional().default("launch"),
 });
 
 export type MarketingCopilotPlanBlock = z.infer<typeof marketingCopilotPlanBlockSchema>;
@@ -53,10 +64,45 @@ export const marketingCopilotArtifactBlockSchema = z.object({
   content: z.string().min(1).max(100_000),
 });
 
+export const marketingCopilotPriorityActionSchema = z.object({
+  title: z.string().min(1).max(500),
+  actionNow: z.string().min(1).max(10_000),
+  whyThisMatters: z.string().min(1).max(10_000),
+  channel: z.string().max(64).optional().nullable(),
+  tone: z.enum(["info", "success", "caution", "urgency"]).optional().default("info"),
+});
+
+export const marketingCopilotChannelPlaybookSchema = z.object({
+  channel: marketingCopilotChannelKeySchema,
+  audienceFit: z.string().max(10_000),
+  whyThisChannel: z.string().max(10_000),
+  cadence: z.string().max(10_000),
+  messagingAngle: z.string().max(10_000),
+  ctaGuidance: z.string().max(10_000),
+  assetSuggestions: z.array(z.string().min(1).max(500)).max(8).default([]),
+  doNotes: z.array(z.string().min(1).max(500)).max(8).default([]),
+  avoidNotes: z.array(z.string().min(1).max(500)).max(8).default([]),
+});
+
+export const marketingCopilotWatchoutSchema = z.object({
+  title: z.string().min(1).max(300),
+  detail: z.string().min(1).max(10_000),
+});
+
+export const marketingCopilotMeasurementPlanItemSchema = z.object({
+  metric: z.string().min(1).max(300),
+  whyThisMatters: z.string().min(1).max(10_000),
+  targetSignal: z.string().max(500).optional().default(""),
+});
+
 export const marketingCopilotStructuredResultSchema = z.object({
   plan: marketingCopilotPlanBlockSchema,
+  priorityActions: z.array(marketingCopilotPriorityActionSchema).max(12).default([]),
+  channelPlaybooks: z.array(marketingCopilotChannelPlaybookSchema).max(12).default([]),
   tasks: z.array(marketingCopilotTaskBlockSchema).min(1).max(28),
   artifacts: z.array(marketingCopilotArtifactBlockSchema).min(1).max(36),
+  watchouts: z.array(marketingCopilotWatchoutSchema).max(10).default([]),
+  measurementPlan: z.array(marketingCopilotMeasurementPlanItemSchema).max(10).default([]),
 });
 
 export const marketingCopilotApplyBodySchema = z.object({
@@ -83,3 +129,5 @@ export type MarketingCopilotStructuredResult = z.infer<typeof marketingCopilotSt
 export type MarketingCopilotGenerateBody = z.infer<typeof marketingCopilotGenerateBodySchema>;
 export type MarketingCopilotTaskBlock = z.infer<typeof marketingCopilotTaskBlockSchema>;
 export type MarketingCopilotArtifactBlock = z.infer<typeof marketingCopilotArtifactBlockSchema>;
+export type MarketingCopilotPriorityAction = z.infer<typeof marketingCopilotPriorityActionSchema>;
+export type MarketingCopilotChannelPlaybook = z.infer<typeof marketingCopilotChannelPlaybookSchema>;

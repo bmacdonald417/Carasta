@@ -33,10 +33,18 @@ function buildPreview(output: unknown): string {
   if (!o) return "";
   if (typeof o.text === "string") return o.text.slice(0, 400);
   const title = typeof o.title === "string" ? o.title : "";
+  const shortSummary =
+    typeof o.shortSummary === "string" ? o.shortSummary.slice(0, 160) : "";
   const desc = typeof o.description === "string" ? o.description.slice(0, 240) : "";
   const cs =
     typeof o.conditionSummary === "string" ? o.conditionSummary.slice(0, 160) : "";
-  const parts = [title, desc, cs].filter(Boolean);
+  const missingInfo = Array.isArray(o.missingInfo)
+    ? (o.missingInfo as unknown[])
+        .filter((v): v is string => typeof v === "string")
+        .slice(0, 2)
+        .join(" | ")
+    : "";
+  const parts = [title, shortSummary, desc, cs, missingInfo && `Missing: ${missingInfo}`].filter(Boolean);
   return parts.join("\n\n").slice(0, 500);
 }
 
@@ -55,7 +63,13 @@ function summarizeIntake(intake: unknown): string | null {
   }
   if (kind === "LISTING_GENERATE") {
     const scope = typeof o.wizardScope === "string" ? o.wizardScope : "full";
-    return `wizardScope=${scope}`;
+    const audiencePreset =
+      typeof o.audiencePreset === "string" ? ` · audience=${o.audiencePreset}` : "";
+    const history =
+      typeof o.serviceHistoryConfidence === "string"
+        ? ` · history=${o.serviceHistoryConfidence}`
+        : "";
+    return `wizardScope=${scope}${audiencePreset}${history}`;
   }
   return null;
 }

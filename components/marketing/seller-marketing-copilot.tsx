@@ -33,6 +33,17 @@ const CHANNEL_LABELS: Record<MarketingCopilotChannelKey, string> = {
   email: "Email / direct outreach",
 };
 
+const WORKFLOW_MODE_OPTIONS: Array<{
+  value: MarketingCopilotGenerateBody["workflowMode"];
+  label: string;
+}> = [
+  { value: "launch", label: "Launch checklist" },
+  { value: "low_traction_recovery", label: "Low-traction recovery" },
+  { value: "ending_soon_push", label: "Ending-soon push" },
+  { value: "channel_expansion", label: "Channel expansion" },
+  { value: "content_refresh", label: "Content refresh" },
+];
+
 export type SellerMarketingListingCapsule = {
   title: string;
   year: number;
@@ -93,6 +104,8 @@ export function SellerMarketingCopilot({
   const [budgetLevel, setBudgetLevel] = useState("");
   const [urgency, setUrgency] = useState("");
   const [listingHighlights, setListingHighlights] = useState("");
+  const [workflowMode, setWorkflowMode] =
+    useState<MarketingCopilotGenerateBody["workflowMode"]>("launch");
   const [selectedChannels, setSelectedChannels] = useState<Set<string>>(() => {
     const fromPlan = parseChannelsFromPlan(workspacePlan?.channels);
     if (fromPlan.size > 0) return fromPlan;
@@ -147,6 +160,8 @@ export function SellerMarketingCopilot({
       budgetLevel,
       urgency,
       listingHighlights,
+      workflowMode,
+      previousStrategySummary: workspacePlan?.positioning ?? "",
     };
   }, [
     auctionId,
@@ -158,6 +173,8 @@ export function SellerMarketingCopilot({
     selectedChannels,
     tone,
     urgency,
+    workflowMode,
+    workspacePlan?.positioning,
   ]);
 
   const updatePlanField = useCallback(
@@ -219,7 +236,55 @@ export function SellerMarketingCopilot({
   const exportDraftMarkdown = useCallback(() => {
     if (!draft) return;
     const lines: string[] = [];
-    lines.push(`# Copilot draft`, ``, `## Plan`, `- Objective: ${draft.plan.objective}`, `- Audience: ${draft.plan.audience}`, `- Positioning: ${draft.plan.positioning}`, `- Channels: ${draft.plan.channels.join(", ")}`, ``, `### Strategy`, draft.plan.summaryStrategy, ``, `## Tasks`);
+    lines.push(
+      `# Copilot draft`,
+      ``,
+      `## Plan`,
+      `- Objective: ${draft.plan.objective}`,
+      `- Audience: ${draft.plan.audience}`,
+      `- Positioning: ${draft.plan.positioning}`,
+      `- Channels: ${draft.plan.channels.join(", ")}`,
+      `- Workflow mode: ${draft.plan.workflowMode ?? "launch"}`,
+      ``
+    );
+    if (draft.plan.whyNow) {
+      lines.push(`### Why now`, draft.plan.whyNow, ``);
+    }
+    lines.push(`### Strategy`, draft.plan.summaryStrategy, ``);
+    if (draft.priorityActions.length > 0) {
+      lines.push(`## Priority actions`);
+      draft.priorityActions.forEach((action, i) => {
+        lines.push(
+          `${i + 1}. **${action.title}**`,
+          `   Action now: ${action.actionNow}`,
+          `   Why this matters: ${action.whyThisMatters}`,
+          action.channel ? `   Channel: ${action.channel}` : "",
+          ""
+        );
+      });
+    }
+    if (draft.channelPlaybooks.length > 0) {
+      lines.push(`## Channel playbooks`);
+      draft.channelPlaybooks.forEach((playbook) => {
+        lines.push(
+          `### ${playbook.channel}`,
+          `- Audience fit: ${playbook.audienceFit}`,
+          `- Why this channel: ${playbook.whyThisChannel}`,
+          `- Cadence: ${playbook.cadence}`,
+          `- Messaging angle: ${playbook.messagingAngle}`,
+          `- CTA guidance: ${playbook.ctaGuidance}`,
+          playbook.assetSuggestions.length
+            ? `- Asset suggestions: ${playbook.assetSuggestions.join(", ")}`
+            : "",
+          playbook.doNotes.length ? `- Do: ${playbook.doNotes.join(", ")}` : "",
+          playbook.avoidNotes.length
+            ? `- Avoid: ${playbook.avoidNotes.join(", ")}`
+            : "",
+          ""
+        );
+      });
+    }
+    lines.push(`## Tasks`);
     draft.tasks.forEach((t, i) => {
       lines.push(`${i + 1}. **${t.title}**`, t.description ? `   ${t.description}` : "", t.channel ? `   _${t.channel}_` : "");
     });
@@ -227,6 +292,24 @@ export function SellerMarketingCopilot({
     draft.artifacts.forEach((a, i) => {
       lines.push(`### ${i + 1}. ${a.type}${a.channel ? ` · ${a.channel}` : ""}`, "```", a.content, "```", "");
     });
+    if (draft.watchouts.length > 0) {
+      lines.push(`## Watchouts`);
+      draft.watchouts.forEach((w) => {
+        lines.push(`- **${w.title}**: ${w.detail}`);
+      });
+      lines.push(``);
+    }
+    if (draft.measurementPlan.length > 0) {
+      lines.push(`## Measurement plan`);
+      draft.measurementPlan.forEach((m) => {
+        lines.push(
+          `- **${m.metric}**: ${m.whyThisMatters}${
+            m.targetSignal ? ` (target signal: ${m.targetSignal})` : ""
+          }`
+        );
+      });
+      lines.push(``);
+    }
     downloadTextFile(`copilot-draft-${auctionId}.md`, lines.join("\n"), "text/markdown;charset=utf-8");
   }, [auctionId, downloadTextFile, draft]);
 
@@ -470,6 +553,24 @@ export function SellerMarketingCopilot({
                     ))}
                   </select>
                 </div>
+                <div className="space-y-2 md:col-span-2">
+                  <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Workflow mode</p>
+                  <select
+                    className="h-10 w-full max-w-xl rounded-2xl border border-[hsl(var(--seller-border))] bg-white px-3 text-sm text-[hsl(var(--seller-foreground))]"
+                    value={workflowMode}
+                    onChange={(e) =>
+                      setWorkflowMode(
+                        e.target.value as MarketingCopilotGenerateBody["workflowMode"]
+                      )
+                    }
+                  >
+                    {WORKFLOW_MODE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Audience</p>
                   <Textarea
@@ -655,9 +756,171 @@ export function SellerMarketingCopilot({
                         }}
                       />
                     </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Workflow mode</p>
+                      <Input
+                        className="border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-sm text-[hsl(var(--seller-foreground))]"
+                        value={draft.plan.workflowMode ?? ""}
+                        onChange={(e) => updatePlanField("workflowMode", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-1 md:col-span-2">
+                      <p className="text-xs font-medium text-[hsl(var(--seller-muted))]">Why now</p>
+                      <Textarea
+                        rows={3}
+                        className="resize-y border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-sm text-[hsl(var(--seller-foreground))]"
+                        value={draft.plan.whyNow ?? ""}
+                        onChange={(e) => updatePlanField("whyNow", e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
               </section>
+
+              {draft.priorityActions.length > 0 ? (
+                <section className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+                  <h3 className="text-sm font-semibold text-[hsl(var(--seller-foreground))]">
+                    Priority actions ({draft.priorityActions.length})
+                  </h3>
+                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                    {draft.priorityActions.map((action, i) => (
+                      <div
+                        key={`priority-${i}`}
+                        className="rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3"
+                      >
+                        <p className="text-xs uppercase text-[hsl(var(--seller-muted))]">
+                          {action.tone}
+                          {action.channel ? ` · ${action.channel}` : ""}
+                        </p>
+                        <p className="mt-2 font-medium text-[hsl(var(--seller-foreground))]">
+                          {action.title}
+                        </p>
+                        <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
+                          {action.actionNow}
+                        </p>
+                        <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
+                          Why this matters: {action.whyThisMatters}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
+              {draft.channelPlaybooks.length > 0 ? (
+                <section className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+                  <h3 className="text-sm font-semibold text-[hsl(var(--seller-foreground))]">
+                    Channel playbooks ({draft.channelPlaybooks.length})
+                  </h3>
+                  <div className="mt-3 space-y-3">
+                    {draft.channelPlaybooks.map((playbook, i) => (
+                      <div
+                        key={`playbook-${i}`}
+                        className="rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3"
+                      >
+                        <p className="text-xs uppercase text-[hsl(var(--seller-muted))]">
+                          {CHANNEL_LABELS[playbook.channel] ?? playbook.channel}
+                        </p>
+                        <div className="mt-2 grid gap-2 md:grid-cols-2">
+                          <p className="text-xs text-[hsl(var(--seller-muted))]">
+                            Audience fit: {playbook.audienceFit}
+                          </p>
+                          <p className="text-xs text-[hsl(var(--seller-muted))]">
+                            Why this channel: {playbook.whyThisChannel}
+                          </p>
+                          <p className="text-xs text-[hsl(var(--seller-muted))]">
+                            Cadence: {playbook.cadence}
+                          </p>
+                          <p className="text-xs text-[hsl(var(--seller-muted))]">
+                            CTA guidance: {playbook.ctaGuidance}
+                          </p>
+                        </div>
+                        <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
+                          Messaging angle: {playbook.messagingAngle}
+                        </p>
+                        {playbook.assetSuggestions.length > 0 ? (
+                          <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
+                            Asset suggestions: {playbook.assetSuggestions.join(" · ")}
+                          </p>
+                        ) : null}
+                        {playbook.doNotes.length > 0 ? (
+                          <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
+                            Do: {playbook.doNotes.join(" · ")}
+                          </p>
+                        ) : null}
+                        {playbook.avoidNotes.length > 0 ? (
+                          <p className="mt-2 text-xs text-[hsl(var(--seller-muted))]">
+                            Avoid: {playbook.avoidNotes.join(" · ")}
+                          </p>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
+              {(draft.watchouts.length > 0 || draft.measurementPlan.length > 0) ? (
+                <section className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+                  <h3 className="text-sm font-semibold text-[hsl(var(--seller-foreground))]">
+                    Watchouts and measurement
+                  </h3>
+                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <p className="text-xs uppercase text-[hsl(var(--seller-muted))]">
+                        Watchouts
+                      </p>
+                      {draft.watchouts.length > 0 ? (
+                        draft.watchouts.map((item, i) => (
+                          <div
+                            key={`watchout-${i}`}
+                            className="rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3"
+                          >
+                            <p className="text-sm font-medium text-[hsl(var(--seller-foreground))]">
+                              {item.title}
+                            </p>
+                            <p className="mt-1 text-xs text-[hsl(var(--seller-muted))]">
+                              {item.detail}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-xs text-[hsl(var(--seller-muted))]">
+                          No watchouts returned.
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-xs uppercase text-[hsl(var(--seller-muted))]">
+                        Measurement plan
+                      </p>
+                      {draft.measurementPlan.length > 0 ? (
+                        draft.measurementPlan.map((item, i) => (
+                          <div
+                            key={`measure-${i}`}
+                            className="rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3"
+                          >
+                            <p className="text-sm font-medium text-[hsl(var(--seller-foreground))]">
+                              {item.metric}
+                            </p>
+                            <p className="mt-1 text-xs text-[hsl(var(--seller-muted))]">
+                              {item.whyThisMatters}
+                            </p>
+                            {item.targetSignal ? (
+                              <p className="mt-1 text-xs text-[hsl(var(--seller-muted))]">
+                                Target signal: {item.targetSignal}
+                              </p>
+                            ) : null}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-xs text-[hsl(var(--seller-muted))]">
+                          No measurement plan returned.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </section>
+              ) : null}
 
               <section className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
                 <h3 className="text-sm font-semibold text-[hsl(var(--seller-foreground))]">Checklist ({draft.tasks.length})</h3>

@@ -2,8 +2,21 @@ import { z } from "zod";
 
 /** Sell wizard section — drives prompt + which fields the client should apply. */
 export const listingAiWizardScopeSchema = z.enum(["full", "condition", "imperfections"]);
+export const listingAiAudiencePresetSchema = z.enum([
+  "collector",
+  "performance_buyer",
+  "daily_driver",
+  "project_car",
+  "weekend_enthusiast",
+]);
+export const listingAiServiceHistoryConfidenceSchema = z.enum([
+  "documented",
+  "partial",
+  "unknown",
+]);
 
 export type ListingAiWizardScope = z.infer<typeof listingAiWizardScopeSchema>;
+export type ListingAiAudiencePreset = z.infer<typeof listingAiAudiencePresetSchema>;
 
 export const listingAiGenerateBodySchema = z.object({
   auctionId: z.string().min(1).optional(),
@@ -23,14 +36,28 @@ export const listingAiGenerateBodySchema = z.object({
   highlights: z.string().max(8000).optional(),
   tone: z.string().max(200).optional(),
   audience: z.string().max(2000).optional(),
+  audiencePreset: listingAiAudiencePresetSchema.optional(),
+  ownershipDuration: z.string().max(200).optional(),
+  serviceHistoryConfidence: listingAiServiceHistoryConfidenceSchema.optional(),
+  modifications: z.string().max(4000).optional(),
+  originality: z.string().max(4000).optional(),
+  documentationAvailable: z.string().max(1000).optional(),
+  sellingReason: z.string().max(1000).optional(),
 });
 
 export type ListingAiGenerateBody = z.infer<typeof listingAiGenerateBodySchema>;
 
 export const listingAiStructuredResultSchema = z.object({
   title: z.string().min(1).max(200),
+  titleOptions: z.array(z.string().min(1).max(200)).max(4).default([]),
+  shortSummary: z.string().max(600).default(""),
   description: z.string().min(1).max(20000),
   conditionSummary: z.string().max(8000).optional().nullable(),
+  missingInfo: z.array(z.string().min(1).max(300)).max(10).default([]),
+  riskFlags: z.array(z.string().min(1).max(300)).max(10).default([]),
+  readinessScore: z.number().int().min(0).max(100).default(0),
+  readinessReasons: z.array(z.string().min(1).max(400)).max(10).default([]),
+  disclosureSuggestions: z.array(z.string().min(1).max(400)).max(10).default([]),
 });
 
 export type ListingAiStructuredResult = z.infer<typeof listingAiStructuredResultSchema>;
@@ -51,6 +78,13 @@ export const listingAiRewriteFieldSchema = z
     description: z.string().max(20000).optional(),
     conditionSummary: z.string().max(8000).optional(),
     conditionGrade: z.string().max(32).optional().nullable(),
+    audiencePreset: listingAiAudiencePresetSchema.optional(),
+    ownershipDuration: z.string().max(200).optional(),
+    serviceHistoryConfidence: listingAiServiceHistoryConfidenceSchema.optional(),
+    modifications: z.string().max(4000).optional(),
+    originality: z.string().max(4000).optional(),
+    documentationAvailable: z.string().max(1000).optional(),
+    sellingReason: z.string().max(1000).optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.auctionId) {

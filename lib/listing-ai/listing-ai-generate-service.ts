@@ -1,4 +1,5 @@
 import { openAiChatJsonObject } from "@/lib/marketing/marketing-copilot-openai";
+import { deriveListingReadinessSnapshot } from "@/lib/listing-ai/listing-ai-readiness";
 import {
   listingAiStructuredResultSchema,
   type ListingAiGenerateBody,
@@ -9,17 +10,26 @@ import {
 const SYSTEM_FULL = `You are an expert automotive listing editor for Carasta, a collector and enthusiast marketplace.
 Return a single JSON object only (no markdown) with keys:
 - "title": compelling auction title, max 200 chars, factual.
+- "titleOptions": 2-4 factual alternative title options.
+- "shortSummary": 1-2 sentence top-line summary for a seller preview panel.
 - "description": 2–6 short paragraphs: condition, notable options, service history if implied by input, why it matters to buyers. No false claims; if unknown, say so briefly. Plain text, no HTML.
 - "conditionSummary": optional 1–3 sentences summarizing condition for a condition field; use empty string if nothing to add.
+- "missingInfo": specific missing seller inputs that would improve confidence. Prefer explicit gaps over invented certainty.
+- "riskFlags": factual-writing cautions or overclaim risks.
+- "readinessScore": integer 0-100 based only on seller-provided context and clearly missing context.
+- "readinessReasons": concise reasons for the score.
+- "disclosureSuggestions": seller-safe disclosure or clarification suggestions.
 
 Rules:
 - Never invent VIN decode, accident history, or legal guarantees.
 - Match year/make/model/trim from input; do not change year.
 - Tone: confident, specific, enthusiast-friendly; avoid ALL CAPS shouting.
-- If intake includes seller "highlights", weave them naturally; do not contradict other fields.`;
+- If intake includes seller "highlights", weave them naturally; do not contradict other fields.
+- Audience presets affect emphasis only, never the underlying facts.
+- If a fact is not supported, call it unknown or list it in missingInfo rather than implying certainty.`;
 
 const SYSTEM_CONDITION = `You are an expert automotive listing editor for Carasta.
-The seller is on the CONDITION step. Return a single JSON object only (no markdown) with keys "title", "description", "conditionSummary" as required by the schema.
+The seller is on the CONDITION step. Return a single JSON object only (no markdown) with the schema keys required for listing AI output.
 
 Focus:
 - Primary: write an excellent "conditionSummary" (1–3 sentences) that matches any condition grade provided and the vehicle context. Honest, specific, no invented history.
@@ -27,10 +37,11 @@ Focus:
 
 Rules:
 - Never invent VIN decode, accident history, or legal guarantees.
-- Do not change model year.`;
+- Do not change model year.
+- Use missingInfo / riskFlags / disclosureSuggestions to surface gaps instead of guessing.`;
 
 const SYSTEM_IMPERFECTIONS = `You are an expert automotive listing editor for Carasta.
-The seller listed disclosed imperfections (locations, severities, notes). Return a single JSON object only (no markdown) with keys "title", "description", "conditionSummary".
+The seller listed disclosed imperfections (locations, severities, notes). Return a single JSON object only (no markdown) with the schema keys required for listing AI output.
 
 Focus:
 - Primary: rewrite or expand "description" to include a clear, buyer-friendly "Disclosures" tone: weave the imperfection list honestly into the narrative (plain text, no HTML). Do not minimize major items; do not shame the seller.
@@ -40,77 +51,121 @@ Focus:
 Rules:
 - Never invent damage not present in the imperfection list or highlights.
 - Never invent VIN decode, accident history, or legal guarantees.
-- Do not change model year.`;
+- Do not change model year.
+- Use disclosureSuggestions to tighten honesty and scanability, not to add unsupported facts.`;
 
 function scopeFromIntake(intake: ListingAiGenerateBody): ListingAiWizardScope {
   return intake.wizardScope ?? "full";
 }
 
 function buildUserPromptFull(input: ListingAiGenerateBody): string {
+  const readiness = deriveListingReadinessSnapshot(input);
   const lines: string[] = [
-    `Vehicle: ${input.year} ${input.make} ${input.model}${input.trim ? ` ${input.trim}` : ""}`,
+    "AUTHORITATIVE_LISTING_CONTEXT_JSON:",
+    JSON.stringify({
+      vehicle: {
+        year: input.year,
+        make: input.make,
+        model: input.model,
+        trim: input.trim ?? null,
+        mileage: input.mileage ?? null,
+        vin: input.vin ?? null,
+        conditionGrade: input.conditionGrade ?? null,
+      },
+      currentFields: {
+        title: input.title ?? "",
+        description: input.description ?? "",
+        conditionSummary: input.conditionSummary ?? "",
+      },
+      sellerContext: {
+        highlights: input.highlights ?? "",
+        tone: input.tone ?? "",
+        audience: input.audience ?? "",
+        audiencePreset: input.audiencePreset ?? null,
+        ownershipDuration: input.ownershipDuration ?? "",
+        serviceHistoryConfidence: input.serviceHistoryConfidence ?? "unknown",
+        modifications: input.modifications ?? "",
+        originality: input.originality ?? "",
+        documentationAvailable: input.documentationAvailable ?? "",
+        sellingReason: input.sellingReason ?? "",
+      },
+      readinessContext: readiness,
+    }),
   ];
-  if (input.mileage != null) lines.push(`Mileage: ${input.mileage}`);
-  if (input.vin) lines.push(`VIN (do not decode; treat as opaque): ${input.vin}`);
-  if (input.title?.trim()) lines.push(`Current title (may improve): ${input.title.trim()}`);
-  if (input.description?.trim()) lines.push(`Current description (may rewrite): ${input.description.trim()}`);
-  if (input.conditionSummary?.trim()) {
-    lines.push(`Current condition summary: ${input.conditionSummary.trim()}`);
-  }
-  if (input.conditionGrade) lines.push(`Condition grade (enum): ${input.conditionGrade}`);
-  if (input.highlights?.trim()) lines.push(`Seller highlights / bullets:\n${input.highlights.trim()}`);
-  if (input.tone?.trim()) lines.push(`Preferred tone: ${input.tone.trim()}`);
-  if (input.audience?.trim()) lines.push(`Target audience: ${input.audience.trim()}`);
   lines.push(
     "",
     `Respond with JSON exactly shaped as:
-{"title":"...","description":"...","conditionSummary":"..."}
+{"title":"...","titleOptions":["..."],"shortSummary":"...","description":"...","conditionSummary":"...","missingInfo":["..."],"riskFlags":["..."],"readinessScore":0,"readinessReasons":["..."],"disclosureSuggestions":["..."]}
 Use "conditionSummary" as empty string if not needed.`
   );
   return lines.join("\n");
 }
 
 function buildUserPromptCondition(input: ListingAiGenerateBody): string {
+  const readiness = deriveListingReadinessSnapshot(input);
   const lines: string[] = [
-    `Vehicle: ${input.year} ${input.make} ${input.model}${input.trim ? ` ${input.trim}` : ""}`,
+    "AUTHORITATIVE_LISTING_CONTEXT_JSON:",
+    JSON.stringify({
+      vehicle: {
+        year: input.year,
+        make: input.make,
+        model: input.model,
+        trim: input.trim ?? null,
+        mileage: input.mileage ?? null,
+        vin: input.vin ?? null,
+        conditionGrade: input.conditionGrade ?? null,
+      },
+      currentFields: {
+        title: input.title ?? "",
+        description: input.description ?? "",
+        conditionSummary: input.conditionSummary ?? "",
+      },
+      sellerContext: {
+        highlights: input.highlights ?? "",
+        tone: input.tone ?? "",
+        audiencePreset: input.audiencePreset ?? null,
+        serviceHistoryConfidence: input.serviceHistoryConfidence ?? "unknown",
+        documentationAvailable: input.documentationAvailable ?? "",
+      },
+      readinessContext: readiness,
+    }),
   ];
-  if (input.mileage != null) lines.push(`Mileage: ${input.mileage}`);
-  if (input.vin) lines.push(`VIN (do not decode; treat as opaque): ${input.vin}`);
-  if (input.conditionGrade) lines.push(`Selected condition grade: ${input.conditionGrade}`);
-  if (input.title?.trim()) lines.push(`Current title (keep if already good): ${input.title.trim()}`);
-  if (input.description?.trim()) {
-    lines.push(`Current description (keep if already good): ${input.description.trim()}`);
-  }
-  if (input.conditionSummary?.trim()) {
-    lines.push(`Current condition summary (may improve): ${input.conditionSummary.trim()}`);
-  }
-  if (input.highlights?.trim()) lines.push(`Extra seller notes:\n${input.highlights.trim()}`);
-  if (input.tone?.trim()) lines.push(`Preferred tone: ${input.tone.trim()}`);
   lines.push(
     "",
     `Respond with JSON exactly shaped as:
-{"title":"...","description":"...","conditionSummary":"..."}`
+{"title":"...","titleOptions":["..."],"shortSummary":"...","description":"...","conditionSummary":"...","missingInfo":["..."],"riskFlags":["..."],"readinessScore":0,"readinessReasons":["..."],"disclosureSuggestions":["..."]}`
   );
   return lines.join("\n");
 }
 
 function buildUserPromptImperfections(input: ListingAiGenerateBody): string {
+  const readiness = deriveListingReadinessSnapshot(input);
   const lines: string[] = [
-    `Vehicle: ${input.year} ${input.make} ${input.model}${input.trim ? ` ${input.trim}` : ""}`,
+    "AUTHORITATIVE_LISTING_CONTEXT_JSON:",
+    JSON.stringify({
+      vehicle: {
+        year: input.year,
+        make: input.make,
+        model: input.model,
+        trim: input.trim ?? null,
+      },
+      currentFields: {
+        title: input.title ?? "",
+        description: input.description ?? "",
+        conditionSummary: input.conditionSummary ?? "",
+      },
+      disclosedImperfections: input.highlights ?? "",
+      sellerContext: {
+        tone: input.tone ?? "",
+        audiencePreset: input.audiencePreset ?? null,
+      },
+      readinessContext: readiness,
+    }),
   ];
-  if (input.title?.trim()) lines.push(`Current title: ${input.title.trim()}`);
-  if (input.description?.trim()) lines.push(`Current description:\n${input.description.trim()}`);
-  if (input.conditionSummary?.trim()) {
-    lines.push(`Current condition summary (preserve meaning):\n${input.conditionSummary.trim()}`);
-  }
-  lines.push("");
-  lines.push("Disclosed imperfections (authoritative):");
-  lines.push(input.highlights?.trim() || "(none provided — ask seller to add rows or notes.)");
-  if (input.tone?.trim()) lines.push(`Preferred tone: ${input.tone.trim()}`);
   lines.push(
     "",
     `Respond with JSON exactly shaped as:
-{"title":"...","description":"...","conditionSummary":"..."}`
+{"title":"...","titleOptions":["..."],"shortSummary":"...","description":"...","conditionSummary":"...","missingInfo":["..."],"riskFlags":["..."],"readinessScore":0,"readinessReasons":["..."],"disclosureSuggestions":["..."]}`
   );
   return lines.join("\n");
 }
@@ -120,28 +175,51 @@ function mergeByScope(
   out: ListingAiStructuredResult,
   scope: ListingAiWizardScope
 ): ListingAiStructuredResult {
+  const readiness = deriveListingReadinessSnapshot(intake);
+  const titleOptions = Array.from(
+    new Set([out.title, ...(out.titleOptions ?? [])].map((v) => v.trim()).filter(Boolean))
+  ).slice(0, 4);
+  const base: ListingAiStructuredResult = {
+    ...out,
+    titleOptions,
+    shortSummary: out.shortSummary?.trim() ?? "",
+    missingInfo: Array.from(new Set([...(out.missingInfo ?? []), ...readiness.missingInfo])).slice(0, 8),
+    riskFlags: Array.from(new Set([...(out.riskFlags ?? []), ...readiness.riskFlags])).slice(0, 6),
+    readinessScore:
+      typeof out.readinessScore === "number" && out.readinessScore > 0
+        ? Math.round((out.readinessScore + readiness.readinessScore) / 2)
+        : readiness.readinessScore,
+    readinessReasons: Array.from(
+      new Set([...(out.readinessReasons ?? []), ...readiness.readinessReasons])
+    ).slice(0, 6),
+    disclosureSuggestions: Array.from(
+      new Set(out.disclosureSuggestions ?? [])
+    ).slice(0, 6),
+  };
+
   if (scope === "full") {
-    const cs = out.conditionSummary?.trim();
-    if (!cs) return { title: out.title, description: out.description };
-    return { title: out.title, description: out.description, conditionSummary: cs };
+    const cs = base.conditionSummary?.trim();
+    if (!cs) return { ...base, conditionSummary: undefined };
+    return { ...base, conditionSummary: cs };
   }
 
   if (scope === "condition") {
-    const title = intake.title?.trim() || out.title;
-    const description = intake.description?.trim() || out.description;
-    const cs = out.conditionSummary?.trim() ?? "";
-    return { title, description, ...(cs ? { conditionSummary: cs } : {}) };
+    const title = intake.title?.trim() || base.title;
+    const description = intake.description?.trim() || base.description;
+    const cs = base.conditionSummary?.trim() ?? "";
+    return { ...base, title, description, ...(cs ? { conditionSummary: cs } : {}) };
   }
 
   // imperfections
-  const title = intake.title?.trim() || out.title;
+  const title = intake.title?.trim() || base.title;
   const cs =
     intake.conditionSummary?.trim() ||
-    out.conditionSummary?.trim() ||
+    base.conditionSummary?.trim() ||
     "";
   return {
+    ...base,
     title,
-    description: out.description,
+    description: base.description,
     ...(cs ? { conditionSummary: cs } : {}),
   };
 }
