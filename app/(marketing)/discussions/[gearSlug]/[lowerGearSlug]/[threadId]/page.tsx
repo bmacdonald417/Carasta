@@ -20,6 +20,8 @@ import { prisma } from "@/lib/db";
 import { getForumThreadDetail } from "@/lib/forums/forum-service";
 import { touchForumThreadSubscriptionViewed } from "@/lib/forums/thread-subscriptions";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -188,21 +190,24 @@ export default async function ThreadPage({ params }: Props) {
 
   return (
     <div className="carasta-container max-w-3xl py-8">
-      <nav className="text-xs text-neutral-500">
-        <Link href="/discussions" className="text-primary hover:underline">
+      <nav className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
+        <Link
+          href="/discussions"
+          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
+        >
           Discussions
         </Link>
-        <span className="mx-1.5 text-neutral-600">/</span>
+        <span aria-hidden className="text-muted-foreground/40">/</span>
         <Link
           href={`/discussions/${thread.category.space.slug}`}
-          className="text-primary hover:underline"
+          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
         >
           {thread.category.space.title}
         </Link>
-        <span className="mx-1.5 text-neutral-600">/</span>
+        <span aria-hidden className="text-muted-foreground/40">/</span>
         <Link
           href={`/discussions/${thread.category.space.slug}/${thread.category.slug}`}
-          className="text-primary hover:underline"
+          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
         >
           {thread.category.title}
         </Link>
@@ -216,27 +221,27 @@ export default async function ThreadPage({ params }: Props) {
         </div>
       ) : null}
 
-      <article className="mt-6 rounded-2xl border border-border/50 bg-card/60 p-5 shadow-glass-sm">
+      <article className="mt-6 rounded-2xl border border-border bg-card p-5 shadow-e1 md:p-6">
         <header className="space-y-4">
-          <h1 className="font-display text-xl font-bold uppercase tracking-wide text-foreground md:text-2xl">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
             {thread.title}
           </h1>
 
-          <div className="flex flex-col gap-3 border-b border-border/40 pb-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-3 border-b border-border pb-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 space-y-2">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
                 <AuthorHandleLink handle={thread.author.handle} className="text-sm" />
                 {thread.author.name ? (
-                  <span className="text-neutral-500">· {thread.author.name}</span>
+                  <span className="text-muted-foreground/90">· {thread.author.name}</span>
                 ) : null}
-                <span className="text-neutral-500">· {formatLong(thread.createdAt)}</span>
+                <span className="text-muted-foreground/90">· {formatLong(thread.createdAt)}</span>
                 {viewerId && viewerId !== thread.author.id ? (
                   <span className="inline-flex flex-wrap items-center gap-2">
-                    <span className="text-neutral-600">·</span>
+                    <span className="text-muted-foreground/50">·</span>
                     <FollowButton
                       targetUserId={thread.author.id}
                       initialFollowing={viewerFollowsAuthor}
-                      className="h-7 border-primary/35 bg-primary/5 px-2 text-[10px] font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
+                      className="h-7 border-border bg-muted/40 px-2 text-[10px] font-semibold uppercase tracking-wide text-foreground hover:bg-muted/60"
                     />
                   </span>
                 ) : null}
@@ -257,7 +262,7 @@ export default async function ThreadPage({ params }: Props) {
                   url={threadSharePath}
                   title={thread.title}
                   description={`${thread.category.space.title} · ${thread.category.title}`}
-                  triggerClassName="border-primary/35 bg-primary/5 text-xs text-primary hover:bg-primary/10"
+                  triggerClassName="border-border bg-muted/40 text-xs text-foreground hover:bg-muted/60"
                   carmunityShareMeta={
                     viewerId ? { surface: "discussion_thread", threadId: thread.id } : undefined
                   }
@@ -269,7 +274,7 @@ export default async function ThreadPage({ params }: Props) {
                       threadId={thread.id}
                       contentLabel={`Reporting “${thread.title.slice(0, 120)}${thread.title.length > 120 ? "…" : ""}”`}
                       variant="outline"
-                      className="border-border/60"
+                      className="border-border"
                     />
                     {peerSafety ? (
                       <DiscussionPeerSafetyMenu
@@ -283,8 +288,10 @@ export default async function ThreadPage({ params }: Props) {
                 ) : null}
               </div>
 
-              <div className="flex flex-col gap-2 rounded-xl border border-border/40 bg-muted/5 p-3 lg:items-end">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">Reactions</p>
+              <div className="flex flex-col gap-2 rounded-xl border border-border bg-muted/20 p-3 lg:items-end">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Reactions
+                </p>
                 <DiscussionReactionPicker
                   target="thread"
                   targetId={thread.id}
@@ -297,7 +304,7 @@ export default async function ThreadPage({ params }: Props) {
           </div>
         </header>
 
-        <div className="mt-5 text-sm leading-relaxed text-foreground/90">
+        <div className="mt-5 text-sm leading-relaxed text-foreground">
           <DiscussionRichText text={thread.body} validHandles={validMentionHandles} />
         </div>
       </article>
@@ -315,7 +322,7 @@ export default async function ThreadPage({ params }: Props) {
       <p className="mt-10 text-sm text-muted-foreground">
         <Link
           href={`/discussions/${thread.category.space.slug}/${thread.category.slug}`}
-          className="text-primary hover:underline"
+          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
         >
           ← Back to {thread.category.title}
         </Link>

@@ -70,7 +70,7 @@ export function DiscussionPeerSafetyMenu({
       >
         {blocked ? "Unblock" : "Block"} @{targetHandle}
       </Button>
-      <span className="text-[10px] text-neutral-600">·</span>
+      <span className="text-[10px] text-muted-foreground/50">·</span>
       <Button
         type="button"
         variant="ghost"

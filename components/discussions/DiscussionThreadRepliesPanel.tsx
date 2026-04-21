@@ -9,9 +9,12 @@ import { DiscussionReactionPicker } from "@/components/discussions/DiscussionRea
 import { DiscussionReportDialog } from "@/components/discussions/DiscussionReportDialog";
 import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
 import { DiscussionThreadReplyComposer } from "@/components/discussions/DiscussionThreadReplyComposer";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { discussionReplyAnchorId } from "@/lib/discussions/discussion-paths";
 import type { DiscussionReactionTotals } from "@/lib/forums/forum-service";
-import { Button } from "@/components/ui/button";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export type SerializedThreadReply = {
   id: string;
@@ -104,17 +107,15 @@ export function DiscussionThreadRepliesPanel({
   return (
     <section className="mt-8 space-y-4">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-neutral-400">
-          Replies ({replyCount})
+        <h2 className="text-sm font-semibold text-foreground">
+          Replies <span className="font-normal text-muted-foreground">({replyCount})</span>
         </h2>
       </div>
 
       <ul className="space-y-3">
         {replies.length === 0 ? (
-          <li className="rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-5 py-8 text-center">
-            <p className="font-display text-sm font-semibold uppercase tracking-wide text-neutral-200">
-              Start the thread momentum
-            </p>
+          <li className="rounded-2xl border border-dashed border-border bg-muted/20 px-5 py-8 text-center shadow-e1">
+            <p className="text-sm font-semibold text-foreground">Start the thread momentum</p>
             <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
               A clear question or reference photo invites better answers. Mention someone with{" "}
               <span className="font-mono text-primary/90">@handle</span> when you want them in the loop.
@@ -125,19 +126,22 @@ export function DiscussionThreadRepliesPanel({
             <li
               key={r.id}
               id={discussionReplyAnchorId(r.id)}
-              className="rounded-2xl border border-border/50 bg-card/45 px-4 py-3 shadow-sm scroll-mt-24"
+              className="scroll-mt-24 rounded-2xl border border-border bg-card px-4 py-3 shadow-e1"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <p className="text-xs text-muted-foreground">
                   <AuthorHandleLink handle={r.author.handle} className="text-xs" />
                   {r.author.name ? (
-                    <span className="text-neutral-500"> · {r.author.name}</span>
+                    <span className="text-muted-foreground/90"> · {r.author.name}</span>
                   ) : null}
-                  <span className="text-neutral-500"> · {formatLong(r.createdAt)}</span>
+                  <span className="text-muted-foreground/90"> · {formatLong(r.createdAt)}</span>
                   {r.demoSeed ? (
-                    <span className="ml-2 rounded border border-amber-500/35 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-200">
+                    <Badge
+                      variant="secondary"
+                      className="ml-2 h-5 px-1.5 text-[10px] font-semibold uppercase"
+                    >
                       Demo
-                    </span>
+                    </Badge>
                   ) : null}
                 </p>
                 {!r.contentWithdrawn ? (
@@ -148,14 +152,16 @@ export function DiscussionThreadRepliesPanel({
                     initialKind={r.viewerReactionKind}
                   />
                 ) : (
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
+                  <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                     Unavailable
                   </span>
                 )}
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-foreground/90">
+              <p className="mt-2 text-sm leading-relaxed text-foreground">
                 {r.contentWithdrawn ? (
-                  <span className="text-muted-foreground">This content has been removed.</span>
+                  <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-muted-foreground">
+                    This content has been removed.
+                  </span>
                 ) : (
                   <DiscussionRichText text={r.body} validHandles={validMentionHandles} />
                 )}
@@ -167,7 +173,10 @@ export function DiscussionThreadRepliesPanel({
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="h-7 px-2 text-xs text-primary hover:text-primary"
+                      className={cn(
+                        "h-7 px-2 text-xs text-primary hover:bg-muted/60 hover:text-primary",
+                        shellFocusRing
+                      )}
                       onClick={() => setParentReplyId(r.id)}
                     >
                       Reply
@@ -200,7 +209,10 @@ export function DiscussionThreadRepliesPanel({
             size="sm"
             disabled={loadingMore}
             onClick={() => void loadMore()}
-            className="border-primary/35 bg-primary/5 text-xs font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
+            className={cn(
+              "border-border text-xs font-semibold text-primary hover:bg-muted/50",
+              shellFocusRing
+            )}
           >
             {loadingMore ? "Loading…" : "Load more replies"}
           </Button>
@@ -208,13 +220,13 @@ export function DiscussionThreadRepliesPanel({
       ) : null}
 
       {parentPreview ? (
-        <div className="rounded-xl border border-primary/25 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
+        <div className="rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground shadow-e1">
           <div className="flex items-start justify-between gap-2">
             <p className="min-w-0">
-              <span className="font-semibold text-primary">Replying to </span>
+              <span className="font-semibold text-foreground">Replying to </span>
               <AuthorHandleLink handle={parentPreview.author.handle} className="text-xs" />
-              <span className="mx-1 text-neutral-500">·</span>
-              <span className="line-clamp-2 text-neutral-400">
+              <span className="mx-1 text-muted-foreground/60">·</span>
+              <span className="line-clamp-2 text-muted-foreground">
                 {parentPreview.contentWithdrawn
                   ? "This content has been removed."
                   : parentPreview.body}
@@ -222,7 +234,11 @@ export function DiscussionThreadRepliesPanel({
             </p>
             <button
               type="button"
-              className="shrink-0 text-[11px] text-primary hover:underline"
+              className={cn(
+                "shrink-0 text-[11px] font-medium text-primary hover:underline",
+                shellFocusRing,
+                "rounded-sm px-0.5"
+              )}
               onClick={() => setParentReplyId(null)}
             >
               Clear

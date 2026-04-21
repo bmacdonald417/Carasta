@@ -30,7 +30,7 @@ export function DiscussionThreadReplyComposer({
 
   if (locked) {
     return (
-      <p className="rounded-xl border border-border/60 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+      <p className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground shadow-e1">
         This thread is locked — new replies are disabled.
       </p>
     );
@@ -42,7 +42,7 @@ export function DiscussionThreadReplyComposer({
 
   if (!session?.user) {
     return (
-      <div className="rounded-xl border border-border/60 bg-card/60 p-4 text-sm text-muted-foreground">
+      <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground shadow-e1">
         <Link
           href={`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`}
           className="text-primary hover:underline"
@@ -88,11 +88,11 @@ export function DiscussionThreadReplyComposer({
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-4 rounded-2xl border border-border/50 bg-card/55 p-4 shadow-sm backdrop-blur-sm sm:p-5"
+      className="space-y-4 rounded-2xl border border-border bg-card p-4 shadow-e1 sm:p-5"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-primary/90">Reply</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Reply</p>
           <p className="text-sm font-medium text-foreground">Join the thread</p>
         </div>
         <span className="tabular-nums text-[11px] text-muted-foreground">{body.length} / 8000</span>
@@ -106,21 +106,15 @@ export function DiscussionThreadReplyComposer({
         onChange={setBody}
         placeholder="Add perspective, data, or encouragement — type @ to mention someone."
         rows={4}
-        className="min-h-[108px] resize-y border-border/60 bg-background/70 text-[15px] leading-relaxed"
+        className="min-h-[108px] resize-y border-border bg-background text-[15px] leading-relaxed"
         maxLength={8000}
       />
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/35 pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
         <p className="max-w-xl text-[11px] leading-snug text-muted-foreground">
           <span className="font-mono text-primary/90">@handle</span> linkifies for readers and notifies when the
           handle is valid on Carmunity.
         </p>
-        <Button
-          type="submit"
-          variant="performance"
-          size="sm"
-          disabled={sending}
-          className="shrink-0 rounded-full px-4"
-        >
+        <Button type="submit" variant="default" size="sm" disabled={sending} className="shrink-0 rounded-full px-4">
           {sending ? "Posting…" : "Post reply"}
         </Button>
       </div>

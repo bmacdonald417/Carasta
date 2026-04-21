@@ -5,15 +5,13 @@ export function DemoProfileBanner({ className }: { className?: string }) {
     <p
       role="status"
       className={cn(
-        "rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100",
+        "rounded-xl border border-caution/25 bg-caution-soft/50 px-4 py-3 text-sm text-caution-foreground shadow-e1",
         className
       )}
     >
-      <span className="font-semibold text-amber-200">Demo profile.</span> This
-      account is seeded for Carmunity preview. See{" "}
-      <span className="font-mono text-xs text-amber-100/90">
-        CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md
-      </span>
+      <span className="font-semibold text-foreground">Demo profile.</span> This account is seeded
+      for Carmunity preview. See{" "}
+      <span className="font-mono text-xs text-muted-foreground">CARMUNITY_DISCUSSIONS_DEMO_CONTENT.md</span>
       .
     </p>
   );

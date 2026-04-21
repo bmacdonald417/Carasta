@@ -4,9 +4,12 @@ import { notFound } from "next/navigation";
 
 import { AuthorHandleLink } from "@/components/discussions/AuthorHandleLink";
 import { DiscussionReactionSummary } from "@/components/discussions/DiscussionReactionSummary";
+import { Badge } from "@/components/ui/badge";
 import { getForumSpaceBySlug, listRecentThreadsForGear } from "@/lib/forums/forum-service";
 import { getSession } from "@/lib/auth";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -44,21 +47,21 @@ export default async function GearPage({ params }: Props) {
 
   return (
     <div className="carasta-container max-w-3xl py-8">
-      <nav className="text-xs text-neutral-500">
-        <Link href="/discussions" className="text-primary hover:underline">
+      <nav className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
+        <Link href="/discussions" className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}>
           Discussions
         </Link>
-        <span className="mx-1.5 text-neutral-600">/</span>
-        <span className="text-neutral-300">Gears</span>
-        <span className="mx-1.5 text-neutral-600">/</span>
-        <span className="text-neutral-300">{space.title}</span>
+        <span aria-hidden className="text-muted-foreground/40">/</span>
+        <span className="text-muted-foreground/80">Gears</span>
+        <span aria-hidden className="text-muted-foreground/40">/</span>
+        <span className="font-medium text-foreground">{space.title}</span>
       </nav>
 
-      <header className="mt-4 rounded-2xl border border-border/50 bg-card/60 p-5 shadow-glass-sm">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">Gear</p>
-        <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wider text-foreground">
-          {space.title}
-        </h1>
+      <header className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-e1">
+        <Badge variant="outline" className="text-[10px] font-medium uppercase tracking-wide">
+          Gear
+        </Badge>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">{space.title}</h1>
         {space.description ? (
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{space.description}</p>
         ) : (
@@ -69,17 +72,17 @@ export default async function GearPage({ params }: Props) {
       </header>
 
       <section className="mt-8 space-y-3">
-        <div className="flex items-end justify-between gap-4">
-          <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-neutral-400">
-            Lower Gears
-          </h2>
-        </div>
+        <h2 className="text-sm font-semibold text-foreground">Lower Gears</h2>
         <ul className="space-y-2">
           {space.categories.map((c) => (
             <li key={c.id}>
               <Link
                 href={`/discussions/${space.slug}/${c.slug}`}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-border/50 bg-card/50 px-4 py-3 transition hover:border-primary/35 hover:bg-muted/10"
+                className={cn(
+                  "flex items-center justify-between gap-4 rounded-2xl border border-border bg-card px-4 py-3 shadow-e1 transition-colors",
+                  shellFocusRing,
+                  "hover:border-primary/30 hover:bg-muted/30"
+                )}
               >
                 <div className="min-w-0">
                   <p className="font-medium text-foreground">{c.title}</p>
@@ -97,13 +100,9 @@ export default async function GearPage({ params }: Props) {
       </section>
 
       <section className="mt-10 space-y-3">
-        <div className="flex items-end justify-between gap-4">
-          <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-neutral-400">
-            Recent across this Gear
-          </h2>
-        </div>
+        <h2 className="text-sm font-semibold text-foreground">Recent across this Gear</h2>
         {recent.ok && recent.threads.length === 0 ? (
-          <p className="rounded-2xl border border-border/50 bg-card/40 px-4 py-6 text-sm text-muted-foreground">
+          <p className="rounded-2xl border border-border bg-muted/25 px-4 py-6 text-sm text-muted-foreground shadow-e1">
             No threads yet — start one from a Lower Gear.
           </p>
         ) : (
@@ -113,23 +112,27 @@ export default async function GearPage({ params }: Props) {
                   <li key={t.id}>
                     <Link
                       href={discussionThreadPath(t.category.gearSlug, t.category.slug, t.id)}
-                      className="block rounded-2xl border border-border/50 bg-card/40 px-4 py-3 transition hover:border-primary/35 hover:bg-muted/10"
+                      className={cn(
+                        "block rounded-2xl border border-border bg-card px-4 py-3 shadow-e1 transition-colors",
+                        shellFocusRing,
+                        "hover:border-primary/30 hover:bg-muted/30"
+                      )}
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-medium text-foreground">{t.title}</span>
                         {t.demoSeed ? (
-                          <span className="rounded-md border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-200">
+                          <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold uppercase tracking-wide">
                             Demo
-                          </span>
+                          </Badge>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        <span className="text-primary/90">{t.category.slug}</span>
-                        <span className="mx-1 text-neutral-600">·</span>
+                      <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                        <span className="font-medium text-primary/90">{t.category.slug}</span>
+                        <span className="text-muted-foreground/60">·</span>
                         <AuthorHandleLink handle={t.author.handle} className="text-xs" />
-                        <span className="mx-1 text-neutral-600">·</span>
+                        <span className="text-muted-foreground/60">·</span>
                         <DiscussionReactionSummary summary={t.reactionSummary} />
-                        <span className="mx-1 text-neutral-600">·</span>
+                        <span className="text-muted-foreground/60">·</span>
                         {t.replyCount} repl{t.replyCount === 1 ? "y" : "ies"}
                       </p>
                     </Link>
@@ -141,7 +144,7 @@ export default async function GearPage({ params }: Props) {
       </section>
 
       <p className="mt-10 text-sm text-muted-foreground">
-        <Link href="/discussions" className="text-primary hover:underline">
+        <Link href="/discussions" className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}>
           ← All Gears
         </Link>
       </p>

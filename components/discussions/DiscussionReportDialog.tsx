@@ -123,9 +123,9 @@ export function DiscussionReportDialog({
           Report
         </Button>
       </DialogTrigger>
-      <DialogContent className="border-border/60 bg-card/95 sm:max-w-md">
+      <DialogContent className="border-border bg-popover shadow-e2 sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display text-lg uppercase tracking-wide text-foreground">
+          <DialogTitle className="text-lg font-semibold tracking-tight text-foreground">
             Report {target === "thread" ? "thread" : "reply"}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
@@ -136,7 +136,7 @@ export function DiscussionReportDialog({
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Reason</Label>
             <Select value={reason} onValueChange={(v) => setReason(v as DiscussionReportReason)}>
-              <SelectTrigger className="bg-background/80">
+              <SelectTrigger className="border-border bg-background">
                 <SelectValue placeholder="Choose a reason" />
               </SelectTrigger>
               <SelectContent>
@@ -155,18 +155,18 @@ export function DiscussionReportDialog({
               onChange={(e) => setDetails(e.target.value)}
               rows={4}
               maxLength={4000}
-              className="resize-y bg-background/80"
+              className="resize-y border-border bg-background"
               placeholder="Add context that helps moderators understand the issue."
             />
           </div>
           {message ? (
-            <p className="text-sm text-primary">{message}</p>
+            <p className="text-sm text-muted-foreground">{message}</p>
           ) : null}
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" variant="performance" disabled={sending}>
+            <Button type="submit" variant="default" disabled={sending}>
               {sending ? "Submitting…" : "Submit report"}
             </Button>
           </DialogFooter>

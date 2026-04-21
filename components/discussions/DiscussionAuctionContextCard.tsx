@@ -30,64 +30,62 @@ export function DiscussionAuctionContextCard({
       : null;
 
   return (
-    <aside className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.07] via-transparent to-transparent p-[1px]">
-      <div className="rounded-2xl border border-white/10 bg-[#0c0c10]/85 p-4 backdrop-blur-sm">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">
-          Listing context
-        </p>
-        <div className="mt-3 flex gap-3">
-          <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
-            {auction.leadImageUrl ? (
-              <Image
-                src={auction.leadImageUrl}
-                alt=""
-                fill
-                unoptimized
-                className="object-cover"
-                sizes="96px"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-[10px] text-muted-foreground">
-                No photo
-              </div>
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <Link
-              href={`/auctions/${auction.id}`}
-              className="font-display text-sm font-semibold uppercase tracking-wide text-foreground transition hover:text-primary"
-            >
-              {auction.title}
-            </Link>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {auction.year} {auction.make} {auction.model}
-            </p>
-            <p className="mt-2 text-xs text-neutral-300">
-              {bidLine}
-              {reserveLine ? (
-                <>
-                  <span className="text-neutral-600"> · </span>
-                  {reserveLine}
-                </>
-              ) : null}
-            </p>
-            <p className="mt-1 text-[10px] uppercase tracking-wide text-neutral-500">
-              {isLive ? (
-                <span className="text-[hsl(var(--performance-red))]">Live auction</span>
-              ) : (
-                <span>Status: {auction.status}</span>
-              )}
-            </p>
-          </div>
+    <aside className="rounded-2xl border border-border bg-card p-4 shadow-e1">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+        Listing context
+      </p>
+      <div className="mt-3 flex gap-3">
+        <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+          {auction.leadImageUrl ? (
+            <Image
+              src={auction.leadImageUrl}
+              alt=""
+              fill
+              unoptimized
+              className="object-cover"
+              sizes="96px"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-[10px] text-muted-foreground">
+              No photo
+            </div>
+          )}
         </div>
-        <div className="mt-3">
+        <div className="min-w-0 flex-1">
           <Link
             href={`/auctions/${auction.id}`}
-            className="text-xs font-semibold uppercase tracking-wide text-primary hover:underline"
+            className="text-sm font-semibold leading-snug text-foreground transition-colors hover:text-primary"
           >
-            View listing →
+            {auction.title}
           </Link>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {auction.year} {auction.make} {auction.model}
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {bidLine}
+            {reserveLine ? (
+              <>
+                <span className="text-muted-foreground/50"> · </span>
+                {reserveLine}
+              </>
+            ) : null}
+          </p>
+          <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+            {isLive ? (
+              <span className="text-signal">Live auction</span>
+            ) : (
+              <span>Status: {auction.status}</span>
+            )}
+          </p>
         </div>
+      </div>
+      <div className="mt-3">
+        <Link
+          href={`/auctions/${auction.id}`}
+          className="text-xs font-semibold text-primary hover:underline"
+        >
+          View listing →
+        </Link>
       </div>
     </aside>
   );
