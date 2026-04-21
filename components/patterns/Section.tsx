@@ -28,7 +28,7 @@ export function Section({
           <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
               {title && (
-                <h2 className="font-display text-2xl font-semibold uppercase tracking-[0.1em] text-neutral-100 md:text-3xl">
+                <h2 className="font-display text-2xl font-semibold uppercase tracking-[0.1em] text-foreground md:text-3xl">
                   {title}
                 </h2>
               )}

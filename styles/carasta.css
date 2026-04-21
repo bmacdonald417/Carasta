@@ -1,52 +1,53 @@
 /**
- * Carasta / Carmunity marketing chrome — aligns with styles/carmunity-tokens.css.
- * Brand copper for glows; signal red reserved for live / bid affordances in components.
+ * Carasta — marketing + legacy utility chrome (Phase 1A).
+ *
+ * Important:
+ * - Do not force global product heading typography here.
+ * - Prefer semantic tokens from `styles/carasta.semantic.tokens.css`.
+ * - Oswald/uppercase should be opt-in via `.carasta-marketing-display`.
  */
 
 :root {
-  /* Cyber-Luxury palette */
-  --carasta-bg: #07080c;
-  --carasta-card-bg: rgba(16, 18, 26, 0.78);
+  /* Legacy marketing vars (kept for backwards compatibility with older utilities) */
+  --carasta-bg: hsl(var(--background));
+  --carasta-card-bg: hsl(var(--card) / 0.92);
   --carasta-white: #ffffff;
 
-  /* Text — high contrast */
-  --carasta-ink: #f4f4f5;
-  --carasta-muted: #a1a1aa;
-  --carasta-muted-dark: #71717a;
+  /* Text */
+  --carasta-ink: hsl(var(--foreground));
+  --carasta-muted: hsl(var(--muted-foreground));
+  --carasta-muted-dark: hsl(var(--muted-foreground));
 
-  /* Borders — subtle; brand hover uses copper */
-  --carasta-border: rgba(255, 255, 255, 0.07);
-  --carasta-border-glow: rgba(232, 165, 75, 0.35);
+  /* Borders */
+  --carasta-border: hsl(var(--border) / 0.65);
+  --carasta-border-glow: hsl(var(--primary) / 0.35);
 
-  /* Brand copper + signal red (auction only in UI code) */
-  --carasta-brand-copper: #e8a54b;
-  --carasta-neon-blue: #ff3b5c;
-  --carasta-neon-lime: #ccff00;
-  --carasta-blue: #e8a54b;
-  --carasta-red: #ff3b5c;
+  /* Brand + signal (copper is heritage-only; functional accent is blue-violet via tokens) */
+  --carasta-brand-copper: hsl(var(--legacy-brand-copper));
+  --carasta-neon-blue: hsl(var(--neon-blue));
+  --carasta-neon-lime: hsl(var(--neon-lime));
+  --carasta-blue: hsl(var(--primary));
+  --carasta-red: hsl(var(--performance-red));
 
-  /* Glassmorphism */
-  --carasta-glass-bg: rgba(7, 8, 12, 0.88);
-  --carasta-glass-border: rgba(255, 255, 255, 0.055);
-  --carasta-glass-border-glow: rgba(232, 165, 75, 0.18);
+  /* Glassmorphism (selective; used only by explicit utilities) */
+  --carasta-glass-bg: hsl(var(--background) / 0.82);
+  --carasta-glass-border: hsl(var(--border) / 0.55);
+  --carasta-glass-border-glow: hsl(var(--primary) / 0.22);
 
   /* Typography */
   --carasta-font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
   --carasta-font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
 }
 
-/* Cyber-Luxury theme */
+/* Theme hook: keep typography defaults calm; color comes from Tailwind tokens on <body> */
 body.carasta-theme {
-  background-color: var(--carasta-bg);
-  color: var(--carasta-ink);
   font-family: var(--carasta-font-sans);
   line-height: 1.5;
 }
 
-body.carasta-theme h1,
-body.carasta-theme h2,
-body.carasta-theme h3,
-body.carasta-theme .carasta-heading {
+/* Opt-in marketing/display typography (do not apply to all headings globally) */
+.carasta-marketing-display,
+.carasta-heading {
   font-family: var(--font-oswald), "Oswald", system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -59,34 +60,35 @@ body.carasta-theme .carasta-body {
   line-height: 1.6;
 }
 
-/* Glass card — cyber overlay with neon border on hover */
+/* Glass card — opt-in utility */
 .carasta-card {
-  background: var(--carasta-card-bg);
-  border: 1px solid var(--carasta-glass-border);
+  background: hsl(var(--card) / 0.92);
+  border: 1px solid hsl(var(--border) / 0.55);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-e2);
   padding: 1.5rem 2rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color var(--motion-duration-3) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-3) var(--motion-ease-standard);
 }
 
 .carasta-card:hover {
-  border-color: var(--carasta-border-glow);
-  box-shadow: 0 4px 32px rgba(232, 165, 75, 0.1);
+  border-color: hsl(var(--primary) / 0.35);
+  box-shadow: var(--shadow-e3);
 }
 
 /* Glassmorphism header/nav */
 .carasta-glass {
-  background: var(--carasta-glass-bg);
+  background: hsl(var(--background) / 0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--carasta-glass-border);
+  border-bottom: 1px solid hsl(var(--border) / 0.55);
 }
 
 .carasta-glass-scrolled {
-  background: rgba(7, 8, 12, 0.96);
-  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.35),
-    0 0 40px rgba(232, 165, 75, 0.04);
+  background: hsl(var(--background) / 0.92);
+  box-shadow: var(--shadow-e2);
 }
 
 /* Container */
@@ -107,16 +109,16 @@ body.carasta-theme .carasta-body {
 
 /* Neon glow utilities */
 .neon-glow-blue {
-  box-shadow: 0 0 20px rgba(232, 165, 75, 0.28);
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.22);
 }
 
 .neon-glow-lime {
-  box-shadow: 0 0 20px rgba(204, 255, 0, 0.3);
+  box-shadow: 0 0 20px hsl(var(--neon-lime) / 0.22);
 }
 
 .neon-text-blue {
-  color: var(--carasta-brand-copper);
-  text-shadow: 0 0 20px rgba(232, 165, 75, 0.45);
+  color: hsl(var(--primary));
+  text-shadow: 0 0 20px hsl(var(--primary) / 0.35);
 }
 
 .neon-text-lime {

@@ -1,0 +1,184 @@
+/**
+ * Carasta — canonical semantic design tokens (Phase 1A).
+ *
+ * Rules:
+ * - HSL components only (no hsl() wrapper) for Tailwind: hsl(var(--name)).
+ * - Light-first in :root; secondary dark mapping in .dark
+ * - Blue-violet is the functional accent (wired to shadcn `--primary` + `--ring` for compatibility).
+ * - Copper is not a functional chrome color in :root (see `--legacy-brand-copper` for transitional compatibility only).
+ * - Red family is reserved for urgency/danger/auction signal (see `--danger` + `--performance-red`).
+ */
+
+:root {
+  /* Motion */
+  --motion-duration-1: 120ms;
+  --motion-duration-2: 160ms;
+  --motion-duration-3: 200ms;
+  --motion-duration-4: 240ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-ease-emphasized: cubic-bezier(0.2, 0.9, 0.2, 1);
+
+  /* Core surfaces (light-first) */
+  --background: 220 33% 98%;
+  --foreground: 224 32% 12%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 224 32% 12%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 32% 12%;
+
+  /* Functional accent (blue-violet) — mapped into shadcn primary for compatibility */
+  --primary: 258 86% 58%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 258 86% 58%;
+
+  --secondary: 220 14% 96%;
+  --secondary-foreground: 224 32% 12%;
+
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 9% 42%;
+
+  /* shadcn "accent" is a muted interactive surface (NOT the brand accent color) */
+  --accent: 220 14% 96%;
+  --accent-foreground: 224 32% 12%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 220 13% 90%;
+  --input: 220 13% 90%;
+
+  /* Semantic states */
+  --info: 258 86% 58%;
+  --info-soft: 258 86% 97%;
+  --info-foreground: 258 42% 34%;
+
+  --success: 160 84% 39%;
+  --success-soft: 150 60% 96%;
+  --success-foreground: 160 52% 30%;
+
+  --caution: 38 92% 50%;
+  --caution-soft: 42 100% 96%;
+  --caution-foreground: 30 80% 32%;
+
+  --danger: 0 84% 60%;
+  --danger-soft: 0 100% 97%;
+  --danger-foreground: 0 58% 38%;
+
+  /* Elevation / scrim */
+  --shadow-e1: 0 1px 0 rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-e2: 0 10px 30px rgba(15, 23, 42, 0.12);
+  --shadow-e3: 0 24px 80px rgba(15, 23, 42, 0.22);
+  --scrim: 224 32% 12%;
+
+  /* Auction / bid / live urgency — scoped vivid signal */
+  --performance-red: 348 100% 60%;
+  --reserve-emerald: 160 84% 39%;
+  --neon-lime: 72 100% 50%;
+  /* Legacy name: maps to auction signal */
+  --neon-blue: 348 100% 60%;
+
+  /* Transitional compatibility: old “brand copper” value (avoid new functional usage) */
+  --legacy-brand-copper: 37 76% 58%;
+
+  /* Seller workspace sub-theme (kept; values are already light/analytic) */
+  --seller-canvas: 220 30% 97%;
+  --seller-foreground: 224 32% 16%;
+  --seller-panel: 0 0% 100%;
+  --seller-panel-muted: 220 30% 99%;
+  --seller-panel-strong: 223 27% 19%;
+  --seller-border: 220 20% 88%;
+  --seller-muted: 220 12% 43%;
+  --seller-info: 228 86% 60%;
+  --seller-info-soft: 228 100% 97%;
+  --seller-info-foreground: 228 62% 34%;
+  --seller-success: 160 84% 39%;
+  --seller-success-soft: 150 60% 96%;
+  --seller-success-foreground: 160 52% 30%;
+  --seller-caution: 38 92% 50%;
+  --seller-caution-soft: 42 100% 96%;
+  --seller-caution-foreground: 30 80% 32%;
+  --seller-urgency: 0 84% 60%;
+  --seller-urgency-soft: 0 100% 97%;
+  --seller-urgency-foreground: 0 58% 38%;
+  --seller-shadow: 220 30% 12%;
+}
+
+.dark {
+  /* Dark mode is secondary: calm graphite, not neon cyber */
+  --background: 222 24% 6%;
+  --foreground: 220 14% 96%;
+
+  --card: 222 18% 9%;
+  --card-foreground: 220 14% 96%;
+
+  --popover: 222 18% 9%;
+  --popover-foreground: 220 14% 96%;
+
+  --primary: 258 86% 62%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 258 86% 62%;
+
+  --secondary: 222 16% 12%;
+  --secondary-foreground: 220 14% 96%;
+
+  --muted: 222 14% 12%;
+  --muted-foreground: 220 10% 65%;
+
+  --accent: 222 14% 14%;
+  --accent-foreground: 220 14% 96%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 220 14% 18%;
+  --input: 220 14% 18%;
+
+  --info: 258 86% 62%;
+  --info-soft: 258 40% 16%;
+  --info-foreground: 220 14% 96%;
+
+  --success: 160 84% 39%;
+  --success-soft: 160 30% 14%;
+  --success-foreground: 220 14% 96%;
+
+  --caution: 38 92% 54%;
+  --caution-soft: 32 35% 14%;
+  --caution-foreground: 220 14% 96%;
+
+  --danger: 0 84% 60%;
+  --danger-soft: 0 35% 16%;
+  --danger-foreground: 220 14% 96%;
+
+  --shadow-e1: 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-e2: 0 14px 40px rgba(0, 0, 0, 0.55);
+  --shadow-e3: 0 28px 90px rgba(0, 0, 0, 0.65);
+  --scrim: 0 0% 0%;
+
+  --performance-red: 348 100% 60%;
+  --reserve-emerald: 160 84% 39%;
+  --neon-lime: 72 100% 50%;
+  --neon-blue: 348 100% 60%;
+
+  --seller-canvas: 222 24% 6%;
+  --seller-foreground: 220 14% 96%;
+  --seller-panel: 222 18% 9%;
+  --seller-panel-muted: 222 16% 12%;
+  --seller-panel-strong: 220 14% 96%;
+  --seller-border: 220 14% 18%;
+  --seller-muted: 220 10% 70%;
+  --seller-info: 228 86% 62%;
+  --seller-info-soft: 228 40% 16%;
+  --seller-info-foreground: 220 14% 96%;
+  --seller-success: 160 84% 39%;
+  --seller-success-soft: 160 30% 14%;
+  --seller-success-foreground: 220 14% 96%;
+  --seller-caution: 38 92% 54%;
+  --seller-caution-soft: 32 35% 14%;
+  --seller-caution-foreground: 220 14% 96%;
+  --seller-urgency: 0 84% 60%;
+  --seller-urgency-soft: 0 35% 16%;
+  --seller-urgency-foreground: 220 14% 96%;
+  --seller-shadow: 0 0% 0%;
+}

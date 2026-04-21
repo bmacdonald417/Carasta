@@ -1,5 +1,6 @@
-@import "../styles/carasta.css";
 @import "../styles/carmunity-tokens.css";
+@import "../styles/carasta.motion.tokens.css";
+@import "../styles/carasta.css";
 @import "../styles/carmunity-motion.css";
 
 @tailwind base;
@@ -17,7 +18,7 @@
 
 /* Glass card effect — cyber */
 .glass {
-  @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  @apply border border-border/60 bg-background/70 shadow-e2 backdrop-blur-xl;
 }
 
 /* Reserve meter gradient — signal red → amber → emerald */

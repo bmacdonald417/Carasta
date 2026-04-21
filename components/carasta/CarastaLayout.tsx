@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
@@ -47,21 +46,12 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="carasta-theme flex min-h-screen flex-col bg-background">
-      {/* Sticky glassmorphism header — cyber-luxury */}
-      <motion.header
-        className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
+      <header
+        className={`sticky top-0 z-50 w-full border-b transition-[border-color,background-color,box-shadow,backdrop-filter] duration-300 ease-out ${
           scrolled
-            ? "border-border/70 bg-background/95 shadow-lg shadow-black/25 backdrop-blur-xl"
+            ? "border-border/70 bg-background/80 shadow-e2 backdrop-blur-xl"
             : "border-transparent bg-transparent"
         }`}
-        initial={false}
-        animate={{
-          backgroundColor: scrolled
-            ? "rgba(7, 8, 12, 0.95)"
-            : "rgba(7, 8, 12, 0)",
-          backdropFilter: scrolled ? "blur(20px)" : "blur(0px)",
-        }}
-        transition={{ duration: 0.3 }}
       >
         <div className="carasta-container flex h-16 items-center gap-4 md:h-20 md:gap-6">
           <Link
@@ -78,7 +68,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 onError={() => setLogoError(true)}
               />
             ) : null}
-            <span className="font-display text-xl font-semibold uppercase tracking-[0.2em] text-neutral-100">
+            <span className="carasta-marketing-display text-xl font-semibold tracking-[0.18em] text-foreground">
               Carasta
             </span>
           </Link>
@@ -90,8 +80,8 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   href={href}
                   className={`rounded-full px-3 py-2 font-medium transition ${
                     pathname === href
-                      ? "bg-white/10 text-white"
-                      : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                   }`}
                 >
                   {label}
@@ -109,7 +99,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     className={`carmunity-nav-link rounded-full px-3 py-2 font-medium transition ${
                       appActive
                         ? "bg-primary/15 text-primary"
-                        : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                        : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                     }`}
                   >
                     {label}
@@ -120,7 +110,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           </div>
           <nav className="ml-auto flex items-center gap-3 text-sm">
             {status === "loading" ? (
-              <span className="text-neutral-500">…</span>
+              <span className="text-muted-foreground">…</span>
             ) : session ? (
               <>
                 <Link
@@ -128,7 +118,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   className={`hidden rounded-full px-3 py-2 text-[13px] font-medium transition xl:inline-flex ${
                     pathname.startsWith("/messages")
                       ? "bg-primary/15 text-primary"
-                      : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                   }`}
                 >
                   Messages
@@ -136,16 +126,16 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 <NotificationDropdown />
                 <DropdownMenu>
                   <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-background focus:ring-2 focus:ring-ring">
-                    <Avatar className="h-8 w-8 border border-white/10">
+                    <Avatar className="h-8 w-8 border border-border">
                       <AvatarImage src={session.user?.image ?? undefined} />
-                      <AvatarFallback className="bg-neutral-800 text-xs text-neutral-300">
+                      <AvatarFallback className="bg-muted text-xs text-muted-foreground">
                         {(session.user?.name ?? "U").slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="min-w-[160px] border-white/10 bg-[#121218]/95 backdrop-blur-xl"
+                    className="min-w-[180px] border-border bg-popover/95 text-popover-foreground backdrop-blur-xl"
                   >
                     <DropdownMenuItem asChild>
                       <Link
@@ -205,13 +195,13 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               <>
                 <Link
                   href="/auctions"
-                  className="hidden font-medium text-neutral-400 transition hover:text-neutral-100 md:inline-flex"
+                  className="hidden font-medium text-muted-foreground transition hover:text-foreground md:inline-flex"
                 >
                   Browse Auctions
                 </Link>
                 <Link
                   href="/auth/sign-in"
-                  className="font-medium text-neutral-400 transition hover:text-primary"
+                  className="font-medium text-muted-foreground transition hover:text-primary"
                 >
                   Sign in
                 </Link>
@@ -225,7 +215,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             )}
           </nav>
         </div>
-      </motion.header>
+      </header>
 
       <div className="flex flex-1">
         <AppSidebar />
@@ -236,7 +226,6 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
       <MobileBottomNav />
 
-      {/* Footer — cyber-luxury with neon accent */}
       <footer className="mt-auto">
         <div className="relative border-t border-border/60 bg-background pt-16 pb-24 md:pt-20 md:pb-28">
           <div className="carasta-container">
@@ -253,11 +242,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
                   />
-                  <span className="font-display text-2xl font-semibold uppercase tracking-[0.15em] text-neutral-100 md:text-3xl">
+                  <span className="carasta-marketing-display text-2xl font-semibold tracking-[0.15em] text-foreground md:text-3xl">
                     Carasta
                   </span>
                 </div>
-                <p className="mt-5 max-w-md text-sm leading-7 text-neutral-400">
+                <p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
                   Carmunity by Carasta brings discussions, profiles, Garage
                   identity, messaging, auctions, and seller tools into one
                   platform built for enthusiasts.
@@ -271,7 +260,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                   <Link
                     href="/auctions"
-                    className="rounded-full border border-white/10 px-4 py-2 font-semibold text-neutral-300 transition hover:border-white/20 hover:text-white"
+                    className="rounded-full border border-border px-4 py-2 font-semibold text-foreground transition hover:bg-muted/60"
                   >
                     Browse Auctions
                   </Link>
@@ -279,15 +268,15 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-1">
                 <div>
-                  <p className="font-display text-lg font-semibold text-neutral-100">
+                  <p className="text-lg font-semibold tracking-tight text-foreground">
                     Explore
                   </p>
-                  <nav className="mt-4 flex flex-col gap-3 text-sm text-neutral-400">
+                  <nav className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
                     {marketingNav.map(({ href, label }) => (
                       <Link
                         key={href}
                         href={href}
-                        className="transition hover:text-white"
+                        className="transition hover:text-foreground"
                       >
                         {label}
                       </Link>
@@ -295,10 +284,10 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </nav>
                 </div>
                 <div>
-                  <p className="font-display text-lg font-semibold text-neutral-100">
+                  <p className="text-lg font-semibold tracking-tight text-foreground">
                     Support
                   </p>
-                  <nav className="mt-4 flex flex-col gap-3 text-sm text-neutral-400">
+                  <nav className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
                     {[
                       { href: "/resources/faq", label: "FAQ" },
                       { href: "/resources/glossary", label: "Glossary" },
@@ -308,7 +297,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                       <Link
                         key={href}
                         href={href}
-                        className="transition hover:text-white"
+                        className="transition hover:text-foreground"
                       >
                         {label}
                       </Link>
@@ -318,10 +307,10 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-1">
                 <div>
-                  <p className="font-display text-lg font-semibold text-neutral-100">
+                  <p className="text-lg font-semibold tracking-tight text-foreground">
                     Product
                   </p>
-                  <nav className="mt-4 flex flex-col gap-3 text-sm text-neutral-400">
+                  <nav className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
                     {[
                       ...appNav,
                       { href: "/messages", label: "Messages" },
@@ -330,7 +319,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                       <Link
                         key={href}
                         href={href}
-                        className="transition hover:text-white"
+                        className="transition hover:text-foreground"
                       >
                         {label}
                       </Link>
@@ -338,7 +327,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </nav>
                 </div>
                 <div>
-                  <p className="font-display text-lg font-semibold text-neutral-100">
+                  <p className="text-lg font-semibold tracking-tight text-foreground">
                     Contact
                   </p>
                   <a
@@ -348,13 +337,13 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     info@carasta.com
                   </a>
                   <div className="mt-5">
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-muted-foreground">
                       Carmunity on mobile
                     </p>
                     <div className="mt-3">
                       <AppStoreBadges />
                     </div>
-                    <p className="mt-3 max-w-xs text-[11px] leading-relaxed text-neutral-600">
+                    <p className="mt-3 max-w-xs text-[11px] leading-relaxed text-muted-foreground">
                       Same account identity and social graph as the web product,
                       with a narrower surface area for now.
                     </p>
@@ -368,10 +357,10 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         <div className="border-t border-border/60 bg-background py-6">
           <div className="carasta-container flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
             <div className="text-center md:text-left">
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-muted-foreground">
                 © {new Date().getFullYear()} Carasta. All rights reserved.
               </p>
-              <p className="mt-1 text-xs text-neutral-600">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Carmunity by Carasta — feed, discussions, garage, and auctions
                 in one place.
               </p>
@@ -379,19 +368,19 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             <nav className="flex flex-wrap justify-center gap-6 text-sm md:justify-end">
               <Link
                 href="/terms"
-                className="text-neutral-500 transition hover:text-primary"
+                className="text-muted-foreground transition hover:text-primary"
               >
                 Terms &amp; Conditions
               </Link>
               <Link
                 href="/privacy"
-                className="text-neutral-500 transition hover:text-primary"
+                className="text-muted-foreground transition hover:text-primary"
               >
                 Privacy Policy
               </Link>
               <Link
                 href="/community-guidelines"
-                className="text-neutral-500 transition hover:text-primary"
+                className="text-muted-foreground transition hover:text-primary"
               >
                 Community Guidelines
               </Link>

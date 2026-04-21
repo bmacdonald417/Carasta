@@ -149,7 +149,7 @@ export function ShareButtons({
           size="sm"
           className={
             triggerClassName ??
-            "border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10 hover:text-neutral-100"
+            "border-white/10 bg-white/5 text-neutral-300 hover:bg-white/10 hover:text-foreground"
           }
         >
           <Share2 className="mr-2 h-4 w-4" />

@@ -1,63 +1,9 @@
 /**
- * Carmunity by Carasta — web semantic tokens (Phase B).
- * HSL components only (no hsl() wrapper) for Tailwind: hsl(var(--name)).
- * Brand accent = copper; red = auction / bid / urgency only (--performance-red).
+ * Carmunity by Carasta — web semantic tokens entrypoint (Phase 1A).
+ *
+ * Canonical tokens live in `styles/carasta.semantic.tokens.css`.
+ * This file remains the stable import path used by `app/globals.css`.
  */
 
-:root {
-  /* Surfaces — deep graphite / black */
-  --background: 222 24% 4%;
-  --foreground: 220 14% 96%;
-  --card: 222 18% 7%;
-  --card-foreground: 220 14% 96%;
-  --popover: 222 18% 7%;
-  --popover-foreground: 220 14% 96%;
-
-  /* Brand — copper #E8A54B */
-  --primary: 37 76% 58%;
-  --primary-foreground: 222 32% 8%;
-  --ring: 37 72% 52%;
-
-  --secondary: 222 16% 10%;
-  --secondary-foreground: 220 14% 96%;
-  --muted: 222 14% 11%;
-  --muted-foreground: 220 10% 55%;
-
-  --accent: 222 14% 13%;
-  --accent-foreground: 220 14% 96%;
-
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  --border: 220 14% 16%;
-  --input: 220 14% 16%;
-
-  /* Auction / bid / live urgency — do not use for general brand chrome */
-  --performance-red: 348 100% 60%;
-  --reserve-emerald: 160 84% 39%;
-  --neon-lime: 72 100% 50%;
-  /* Legacy name: maps to auction signal */
-  --neon-blue: 348 100% 60%;
-
-  /* Seller workspace sub-theme */
-  --seller-canvas: 220 30% 97%;
-  --seller-foreground: 224 32% 16%;
-  --seller-panel: 0 0% 100%;
-  --seller-panel-muted: 220 30% 99%;
-  --seller-panel-strong: 223 27% 19%;
-  --seller-border: 220 20% 88%;
-  --seller-muted: 220 12% 43%;
-  --seller-info: 228 86% 60%;
-  --seller-info-soft: 228 100% 97%;
-  --seller-info-foreground: 228 62% 34%;
-  --seller-success: 160 84% 39%;
-  --seller-success-soft: 150 60% 96%;
-  --seller-success-foreground: 160 52% 30%;
-  --seller-caution: 38 92% 50%;
-  --seller-caution-soft: 42 100% 96%;
-  --seller-caution-foreground: 30 80% 32%;
-  --seller-urgency: 0 84% 60%;
-  --seller-urgency-soft: 0 100% 97%;
-  --seller-urgency-foreground: 0 58% 38%;
-  --seller-shadow: 220 30% 12%;
-}
+@import "./carasta.semantic.tokens.css";
+@import "./carasta.tokens.legacy.css";

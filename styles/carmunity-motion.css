@@ -7,9 +7,9 @@
 @media (prefers-reduced-motion: no-preference) {
   .carmunity-feed-card {
     transition:
-      border-color 160ms ease-out,
-      box-shadow 180ms ease-out,
-      transform 180ms ease-out;
+      border-color var(--motion-duration-2) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-3) var(--motion-ease-standard),
+      transform var(--motion-duration-3) var(--motion-ease-standard);
   }
   .carmunity-feed-card:hover {
     transform: translateY(-1px);
@@ -20,9 +20,9 @@
 @media (prefers-reduced-motion: reduce) {
   .carmunity-feed-card {
     transition:
-      border-color 140ms ease-out,
-      opacity 140ms ease-out,
-      box-shadow 140ms ease-out;
+      border-color var(--motion-duration-2) var(--motion-ease-standard),
+      opacity var(--motion-duration-2) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-2) var(--motion-ease-standard);
   }
   .carmunity-feed-card:hover {
     transform: none;
@@ -44,7 +44,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .carmunity-profile-enter {
-    animation: carmunity-profile-fade-up 220ms ease-out both;
+    animation: carmunity-profile-fade-up var(--motion-duration-3) var(--motion-ease-standard) both;
   }
 }
 
@@ -80,7 +80,7 @@
 /* App nav links — underline width */
 .carmunity-nav-link {
   position: relative;
-  transition: color 150ms ease-out;
+  transition: color var(--motion-duration-2) var(--motion-ease-standard);
 }
 @media (prefers-reduced-motion: no-preference) {
   .carmunity-nav-link::after {
@@ -92,7 +92,7 @@
     width: 0;
     border-radius: 1px;
     background: hsl(var(--primary));
-    transition: width 160ms ease-out;
+    transition: width var(--motion-duration-2) var(--motion-ease-standard);
   }
   .carmunity-nav-link[data-active="true"]::after {
     width: 100%;

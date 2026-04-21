@@ -1,0 +1,15 @@
+/**
+ * Carasta — motion token foundation (Phase 1A).
+ *
+ * Note: canonical values also exist in `styles/carasta.semantic.tokens.css`.
+ * This file exists so motion-related imports can evolve independently if needed.
+ */
+
+:root {
+  --motion-duration-1: 120ms;
+  --motion-duration-2: 160ms;
+  --motion-duration-3: 200ms;
+  --motion-duration-4: 240ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-ease-emphasized: cubic-bezier(0.2, 0.9, 0.2, 1);
+}

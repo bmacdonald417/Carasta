@@ -1,0 +1,11 @@
+/**
+ * Legacy / compatibility token aliases (Phase 1A).
+ *
+ * Goal: keep older conceptual names stable while the codebase migrates to clearer semantics.
+ * Prefer using semantic roles directly in new code.
+ */
+
+:root {
+  /* Back-compat: "neon-blue" historically mapped to auction signal red */
+  --neon-blue-alias: var(--neon-blue);
+}
