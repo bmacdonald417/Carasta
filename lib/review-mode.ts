@@ -34,33 +34,33 @@ export const getReviewModeContext = cache(async (): Promise<ReviewModeContext | 
   const sellerHandle = getReviewModeDemoHandle();
   const profileHandle = getReviewModeProfileHandle();
 
-  const [seller, profile, thread, conversation] = await Promise.all([
-    prisma.user.findFirst({
-      where: { handle: sellerHandle },
-      select: { id: true, handle: true, role: true },
-    }),
-    prisma.user.findFirst({
-      where: { handle: profileHandle },
-      select: { handle: true },
-    }),
-    prisma.forumThread.findFirst({
-      where: { isHidden: false },
-      orderBy: { lastActivityAt: "desc" },
-      select: {
-        id: true,
-        category: {
-          select: {
-            slug: true,
-            space: { select: { slug: true } },
-          },
+  // Sequential reads: `Promise.all` here spikes 4 concurrent connections per prerender.
+  // During `next build` that can exhaust small Railway Postgres `max_connections`.
+  const seller = await prisma.user.findFirst({
+    where: { handle: sellerHandle },
+    select: { id: true, handle: true, role: true },
+  });
+  const profile = await prisma.user.findFirst({
+    where: { handle: profileHandle },
+    select: { handle: true },
+  });
+  const thread = await prisma.forumThread.findFirst({
+    where: { isHidden: false },
+    orderBy: { lastActivityAt: "desc" },
+    select: {
+      id: true,
+      category: {
+        select: {
+          slug: true,
+          space: { select: { slug: true } },
         },
       },
-    }),
-    prisma.conversation.findFirst({
-      orderBy: { updatedAt: "desc" },
-      select: { id: true },
-    }),
-  ]);
+    },
+  });
+  const conversation = await prisma.conversation.findFirst({
+    orderBy: { updatedAt: "desc" },
+    select: { id: true },
+  });
 
   if (!seller) return null;
 

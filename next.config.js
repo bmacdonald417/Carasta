@@ -1,11 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Reduces parallel static-generation workers so `next build` opens fewer concurrent
-  // Prisma pools against Railway Postgres (mitigates FATAL: too many clients already).
-  experimental: {
-    staticGenerationMaxConcurrency: 2,
-    staticGenerationMinPagesPerWorker: 999,
-  },
   async redirects() {
     return [
       { source: "/forums", destination: "/discussions", permanent: true },

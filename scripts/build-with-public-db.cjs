@@ -26,7 +26,7 @@ function withBuildPostgresConnectionGuards(urlString) {
     const u = new URL(urlString);
     const proto = u.protocol.toLowerCase();
     if (proto !== "postgres:" && proto !== "postgresql:") return urlString;
-    const cap = String(process.env.DATABASE_BUILD_CONNECTION_LIMIT || "3").trim();
+    const cap = String(process.env.DATABASE_BUILD_CONNECTION_LIMIT || "1").trim();
     if (!u.searchParams.has("connection_limit") && /^\d+$/.test(cap)) {
       u.searchParams.set("connection_limit", cap);
     }
