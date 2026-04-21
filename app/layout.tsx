@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { Inter, Oswald, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { CarastaAssistantLauncher } from "@/components/assistant/carasta-assistant-launcher";
 import { CarastaLayout } from "@/components/carasta/CarastaLayout";
 import { Toaster } from "@/components/ui/toaster";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
@@ -50,6 +51,7 @@ export default function RootLayout({
       >
         <Providers>
           <CarastaLayout>{children}</CarastaLayout>
+          <CarastaAssistantLauncher />
           <FeedbackWidget />
           <Toaster />
         </Providers>
