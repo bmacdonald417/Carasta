@@ -18,7 +18,7 @@ export default async function ConversationPage({
   if (!conversationId || !viewerId) redirect("/messages");
 
   return (
-    <div className="carasta-container max-w-3xl py-6">
+    <div className="carasta-container max-w-3xl py-6 md:max-w-4xl">
       <ConversationClient conversationId={conversationId} viewerId={viewerId} />
     </div>
   );

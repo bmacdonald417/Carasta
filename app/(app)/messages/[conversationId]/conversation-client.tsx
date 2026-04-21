@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
+import { cn } from "@/lib/utils";
 
 type UserMini = {
   id: string;
@@ -74,7 +75,9 @@ export function ConversationClient({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/messages/conversations/${encodeURIComponent(conversationId)}?limit=60`);
+      const res = await fetch(
+        `/api/messages/conversations/${encodeURIComponent(conversationId)}?limit=60`
+      );
       const j = (await res.json()) as {
         ok?: boolean;
         conversation?: ConversationPayload;
@@ -84,10 +87,14 @@ export function ConversationClient({
       if (!res.ok || !j.ok) throw new Error(j.error ?? "Failed to load conversation.");
       setConversation(j.conversation ?? null);
       setMessages((j.messages ?? []).slice().reverse());
-      // Mark read best-effort.
-      void fetch(`/api/messages/conversations/${encodeURIComponent(conversationId)}/read`, { method: "PATCH" });
+      void fetch(`/api/messages/conversations/${encodeURIComponent(conversationId)}/read`, {
+        method: "PATCH",
+      });
       setTimeout(() => {
-        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "instant" as any });
+        scrollRef.current?.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: "auto",
+        });
       }, 0);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load conversation.");
@@ -121,7 +128,10 @@ export function ConversationClient({
       setMessages((prev) => [...prev, j.message!]);
       setBody("");
       setTimeout(() => {
-        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+        scrollRef.current?.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: "smooth",
+        });
       }, 0);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Send failed.");
@@ -132,22 +142,25 @@ export function ConversationClient({
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-neutral-400">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading…
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
+        Loading thread…
       </div>
     );
   }
 
-  if (error) {
+  if (error && !conversation) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-        <p className="text-sm text-neutral-300">{error}</p>
-        <div className="mt-3 flex gap-2">
-          <Button type="button" variant="outline" size="sm" asChild>
-            <Link href="/messages">Back</Link>
+      <div
+        className="rounded-xl border border-destructive/25 bg-destructive/5 p-4 shadow-e1"
+        role="alert"
+      >
+        <p className="text-sm text-destructive">{error}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button type="button" variant="outline" size="sm" className="border-border" asChild>
+            <Link href="/messages">Back to messages</Link>
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => void load()}>
+          <Button type="button" variant="outline" size="sm" className="border-border" onClick={() => void load()}>
             Retry
           </Button>
         </div>
@@ -156,77 +169,112 @@ export function ConversationClient({
   }
 
   return (
-    <div className="flex h-[calc(100vh-10rem)] min-h-[520px] flex-col rounded-2xl border border-white/10 bg-white/5">
-      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="sm" className="text-neutral-400 hover:text-foreground">
+    <div className="flex h-[calc(100vh-10rem)] min-h-[520px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-e2">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="shrink-0 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+          >
             <Link href="/messages">Back</Link>
           </Button>
           {other ? (
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8 border border-white/10">
+            <div className="flex min-w-0 items-center gap-2">
+              <Avatar className="h-9 w-9 shrink-0 border border-border">
                 <AvatarImage src={other.avatarUrl ?? other.image ?? undefined} />
-                <AvatarFallback className="bg-neutral-800 text-xs text-neutral-300">
+                <AvatarFallback className="bg-muted text-xs font-medium text-muted-foreground">
                   {(other.handle ?? "U").slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-foreground">@{other.handle}</p>
-                <p className="truncate text-[11px] text-neutral-500">{other.name ?? " "}</p>
+                <p className="truncate text-sm font-semibold text-foreground">
+                  @{other.handle}
+                </p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {other.name ?? "Direct message"}
+                </p>
               </div>
             </div>
           ) : (
-            <p className="text-sm font-semibold text-foreground">Conversation</p>
+            <p className="truncate text-sm font-semibold text-foreground">Conversation</p>
           )}
         </div>
       </div>
 
       {conversation?.auction ? (
-        <div className="border-b border-white/10 px-4 py-3">
+        <div className="shrink-0 border-b border-border bg-muted/25 px-4 py-3">
           <Link
             href={`/auctions/${conversation.auction.id}`}
-            className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/20 p-3 hover:bg-black/30"
+            className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 shadow-e1 transition-colors hover:border-primary/25 hover:bg-muted/30"
           >
-            <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-black/30">
+            <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
               {conversation.auction.images?.[0]?.url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                // eslint-disable-next-line @next/next/no-img-element -- listing thumbs vary by host; keep lightweight
                 <img
                   src={conversation.auction.images[0].url}
                   alt=""
                   className="h-full w-full object-cover"
                 />
-              ) : null}
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
+                  No photo
+                </div>
+              )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-foreground">
+              <p className="truncate text-sm font-semibold leading-snug text-foreground">
                 {conversation.auction.title}
               </p>
-              <p className="mt-0.5 truncate text-xs text-neutral-500">
-                {conversation.auction.year} {conversation.auction.make} {conversation.auction.model}
-                {conversation.auction.trim ? ` ${conversation.auction.trim}` : ""} ·{" "}
-                {conversation.auction.status}
+              <p className="mt-1 truncate text-xs text-muted-foreground">
+                {conversation.auction.year} {conversation.auction.make}{" "}
+                {conversation.auction.model}
+                {conversation.auction.trim ? ` ${conversation.auction.trim}` : ""}
+                <span className="text-muted-foreground/80"> · </span>
+                <span className="font-medium text-foreground/90">
+                  {conversation.auction.status}
+                </span>
               </p>
-              <p className="mt-0.5 text-[11px] text-neutral-600">
-                View listing
-              </p>
+              <p className="mt-1 text-xs font-medium text-primary">View listing</p>
             </div>
           </Link>
         </div>
       ) : null}
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="space-y-3">
+      <div
+        ref={scrollRef}
+        className="min-h-0 flex-1 overflow-y-auto bg-background/50 px-4 py-4"
+      >
+        <div className="mx-auto max-w-2xl space-y-3">
           {messages.map((m) => {
             const mine = m.senderId === viewerId;
+            if (m.isSystem) {
+              return (
+                <div key={m.id} className="flex justify-center">
+                  <p className="max-w-[min(90%,32rem)] rounded-full border border-border bg-muted/60 px-3 py-1.5 text-center text-[11px] leading-relaxed text-muted-foreground shadow-e1">
+                    {m.body}
+                  </p>
+                </div>
+              );
+            }
             return (
-              <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+              <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                    mine ? "bg-primary text-primary-foreground" : "bg-black/40 text-foreground"
-                  }`}
+                  className={cn(
+                    "max-w-[min(85%,28rem)] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-e1",
+                    mine
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border bg-card text-card-foreground"
+                  )}
                 >
                   <p className="whitespace-pre-wrap">{m.body}</p>
-                  <p className="mt-1 text-[10px] opacity-70">
+                  <p
+                    className={cn(
+                      "mt-1.5 text-[10px]",
+                      mine ? "text-primary-foreground/75" : "text-muted-foreground"
+                    )}
+                  >
                     {new Date(m.createdAt).toLocaleString()}
                   </p>
                 </div>
@@ -236,18 +284,22 @@ export function ConversationClient({
         </div>
       </div>
 
-      <div className="border-t border-white/10 p-3">
-        {error ? <p className="mb-2 text-xs text-red-300">{error}</p> : null}
+      <div className="shrink-0 border-t border-border bg-card p-3">
         {reviewMode ? (
-          <p className="mb-2 text-xs text-amber-300">
-            Review mode: message sending is disabled. This thread is for visual
-            review only.
+          <p className="mb-3 rounded-md border border-caution/30 bg-caution-soft/40 px-3 py-2 text-xs text-caution-foreground">
+            Review mode: sending is disabled. Scroll and layout are for visual review
+            only.
+          </p>
+        ) : null}
+        {error && conversation ? (
+          <p className="mb-2 text-xs font-medium text-destructive" role="status">
+            {error}
           </p>
         ) : null}
         <div className="flex items-end gap-2">
           <Textarea
             rows={2}
-            className="resize-none bg-black/30 text-sm"
+            className="resize-none border-border bg-background text-sm text-foreground"
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Write a message…"
@@ -255,18 +307,17 @@ export function ConversationClient({
           />
           <Button
             type="button"
-            className="bg-[#ff3b5c] text-white hover:bg-[#ff3b5c]/90"
             disabled={reviewMode || sending || body.trim().length === 0}
             onClick={() => void send()}
+            className="shrink-0"
           >
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
           </Button>
         </div>
-        <p className="mt-2 text-[11px] text-neutral-600">
-          Keep it respectful. Blocks prevent new messages.
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Keep it respectful. Blocking prevents new messages from that participant.
         </p>
       </div>
     </div>
   );
 }
-

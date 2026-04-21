@@ -4,8 +4,26 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
+
+function formatListTime(iso: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const now = new Date();
+  const sameDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+  if (sameDay) {
+    return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  }
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
 
 type ConversationListRow = {
   id: string;
@@ -40,7 +58,11 @@ export function MessagesConversationsClient() {
     setError(null);
     try {
       const res = await fetch("/api/messages/conversations");
-      const j = (await res.json()) as { ok?: boolean; conversations?: ConversationListRow[]; error?: string };
+      const j = (await res.json()) as {
+        ok?: boolean;
+        conversations?: ConversationListRow[];
+        error?: string;
+      };
       if (!res.ok || !j.ok) throw new Error(j.error ?? "Failed to load conversations.");
       setRows(j.conversations ?? []);
     } catch (e) {
@@ -56,18 +78,27 @@ export function MessagesConversationsClient() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-neutral-400">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading…
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
+        Loading conversations…
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-        <p className="text-sm text-neutral-300">{error}</p>
-        <Button type="button" variant="outline" size="sm" className="mt-3" onClick={() => void load()}>
+      <div
+        className="rounded-xl border border-destructive/25 bg-destructive/5 p-4 shadow-e1"
+        role="alert"
+      >
+        <p className="text-sm text-destructive">{error}</p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-3 border-border"
+          onClick={() => void load()}
+        >
           Retry
         </Button>
       </div>
@@ -76,14 +107,15 @@ export function MessagesConversationsClient() {
 
   if (sorted.length === 0) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/5 p-6 text-center">
-        <p className="text-sm font-medium text-neutral-200">No messages yet</p>
-        <p className="mt-2 text-xs text-neutral-500">
-          Start a conversation from someone’s profile (Phase Q follow-up) or via API.
+      <div className="rounded-xl border border-border bg-card p-8 text-center shadow-e1">
+        <p className="text-sm font-medium text-foreground">No conversations yet</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          When someone messages you, or you start a thread from a profile or
+          listing context, it will appear here.
         </p>
         {reviewMode ? (
-          <p className="mt-2 text-xs text-amber-300">
-            Review mode uses demo conversations when available.
+          <p className="mt-4 rounded-md border border-caution/30 bg-caution-soft/40 px-3 py-2 text-left text-xs text-caution-foreground">
+            Review mode: demo conversations appear when seeded data is present.
           </p>
         ) : null}
       </div>
@@ -91,34 +123,66 @@ export function MessagesConversationsClient() {
   }
 
   return (
-    <ul className="divide-y divide-white/5 overflow-hidden rounded-xl border border-white/10 bg-white/5">
+    <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-e1">
       {sorted.map((c) => {
         const other = c.otherParticipants[0];
         const display = other?.handle ? `@${other.handle}` : "Conversation";
         const avatar = other?.avatarUrl ?? other?.image ?? undefined;
+        const unread = c.unreadCount > 0;
+        const listTime = formatListTime(c.lastMessageAt);
         return (
           <li key={c.id}>
             <Link
               href={`/messages/${c.id}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
+              className={cn(
+                "flex items-center gap-3 px-4 py-3.5 transition-colors",
+                shellFocusRing,
+                "hover:bg-muted/50",
+                unread && "bg-primary/5"
+              )}
             >
-              <Avatar className="h-10 w-10 border border-white/10">
+              <Avatar className="h-10 w-10 shrink-0 border border-border">
                 <AvatarImage src={avatar} />
-                <AvatarFallback className="bg-neutral-800 text-xs text-neutral-300">
+                <AvatarFallback className="bg-muted text-xs font-medium text-muted-foreground">
                   {(other?.handle ?? "U").slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-sm font-semibold text-foreground">{display}</p>
-                  {c.unreadCount > 0 ? (
-                    <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary">
-                      {c.unreadCount}
-                    </span>
-                  ) : null}
+                  <p
+                    className={cn(
+                      "min-w-0 flex-1 truncate text-sm",
+                      unread ? "font-semibold text-foreground" : "font-medium text-foreground"
+                    )}
+                  >
+                    {display}
+                  </p>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {listTime ? (
+                      <time
+                        className="text-[11px] tabular-nums text-muted-foreground"
+                        dateTime={c.lastMessageAt ?? undefined}
+                      >
+                        {listTime}
+                      </time>
+                    ) : null}
+                    {unread ? (
+                      <Badge
+                        variant="default"
+                        className="h-5 min-w-5 justify-center px-1.5 py-0 text-[10px] font-bold leading-none"
+                      >
+                        {c.unreadCount > 99 ? "99+" : c.unreadCount}
+                      </Badge>
+                    ) : null}
+                  </div>
                 </div>
-                <p className="mt-0.5 line-clamp-1 text-xs text-neutral-500">
-                  {c.lastMessagePreview ?? "—"}
+                {other?.name ? (
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                    {other.name}
+                  </p>
+                ) : null}
+                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                  {c.lastMessagePreview ?? "No preview yet"}
                 </p>
               </div>
             </Link>
@@ -128,4 +192,3 @@ export function MessagesConversationsClient() {
     </ul>
   );
 }
-

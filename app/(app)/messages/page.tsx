@@ -10,12 +10,15 @@ export default async function MessagesPage() {
 
   return (
     <div className="carasta-container max-w-3xl py-8">
-      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-foreground">
-        Messages
-      </h1>
-      <p className="mt-1 text-sm text-neutral-500">
-        Private 1:1 conversations. No attachments yet.
-      </p>
+      <header className="border-b border-border pb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          Messages
+        </h1>
+        <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
+          Private 1:1 conversations tied to your account. Attachments are not
+          supported yet.
+        </p>
+      </header>
       <div className="mt-6">
         <MessagesConversationsClient />
       </div>
