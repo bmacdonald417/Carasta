@@ -1,6 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export type GaragePreviewCar = {
   id: string;
@@ -27,10 +31,12 @@ export function ProfileGaragePreviewGrid({
 
   if (cars.length === 0) {
     return (
-      <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/10 via-muted/15 to-muted/5 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-border bg-muted/20 p-6 shadow-e1 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Garage</p>
-          <p className="mt-1 text-sm font-semibold text-foreground">Show the collection behind the handle</p>
+          <Badge variant="outline" className="text-[10px] font-medium uppercase tracking-wide">
+            Garage
+          </Badge>
+          <p className="mt-2 text-sm font-semibold text-foreground">Show the collection behind the handle</p>
           <p className="mt-1 max-w-md text-xs leading-relaxed text-muted-foreground">
             {isOwnProfile
               ? "Add a hero car on the web — this grid becomes your rolling portfolio for buyers and friends alike."
@@ -39,11 +45,11 @@ export function ProfileGaragePreviewGrid({
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           {isOwnProfile ? (
-            <Button size="sm" asChild className="border-primary/30 bg-primary/15 text-primary hover:bg-primary/25">
+            <Button size="sm" asChild className={cn(shellFocusRing)}>
               <Link href="/garage/add">Add a car</Link>
             </Button>
           ) : null}
-          <Button size="sm" variant="outline" asChild className="border-border/60">
+          <Button size="sm" variant="outline" asChild className={cn("border-border", shellFocusRing)}>
             <Link href={href}>Open garage</Link>
           </Button>
         </div>
@@ -57,7 +63,11 @@ export function ProfileGaragePreviewGrid({
         <Link
           key={car.id}
           href={href}
-          className="carmunity-feed-card group relative aspect-[4/3] overflow-hidden rounded-xl border border-border/50 bg-muted/30 hover:border-primary/30"
+          className={cn(
+            "carmunity-feed-card group relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted/30 shadow-e1 transition-colors",
+            shellFocusRing,
+            "hover:border-primary/35 hover:shadow-e2"
+          )}
         >
           {car.imageUrl ? (
             <Image
@@ -74,9 +84,9 @@ export function ProfileGaragePreviewGrid({
               </span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-90 transition group-hover:opacity-100" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/90 via-background/25 to-transparent opacity-95 transition group-hover:opacity-100" />
           <div className="absolute bottom-0 left-0 right-0 p-2">
-            <p className="truncate text-xs font-semibold tracking-tight text-white drop-shadow-sm">
+            <p className="truncate text-xs font-semibold tracking-tight text-foreground drop-shadow-sm">
               {car.year} {car.make} {car.model}
             </p>
           </div>

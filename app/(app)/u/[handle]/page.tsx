@@ -26,6 +26,8 @@ import { listProfileDiscussionActivityPage } from "@/lib/forums/profile-discussi
 import { listSavedThreadsForUser, savedThreadHref } from "@/lib/forums/thread-subscriptions";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -260,9 +262,9 @@ export default async function ProfilePage({
     <div className="carasta-container max-w-3xl space-y-8 py-10 pb-16">
       {user.isDemoSeed ? <DemoProfileBanner /> : null}
       {/* 1 — Profile header */}
-      <section className="carmunity-profile-enter overflow-hidden rounded-2xl border border-border/50 bg-card/70 shadow-md backdrop-blur-sm">
+      <section className="carmunity-profile-enter overflow-hidden rounded-2xl border border-border bg-card shadow-e1">
         <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start sm:gap-8">
-          <Avatar className="mx-auto h-28 w-28 shrink-0 ring-2 ring-border/60 sm:mx-0 sm:h-32 sm:w-32">
+          <Avatar className="mx-auto h-28 w-28 shrink-0 border-2 border-border sm:mx-0 sm:h-32 sm:w-32">
             <AvatarImage src={user.avatarUrl ?? user.image ?? undefined} alt="" />
             <AvatarFallback className="text-2xl font-semibold">
               {(user.name ?? user.handle).slice(0, 2).toUpperCase()}
@@ -274,7 +276,7 @@ export default async function ProfilePage({
               Carmunity
             </p>
             <div className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                 {displayName}
               </h1>
               <ReputationBadge tier={user.collectorTier} />
@@ -288,7 +290,7 @@ export default async function ProfilePage({
               <p className="mt-1 text-xs text-muted-foreground">{user.location}</p>
             ) : null}
             {user.bio ? (
-              <p className="mt-3 max-w-prose text-sm leading-relaxed text-foreground/85">{user.bio}</p>
+              <p className="mt-3 max-w-prose text-sm leading-relaxed text-foreground">{user.bio}</p>
             ) : null}
 
             <div className="mt-4 flex justify-center sm:justify-start">
@@ -303,7 +305,7 @@ export default async function ProfilePage({
         </div>
 
         {/* Stats — identity hub: posts + social first */}
-        <div className="grid grid-cols-3 border-t border-border/40 bg-muted/10 sm:grid-cols-6">
+        <div className="grid grid-cols-3 border-t border-border bg-muted/20 sm:grid-cols-6">
           {(
             [
               { label: "Posts", value: user._count.posts, href: null as string | null },
@@ -324,25 +326,24 @@ export default async function ProfilePage({
           ).map((s) => (
             <div
               key={s.label}
-              className="border-border/30 px-2 py-4 text-center sm:border-r sm:border-border/30 sm:last:border-r-0"
+              className="border-border/40 px-2 py-4 text-center sm:border-r sm:border-border sm:last:border-r-0"
             >
               {s.href ? (
                 <Link
                   href={s.href}
-                  className="-m-2 block rounded-lg px-2 py-2 transition hover:bg-muted/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  className={cn(
+                    "-m-2 block rounded-lg px-2 py-2 transition-colors hover:bg-muted/40",
+                    shellFocusRing
+                  )}
                 >
-                  <p className="font-display text-lg font-semibold tabular-nums text-foreground sm:text-xl">
-                    {s.value}
-                  </p>
-                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-primary/90 sm:text-xs">
+                  <p className="text-lg font-semibold tabular-nums text-foreground sm:text-xl">{s.value}</p>
+                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-primary sm:text-xs">
                     {s.label}
                   </p>
                 </Link>
               ) : (
                 <>
-                  <p className="font-display text-lg font-semibold tabular-nums text-foreground sm:text-xl">
-                    {s.value}
-                  </p>
+                  <p className="text-lg font-semibold tabular-nums text-foreground sm:text-xl">{s.value}</p>
                   <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
                     {s.label}
                   </p>
@@ -362,7 +363,7 @@ export default async function ProfilePage({
             user.bio?.replace(/\s+/g, " ").trim().slice(0, 140) ||
             `Carmunity profile — garage, posts, and discussions.`
           }
-          triggerClassName="border-primary/35 bg-primary/5 text-xs text-primary hover:bg-primary/10"
+          triggerClassName="border-border bg-muted/40 text-xs text-foreground hover:bg-muted/60"
           carmunityShareMeta={
             currentUserId
               ? { surface: "profile", profileUserId: user.id, handle: user.handle }
@@ -382,25 +383,25 @@ export default async function ProfilePage({
         ) : null}
         {isOwnProfile ? (
           <>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
               <Link href="/explore">Open Carmunity</Link>
             </Button>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
               <Link href="/settings">Settings</Link>
             </Button>
           </>
         ) : null}
-        <Button variant="outline" size="sm" asChild>
+        <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
           <Link href={`/u/${user.handle}/garage`}>Garage</Link>
         </Button>
-        <Button variant="outline" size="sm" asChild>
+        <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
           <Link href={`/u/${user.handle}/dream`}>Dream garage</Link>
         </Button>
-        <Button variant="outline" size="sm" asChild>
+        <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
           <Link href={`/u/${user.handle}/listings`}>Listings</Link>
         </Button>
         {isOwnProfile && isMarketingEnabled() ? (
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
             <Link href={`/u/${user.handle}/marketing`}>Marketing</Link>
           </Button>
         ) : null}
@@ -424,26 +425,24 @@ export default async function ProfilePage({
       {isOwnProfile ? (
         <section className="space-y-3">
           <div>
-            <h2 className="font-display text-lg font-semibold tracking-tight">Saved discussions</h2>
+            <h2 className="text-lg font-semibold text-foreground">Saved discussions</h2>
             <p className="text-sm text-muted-foreground">
               Threads you saved for quick return — same as &quot;Save thread&quot; in discussions.
             </p>
           </div>
           {savedThreads.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-5 py-8 text-center">
-              <p className="font-display text-base font-semibold tracking-tight text-foreground">
-                Saved threads are your reading list
-              </p>
+            <div className="rounded-2xl border border-dashed border-border bg-muted/20 px-5 py-8 text-center shadow-e1">
+              <p className="text-base font-semibold text-foreground">Saved threads are your reading list</p>
               <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
                 When a build thread or tech debate deserves a bookmark, tap{" "}
                 <span className="font-medium text-primary">Save thread</span> — we’ll surface light
                 activity hints here when there’s fresh discussion.
               </p>
               <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-                <Button asChild size="sm" className="border-primary/30 bg-primary/15 text-primary hover:bg-primary/25">
+                <Button asChild size="sm" className={cn(shellFocusRing)}>
                   <Link href="/discussions">Browse discussions</Link>
                 </Button>
-                <Button asChild size="sm" variant="outline" className="border-border/60">
+                <Button asChild size="sm" variant="outline" className={cn("border-border", shellFocusRing)}>
                   <Link href="/explore?tab=following">Open Following feed</Link>
                 </Button>
               </div>
@@ -454,7 +453,10 @@ export default async function ProfilePage({
                 <li key={t.id}>
                   <Link
                     href={savedThreadHref(t)}
-                    className="relative block rounded-xl border border-border/50 bg-card/40 px-4 py-3 transition hover:border-primary/35 hover:bg-muted/10"
+                    className={cn(
+                      "relative block rounded-xl border border-border bg-card px-4 py-3 shadow-e1 transition-colors hover:border-primary/30 hover:bg-muted/30",
+                      shellFocusRing
+                    )}
                   >
                     {t.hasNewActivity ? (
                       <span
@@ -480,10 +482,8 @@ export default async function ProfilePage({
       ) : null}
 
       {isOwnProfile ? (
-        <section className="rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-4 py-5">
-          <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-primary">
-            Following activity
-          </h2>
+        <section className="rounded-2xl border border-border bg-muted/20 px-4 py-5 shadow-e1">
+          <h2 className="text-sm font-semibold text-foreground">Following activity</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Use <span className="font-medium text-primary">Carmunity → Following</span> for a unified
             stream of posts plus discussion threads and replies from people you follow.
@@ -495,14 +495,19 @@ export default async function ProfilePage({
       <section className="space-y-3">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-lg font-semibold tracking-tight">Garage</h2>
+            <h2 className="text-lg font-semibold text-foreground">Garage</h2>
             <p className="text-sm text-muted-foreground">
               {user._count.garageCars === 0
                 ? "Collection portfolio — add cars on the web."
                 : `${user._count.garageCars} car${user._count.garageCars === 1 ? "" : "s"} on file`}
             </p>
           </div>
-          <Button variant="ghost" size="sm" className="shrink-0 text-primary" asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn("shrink-0 text-primary hover:text-primary", shellFocusRing)}
+            asChild
+          >
             <Link href={`/u/${user.handle}/garage`}>View all</Link>
           </Button>
         </div>
@@ -521,11 +526,11 @@ export default async function ProfilePage({
       <section className="space-y-3">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-lg font-semibold tracking-tight">Posts</h2>
+            <h2 className="text-lg font-semibold text-foreground">Posts</h2>
             <p className="text-sm text-muted-foreground">Carmunity updates from @{user.handle}</p>
           </div>
           {recentPosts.length > 0 ? (
-            <Button variant="ghost" size="sm" className="shrink-0 text-primary" asChild>
+            <Button variant="ghost" size="sm" className={cn("shrink-0 text-primary", shellFocusRing)} asChild>
               <Link href="/explore">Explore feed</Link>
             </Button>
           ) : null}
@@ -553,12 +558,16 @@ export default async function ProfilePage({
 
       {wonAuctionsFiltered.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Won auctions</h2>
+          <h2 className="text-lg font-semibold text-foreground">Won auctions</h2>
           <p className="text-sm text-muted-foreground">Auctions won by @{user.handle}</p>
           <div className="grid gap-4 sm:grid-cols-2">
             {wonAuctionsFiltered.map((a) => (
-              <Link key={a.id} href={`/auctions/${a.id}`}>
-                <div className="flex gap-4 rounded-xl border border-border/50 bg-card/50 p-4 transition hover:border-primary/25 hover:bg-muted/20">
+              <Link
+                key={a.id}
+                href={`/auctions/${a.id}`}
+                className={cn("block rounded-xl", shellFocusRing)}
+              >
+                <div className="flex gap-4 rounded-xl border border-border bg-card p-4 shadow-e1 transition-colors hover:border-primary/30 hover:bg-muted/30">
                   <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-muted">
                     {a.images[0]?.url ? (
                       <Image
@@ -579,7 +588,7 @@ export default async function ProfilePage({
                     <p className="text-sm text-muted-foreground">
                       {a.year} {a.make} {a.model}
                     </p>
-                    <p className="text-sm font-semibold tabular-nums text-primary">
+                    <p className="text-sm font-semibold tabular-nums text-foreground">
                       Won at $
                       {(
                         ((a.buyerId ? a.buyNowPriceCents : a.bids[0]?.amountCents) ?? 0) / 100

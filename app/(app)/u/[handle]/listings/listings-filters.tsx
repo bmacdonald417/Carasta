@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 const STATUSES = [
   { value: "", label: "All" },
@@ -30,6 +32,7 @@ export function ListingsFilters({
             key={value || "all"}
             variant={isActive ? "default" : "outline"}
             size="sm"
+            className={cn(!isActive && "border-border", shellFocusRing)}
             asChild
           >
             <Link href={href}>{label}</Link>

@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export default async function DreamGaragePage({
   params,
@@ -32,25 +34,25 @@ export default async function DreamGaragePage({
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             Wishlist
           </p>
-          <h1 className="font-display text-3xl font-bold tracking-tight">Dream garage</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Dream garage</h1>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Cars @{user.handle} is chasing — same layout language as the owned garage.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {isOwn ? (
-            <Button size="sm" variant="default" asChild>
+            <Button size="sm" variant="default" asChild className={cn(shellFocusRing)}>
               <Link href="/dream/add">Add car</Link>
             </Button>
           ) : null}
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
             <Link href={`/u/${user.handle}`}>Profile</Link>
           </Button>
         </div>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         {cars.length === 0 ? (
-          <div className="col-span-full rounded-2xl border border-dashed border-border/60 bg-gradient-to-b from-muted/25 to-muted/10 px-6 py-14 text-center sm:px-10">
+          <div className="col-span-full rounded-2xl border border-dashed border-border bg-muted/20 px-6 py-14 text-center shadow-e1 sm:px-10">
             <p className="text-sm font-semibold text-foreground">Dream sheet is blank</p>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
               {isOwn
@@ -59,21 +61,21 @@ export default async function DreamGaragePage({
             </p>
             <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
               {isOwn ? (
-                <Button size="sm" asChild>
+                <Button size="sm" asChild className={cn(shellFocusRing)}>
                   <Link href="/dream/add">Add a dream car</Link>
                 </Button>
               ) : null}
-              <Button size="sm" variant="outline" asChild>
+              <Button size="sm" variant="outline" asChild className={cn("border-border", shellFocusRing)}>
                 <Link href={`/u/${user.handle}`}>Profile</Link>
               </Button>
-              <Button size="sm" variant="outline" asChild>
+              <Button size="sm" variant="outline" asChild className={cn("border-border", shellFocusRing)}>
                 <Link href="/explore">Explore Carmunity</Link>
               </Button>
             </div>
           </div>
         ) : (
           cars.map((car) => (
-            <Card key={car.id} className="overflow-hidden border-border/50 bg-card/60 shadow-sm">
+            <Card key={car.id} className="overflow-hidden transition-colors hover:border-primary/30">
               <div className="relative aspect-[4/3] w-full bg-muted sm:aspect-video">
                 {car.images[0]?.url ? (
                   <Image
@@ -90,7 +92,7 @@ export default async function DreamGaragePage({
                 )}
               </div>
               <CardContent className="p-4">
-                <p className="font-display font-semibold">
+                <p className="text-base font-semibold text-foreground">
                   {car.year} {car.make} {car.model}
                 </p>
                 {car.trim && (

@@ -4,6 +4,8 @@ import { getSession } from "@/lib/auth";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GarageCard3D } from "@/components/garage/GarageCard3D";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export default async function GaragePage({
   params,
@@ -31,7 +33,7 @@ export default async function GaragePage({
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             Collection
           </p>
-          <h1 className="font-display text-3xl font-bold tracking-tight">Garage</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Garage</h1>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted-foreground">
             @{user.handle}&apos;s owned rides — image-first portfolio. {cars.length} car
             {cars.length === 1 ? "" : "s"} on file.
@@ -39,11 +41,11 @@ export default async function GaragePage({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {isOwn ? (
-            <Button size="sm" variant="default" asChild>
+            <Button size="sm" variant="default" asChild className={cn(shellFocusRing)}>
               <Link href="/garage/add">Add car</Link>
             </Button>
           ) : null}
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
             <Link href={`/u/${user.handle}`}>Profile</Link>
           </Button>
         </div>
@@ -51,7 +53,7 @@ export default async function GaragePage({
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
         {cars.length === 0 ? (
-          <div className="col-span-full rounded-2xl border border-dashed border-border/60 bg-gradient-to-b from-muted/25 to-muted/10 px-6 py-14 text-center sm:px-10">
+          <div className="col-span-full rounded-2xl border border-dashed border-border bg-muted/20 px-6 py-14 text-center shadow-e1 sm:px-10">
             <p className="text-sm font-semibold text-foreground">Room in the garage</p>
             <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
               {isOwn
@@ -60,14 +62,14 @@ export default async function GaragePage({
             </p>
             <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
               {isOwn ? (
-                <Button size="sm" asChild>
+                <Button size="sm" asChild className={cn(shellFocusRing)}>
                   <Link href="/garage/add">Add a car</Link>
                 </Button>
               ) : null}
-              <Button size="sm" variant="outline" asChild>
+              <Button size="sm" variant="outline" asChild className={cn("border-border", shellFocusRing)}>
                 <Link href={`/u/${user.handle}`}>Back to profile</Link>
               </Button>
-              <Button size="sm" variant="outline" asChild>
+              <Button size="sm" variant="outline" asChild className={cn("border-border", shellFocusRing)}>
                 <Link href="/explore">Explore Carmunity</Link>
               </Button>
             </div>

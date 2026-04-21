@@ -4,8 +4,11 @@ import { getSession } from "@/lib/auth";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 import { computeCurrentBidCents } from "@/lib/auction-metrics";
 import { ListingsFilters } from "./listings-filters";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
@@ -65,20 +68,28 @@ export default async function ListingsPage({
 
   return (
     <div className="carasta-container max-w-6xl py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold">My Listings</h1>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">My listings</h1>
         <div className="flex items-center gap-4">
           {isMarketingEnabled() ? (
             <Link
               href={`/u/${user.handle}/marketing`}
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className={cn(
+                "text-sm text-muted-foreground transition-colors hover:text-foreground",
+                shellFocusRing,
+                "rounded-md"
+              )}
             >
               Marketing
             </Link>
           ) : null}
           <Link
             href={`/u/${user.handle}`}
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className={cn(
+              "text-sm text-muted-foreground transition-colors hover:text-foreground",
+              shellFocusRing,
+              "rounded-md"
+            )}
           >
             ← @{user.handle}
           </Link>
@@ -92,21 +103,21 @@ export default async function ListingsPage({
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.length === 0 ? (
-          <p className="col-span-full py-12 text-center text-neutral-500">
+          <p className="col-span-full rounded-xl border border-dashed border-border bg-muted/20 py-12 text-center text-sm text-muted-foreground shadow-e1">
             No listings yet.
           </p>
         ) : (
           items.map((a) => {
             const highBidCents = computeCurrentBidCents(a.bids);
+            const statusBadgeClass =
+              a.status === "LIVE"
+                ? "border-signal/40 bg-signal/10 text-signal"
+                : a.status === "SOLD"
+                  ? "border-success/40 bg-success-soft text-success-foreground"
+                  : "border-border bg-muted text-muted-foreground";
             return (
-            <Card
-              key={a.id}
-              className="overflow-hidden border-white/10 bg-white/5 transition-all hover:border-[#ff3b5c]/30"
-            >
-              <Link
-                href={`/auctions/${a.id}`}
-                className="relative block aspect-video w-full overflow-hidden bg-neutral-900"
-              >
+            <Card key={a.id} className="overflow-hidden transition-colors hover:border-primary/35">
+              <Link href={`/auctions/${a.id}`} className="relative block aspect-video w-full overflow-hidden bg-muted">
                 <Image
                   src={
                     a.images[0]?.url ??
@@ -119,40 +130,31 @@ export default async function ListingsPage({
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
                 <div className="absolute left-3 top-3">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
-                      a.status === "LIVE"
-                        ? "border border-[#ff3b5c]/50 bg-[#ff3b5c]/90 text-white"
-                        : a.status === "SOLD"
-                          ? "border border-green-500/50 bg-green-500/20 text-green-400"
-                          : a.status === "DRAFT"
-                            ? "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400"
-                            : "border border-neutral-500/50 bg-neutral-500/20 text-neutral-400"
-                    }`}
+                  <Badge
+                    variant="outline"
+                    className={cn("rounded-full px-3 py-0.5 text-[11px] font-semibold uppercase", statusBadgeClass)}
                   >
                     {a.status}
-                  </span>
+                  </Badge>
                 </div>
               </Link>
-              <CardContent className="border-t border-white/5 p-4">
-                <p className="text-xs text-neutral-500">
+              <CardContent className="border-t border-border p-4">
+                <p className="text-xs text-muted-foreground">
                   {a.year} {a.make} {a.model}
                 </p>
-                <Link href={`/auctions/${a.id}`} className="block">
-                  <h2 className="mt-1 font-display font-semibold line-clamp-1 text-foreground transition hover:text-[#ff3b5c]/90">
+                <Link href={`/auctions/${a.id}`} className={cn("block", shellFocusRing, "rounded-sm")}>
+                  <h2 className="mt-1 line-clamp-1 text-base font-semibold text-foreground transition-colors hover:text-primary">
                     {a.title}
                   </h2>
                 </Link>
                 {a.status === "LIVE" && (
-                  <p className="mt-2 text-sm text-[#ff3b5c]">
+                  <p className="mt-2 text-sm font-medium text-signal">
                     {formatCurrency(highBidCents)} high bid
-                    <span className="ml-1 text-neutral-500">
-                      · {a._count.bids} bids
-                    </span>
+                    <span className="ml-1 font-normal text-muted-foreground">· {a._count.bids} bids</span>
                   </p>
                 )}
                 {a.status === "SOLD" && (
-                  <p className="mt-2 text-sm text-green-400">
+                  <p className="mt-2 text-sm font-medium text-success">
                     Sold
                     {a.buyerId
                       ? ` at ${formatCurrency(a.buyNowPriceCents ?? 0)}`
@@ -162,7 +164,7 @@ export default async function ListingsPage({
                   </p>
                 )}
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
                     <Link href={`/auctions/${a.id}`}>View listing</Link>
                   </Button>
                   <ListingsAiRefineDialog
@@ -194,7 +196,7 @@ export default async function ListingsPage({
 
       {hasMore && nextCursor && (
         <div className="mt-8 flex justify-center">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className={cn("border-border", shellFocusRing)}>
             <Link
               href={`/u/${user.handle}/listings?cursor=${nextCursor}${
                 statusFilter ? `&status=${statusFilter}` : ""

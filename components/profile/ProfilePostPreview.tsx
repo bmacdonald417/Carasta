@@ -1,7 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, MessageCircle } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export type ProfilePostPreviewData = {
   id: string;
@@ -25,8 +29,7 @@ function formatPostTime(d: Date): string {
 }
 
 /**
- * Read-only Carmunity post shell for profile grids — matches explore feed card language
- * (media-forward, caption clamp, stat row). Engagement opens the post detail for actions.
+ * Read-only Carmunity post shell for profile grids — aligned with Explore feed card language.
  */
 export function ProfilePostPreview({ post }: { post: ProfilePostPreviewData }) {
   const hasImage = Boolean(post.imageUrl?.trim());
@@ -34,21 +37,23 @@ export function ProfilePostPreview({ post }: { post: ProfilePostPreviewData }) {
   const detailHref = `/explore/post/${post.id}`;
 
   return (
-    <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/25">
+    <Card className="carmunity-feed-card overflow-hidden p-0 transition-colors hover:border-primary/35">
       <div className="flex items-center justify-between gap-2 px-4 pt-3 pb-2">
         <div className="flex min-w-0 items-center gap-2">
           {post.auctionId ? (
-            <span className="shrink-0 rounded-md border border-[hsl(var(--performance-red))]/35 bg-[hsl(var(--performance-red))]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[hsl(var(--performance-red))]">
-              Auction
-            </span>
+            <Badge variant="outline" className="shrink-0 border-primary/30 text-[10px] font-semibold uppercase tracking-wide text-primary">
+              Listing
+            </Badge>
           ) : null}
-          <span className="truncate text-xs text-muted-foreground tabular-nums">
-            {formatPostTime(post.createdAt)}
-          </span>
+          <span className="truncate text-xs tabular-nums text-muted-foreground">{formatPostTime(post.createdAt)}</span>
         </div>
         <Link
           href={detailHref}
-          className="shrink-0 text-xs font-medium text-primary hover:underline"
+          className={cn(
+            "shrink-0 text-xs font-medium text-primary hover:underline",
+            shellFocusRing,
+            "rounded-sm"
+          )}
         >
           View
         </Link>
@@ -69,29 +74,35 @@ export function ProfilePostPreview({ post }: { post: ProfilePostPreviewData }) {
       {(hasContent || !hasImage) && (
         <div className="px-4 pb-2 pt-1">
           {hasContent ? (
-            <Link href={detailHref} className="block">
-              <p className="line-clamp-4 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
+            <Link href={detailHref} className={cn("block", shellFocusRing, "rounded-md")}>
+              <p className="line-clamp-4 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">
                 {post.content}
               </p>
             </Link>
           ) : !hasImage ? (
-            <Link href={detailHref} className="text-sm text-muted-foreground hover:text-primary">
+            <Link
+              href={detailHref}
+              className={cn("text-sm text-muted-foreground hover:text-primary", shellFocusRing, "rounded-md")}
+            >
               View post
             </Link>
           ) : null}
         </div>
       )}
 
-      <div className="flex items-center gap-1 border-t border-border/40 px-3 py-2 text-muted-foreground">
+      <div className="flex items-center gap-1 border-t border-border px-3 py-2 text-muted-foreground">
         <span className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium tabular-nums">
-          <Heart className="h-[18px] w-[18px] shrink-0" />
+          <Heart className="h-[18px] w-[18px] shrink-0" aria-hidden />
           {post._count.likes}
         </span>
         <Link
           href={detailHref}
-          className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors hover:bg-muted/50 hover:text-foreground tabular-nums"
+          className={cn(
+            "inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium tabular-nums transition-colors hover:bg-muted/50 hover:text-foreground",
+            shellFocusRing
+          )}
         >
-          <MessageCircle className="h-[18px] w-[18px] shrink-0" />
+          <MessageCircle className="h-[18px] w-[18px] shrink-0" aria-hidden />
           {post._count.comments}
         </Link>
       </div>
