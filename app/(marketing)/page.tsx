@@ -3,15 +3,21 @@ import { fetchLiveAuctionsForList } from "@/lib/auction-queries";
 import { getHomeStats } from "@/lib/home-stats";
 import { HomeStatsStrip } from "@/components/home/HomeStatsStrip";
 import { LiveActivityFeed } from "@/components/home/LiveActivityFeed";
-
-export const dynamic = "force-dynamic";
 import Link from "next/link";
+import {
+  CarmunityHero,
+  HowItWorksSnapshot,
+  ProductPillarsSection,
+  SellerIntelligenceSection,
+  TrustResourcesBand,
+  WhyCarastaSection,
+} from "@/components/home/HomePublicSections";
 import { ShowroomHero } from "@/components/home/ShowroomHero";
 import { AuctionImageStrip } from "@/components/home/AuctionImageStrip";
 import { AuctionCard } from "@/app/(marketing)/auctions/auction-card";
-import { AppStoreBadges } from "@/components/ui/app-store-badges";
-import { InstagramShowcase } from "@/components/carasta/InstagramShowcase";
 import { Gavel } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 function AuctionSection({
   title,
@@ -28,18 +34,18 @@ function AuctionSection({
 }) {
   if (auctions.length === 0) return null;
   return (
-    <section className="border-t border-border/60 bg-card/30 py-12 md:py-16">
+    <section className="border-t border-border/60 bg-neutral-50 py-12 md:py-16">
       <div className="carasta-container">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-2xl font-semibold uppercase tracking-[0.1em] text-neutral-100 md:text-3xl">
+            <h2 className="font-display text-2xl font-semibold uppercase tracking-[0.1em] text-neutral-950 md:text-3xl">
               {title}
             </h2>
-            <p className="mt-1 text-neutral-400">{description}</p>
+            <p className="mt-1 text-neutral-600">{description}</p>
           </div>
           <Link
             href={viewAllHref}
-            className="hidden shrink-0 items-center gap-2 rounded-lg border border-signal/35 bg-signal/10 px-4 py-2.5 font-medium text-signal transition hover:bg-signal/20 md:inline-flex"
+            className="hidden shrink-0 items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2.5 font-medium text-neutral-900 transition hover:border-neutral-400 hover:bg-neutral-100 md:inline-flex"
           >
             View all
             <Gavel className="h-4 w-4" />
@@ -71,7 +77,7 @@ function AuctionSection({
         <div className="mt-6 text-center md:hidden">
           <Link
             href={viewAllHref}
-            className="inline-flex items-center gap-2 rounded-lg bg-signal/15 px-4 py-2.5 font-medium text-signal transition hover:bg-signal/25"
+            className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2.5 font-medium text-neutral-900 transition hover:border-neutral-400 hover:bg-neutral-100"
           >
             View all
             <Gavel className="h-4 w-4" />
@@ -116,7 +122,6 @@ export default async function HomePage() {
 
   return (
     <div className="bg-background">
-      {/* Scrolling auction image strip */}
       <AuctionImageStrip
         auctions={stripAuctions.map((a) => ({
           id: a.id,
@@ -125,50 +130,104 @@ export default async function HomePage() {
         }))}
         requireAuth={requireAuth}
       />
-      {/* Featured Live Auctions — hero carousel */}
-      <ShowroomHero auctions={featuredForHero} requireAuth={requireAuth} />
+      <CarmunityHero />
+      <ProductPillarsSection />
 
-      {/* Carasta at a glance */}
-      <HomeStatsStrip stats={homeStats} />
-
-      {/* Live Activity Feed */}
-      <section className="border-t border-border/60 py-8">
+      <section className="border-b border-border/60 bg-white py-16 md:py-20">
         <div className="carasta-container">
-          <div className="mx-auto max-w-sm">
-            <LiveActivityFeed />
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+                Platform activity
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-neutral-950 md:text-4xl">
+                Alive now, not just explained well.
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-neutral-600 md:text-lg">
+                Carasta already has the ingredients people expect from a real
+                product: live auctions, bids, Carmunity activity, and public
+                surfaces that connect identity with marketplace motion.
+              </p>
+              <div className="mt-8">
+                <HomeStatsStrip stats={homeStats} />
+              </div>
+            </div>
+            <div className="rounded-[2rem] border border-neutral-200 bg-neutral-50 p-4 shadow-sm md:p-5">
+              <LiveActivityFeed />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Ending Soon */}
+      <WhyCarastaSection />
+
+      <section className="border-b border-border/60 bg-neutral-950 py-16 text-white md:py-20">
+        <div className="carasta-container">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+              Marketplace proof
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl">
+              Live auctions should validate the story, not have to carry it by themselves.
+            </h2>
+            <p className="mt-4 text-base leading-7 text-neutral-300 md:text-lg">
+              The marketplace remains a serious part of Carasta. This is where
+              live inventory, bidding urgency, and seller credibility prove that
+              the broader platform already has real substance.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/auctions"
+                className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-100"
+              >
+                Browse Live Auctions
+              </Link>
+              <Link
+                href="/how-it-works"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+              >
+                See How Bidding Works
+              </Link>
+              <Link
+                href="/sell"
+                className="inline-flex items-center gap-2 rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-neutral-300 transition hover:text-white"
+              >
+                Sell Your Car
+              </Link>
+            </div>
+          </div>
+        </div>
+        <div className="mt-10">
+          <ShowroomHero auctions={featuredForHero} requireAuth={requireAuth} />
+        </div>
+      </section>
+
       <AuctionSection
         title="Ending Soon"
-        description="Auctions closing next. Place your bid before it's too late."
+        description="Auctions closing next. Follow the market as bidding gets tighter."
         auctions={endingSoonAuctions}
         viewAllHref="/auctions?sort=ending"
         requireAuth={requireAuth}
       />
 
-      {/* Recently Added */}
       <AuctionSection
         title="Recently Added"
-        description="Just listed. Fresh collector cars hitting the block."
+        description="Fresh collector cars entering the marketplace right now."
         auctions={recentAuctions}
         viewAllHref="/auctions?sort=newest"
         requireAuth={requireAuth}
       />
 
-      {/* Fallback when no auctions */}
       {endingSoonAuctions.length === 0 && recentAuctions.length === 0 && (
-        <section className="border-t border-border/60 py-16 md:py-24">
+        <section className="border-t border-border/60 bg-neutral-50 py-16 md:py-24">
           <div className="carasta-container">
-            <div className="rounded-2xl border border-border/60 bg-card/50 py-16 text-center">
-              <p className="text-neutral-400">
+            <div className="rounded-3xl border border-neutral-200 bg-white py-16 text-center shadow-sm">
+              <p className="text-neutral-600">
                 No live auctions at the moment. Check back soon.
               </p>
               <Link
                 href="/auctions"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-signal hover:underline"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-900 hover:underline"
               >
                 Browse Auctions
                 <Gavel className="h-4 w-4" />
@@ -178,28 +237,9 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Social Command Center — Instagram showcase */}
-      <InstagramShowcase />
-
-      {/* Value proposition + Download App */}
-      <section className="border-t border-border/60 bg-card/25 py-16 md:py-24">
-        <div className="carasta-container text-center">
-          <h2 className="font-display text-2xl font-semibold uppercase tracking-[0.1em] text-neutral-100 md:text-3xl">
-            Built by Enthusiasts, for Enthusiasts.
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-neutral-400">
-            Carmunity by Carasta — a social-first home for gearheads and
-            collectors, with transparent auctions: bidding, reserve meters,
-            anti-sniping, and real listings.
-          </p>
-          <p className="mt-6 text-sm font-medium text-neutral-500">
-            Download the app
-          </p>
-          <div className="mt-4">
-            <AppStoreBadges />
-          </div>
-        </div>
-      </section>
+      <SellerIntelligenceSection />
+      <HowItWorksSnapshot />
+      <TrustResourcesBand />
     </div>
   );
 }

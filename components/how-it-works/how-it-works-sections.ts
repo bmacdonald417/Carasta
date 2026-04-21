@@ -3,12 +3,11 @@
  */
 import type { LucideIcon } from "lucide-react";
 import {
-  Search,
+  UserRound,
+  Users,
+  MessageSquare,
   Gavel,
   Shield,
-  Clock,
-  CreditCard,
-  Truck,
   BadgeCheck,
 } from "lucide-react";
 
@@ -19,52 +18,45 @@ export const HOW_IT_WORKS_SECTIONS: {
   description: string;
 }[] = [
   {
-    id: "discover",
-    icon: Search,
-    title: "Discover & Watchlist",
+    id: "identity",
+    icon: UserRound,
+    title: "Build your profile and Garage",
     description:
-      "Browse live auctions filtered by make, model, year, and condition. Each listing includes detailed condition reports, high-resolution photos, and seller profiles. Save cars you love to your Garage—your personal collection of owned and dream vehicles—so you can track them and bid when you're ready.",
+      "Start with a real enthusiast identity. Your profile and Garage help you show what you own, what you are building, and what you are chasing next. Carasta is designed so your identity matters before you ever place a bid or list a car.",
   },
   {
-    id: "bid",
+    id: "carmunity",
+    icon: Users,
+    title: "Join the Carmunity",
+    description:
+      "Follow people, discover posts, and keep up with the cars and stories that actually interest you. Carmunity is the social layer that makes Carasta useful on ordinary days, not only on auction day.",
+  },
+  {
+    id: "discussions",
+    icon: MessageSquare,
+    title: "Use Discussions and Messages",
+    description:
+      "Move from public conversation to direct connection without leaving the platform. Discussions help people swap context and opinions, while Messages make it easier to continue a conversation when it needs to become one-to-one.",
+  },
+  {
+    id: "market",
     icon: Gavel,
-    title: "Bidding Basics",
+    title: "Browse, bid, and sell with clearer mechanics",
     description:
-      "Place bids in real time. The minimum bid increment is $250—each new bid must be at least $250 higher than the current high bid. Set an auto-bid with your maximum amount and we'll bid in $250 steps for you until your cap is reached, so you can stay in the race without constant monitoring.",
+      "When you step into the marketplace, Carasta gives you real auction tools: live bidding, reserve visibility, anti-sniping protection, watchlists, and seller surfaces that feel grounded in how enthusiasts actually evaluate cars.",
   },
   {
-    id: "reserve",
+    id: "trust",
     icon: Shield,
-    title: "Reserve Prices",
+    title: "Trust the process",
     description:
-      "Sellers can set a hidden reserve—the minimum price they'll accept. You won't see the exact number, but the reserve meter shows how close the high bid is to meeting it (0–100%). When the meter hits 100%, the reserve is met and the car will sell to the highest bidder when the auction ends. No reserve means the car sells to the top bid regardless of amount.",
-  },
-  {
-    id: "anti-sniping",
-    icon: Clock,
-    title: "Anti-Sniping",
-    description:
-      "Last-second bids can feel unfair. Our anti-sniping system extends the auction clock by 2 minutes whenever a new bid is placed in the final 2 minutes. That gives everyone a fair chance to respond—no more losing to a snipe in the last second.",
-  },
-  {
-    id: "winning",
-    icon: CreditCard,
-    title: "Winning, Payment & Next Steps",
-    description:
-      "When you win, you'll receive confirmation and next-step instructions. Payment and delivery coordination are handled through Carasta. We connect buyer and seller to complete the transaction and ensure a smooth handoff.",
-  },
-  {
-    id: "shipping",
-    icon: Truck,
-    title: "Shipping & Handoff",
-    description:
-      "Coordinate pickup or shipping directly with the seller. You'll receive title, bill of sale, and condition documentation. We support the full handoff so you drive away—or ship away—with confidence and proper paperwork.",
+      "Buyer and seller confidence depends on transparency. Reserve state, seller identity, condition context, and platform rules help reduce guesswork and keep the experience legible.",
   },
   {
     id: "reputation",
     icon: BadgeCheck,
-    title: "Reputation & Trust",
+    title: "Stay connected after the transaction",
     description:
-      "Collectors earn reputation through completed sales, purchases, and quality condition reports. Tiers (New, Verified, Elite, Apex) reflect experience and reliability. Disputes and policy violations affect standing. Check a seller's profile to see their track record before bidding.",
+      "The point is not to disappear once the sale ends. Profiles, Garage identity, Carmunity, and Discussions give the platform ongoing value that outlives any single listing.",
   },
 ];

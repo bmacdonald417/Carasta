@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import {
   Gavel,
   Users,
-  ShoppingBag,
   LayoutGrid,
   MessageSquare,
+  PlusCircle,
 } from "lucide-react";
 
 const navItems = [
@@ -16,7 +16,7 @@ const navItems = [
   { href: "/discussions", label: "Discussions", icon: MessageSquare },
   { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/auctions", label: "Auctions", icon: Gavel },
-  { href: "/merch", label: "Merch", icon: ShoppingBag },
+  { href: "/sell", label: "Sell", icon: PlusCircle },
 ] as const;
 
 export function MobileBottomNav() {

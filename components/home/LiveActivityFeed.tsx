@@ -11,11 +11,11 @@ const MAX_EVENTS = 15;
 function EventIcon({ type }: { type: ActivityEvent["type"] }) {
   switch (type) {
     case "new_bid":
-      return <Gavel className="h-3.5 w-3.5 text-[#ff3b5c]/80" />;
+      return <Gavel className="h-3.5 w-3.5 text-primary" />;
     case "new_comment":
-      return <MessageSquare className="h-3.5 w-3.5 text-blue-400/80" />;
+      return <MessageSquare className="h-3.5 w-3.5 text-sky-600" />;
     case "ending_soon":
-      return <Clock className="h-3.5 w-3.5 text-amber-400/80" />;
+      return <Clock className="h-3.5 w-3.5 text-amber-600" />;
     default:
       return <Gavel className="h-3.5 w-3.5 text-neutral-500" />;
   }
@@ -40,7 +40,7 @@ function EventLink({ event }: { event: ActivityEvent }) {
   return (
     <Link
       href={href}
-      className="line-clamp-1 text-sm text-neutral-300 hover:text-[#ff3b5c] transition-colors"
+      className="line-clamp-1 text-sm text-neutral-800 transition-colors hover:text-primary"
     >
       {title}
     </Link>
@@ -117,7 +117,7 @@ export function LiveActivityFeed() {
   }, [mounted, addEvent]);
 
   return (
-    <div className="rounded-xl border border-white/10 bg-black/30 py-4">
+    <div className="rounded-[1.75rem] border border-neutral-200 bg-white py-4 shadow-sm">
       <h3 className="px-4 font-display text-xs font-semibold uppercase tracking-wider text-neutral-500">
         Live Activity
       </h3>
@@ -136,7 +136,7 @@ export function LiveActivityFeed() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="flex items-start gap-3 border-b border-white/5 px-4 py-2.5 last:border-0 hover:bg-white/5"
+                  className="flex items-start gap-3 border-b border-neutral-100 px-4 py-2.5 last:border-0 hover:bg-neutral-50"
                 >
                   <EventIcon type={event.type} />
                   <div className="min-w-0 flex-1">
@@ -144,7 +144,7 @@ export function LiveActivityFeed() {
                       <EventLabel event={event} />
                     </p>
                     <EventLink event={event} />
-                    <p className="mt-0.5 text-xs text-neutral-600">
+                    <p className="mt-0.5 text-xs text-neutral-500">
                       {formatTime(event.timestamp)}
                     </p>
                   </div>

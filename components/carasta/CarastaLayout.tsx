@@ -21,9 +21,9 @@ import {
 const marketingNav = [
   { href: "/", label: "Home" },
   { href: "/how-it-works", label: "How It Works" },
+  { href: "/why-carasta", label: "Why Carasta" },
+  { href: "/resources", label: "Resources" },
   { href: "/contact", label: "Contact" },
-  { href: "/terms", label: "Terms" },
-  { href: "/privacy", label: "Privacy" },
 ];
 
 const appNav = [
@@ -31,7 +31,6 @@ const appNav = [
   { href: "/discussions", label: "Discussions" },
   { href: "/auctions", label: "Auctions" },
   { href: "/sell", label: "Sell" },
-  { href: "/messages", label: "Messages" },
 ];
 
 export function CarastaLayout({ children }: { children: React.ReactNode }) {
@@ -64,7 +63,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         }}
         transition={{ duration: 0.3 }}
       >
-        <div className="carasta-container flex h-16 items-center justify-between md:h-20">
+        <div className="carasta-container flex h-16 items-center gap-4 md:h-20 md:gap-6">
           <Link
             href="/"
             className="flex items-center gap-3 transition-opacity hover:opacity-90"
@@ -83,116 +82,146 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               Carasta
             </span>
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
-            {marketingNav.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`font-medium transition ${
-                  pathname === href
-                    ? "text-primary"
-                    : "text-neutral-400 hover:text-neutral-100"
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
-            {appNav.map(({ href, label }) => {
-              const appActive = pathname.startsWith(href);
-              return (
+          <div className="hidden min-w-0 flex-1 items-center justify-between gap-4 lg:flex">
+            <nav className="flex min-w-0 items-center gap-1 text-[13px]">
+              {marketingNav.map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
-                  data-active={appActive ? "true" : "false"}
-                  className={`carmunity-nav-link ${
-                    appActive
-                      ? "font-medium text-primary"
-                      : "text-neutral-400 hover:text-neutral-100"
+                  className={`rounded-full px-3 py-2 font-medium transition ${
+                    pathname === href
+                      ? "bg-white/10 text-white"
+                      : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
                   }`}
                 >
                   {label}
                 </Link>
-              );
-            })}
+              ))}
+            </nav>
+            <nav className="flex items-center gap-1 text-[13px]">
+              {appNav.map(({ href, label }) => {
+                const appActive = pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    data-active={appActive ? "true" : "false"}
+                    className={`carmunity-nav-link rounded-full px-3 py-2 font-medium transition ${
+                      appActive
+                        ? "bg-primary/15 text-primary"
+                        : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+          <nav className="ml-auto flex items-center gap-3 text-sm">
             {status === "loading" ? (
               <span className="text-neutral-500">…</span>
             ) : session ? (
               <>
+                <Link
+                  href="/messages"
+                  className={`hidden rounded-full px-3 py-2 text-[13px] font-medium transition xl:inline-flex ${
+                    pathname.startsWith("/messages")
+                      ? "bg-primary/15 text-primary"
+                      : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                  }`}
+                >
+                  Messages
+                </Link>
                 <NotificationDropdown />
                 <DropdownMenu>
-                <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-background focus:ring-2 focus:ring-ring">
-                  <Avatar className="h-8 w-8 border border-white/10">
-                    <AvatarImage src={session.user?.image ?? undefined} />
-                    <AvatarFallback className="bg-neutral-800 text-xs text-neutral-300">
-                      {(session.user?.name ?? "U").slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="min-w-[160px] border-white/10 bg-[#121218]/95 backdrop-blur-xl"
-                >
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href={
-                        (session.user as any)?.handle
-                          ? `/u/${(session.user as any).handle}`
-                          : "/settings"
-                      }
-                    >
-                      You
-                    </Link>
-                  </DropdownMenuItem>
-                  {(session.user as any)?.handle && (
+                  <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-background focus:ring-2 focus:ring-ring">
+                    <Avatar className="h-8 w-8 border border-white/10">
+                      <AvatarImage src={session.user?.image ?? undefined} />
+                      <AvatarFallback className="bg-neutral-800 text-xs text-neutral-300">
+                        {(session.user?.name ?? "U").slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="min-w-[160px] border-white/10 bg-[#121218]/95 backdrop-blur-xl"
+                  >
                     <DropdownMenuItem asChild>
                       <Link
-                        href={`/u/${(session.user as any).handle}/listings`}
+                        href={
+                          (session.user as any)?.handle
+                            ? `/u/${(session.user as any).handle}`
+                            : "/settings"
+                        }
                       >
-                        My listings
+                        You
                       </Link>
                     </DropdownMenuItem>
-                  )}
-                  {session.user?.handle && session.user.marketingEnabled && (
+                    {(session.user as any)?.handle && (
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href={`/u/${(session.user as any).handle}/listings`}
+                        >
+                          My listings
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    {session.user?.handle && session.user.marketingEnabled && (
+                      <DropdownMenuItem asChild>
+                        <Link href={`/u/${session.user.handle}/marketing`}>
+                          Marketing dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
-                      <Link href={`/u/${session.user.handle}/marketing`}>
-                        Marketing dashboard
-                      </Link>
+                      <Link href="/settings">Settings</Link>
                     </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings">Settings</Link>
-                  </DropdownMenuItem>
-                  {(session.user as any)?.role === "ADMIN" && (
-                    <>
+                    {(session.user as any)?.role === "ADMIN" && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin">Admin</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/dashboard/feedback">
+                            Element feedback
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin/marketing">
+                            Seller marketing (review)
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link href="/admin">Admin</Link>
+                      <Link href="/api/auth/signout">Sign out</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/dashboard/feedback">
-                          Element feedback
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin/marketing">
-                          Seller marketing (review)
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/api/auth/signout">Sign out</Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
-              <Link
-                href="/auth/sign-in"
-                className="font-medium text-neutral-400 transition hover:text-primary"
-              >
-                Sign in
-              </Link>
+              <>
+                <Link
+                  href="/auctions"
+                  className="hidden font-medium text-neutral-400 transition hover:text-neutral-100 md:inline-flex"
+                >
+                  Browse Auctions
+                </Link>
+                <Link
+                  href="/auth/sign-in"
+                  className="font-medium text-neutral-400 transition hover:text-primary"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/auth/sign-up?callbackUrl=%2Fexplore"
+                  className="hidden rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 md:inline-flex"
+                >
+                  Join Carmunity
+                </Link>
+              </>
             )}
           </nav>
         </div>
@@ -211,41 +240,105 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
       <footer className="mt-auto">
         <div className="relative border-t border-border/60 bg-background pt-16 pb-24 md:pt-20 md:pb-28">
           <div className="carasta-container">
-            <div className="flex flex-col items-center gap-10 md:flex-row md:items-start md:justify-between">
-              <div className="flex items-center gap-2">
-                <img
-                  src="/brand/carasta/wordmark.png"
-                  alt="Carasta"
-                  width={180}
-                  height={48}
-                  className="h-10 object-contain object-left md:h-12"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-                <span className="font-display text-2xl font-semibold uppercase tracking-[0.15em] text-neutral-100 md:text-3xl">
-                  Carasta
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-4 md:flex-row md:gap-6">
-                <div className="flex flex-col items-center gap-2">
-                  <p className="text-xs text-neutral-500">Carmunity on mobile</p>
-                  <AppStoreBadges />
-                  <p className="max-w-xs text-center text-[11px] leading-relaxed text-neutral-600">
-                    Same identity and social graph as carasta.com — the site is not a lesser client.
-                  </p>
+            <div className="grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)]">
+              <div>
+                <div className="flex items-center gap-2">
+                  <img
+                    src="/brand/carasta/wordmark.png"
+                    alt="Carasta"
+                    width={180}
+                    height={48}
+                    className="h-10 object-contain object-left md:h-12"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <span className="font-display text-2xl font-semibold uppercase tracking-[0.15em] text-neutral-100 md:text-3xl">
+                    Carasta
+                  </span>
+                </div>
+                <p className="mt-5 max-w-md text-sm leading-7 text-neutral-400">
+                  Carmunity by Carasta brings discussions, profiles, Garage
+                  identity, messaging, auctions, and seller tools into one
+                  platform built for enthusiasts.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-3 text-sm">
+                  <Link
+                    href="/auth/sign-up?callbackUrl=%2Fexplore"
+                    className="rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground transition hover:bg-primary/90"
+                  >
+                    Join Carmunity
+                  </Link>
+                  <Link
+                    href="/auctions"
+                    className="rounded-full border border-white/10 px-4 py-2 font-semibold text-neutral-300 transition hover:border-white/20 hover:text-white"
+                  >
+                    Browse Auctions
+                  </Link>
                 </div>
               </div>
-              <div className="text-center md:text-right">
-                <p className="font-display text-lg font-semibold text-neutral-200">
-                  Contact
-                </p>
-                <a
-                  href="mailto:info@carasta.com"
-                  className="text-primary/90 hover:text-primary"
-                >
-                  info@carasta.com
-                </a>
+              <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-1">
+                <div>
+                  <p className="font-display text-lg font-semibold text-neutral-100">
+                    Explore
+                  </p>
+                  <nav className="mt-4 flex flex-col gap-3 text-sm text-neutral-400">
+                    {marketingNav.map(({ href, label }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        className="transition hover:text-white"
+                      >
+                        {label}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+              <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-1">
+                <div>
+                  <p className="font-display text-lg font-semibold text-neutral-100">
+                    Product
+                  </p>
+                  <nav className="mt-4 flex flex-col gap-3 text-sm text-neutral-400">
+                    {[
+                      ...appNav,
+                      { href: "/messages", label: "Messages" },
+                      { href: "/community-guidelines", label: "Community Guidelines" },
+                    ].map(({ href, label }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        className="transition hover:text-white"
+                      >
+                        {label}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+                <div>
+                  <p className="font-display text-lg font-semibold text-neutral-100">
+                    Contact
+                  </p>
+                  <a
+                    href="mailto:info@carasta.com"
+                    className="mt-4 inline-block text-primary/90 hover:text-primary"
+                  >
+                    info@carasta.com
+                  </a>
+                  <div className="mt-5">
+                    <p className="text-xs text-neutral-500">
+                      Carmunity on mobile
+                    </p>
+                    <div className="mt-3">
+                      <AppStoreBadges />
+                    </div>
+                    <p className="mt-3 max-w-xs text-[11px] leading-relaxed text-neutral-600">
+                      Same account identity and social graph as the web product,
+                      with a narrower surface area for now.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
