@@ -59,14 +59,14 @@ export function FeedPostInlineComment({
           <span className="min-w-[1ch] tabular-nums text-xs text-muted-foreground">{initialCount}</span>
         </Button>
       ) : (
-        <div className="rounded-xl border border-border/50 bg-muted/10 p-3">
+        <div className="rounded-xl border border-border bg-card p-3 shadow-e1">
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Say something constructive…"
             rows={3}
             maxLength={4000}
-            className="resize-y border-border/60 bg-background/70 text-sm"
+            className="resize-y border-border bg-background text-sm"
           />
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
             <Button type="button" variant="ghost" size="sm" className="text-xs" onClick={() => setOpen(false)}>

@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 import { createPost } from "./actions";
 
@@ -65,14 +67,15 @@ export function CreatePostForm({
     <form
       id="carmunity-create-post"
       onSubmit={submit}
-      className={`scroll-mt-28 rounded-2xl border border-border/50 bg-card/70 p-4 shadow-sm backdrop-blur-sm sm:p-5 ${className ?? ""}`}
+      className={cn(
+        "scroll-mt-28 rounded-2xl border border-border bg-card p-4 shadow-e1 sm:p-5",
+        className
+      )}
     >
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-muted-foreground">
           <PenLine className="h-4 w-4 text-primary" aria-hidden />
-          <span className="text-xs font-semibold uppercase tracking-wider text-foreground/80">
-            Share to Carmunity
-          </span>
+          <span className="text-xs font-semibold tracking-wide text-foreground">Share to Carmunity</span>
         </div>
         <span className="tabular-nums text-[11px] text-muted-foreground">{content.length} / 8000</span>
       </div>
@@ -84,7 +87,7 @@ export function CreatePostForm({
         value={content}
         onChange={setContent}
         placeholder="Garage shot, build note, or a question for the lane — type @ to mention someone."
-        className="min-h-[96px] resize-none border-border/60 bg-background/60 text-[15px] leading-relaxed"
+        className="min-h-[96px] resize-none border-border bg-background text-[15px] leading-relaxed"
         maxLength={8000}
       />
       <div className="mt-4 space-y-2">
@@ -97,10 +100,10 @@ export function CreatePostForm({
           placeholder="https://…"
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
-          className="border-border/60 bg-background/60"
+          className="border-border bg-background"
         />
         {previewUrl ? (
-          <div className="mt-2 overflow-hidden rounded-xl border border-border/50 bg-muted/20">
+          <div className="mt-2 overflow-hidden rounded-xl border border-border bg-muted/20 shadow-e1">
             <div className="relative aspect-[16/9] w-full max-h-48 bg-muted">
               <Image
                 src={previewUrl}
@@ -118,8 +121,14 @@ export function CreatePostForm({
           </div>
         ) : null}
       </div>
-      <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-border/35 pt-4">
-        <Button type="submit" variant="default" size="sm" className="rounded-full px-5" disabled={loading}>
+      <div className="mt-5 flex flex-wrap items-center justify-end gap-2 border-t border-border pt-4">
+        <Button
+          type="submit"
+          variant="default"
+          size="sm"
+          className={cn("rounded-full px-5", shellFocusRing)}
+          disabled={loading}
+        >
           {loading ? "Posting…" : "Post"}
         </Button>
       </div>

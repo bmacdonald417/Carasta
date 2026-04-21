@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentForm } from "./comment-form";
 import { getSession } from "@/lib/auth";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 import { summarizePostReactionsMerged, viewerPostReactionKinds } from "@/lib/carmunity/post-reactions";
 import { PostEngagementBar } from "./post-engagement";
@@ -72,16 +74,20 @@ export default async function PostDetailPage({
     <div className="carasta-container max-w-2xl py-8">
       <Link
         href="/explore"
-        className="text-sm text-muted-foreground transition hover:text-primary"
+        className={cn(
+          "text-sm font-medium text-muted-foreground transition-colors hover:text-primary",
+          shellFocusRing,
+          "inline-flex rounded-md"
+        )}
       >
         ← Carmunity
       </Link>
 
-      <Card className="carmunity-feed-card mt-6 overflow-hidden border border-border/50 bg-card/70 p-0 shadow-sm backdrop-blur-sm hover:border-primary/20">
+      <Card className="carmunity-feed-card mt-6 overflow-hidden border border-border bg-card p-0 shadow-e1 transition-colors hover:border-primary/25">
         {/* Author */}
-        <div className="flex items-start gap-3 border-b border-border/40 px-5 pt-5 pb-4">
-          <Link href={`/u/${post.author.handle}`} className="shrink-0">
-            <Avatar className="h-12 w-12 ring-1 ring-border/60">
+        <div className="flex items-start gap-3 border-b border-border px-5 pt-5 pb-4">
+          <Link href={`/u/${post.author.handle}`} className={cn("shrink-0", shellFocusRing, "rounded-full")}>
+            <Avatar className="h-12 w-12 border border-border">
               <AvatarImage src={post.author.avatarUrl ?? undefined} alt="" />
               <AvatarFallback>
                 {(post.author.name ?? post.author.handle).slice(0, 2).toUpperCase()}
@@ -92,7 +98,11 @@ export default async function PostDetailPage({
             <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/u/${post.author.handle}`}
-                className="text-base font-semibold tracking-tight text-foreground hover:text-primary"
+                className={cn(
+                  "text-base font-semibold tracking-tight text-foreground hover:text-primary",
+                  shellFocusRing,
+                  "rounded-sm"
+                )}
               >
                 {displayName}
               </Link>
@@ -121,9 +131,7 @@ export default async function PostDetailPage({
         {/* Body */}
         {hasContent && (
           <div className="px-5 py-5">
-            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
-              {post.content}
-            </p>
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">{post.content}</p>
           </div>
         )}
 
@@ -134,17 +142,25 @@ export default async function PostDetailPage({
           initialSummary={reactionSummary}
           initialKind={viewerReactionKind}
         />
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border/40 px-5 py-3 text-xs">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border px-5 py-3 text-xs">
           <Link
             href={`/u/${post.author.handle}`}
-            className="font-medium text-primary transition-colors duration-150 hover:underline"
+            className={cn(
+              "font-medium text-primary transition-colors duration-150 hover:underline",
+              shellFocusRing,
+              "rounded-sm"
+            )}
           >
             View profile
           </Link>
-          <span className="text-border">·</span>
+          <span className="text-muted-foreground/40">·</span>
           <Link
             href={`/u/${post.author.handle}/garage`}
-            className="text-muted-foreground transition-colors duration-150 hover:text-foreground hover:underline"
+            className={cn(
+              "text-muted-foreground transition-colors duration-150 hover:text-foreground hover:underline",
+              shellFocusRing,
+              "rounded-sm"
+            )}
           >
             Garage
           </Link>
@@ -152,30 +168,25 @@ export default async function PostDetailPage({
       </Card>
 
       <section className="mt-10">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          Comments
-        </h2>
+        <h2 className="text-sm font-semibold text-foreground">Comments</h2>
         {session?.user && <CommentForm postId={post.id} className="mt-4" />}
         <div className="mt-5 space-y-3">
           {post.comments.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border/50 bg-gradient-to-b from-muted/20 to-muted/5 px-5 py-8 text-center">
+            <div className="rounded-xl border border-dashed border-border bg-muted/15 px-5 py-8 text-center shadow-e1">
               <p className="text-sm font-medium text-foreground">Be the first voice in the thread</p>
               <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                 Short reactions welcome — keep it respectful and specific.
               </p>
               {!session?.user ? (
-                <Button asChild className="mt-5" size="sm">
+                <Button asChild className={cn("mt-5", shellFocusRing)} size="sm">
                   <Link href="/auth/sign-in">Sign in to comment</Link>
                 </Button>
               ) : null}
             </div>
           ) : (
             post.comments.map((c) => (
-              <div
-                key={c.id}
-                className="flex gap-3 rounded-xl border border-border/50 bg-card/40 px-4 py-3"
-              >
-                <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border/40">
+              <div key={c.id} className="flex gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-e1">
+                <Avatar className="h-9 w-9 shrink-0 border border-border">
                   <AvatarImage src={c.author.avatarUrl ?? undefined} />
                   <AvatarFallback className="text-xs">
                     {(c.author.name ?? c.author.handle).slice(0, 2).toUpperCase()}
@@ -185,13 +196,17 @@ export default async function PostDetailPage({
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href={`/u/${c.author.handle}`}
-                      className="text-sm font-semibold hover:text-primary"
+                      className={cn(
+                        "text-sm font-semibold hover:text-primary",
+                        shellFocusRing,
+                        "rounded-sm"
+                      )}
                     >
                       @{c.author.handle}
                     </Link>
                     <ReputationBadge tier={c.author.collectorTier} />
                   </div>
-                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">{c.content}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-foreground">{c.content}</p>
                   <p className="mt-2 text-xs text-muted-foreground">
                     {formatPostTime(c.createdAt)}
                   </p>

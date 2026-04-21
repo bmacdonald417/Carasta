@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { getSession } from "@/lib/auth";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 import { buildOnboardingPack, getCarmunityOnboardingState } from "@/lib/carmunity/onboarding-service";
 import { listDiscussedLiveAuctions } from "@/lib/forums/auction-discussion";
 import { listTrendingThreadsGlobal } from "@/lib/forums/discussions-discovery";
@@ -35,22 +37,26 @@ export default async function ExplorePage({
   }
 
   return (
-    <div className="carasta-container max-w-2xl py-10 pb-16">
-      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-foreground">
-        Carmunity
-      </h1>
-      <p className="mt-1 text-sm text-neutral-500">by Carasta</p>
-      <p className="mt-2 text-neutral-400">
-        One home for posts and discussions from people you follow — jump to{" "}
-        <Link
-          href="/discussions"
-          className="carmunity-nav-link text-primary hover:underline"
-          data-active="false"
-        >
-          Discussions
-        </Link>{" "}
-        for full Gear threads.
-      </p>
+    <div className="carasta-container max-w-2xl py-10 pb-16 md:max-w-3xl">
+      <header className="border-b border-border pb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Carmunity</h1>
+        <p className="mt-1 text-sm text-muted-foreground">by Carasta</p>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          One home for posts and discussions from people you follow — jump to{" "}
+          <Link
+            href="/discussions"
+            className={cn(
+              "carmunity-nav-link font-medium text-primary hover:underline",
+              shellFocusRing,
+              "rounded-md"
+            )}
+            data-active="false"
+          >
+            Discussions
+          </Link>{" "}
+          for full Gear threads.
+        </p>
+      </header>
       <TrendingDreamGarage />
       <CommunityFeed
         tab={tab}

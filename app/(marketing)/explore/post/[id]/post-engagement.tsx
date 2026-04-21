@@ -51,7 +51,7 @@ export function PostEngagementBar({
   }, [initialSummary, initialKind]);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/40 px-5 py-4">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-5 py-4">
       <PostReactionPicker
         postId={postId}
         summary={summary}
@@ -66,7 +66,7 @@ export function PostEngagementBar({
         url={`/explore/post/${postId}`}
         title={title}
         description={description ?? undefined}
-        triggerClassName="border-primary/35 bg-primary/5 text-xs text-primary hover:bg-primary/10"
+        triggerClassName="border-border bg-muted/40 text-xs text-foreground hover:bg-muted/60"
         carmunityShareMeta={{ surface: "explore_post", postId }}
       />
     </div>

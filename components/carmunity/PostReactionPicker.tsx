@@ -145,7 +145,7 @@ export function PostReactionPicker({
         </div>
         <DropdownMenuContent
           align="start"
-          className="min-w-[220px] border-border/60 bg-popover/95 text-popover-foreground"
+          className="min-w-[220px] border-border bg-popover text-popover-foreground shadow-e2"
           onPointerEnter={cancelClose}
           onPointerLeave={scheduleClose}
           onCloseAutoFocus={(e) => e.preventDefault()}

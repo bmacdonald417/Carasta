@@ -1,28 +1,33 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { Badge } from "@/components/ui/badge";
 import type { DiscussedLiveAuctionRow } from "@/lib/forums/auction-discussion";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export function DiscussedAuctionsStrip({ items }: { items: DiscussedLiveAuctionRow[] }) {
   if (items.length === 0) return null;
   return (
-    <section className="mb-8 space-y-3 rounded-2xl border border-border/50 bg-card/40 p-4">
+    <section className="mb-8 space-y-3 rounded-2xl border border-border bg-card p-4 shadow-e1 sm:p-5">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
+          <Badge variant="outline" className="text-[10px] font-medium uppercase tracking-wide">
             Marketplace pulse
-          </p>
-          <h2 className="font-display text-base font-semibold uppercase tracking-wide text-foreground">
-            Live listings the community is discussing
-          </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Pulled from real Carmunity threads linked to auctions — commerce stays one click away, not
-            the whole feed.
+          </Badge>
+          <h2 className="mt-2 text-base font-semibold text-foreground">Live listings the community is discussing</h2>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            Pulled from real Carmunity threads linked to auctions — commerce stays one click away, not the whole
+            feed.
           </p>
         </div>
         <Link
           href="/auctions"
-          className="text-xs font-semibold uppercase tracking-wide text-primary hover:underline"
+          className={cn(
+            "text-xs font-medium text-primary hover:underline",
+            shellFocusRing,
+            "rounded-md"
+          )}
         >
           Browse auctions
         </Link>
@@ -32,9 +37,13 @@ export function DiscussedAuctionsStrip({ items }: { items: DiscussedLiveAuctionR
           <li key={a.auctionId}>
             <Link
               href={`/auctions/${a.auctionId}`}
-              className="flex gap-3 rounded-xl border border-white/10 bg-black/25 p-3 transition hover:border-primary/35 hover:bg-muted/10"
+              className={cn(
+                "flex gap-3 rounded-xl border border-border bg-muted/20 p-3 shadow-e1 transition-colors",
+                shellFocusRing,
+                "hover:border-primary/30 hover:bg-muted/40"
+              )}
             >
-              <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
+              <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
                 {a.imageUrl ? (
                   <Image src={a.imageUrl} alt="" fill unoptimized className="object-cover" sizes="80px" />
                 ) : null}

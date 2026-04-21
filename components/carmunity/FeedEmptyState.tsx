@@ -1,8 +1,11 @@
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 /**
- * Premium empty states for Carmunity feed — primary + secondary CTAs.
+ * Empty states for Carmunity feed — tokenized, calm, still inviting.
  */
 export function FeedEmptyState({
   variant,
@@ -14,8 +17,8 @@ export function FeedEmptyState({
   const isFollowing = variant === "following";
 
   return (
-    <div className="rounded-2xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/10 via-muted/15 to-muted/5 px-6 py-12 text-center sm:px-10">
-      <p className="font-display text-lg font-semibold tracking-tight text-foreground">
+    <div className="rounded-2xl border border-dashed border-border bg-muted/20 px-6 py-12 text-center shadow-e1 sm:px-10">
+      <p className="text-lg font-semibold tracking-tight text-foreground">
         {isFollowing ? "Line up who you want in your lane" : "The grid is quiet — set the pace"}
       </p>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
@@ -25,15 +28,15 @@ export function FeedEmptyState({
       </p>
       <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
         {currentUserId ? (
-          <Button asChild className="sm:min-w-[180px]">
+          <Button asChild className={cn("sm:min-w-[180px]", shellFocusRing)}>
             <a href="#carmunity-create-post">Write a post</a>
           </Button>
         ) : (
-          <Button asChild className="sm:min-w-[180px]">
+          <Button asChild className={cn("sm:min-w-[180px]", shellFocusRing)}>
             <Link href="/auth/sign-in">Sign in to post</Link>
           </Button>
         )}
-        <Button variant="outline" asChild className="sm:min-w-[180px]">
+        <Button variant="outline" asChild className={cn("sm:min-w-[180px] border-border", shellFocusRing)}>
           <Link href={isFollowing ? "/discussions" : "/explore?tab=trending"}>
             {isFollowing ? "Find people in Discussions" : "See what’s trending"}
           </Link>

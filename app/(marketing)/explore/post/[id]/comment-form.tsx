@@ -35,12 +35,12 @@ export function CommentForm({
   }
 
   return (
-    <form onSubmit={submit} className={`flex gap-2 ${className ?? ""}`}>
+    <form onSubmit={submit} className={`flex flex-wrap gap-2 sm:flex-nowrap ${className ?? ""}`}>
       <Input
         placeholder="Add a comment..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="flex-1"
+        className="min-w-0 flex-1 border-border bg-background"
       />
       <Button type="submit" size="sm" disabled={loading || !content.trim()}>
         {loading ? "…" : "Post"}
