@@ -146,7 +146,7 @@ export function InstagramShowcase() {
       <div className="carasta-container">
         <div className="flex flex-col items-center gap-2 md:flex-row md:justify-between md:items-end">
           <div>
-            <h2 className="font-display text-2xl font-semibold uppercase tracking-[0.2em] text-neutral-100 md:text-3xl">
+            <h2 className="font-display text-2xl font-semibold uppercase tracking-[0.2em] text-foreground md:text-3xl">
               Follow @{INSTAGRAM_HANDLE.toUpperCase()}
             </h2>
             <p className="mt-1 text-sm text-neutral-500">

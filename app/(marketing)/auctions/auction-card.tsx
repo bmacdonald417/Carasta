@@ -113,7 +113,7 @@ export function AuctionCard({
             <p className="text-xs text-neutral-500">
               {auction.year} {auction.make} {auction.model}
             </p>
-            <h2 className="mt-1 font-display text-lg font-semibold tracking-tight line-clamp-1 text-neutral-100">
+            <h2 className="mt-1 font-display text-lg font-semibold tracking-tight line-clamp-1 text-foreground">
               {auction.title}
             </h2>
             <p className="mt-2 text-lg font-semibold text-signal">

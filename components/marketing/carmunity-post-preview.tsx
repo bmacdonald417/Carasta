@@ -29,7 +29,7 @@ export function CarmunityPostPreview({
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-sm font-medium text-neutral-100">@{handle}</p>
+            <p className="text-sm font-medium text-foreground">@{handle}</p>
             <p className="text-xs text-neutral-500">Preview — not published yet</p>
           </div>
         </div>

@@ -132,7 +132,7 @@ export default function FeedbackModal({
                 </span>
                 <button
                   type="button"
-                  className="text-neutral-400 underline-offset-2 hover:text-neutral-100 hover:underline"
+                  className="text-neutral-400 underline-offset-2 hover:text-foreground hover:underline"
                   onClick={onClearPin}
                 >
                   Clear
@@ -154,7 +154,7 @@ export default function FeedbackModal({
               onChange={(e) => setContent(e.target.value)}
               rows={5}
               maxLength={5000}
-              className="w-full resize-y rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full resize-y rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-foreground placeholder:text-neutral-600 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
               placeholder="What happened? What did you expect?"
             />
             <p className="mt-1 text-right text-[11px] text-neutral-600">

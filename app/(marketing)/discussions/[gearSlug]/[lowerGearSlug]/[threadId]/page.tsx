@@ -218,7 +218,7 @@ export default async function ThreadPage({ params }: Props) {
 
       <article className="mt-6 rounded-2xl border border-border/50 bg-card/60 p-5 shadow-glass-sm">
         <header className="space-y-4">
-          <h1 className="font-display text-xl font-bold uppercase tracking-wide text-neutral-100 md:text-2xl">
+          <h1 className="font-display text-xl font-bold uppercase tracking-wide text-foreground md:text-2xl">
             {thread.title}
           </h1>
 

@@ -38,7 +38,7 @@ export default async function AdminReputationPage({
     <div className="carasta-container max-w-4xl py-8">
       <Link
         href="/admin"
-        className="text-sm text-neutral-400 hover:text-neutral-100"
+        className="text-sm text-neutral-400 hover:text-foreground"
       >
         ← Admin
       </Link>

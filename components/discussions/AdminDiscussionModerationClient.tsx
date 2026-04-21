@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { Button } from "@/components/ui/button";
+import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 
 export type SerializableAdminReportRow = {
   id: string;
@@ -43,12 +44,14 @@ const STATUSES = ["OPEN", "REVIEWING", "ACTIONED", "DISMISSED"] as const;
 
 export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAdminReportRow[] }) {
   const router = useRouter();
+  const reviewMode = isReviewModeClient();
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function patchReport(
     id: string,
     body: { status?: string; moderatorNote?: string | null }
   ) {
+    if (reviewMode) return;
     setBusyId(id);
     try {
       const res = await fetch(`/api/admin/discussions/reports/${encodeURIComponent(id)}`, {
@@ -64,6 +67,7 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
   }
 
   async function setThreadHidden(threadId: string, isHidden: boolean) {
+    if (reviewMode) return;
     setBusyId(`t:${threadId}`);
     try {
       const res = await fetch(`/api/admin/discussions/threads/${encodeURIComponent(threadId)}`, {
@@ -79,6 +83,7 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
   }
 
   async function setReplyHidden(replyId: string, isHidden: boolean) {
+    if (reviewMode) return;
     setBusyId(`r:${replyId}`);
     try {
       const res = await fetch(`/api/admin/discussions/replies/${encodeURIComponent(replyId)}`, {
@@ -95,6 +100,12 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
 
   return (
     <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+      {reviewMode ? (
+        <div className="border-b border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-200">
+          Review mode: moderation actions are disabled. This surface is available
+          for visual and workflow review only.
+        </div>
+      ) : null}
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-white/10 bg-white/[0.04] text-xs uppercase tracking-wide text-neutral-400">
@@ -171,9 +182,9 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                     </label>
                     <select
                       id={`status-${r.id}`}
-                      className="w-full max-w-[140px] rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[11px] text-neutral-100"
+                      className="w-full max-w-[140px] rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[11px] text-foreground"
                       value={r.status}
-                      disabled={targetBusy}
+                      disabled={targetBusy || reviewMode}
                       onChange={(e) => void patchReport(r.id, { status: e.target.value })}
                     >
                       {STATUSES.map((s) => (
@@ -186,10 +197,10 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                   <td className="px-4 py-3 text-xs text-neutral-300">
                     <div className="flex flex-col gap-2">
                       <textarea
-                        className="min-h-[52px] w-full max-w-[220px] rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[11px] text-neutral-100"
+                        className="min-h-[52px] w-full max-w-[220px] rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[11px] text-foreground"
                         placeholder="Moderator note…"
                         defaultValue={r.moderatorNote ?? ""}
-                        disabled={targetBusy}
+                        disabled={targetBusy || reviewMode}
                         onBlur={(e) => {
                           const next = e.target.value.trim();
                           const prev = (r.moderatorNote ?? "").trim();
@@ -203,7 +214,7 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                           size="sm"
                           variant="outline"
                           className="h-7 border-white/15 text-[10px] font-semibold uppercase tracking-wide"
-                          disabled={targetBusy}
+                          disabled={targetBusy || reviewMode}
                           onClick={() => void setThreadHidden(r.thread!.id, !r.thread!.isHidden)}
                         >
                           {r.thread.isHidden ? "Unhide thread" : "Hide thread"}
@@ -216,7 +227,7 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                             size="sm"
                             variant="outline"
                             className="h-7 border-white/15 text-[10px] font-semibold uppercase tracking-wide"
-                            disabled={targetBusy || r.reply.threadIsHidden}
+                            disabled={targetBusy || reviewMode || r.reply.threadIsHidden}
                             onClick={() => void setReplyHidden(r.reply!.id, !r.reply!.isHidden)}
                           >
                             {r.reply.isHidden ? "Unhide reply" : "Hide reply"}
@@ -226,7 +237,7 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                             size="sm"
                             variant="outline"
                             className="h-7 border-white/15 text-[10px] font-semibold uppercase tracking-wide"
-                            disabled={targetBusy}
+                            disabled={targetBusy || reviewMode}
                             onClick={() => void setThreadHidden(r.reply!.threadId, !r.reply!.threadIsHidden)}
                           >
                             {r.reply.threadIsHidden ? "Unhide thread" : "Hide thread"}

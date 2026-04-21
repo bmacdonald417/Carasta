@@ -91,7 +91,7 @@ export function AuctionDiscussPanel({
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">
               Carmunity
             </p>
-            <h3 className="font-display text-lg font-semibold uppercase tracking-wide text-neutral-100">
+            <h3 className="font-display text-lg font-semibold uppercase tracking-wide text-foreground">
               Discuss this auction
             </h3>
             <p className="mt-1 max-w-prose text-sm text-muted-foreground">
@@ -130,7 +130,7 @@ export function AuctionDiscussPanel({
                   href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
                   className="block px-3 py-2.5 text-sm text-neutral-200 transition hover:bg-white/5 hover:text-primary"
                 >
-                  <span className="line-clamp-2 font-medium text-neutral-100">{t.title}</span>
+                  <span className="line-clamp-2 font-medium text-foreground">{t.title}</span>
                   <span className="mt-0.5 block text-[11px] text-muted-foreground">
                     {t.replyCount} repl{t.replyCount === 1 ? "y" : "ies"} · {t.reactionCount} reactions
                   </span>
@@ -190,7 +190,7 @@ export function AuctionDiscussPanel({
               onChange={(e) => setNote(e.target.value)}
               rows={4}
               placeholder="e.g. Asking about service history visibility, PPI scope, or transport…"
-              className="border-white/10 bg-black/30 text-sm text-neutral-100"
+              className="border-white/10 bg-black/30 text-sm text-foreground"
             />
             <div className="flex justify-end gap-2">
               <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>

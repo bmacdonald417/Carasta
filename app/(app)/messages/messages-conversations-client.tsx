@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 
 type ConversationListRow = {
   id: string;
@@ -21,6 +22,7 @@ type ConversationListRow = {
 };
 
 export function MessagesConversationsClient() {
+  const reviewMode = isReviewModeClient();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rows, setRows] = useState<ConversationListRow[]>([]);
@@ -79,6 +81,11 @@ export function MessagesConversationsClient() {
         <p className="mt-2 text-xs text-neutral-500">
           Start a conversation from someone’s profile (Phase Q follow-up) or via API.
         </p>
+        {reviewMode ? (
+          <p className="mt-2 text-xs text-amber-300">
+            Review mode uses demo conversations when available.
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -103,7 +110,7 @@ export function MessagesConversationsClient() {
               </Avatar>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-sm font-semibold text-neutral-100">{display}</p>
+                  <p className="truncate text-sm font-semibold text-foreground">{display}</p>
                   {c.unreadCount > 0 ? (
                     <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary">
                       {c.unreadCount}

@@ -55,7 +55,7 @@ export function CarmunityActivitySection({
           </p>
         </div>
         <div className="rounded-2xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/10 via-muted/15 to-muted/5 px-6 py-10 text-center sm:px-10">
-          <p className="font-display text-base font-semibold tracking-tight text-neutral-100">
+          <p className="font-display text-base font-semibold tracking-tight text-foreground">
             No public discussion activity yet
           </p>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">

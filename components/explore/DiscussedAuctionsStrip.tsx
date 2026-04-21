@@ -12,7 +12,7 @@ export function DiscussedAuctionsStrip({ items }: { items: DiscussedLiveAuctionR
           <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
             Marketplace pulse
           </p>
-          <h2 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100">
+          <h2 className="font-display text-base font-semibold uppercase tracking-wide text-foreground">
             Live listings the community is discussing
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -40,7 +40,7 @@ export function DiscussedAuctionsStrip({ items }: { items: DiscussedLiveAuctionR
                 ) : null}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="line-clamp-2 text-sm font-medium text-neutral-100">{a.title}</p>
+                <p className="line-clamp-2 text-sm font-medium text-foreground">{a.title}</p>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
                   {a.threadCount} thread{a.threadCount === 1 ? "" : "s"}
                 </p>

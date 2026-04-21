@@ -54,3 +54,7 @@ public/uploads/carmunity/*
 
 # Misc
 *.pem
+
+# Local-only artifacts (avoid accidental commits)
+element-feedback-kit.zip
+reports/assistant/

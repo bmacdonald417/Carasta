@@ -99,7 +99,7 @@ export function ListingsAiRefineDialog({
         Refine copy (AI)
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto border-white/10 bg-[#0c0d12] text-neutral-100">
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto border-white/10 bg-[#0c0d12] text-foreground">
           <DialogHeader>
             <DialogTitle className="font-display">Refine listing copy</DialogTitle>
             <DialogDescription className="text-neutral-400">

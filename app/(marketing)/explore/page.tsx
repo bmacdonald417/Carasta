@@ -36,7 +36,7 @@ export default async function ExplorePage({
 
   return (
     <div className="carasta-container max-w-2xl py-10 pb-16">
-      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
+      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-foreground">
         Carmunity
       </h1>
       <p className="mt-1 text-sm text-neutral-500">by Carasta</p>

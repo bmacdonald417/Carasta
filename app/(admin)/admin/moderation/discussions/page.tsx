@@ -47,7 +47,7 @@ export default async function AdminDiscussionModerationPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">Admin</p>
-          <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
+          <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wider text-foreground">
             Discussion moderation
           </h1>
           <p className="mt-2 max-w-prose text-sm text-neutral-400">

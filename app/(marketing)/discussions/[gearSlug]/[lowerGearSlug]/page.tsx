@@ -121,7 +121,7 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
 
       <header className="mt-4 rounded-2xl border border-border/50 bg-card/60 p-5 shadow-glass-sm">
         <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">Lower Gear</p>
-        <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
+        <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wider text-foreground">
           {category.title}
         </h1>
         {category.description ? (
@@ -151,7 +151,7 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
                 className="block rounded-2xl border border-border/50 bg-card/40 px-4 py-3 transition hover:border-primary/35 hover:bg-muted/10"
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium text-neutral-100">{t.title}</span>
+                  <span className="font-medium text-foreground">{t.title}</span>
                   {t.demoSeed ? (
                     <span className="rounded-md border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-200">
                       Demo

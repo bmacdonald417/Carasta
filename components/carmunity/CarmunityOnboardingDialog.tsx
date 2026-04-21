@@ -204,7 +204,7 @@ export function CarmunityOnboardingDialog({
                         {(u.name ?? u.handle).slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="min-w-0 truncate font-medium text-neutral-100">
+                    <span className="min-w-0 truncate font-medium text-foreground">
                       {u.name?.trim() || `@${u.handle}`}
                     </span>
                   </Link>

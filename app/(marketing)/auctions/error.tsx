@@ -15,7 +15,7 @@ export default function AuctionsError({
 
   return (
     <div className="carasta-container max-w-6xl py-16 text-center">
-      <h1 className="font-display text-2xl font-bold text-neutral-100">
+      <h1 className="font-display text-2xl font-bold text-foreground">
         Something went wrong
       </h1>
       <p className="mt-2 text-muted-foreground">

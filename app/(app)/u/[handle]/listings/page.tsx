@@ -11,6 +11,7 @@ import { ListingsFilters } from "./listings-filters";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { isListingAiEnabled } from "@/lib/listing-ai/listing-ai-feature-flag";
 import { ListingsAiRefineDialog } from "@/components/sell/listings-ai-refine-dialog";
+import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 const PAGE_SIZE = 20;
 const STATUSES = ["LIVE", "DRAFT", "SOLD", "ENDED"] as const;
@@ -35,7 +36,10 @@ export default async function ListingsPage({
     where: { handle: handle.toLowerCase() },
   });
   if (!user) notFound();
-  const isOwn = (session?.user as any)?.id === user.id;
+  const reviewCtx = isReviewModeEnabled() ? await getReviewModeContext() : null;
+  const isOwn =
+    (session?.user as any)?.id === user.id ||
+    (reviewCtx?.sellerUserId === user.id && reviewCtx?.sellerHandle === handle.toLowerCase());
 
   if (!isOwn) notFound();
 
@@ -135,7 +139,7 @@ export default async function ListingsPage({
                   {a.year} {a.make} {a.model}
                 </p>
                 <Link href={`/auctions/${a.id}`} className="block">
-                  <h2 className="mt-1 font-display font-semibold line-clamp-1 text-neutral-100 transition hover:text-[#ff3b5c]/90">
+                  <h2 className="mt-1 font-display font-semibold line-clamp-1 text-foreground transition hover:text-[#ff3b5c]/90">
                     {a.title}
                   </h2>
                 </Link>

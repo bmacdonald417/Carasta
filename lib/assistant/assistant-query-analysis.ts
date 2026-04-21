@@ -90,6 +90,7 @@ export function preferredSourceIdsForIntent(intent: AssistantQuestionIntent) {
     case "navigation":
       return [
         "navigation-and-help-paths",
+        "navigation-common-surfaces",
         "help-routing",
         "common-support-situations",
         "trust-safety-and-help",

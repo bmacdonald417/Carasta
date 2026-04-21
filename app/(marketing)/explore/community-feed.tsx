@@ -298,7 +298,7 @@ export function CommunityFeed({
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                 From discussions
               </p>
-              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100">
+              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-foreground">
                 Trending threads
               </h2>
             </div>
@@ -478,7 +478,7 @@ function FollowingThreadCard({
               }
             }}
           >
-            <h3 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100 group-hover:text-primary">
+            <h3 className="font-display text-base font-semibold uppercase tracking-wide text-foreground group-hover:text-primary">
               {thread.title}
             </h3>
             <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-foreground/85">{thread.snippet}</p>

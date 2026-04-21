@@ -15,7 +15,7 @@ export default async function LeaderboardPage() {
       >
         ← Carmunity
       </Link>
-      <h1 className="mt-6 font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
+      <h1 className="mt-6 font-display text-2xl font-bold uppercase tracking-wider text-foreground">
         Leaderboard
       </h1>
       <p className="mt-1 text-muted-foreground">

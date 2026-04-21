@@ -8,7 +8,7 @@ export default async function WalletHistoryPage() {
 
   return (
     <div className="carasta-container max-w-3xl py-8">
-      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
+      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-foreground">
         Carasta Coin history
       </h1>
       <p className="mt-1 text-sm text-neutral-500">

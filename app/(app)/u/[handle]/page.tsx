@@ -25,6 +25,7 @@ import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { listProfileDiscussionActivityPage } from "@/lib/forums/profile-discussion-activity";
 import { listSavedThreadsForUser, savedThreadHref } from "@/lib/forums/thread-subscriptions";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
+import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 export async function generateMetadata({
   params,
@@ -80,6 +81,7 @@ export default async function ProfilePage({
   const { handle } = await params;
   const sp = (await searchParams) ?? {};
   const session = await getSession();
+  const reviewCtx = isReviewModeEnabled() ? await getReviewModeContext() : null;
   const currentUserId = (session?.user as any)?.id;
 
   const user = await prisma.user.findUnique({
@@ -124,7 +126,9 @@ export default async function ProfilePage({
 
   if (!user) notFound();
 
-  const isOwnProfile = currentUserId === user.id;
+  const isOwnProfile =
+    currentUserId === user.id ||
+    (reviewCtx?.profileHandle === user.handle.toLowerCase());
   const following = currentUserId
     ? await prisma.follow.findUnique({
         where: {
@@ -427,7 +431,7 @@ export default async function ProfilePage({
           </div>
           {savedThreads.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-primary/25 bg-primary/5 px-5 py-8 text-center">
-              <p className="font-display text-base font-semibold tracking-tight text-neutral-100">
+              <p className="font-display text-base font-semibold tracking-tight text-foreground">
                 Saved threads are your reading list
               </p>
               <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
@@ -459,7 +463,7 @@ export default async function ProfilePage({
                         aria-hidden
                       />
                     ) : null}
-                    <p className="pr-6 font-medium text-neutral-100 line-clamp-2">{t.title}</p>
+                    <p className="pr-6 font-medium text-foreground line-clamp-2">{t.title}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {t.gearSlug} / {t.lowerGearSlug} · last activity{" "}
                       {t.lastActivityAt.toLocaleDateString(undefined, {

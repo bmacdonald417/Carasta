@@ -57,7 +57,7 @@ export function DamageImageGallery({ images }: { images: DamageImage[] }) {
             {selected && (
               <>
                 <DialogHeader>
-                  <DialogTitle className="text-neutral-100">
+                  <DialogTitle className="text-foreground">
                     {selected.label}
                   </DialogTitle>
                 </DialogHeader>

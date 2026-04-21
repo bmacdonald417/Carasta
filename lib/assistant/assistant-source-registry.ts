@@ -106,6 +106,16 @@ export const assistantSourceRegistry: AssistantSourceDoc[] = [
     aliases: ["where do i find", "where can i find", "how do i get to", "navigation"],
   },
   {
+    id: "navigation-common-surfaces",
+    title: "Navigation Common Surfaces",
+    filePath: path.join(docsRoot, "navigation-common-surfaces.md"),
+    href: "/resources",
+    summary: "Where notifications, settings, saved discussions, watchlist-style surfaces, and seller workspace navigation fit at a general level.",
+    category: "platform",
+    tags: ["notifications", "settings", "saved threads", "watchlist", "navigation", "seller workspace"],
+    aliases: ["where do i find notifications", "where are settings", "where is my watchlist", "saved discussions"],
+  },
+  {
     id: "common-support-situations",
     title: "Common Support Situations",
     filePath: path.join(docsRoot, "common-support-situations.md"),

@@ -8,7 +8,7 @@ export function ProfileCarmunitySetupStrip({ handle }: { handle: string }) {
   return (
     <section className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card/60 to-card/40 p-5 shadow-sm">
       <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">Get started</p>
-      <h2 className="mt-1 font-display text-lg font-semibold tracking-tight text-neutral-100">
+      <h2 className="mt-1 font-display text-lg font-semibold tracking-tight text-foreground">
         Build your Carmunity presence
       </h2>
       <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted-foreground">

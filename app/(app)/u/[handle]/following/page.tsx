@@ -52,7 +52,7 @@ export default async function FollowingPage({ params }: Props) {
     <div className="carasta-container max-w-2xl space-y-6 py-10 pb-16">
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">Carmunity</p>
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-neutral-100">
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-foreground">
           Following
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -86,7 +86,7 @@ export default async function FollowingPage({ params }: Props) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-neutral-100">
+                  <p className="truncate font-medium text-foreground">
                     {f.name?.trim() || `@${f.handle}`}
                   </p>
                   <p className="truncate text-xs text-muted-foreground">@{f.handle}</p>

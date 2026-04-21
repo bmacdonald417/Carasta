@@ -33,7 +33,7 @@ export function AuctionConditionReport(props: AuctionConditionReportProps) {
 
   return (
     <MotionSection className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_0_20px_rgba(255,59,92,0.06)] backdrop-blur-xl">
-      <h3 className="font-display text-lg font-semibold text-neutral-100">
+      <h3 className="font-display text-lg font-semibold text-foreground">
         Condition report
       </h3>
 

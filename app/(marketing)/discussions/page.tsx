@@ -78,7 +78,7 @@ export default async function DiscussionsPage() {
 
   return (
     <div className="carasta-container max-w-3xl py-8">
-      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
+      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-foreground">
         Discussions
       </h1>
       <p className="mt-1 text-neutral-400">
@@ -97,7 +97,7 @@ export default async function DiscussionsPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                 Your graph
               </p>
-              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100">
+              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-foreground">
                 Threads from people you follow
               </h2>
             </div>
@@ -115,7 +115,7 @@ export default async function DiscussionsPage() {
                   href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
                   className="flex flex-col gap-0.5 py-2.5 text-sm text-neutral-200 transition hover:text-primary"
                 >
-                  <span className="line-clamp-2 font-medium text-neutral-100">{t.title}</span>
+                  <span className="line-clamp-2 font-medium text-foreground">{t.title}</span>
                   <span className="text-[11px] text-muted-foreground">
                     @{t.authorHandle} · {t.gearSlug} / {t.lowerGearSlug}
                   </span>
@@ -133,7 +133,7 @@ export default async function DiscussionsPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                 For you
               </p>
-              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-neutral-100">
+              <h2 className="font-display text-base font-semibold uppercase tracking-wide text-foreground">
                 Threads in your Gears
               </h2>
               <p className="mt-1 text-xs text-muted-foreground">
@@ -169,7 +169,7 @@ export default async function DiscussionsPage() {
                   <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                     Discovery
                   </p>
-                  <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-neutral-100">
+                  <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-foreground">
                     Active Gears
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -187,7 +187,7 @@ export default async function DiscussionsPage() {
                     <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                       Gear
                     </p>
-                    <h3 className="mt-1 font-display text-base font-semibold uppercase tracking-wide text-neutral-100">
+                    <h3 className="mt-1 font-display text-base font-semibold uppercase tracking-wide text-foreground">
                       {g.title}
                     </h3>
                     {g.description ? (
@@ -209,7 +209,7 @@ export default async function DiscussionsPage() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                   Trending
                 </p>
-                <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-neutral-100">
+                <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-foreground">
                   Trending threads
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -225,7 +225,7 @@ export default async function DiscussionsPage() {
                       href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
                       className="block px-4 py-3 transition hover:bg-muted/15"
                     >
-                      <p className="font-medium text-neutral-100 line-clamp-2">{t.title}</p>
+                      <p className="font-medium text-foreground line-clamp-2">{t.title}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {t.gearSlug} / {t.lowerGearSlug} · {t.replyCount}{" "}
                         {t.replyCount === 1 ? "reply" : "replies"} ·{" "}
@@ -247,7 +247,7 @@ export default async function DiscussionsPage() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                   People
                 </p>
-                <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-neutral-100">
+                <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-foreground">
                   Suggested voices
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -268,7 +268,7 @@ export default async function DiscussionsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-neutral-100">
+                        <p className="truncate font-medium text-foreground">
                           {u.name?.trim() || `@${u.handle}`}
                         </p>
                         <p className="truncate text-xs text-muted-foreground">@{u.handle}</p>
@@ -285,7 +285,7 @@ export default async function DiscussionsPage() {
         </div>
       )}
 
-      <h2 className="mt-12 font-display text-lg font-semibold uppercase tracking-wide text-neutral-100">
+      <h2 className="mt-12 font-display text-lg font-semibold uppercase tracking-wide text-foreground">
         All Gears
       </h2>
       <div className="mt-4 space-y-3">
@@ -308,7 +308,7 @@ export default async function DiscussionsPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                 Gear
               </p>
-              <h3 className="mt-1 font-display text-lg font-semibold uppercase tracking-wide text-neutral-100">
+              <h3 className="mt-1 font-display text-lg font-semibold uppercase tracking-wide text-foreground">
                 {s.title}
               </h3>
               {s.description ? (

@@ -6,7 +6,7 @@ export default function MerchStorePage() {
     <div className="carasta-container max-w-4xl py-16">
       <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
         <ShoppingBag className="mx-auto h-16 w-16 text-neutral-400" />
-        <h1 className="mt-4 font-display text-2xl font-semibold text-neutral-100">
+        <h1 className="mt-4 font-display text-2xl font-semibold text-foreground">
           Merch Store
         </h1>
         <p className="mt-2 text-neutral-400">

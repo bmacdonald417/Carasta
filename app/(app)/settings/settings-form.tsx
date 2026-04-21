@@ -90,7 +90,7 @@ export function SettingsForm({
           id="name"
           value={n}
           onChange={(e) => setN(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-neutral-100"
+          className="mt-1 border-white/10 bg-white/5 text-foreground"
         />
       </div>
       <div>
@@ -101,7 +101,7 @@ export function SettingsForm({
           id="bio"
           value={b}
           onChange={(e) => setB(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-neutral-100"
+          className="mt-1 border-white/10 bg-white/5 text-foreground"
         />
       </div>
       <div>
@@ -112,7 +112,7 @@ export function SettingsForm({
           id="location"
           value={loc}
           onChange={(e) => setLoc(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-neutral-100"
+          className="mt-1 border-white/10 bg-white/5 text-foreground"
         />
       </div>
       <div>
@@ -124,7 +124,7 @@ export function SettingsForm({
           type="url"
           value={avatar}
           onChange={(e) => setAvatar(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-neutral-100"
+          className="mt-1 border-white/10 bg-white/5 text-foreground"
         />
       </div>
 
@@ -143,7 +143,7 @@ export function SettingsForm({
               placeholder="https://instagram.com/username"
               value={ig}
               onChange={(e) => setIg(e.target.value)}
-              className="border-white/10 bg-white/5 text-neutral-100"
+              className="border-white/10 bg-white/5 text-foreground"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -152,7 +152,7 @@ export function SettingsForm({
               placeholder="https://facebook.com/username"
               value={fb}
               onChange={(e) => setFb(e.target.value)}
-              className="border-white/10 bg-white/5 text-neutral-100"
+              className="border-white/10 bg-white/5 text-foreground"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -161,16 +161,16 @@ export function SettingsForm({
               placeholder="https://x.com/username"
               value={tw}
               onChange={(e) => setTw(e.target.value)}
-              className="border-white/10 bg-white/5 text-neutral-100"
+              className="border-white/10 bg-white/5 text-foreground"
             />
           </div>
           <div className="flex items-center gap-3">
-            <Music2 className="h-5 w-5 shrink-0 text-neutral-100" />
+            <Music2 className="h-5 w-5 shrink-0 text-foreground" />
             <Input
               placeholder="https://tiktok.com/@username"
               value={tk}
               onChange={(e) => setTk(e.target.value)}
-              className="border-white/10 bg-white/5 text-neutral-100"
+              className="border-white/10 bg-white/5 text-foreground"
             />
           </div>
         </div>

@@ -102,7 +102,7 @@ export default function IncorporateFeedbackPanel({ className }: Props) {
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg font-semibold tracking-wide text-neutral-100">
+          <h2 className="font-display text-lg font-semibold tracking-wide text-foreground">
             Incorporate feedback
           </h2>
           <p className="mt-1 text-sm text-neutral-500">

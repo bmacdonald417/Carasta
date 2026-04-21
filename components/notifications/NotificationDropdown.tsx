@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { markAllNotificationsRead } from "@/app/(app)/notifications/actions";
+import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 
 type NotificationItem = {
   id: string;
@@ -52,6 +53,7 @@ function parseNotificationListPayload(json: unknown): {
 }
 
 export function NotificationDropdown() {
+  const reviewMode = isReviewModeClient();
   const [unreadCount, setUnreadCount] = useState(0);
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [nextCursor, setNextCursor] = useState<NotificationCursor | null>(null);
@@ -126,7 +128,7 @@ export function NotificationDropdown() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-neutral-400 hover:text-neutral-100"
+          className="relative text-neutral-400 hover:text-foreground"
           aria-label="Notifications — Carmunity and listing alerts"
         >
           <Bell className="h-5 w-5" />
@@ -147,6 +149,11 @@ export function NotificationDropdown() {
             <p className="text-[11px] leading-snug text-neutral-500">
               Carmunity + listing alerts for this account (same model as Carmunity mobile).
             </p>
+            {reviewMode ? (
+              <p className="mt-1 text-[11px] text-amber-300">
+                Review mode: notification actions are preview-only.
+              </p>
+            ) : null}
           </div>
           {unreadCount > 0 && (
             <button
@@ -257,7 +264,7 @@ function NotificationRow({
         onClick={() => {
           void markRead();
         }}
-        className="block hover:text-neutral-100"
+        className="block hover:text-foreground"
       >
         {content}
         <span className="mt-0.5 block text-xs text-neutral-500">

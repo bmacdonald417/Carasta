@@ -28,7 +28,7 @@ export default async function NewMarketingPresetPage({
       >
         ← Presets
       </Link>
-      <h1 className="font-display text-2xl font-bold text-neutral-100">
+      <h1 className="font-display text-2xl font-bold text-foreground">
         New preset
       </h1>
       <p className="mt-1 text-sm text-neutral-400">

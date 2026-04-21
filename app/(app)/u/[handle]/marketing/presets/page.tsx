@@ -42,7 +42,7 @@ export default async function MarketingPresetsPage({
       </Link>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold text-neutral-100">
+          <h1 className="font-display text-2xl font-bold text-foreground">
             Presets
           </h1>
           <p className="mt-1 text-sm text-neutral-400">
@@ -78,7 +78,7 @@ export default async function MarketingPresetsPage({
               className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-4"
             >
               <div>
-                <p className="font-medium text-neutral-100">{p.name}</p>
+                <p className="font-medium text-foreground">{p.name}</p>
                 <p className="mt-1 text-xs text-neutral-500">
                   {p.source} · {p.medium} · {p.copyVariant.replace("_", " ")}
                   {p.campaignLabel ? ` · campaign: ${p.campaignLabel}` : ""}

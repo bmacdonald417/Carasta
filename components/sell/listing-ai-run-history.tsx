@@ -65,7 +65,7 @@ export function ListingAiRunHistory({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-8 gap-1 text-xs text-neutral-400 hover:text-neutral-100"
+          className="h-8 gap-1 text-xs text-neutral-400 hover:text-foreground"
           disabled={loading}
           onClick={() => void load()}
         >

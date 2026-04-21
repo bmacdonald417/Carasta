@@ -56,7 +56,7 @@ export function AppSidebar() {
                     className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                       isActive && !listingsActive && !marketingActive
                         ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
-                        : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                        : "text-neutral-400 hover:bg-white/5 hover:text-foreground"
                     }`}
                     whileHover={hoverScale}
                     whileTap={tapScale}
@@ -106,7 +106,7 @@ export function AppSidebar() {
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
                   isActive
                     ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
-                    : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                    : "text-neutral-400 hover:bg-white/5 hover:text-foreground"
                 }`}
                 whileHover={hoverScale}
                 whileTap={tapScale}
@@ -129,7 +129,7 @@ export function AppSidebar() {
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               pathname.includes("/garage")
                 ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
-                : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                : "text-neutral-400 hover:bg-white/5 hover:text-foreground"
             }`}
             whileHover={hoverScale}
             whileTap={tapScale}
@@ -143,7 +143,7 @@ export function AppSidebar() {
             className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               pathname.startsWith("/merch")
                 ? "bg-primary/90 text-primary-foreground shadow-lg shadow-black/35"
-                : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                : "text-neutral-400 hover:bg-white/5 hover:text-foreground"
             }`}
             whileHover={hoverScale}
             whileTap={tapScale}

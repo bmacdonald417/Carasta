@@ -60,7 +60,7 @@ function WindowStatsPanel({
             className="flex items-baseline justify-between gap-4 border-b border-white/5 pb-2 last:border-0 last:pb-0"
           >
             <dt className="text-neutral-500">{label}</dt>
-            <dd className="tabular-nums text-neutral-100">{value}</dd>
+            <dd className="tabular-nums text-foreground">{value}</dd>
           </div>
         ))}
       </dl>
@@ -134,7 +134,7 @@ export default async function AdminMarketingPage() {
           >
             ← Admin home
           </Link>
-          <h2 className="mt-3 font-display text-xl font-semibold uppercase tracking-wider text-neutral-100">
+          <h2 className="mt-3 font-display text-xl font-semibold uppercase tracking-wider text-foreground">
             Marketing summary
           </h2>
           <p className="mt-1 text-sm text-neutral-500">
@@ -194,7 +194,7 @@ export default async function AdminMarketingPage() {
           <div>
             <h3
               id="recent-activity-heading"
-              className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-100"
+              className="font-display text-sm font-semibold uppercase tracking-wider text-foreground"
             >
               Recent activity
             </h3>
@@ -226,7 +226,7 @@ export default async function AdminMarketingPage() {
               </div>
               <div className="min-w-0">
                 <p className="text-sm text-neutral-500">{label}</p>
-                <p className="text-xl font-semibold text-neutral-100">{value}</p>
+                <p className="text-xl font-semibold text-foreground">{value}</p>
               </div>
             </div>
             {hint ? (

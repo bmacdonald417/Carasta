@@ -117,7 +117,7 @@ export function CarmunitySettingsSection({
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
                 Carmunity
               </p>
-              <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-neutral-100">
+              <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-foreground">
                 Interests & discovery
               </h2>
               <p className="mt-1 max-w-prose text-sm text-muted-foreground">
@@ -127,7 +127,7 @@ export function CarmunitySettingsSection({
               {!onboardingCompleted ? (
                 <p className="mt-2 text-xs text-amber-200/90">
                   Finish onboarding on{" "}
-                  <span className="font-medium text-neutral-100">Explore</span> to unlock the full feed
+                  <span className="font-medium text-foreground">Explore</span> to unlock the full feed
                   experience.
                 </p>
               ) : null}

@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { decode, getToken } from "next-auth/jwt";
+import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 function subjectFromPayload(payload: Record<string, unknown> | null): string | undefined {
   if (!payload) return undefined;
@@ -18,7 +19,13 @@ function subjectFromPayload(payload: Record<string, unknown> | null): string | u
  */
 export async function getJwtSubjectUserId(req: NextRequest): Promise<string | undefined> {
   const secret = process.env.NEXTAUTH_SECRET;
-  if (!secret) return undefined;
+  if (!secret) {
+    if (isReviewModeEnabled()) {
+      const ctx = await getReviewModeContext();
+      return ctx?.sellerUserId;
+    }
+    return undefined;
+  }
 
   const fromCookie = await getToken({ req, secret });
   const cookieSub = subjectFromPayload(fromCookie as Record<string, unknown> | null);
@@ -30,6 +37,11 @@ export async function getJwtSubjectUserId(req: NextRequest): Promise<string | un
     if (!raw) return undefined;
     const decoded = (await decode({ token: raw, secret })) as Record<string, unknown> | null;
     return subjectFromPayload(decoded);
+  }
+
+  if (isReviewModeEnabled()) {
+    const ctx = await getReviewModeContext();
+    return ctx?.sellerUserId;
   }
 
   return undefined;

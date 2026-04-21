@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { compare } from "bcryptjs";
 import { prisma } from "./db";
+import { getReviewModeDemoHandle, isReviewModeEnabled } from "@/lib/review-mode";
 
 export const authOptions: NextAuthOptions = {
   adapter: require("@auth/prisma-adapter").PrismaAdapter(prisma) as any,
@@ -101,7 +102,37 @@ export const authOptions: NextAuthOptions = {
 
 export async function getSession() {
   const { getServerSession } = await import("next-auth");
-  return getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
+  if (session) return session;
+
+  if (!isReviewModeEnabled()) return session;
+
+  const reviewUser = await prisma.user.findFirst({
+    where: { handle: getReviewModeDemoHandle() },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      avatarUrl: true,
+      handle: true,
+      role: true,
+    },
+  });
+  if (!reviewUser) return null;
+
+  return {
+    user: {
+      id: reviewUser.id,
+      email: reviewUser.email,
+      name: reviewUser.name,
+      image: reviewUser.avatarUrl ?? reviewUser.image,
+      handle: reviewUser.handle,
+      role: reviewUser.role,
+      marketingEnabled: process.env.MARKETING_ENABLED === "true",
+    } as any,
+    expires: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+  } as any;
 }
 
 async function ensureUniqueHandle(base: string): Promise<string> {

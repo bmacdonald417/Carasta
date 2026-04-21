@@ -95,7 +95,7 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
           Admin
         </p>
-        <h1 className="font-display text-3xl font-semibold tracking-wide text-neutral-100">
+        <h1 className="font-display text-3xl font-semibold tracking-wide text-foreground">
           Element feedback
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-neutral-500">

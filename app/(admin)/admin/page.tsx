@@ -57,7 +57,7 @@ export default async function AdminPage() {
             </div>
             <div>
               <p className="text-sm text-neutral-500">Total Auctions</p>
-              <p className="text-2xl font-semibold text-neutral-100">
+              <p className="text-2xl font-semibold text-foreground">
                 {stats.auctionCount}
               </p>
             </div>
@@ -70,7 +70,7 @@ export default async function AdminPage() {
             </div>
             <div>
               <p className="text-sm text-neutral-500">Total Users</p>
-              <p className="text-2xl font-semibold text-neutral-100">
+              <p className="text-2xl font-semibold text-foreground">
                 {stats.userCount}
               </p>
             </div>
@@ -83,7 +83,7 @@ export default async function AdminPage() {
             </div>
             <div>
               <p className="text-sm text-neutral-500">Bid Volume</p>
-              <p className="text-2xl font-semibold text-neutral-100">
+              <p className="text-2xl font-semibold text-foreground">
                 {formatCurrency(stats.totalBidVolume)}
               </p>
             </div>
@@ -96,7 +96,7 @@ export default async function AdminPage() {
             </div>
             <div>
               <p className="text-sm text-neutral-500">Total Bids</p>
-              <p className="text-2xl font-semibold text-neutral-100">
+              <p className="text-2xl font-semibold text-foreground">
                 {stats.totalBids}
               </p>
             </div>
@@ -114,7 +114,7 @@ export default async function AdminPage() {
             <Flag className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-neutral-100">
+            <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-foreground">
               Discussion reports
             </h2>
             <p className="mt-1 text-sm text-neutral-500">
@@ -134,7 +134,7 @@ export default async function AdminPage() {
             <Megaphone className="h-6 w-6 text-[#ff3b5c]" />
           </div>
           <div>
-            <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-neutral-100">
+            <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-foreground">
               Marketing summary
             </h2>
             <p className="mt-1 text-sm text-neutral-500">
@@ -147,7 +147,7 @@ export default async function AdminPage() {
 
       {/* Reputation debug */}
       <div className="mt-8">
-        <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-neutral-100">
+        <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-foreground">
           Reputation Debug
         </h2>
         <p className="mt-1 text-sm text-neutral-500">
@@ -160,7 +160,7 @@ export default async function AdminPage() {
 
       {/* Live auctions table */}
       <div className="mt-8">
-        <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-neutral-100">
+        <h2 className="font-display text-lg font-semibold uppercase tracking-wider text-foreground">
           Live Auctions
         </h2>
         <p className="mt-1 text-sm text-neutral-500">

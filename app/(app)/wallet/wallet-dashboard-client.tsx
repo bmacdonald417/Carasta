@@ -93,7 +93,7 @@ export function WalletDashboardClient() {
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
             Available balance
           </p>
-          <p className="mt-2 font-display text-3xl font-bold text-neutral-100">
+          <p className="mt-2 font-display text-3xl font-bold text-foreground">
             {headline?.available ?? 0}
           </p>
           <p className="mt-1 text-xs text-neutral-500">Carasta Coin</p>
@@ -102,7 +102,7 @@ export function WalletDashboardClient() {
           <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
             Pending / held
           </p>
-          <p className="mt-2 font-display text-3xl font-bold text-neutral-100">
+          <p className="mt-2 font-display text-3xl font-bold text-foreground">
             {headline?.pending ?? 0}
           </p>
           <p className="mt-1 text-xs text-neutral-500">
@@ -114,7 +114,7 @@ export function WalletDashboardClient() {
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-neutral-100">Recent activity</p>
+            <p className="text-sm font-semibold text-foreground">Recent activity</p>
             <p className="mt-1 text-xs text-neutral-500">
               Every movement is recorded as an immutable ledger entry.
             </p>
@@ -147,7 +147,7 @@ export function WalletDashboardClient() {
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-        <p className="text-sm font-semibold text-neutral-100">Referral center</p>
+        <p className="text-sm font-semibold text-foreground">Referral center</p>
         <p className="mt-1 text-xs text-neutral-500">
           Phase 1 includes the backend foundations; UI will show your share link and pipeline next.
         </p>

@@ -55,6 +55,7 @@ import {
   firstSearchParamValue,
   parseSharePresetQueryParam,
 } from "@/lib/marketing/resolve-share-preset-query";
+import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 import {
   SellerInsightCard,
   SellerKpiCard,
@@ -80,7 +81,10 @@ export default async function MarketingAuctionDetailPage({
     where: { handle: handle.toLowerCase() },
   });
   if (!user) notFound();
-  const isOwn = (session?.user as any)?.id === user.id;
+  const reviewCtx = isReviewModeEnabled() ? await getReviewModeContext() : null;
+  const isOwn =
+    (session?.user as any)?.id === user.id ||
+    (reviewCtx?.sellerUserId === user.id && reviewCtx?.sellerHandle === handle.toLowerCase());
   if (!isOwn) notFound();
 
   await ensureSellerMarketingNotifications(user.id, user.handle);

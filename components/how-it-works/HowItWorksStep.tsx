@@ -37,7 +37,7 @@ export function HowItWorksStep({
       {/* Glass card */}
       <div className="group relative flex-1 rounded-2xl border border-white/10 bg-black/40 p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] backdrop-blur-xl transition-all hover:border-[#ff3b5c]/20 md:p-6">
         <div className="absolute left-0 top-4 bottom-4 w-[2px] rounded-full bg-gradient-to-b from-transparent via-[#ff3b5c]/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-        <h3 className="font-display text-lg font-semibold text-neutral-100 md:text-xl">
+        <h3 className="font-display text-lg font-semibold text-foreground md:text-xl">
           {title}
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-neutral-400 md:text-base">

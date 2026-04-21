@@ -37,7 +37,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="carasta-container max-w-xl py-8">
-      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-neutral-100">
+      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-foreground">
         Settings
       </h1>
       <p className="mt-1 text-neutral-400">

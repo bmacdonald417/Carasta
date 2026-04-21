@@ -243,7 +243,7 @@ export function ListingAiAssistant({
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-[#ff3b5c]">
             <Sparkles className="h-5 w-5 shrink-0" />
-            <h3 className="font-display text-base font-semibold text-neutral-100">{heading}</h3>
+            <h3 className="font-display text-base font-semibold text-foreground">{heading}</h3>
           </div>
           <p className="mt-1 text-xs text-neutral-500">{hint}</p>
         </div>
@@ -319,7 +319,7 @@ export function ListingAiAssistant({
               <Label htmlFor="listing-ai-audience-preset">Audience preset</Label>
               <select
                 id="listing-ai-audience-preset"
-                className="h-10 w-full rounded-2xl border border-white/10 bg-black/30 px-3 text-sm text-neutral-100"
+                className="h-10 w-full rounded-2xl border border-white/10 bg-black/30 px-3 text-sm text-foreground"
                 value={audiencePreset}
                 onChange={(e) =>
                   setAudiencePreset(e.target.value as ListingAiAudiencePreset)
@@ -349,7 +349,7 @@ export function ListingAiAssistant({
               <Label htmlFor="listing-ai-history-confidence">Service history confidence</Label>
               <select
                 id="listing-ai-history-confidence"
-                className="h-10 w-full rounded-2xl border border-white/10 bg-black/30 px-3 text-sm text-neutral-100"
+                className="h-10 w-full rounded-2xl border border-white/10 bg-black/30 px-3 text-sm text-foreground"
                 value={serviceHistoryConfidence}
                 onChange={(e) =>
                   setServiceHistoryConfidence(
@@ -434,7 +434,7 @@ export function ListingAiAssistant({
             <>
               <div>
                 <p className="text-xs text-neutral-500">Title</p>
-                <p className="mt-0.5 font-medium text-neutral-100">{preview.title}</p>
+                <p className="mt-0.5 font-medium text-foreground">{preview.title}</p>
               </div>
               {preview.titleOptions && preview.titleOptions.length > 0 ? (
                 <div>
@@ -465,7 +465,7 @@ export function ListingAiAssistant({
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
                   <p className="text-xs text-neutral-500">Readiness</p>
-                  <p className="mt-0.5 text-neutral-100">
+                  <p className="mt-0.5 text-foreground">
                     {preview.readinessScore ?? 0}/100
                   </p>
                   {preview.readinessReasons?.length ? (

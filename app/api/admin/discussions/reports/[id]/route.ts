@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { requireAdminSession } from "@/lib/auth/require-admin";
 import { prisma } from "@/lib/db";
+import { isReviewModeEnabled } from "@/lib/review-mode";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,12 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (isReviewModeEnabled()) {
+    return NextResponse.json(
+      { message: "Review mode is read-only for moderation actions." },
+      { status: 403 }
+    );
+  }
   const admin = await requireAdminSession();
   if (!admin.ok) return admin.response;
 

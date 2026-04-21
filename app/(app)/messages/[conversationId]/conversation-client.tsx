@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 
 type UserMini = {
   id: string;
@@ -54,6 +55,7 @@ export function ConversationClient({
   conversationId: string;
   viewerId: string;
 }) {
+  const reviewMode = isReviewModeClient();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -157,7 +159,7 @@ export function ConversationClient({
     <div className="flex h-[calc(100vh-10rem)] min-h-[520px] flex-col rounded-2xl border border-white/10 bg-white/5">
       <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
         <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="sm" className="text-neutral-400 hover:text-neutral-100">
+          <Button asChild variant="ghost" size="sm" className="text-neutral-400 hover:text-foreground">
             <Link href="/messages">Back</Link>
           </Button>
           {other ? (
@@ -169,12 +171,12 @@ export function ConversationClient({
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-neutral-100">@{other.handle}</p>
+                <p className="truncate text-sm font-semibold text-foreground">@{other.handle}</p>
                 <p className="truncate text-[11px] text-neutral-500">{other.name ?? " "}</p>
               </div>
             </div>
           ) : (
-            <p className="text-sm font-semibold text-neutral-100">Conversation</p>
+            <p className="text-sm font-semibold text-foreground">Conversation</p>
           )}
         </div>
       </div>
@@ -196,7 +198,7 @@ export function ConversationClient({
               ) : null}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-neutral-100">
+              <p className="truncate text-sm font-semibold text-foreground">
                 {conversation.auction.title}
               </p>
               <p className="mt-0.5 truncate text-xs text-neutral-500">
@@ -220,7 +222,7 @@ export function ConversationClient({
               <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                    mine ? "bg-primary text-primary-foreground" : "bg-black/40 text-neutral-100"
+                    mine ? "bg-primary text-primary-foreground" : "bg-black/40 text-foreground"
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{m.body}</p>
@@ -236,6 +238,12 @@ export function ConversationClient({
 
       <div className="border-t border-white/10 p-3">
         {error ? <p className="mb-2 text-xs text-red-300">{error}</p> : null}
+        {reviewMode ? (
+          <p className="mb-2 text-xs text-amber-300">
+            Review mode: message sending is disabled. This thread is for visual
+            review only.
+          </p>
+        ) : null}
         <div className="flex items-end gap-2">
           <Textarea
             rows={2}
@@ -243,11 +251,12 @@ export function ConversationClient({
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Write a message…"
+            disabled={reviewMode}
           />
           <Button
             type="button"
             className="bg-[#ff3b5c] text-white hover:bg-[#ff3b5c]/90"
-            disabled={sending || body.trim().length === 0}
+            disabled={reviewMode || sending || body.trim().length === 0}
             onClick={() => void send()}
           >
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}

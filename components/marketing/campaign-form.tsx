@@ -123,7 +123,7 @@ export function CampaignForm({
           id="campaign-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-neutral-100"
+          className="mt-1 border-white/10 bg-white/5 text-foreground"
           placeholder="e.g. Instagram launch week"
           maxLength={200}
           required
@@ -133,10 +133,10 @@ export function CampaignForm({
       <div>
         <Label className="text-neutral-300">Listing</Label>
         <Select value={auctionId} onValueChange={setAuctionId}>
-          <SelectTrigger className="mt-1 border-white/10 bg-white/5 text-neutral-100">
+          <SelectTrigger className="mt-1 border-white/10 bg-white/5 text-foreground">
             <SelectValue placeholder="Select a listing" />
           </SelectTrigger>
-          <SelectContent className="border-white/10 bg-[#121218] text-neutral-100">
+          <SelectContent className="border-white/10 bg-[#121218] text-foreground">
             {auctions.map((a) => (
               <SelectItem key={a.id} value={a.id}>
                 {a.title}
@@ -153,10 +153,10 @@ export function CampaignForm({
             value={type}
             onValueChange={(v) => setType(v as MarketingCampaignType)}
           >
-            <SelectTrigger className="mt-1 border-white/10 bg-white/5 text-neutral-100">
+            <SelectTrigger className="mt-1 border-white/10 bg-white/5 text-foreground">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-[#121218] text-neutral-100">
+            <SelectContent className="border-white/10 bg-[#121218] text-foreground">
               <SelectItem value="social">Social</SelectItem>
               <SelectItem value="email">Email</SelectItem>
               <SelectItem value="featured">Featured</SelectItem>
@@ -170,10 +170,10 @@ export function CampaignForm({
             value={status}
             onValueChange={(v) => setStatus(v as MarketingCampaignStatus)}
           >
-            <SelectTrigger className="mt-1 border-white/10 bg-white/5 text-neutral-100">
+            <SelectTrigger className="mt-1 border-white/10 bg-white/5 text-foreground">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-[#121218] text-neutral-100">
+            <SelectContent className="border-white/10 bg-[#121218] text-foreground">
               <SelectItem value={MarketingCampaignStatus.DRAFT}>Draft</SelectItem>
               <SelectItem value={MarketingCampaignStatus.ACTIVE}>Active</SelectItem>
               <SelectItem value={MarketingCampaignStatus.PAUSED}>Paused</SelectItem>
@@ -193,7 +193,7 @@ export function CampaignForm({
             type="datetime-local"
             value={startAt}
             onChange={(e) => setStartAt(e.target.value)}
-            className="mt-1 border-white/10 bg-white/5 text-neutral-100"
+            className="mt-1 border-white/10 bg-white/5 text-foreground"
           />
         </div>
         <div>
@@ -205,7 +205,7 @@ export function CampaignForm({
             type="datetime-local"
             value={endAt}
             onChange={(e) => setEndAt(e.target.value)}
-            className="mt-1 border-white/10 bg-white/5 text-neutral-100"
+            className="mt-1 border-white/10 bg-white/5 text-foreground"
           />
         </div>
       </div>

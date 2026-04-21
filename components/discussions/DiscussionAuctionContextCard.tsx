@@ -55,7 +55,7 @@ export function DiscussionAuctionContextCard({
           <div className="min-w-0 flex-1">
             <Link
               href={`/auctions/${auction.id}`}
-              className="font-display text-sm font-semibold uppercase tracking-wide text-neutral-100 transition hover:text-primary"
+              className="font-display text-sm font-semibold uppercase tracking-wide text-foreground transition hover:text-primary"
             >
               {auction.title}
             </Link>

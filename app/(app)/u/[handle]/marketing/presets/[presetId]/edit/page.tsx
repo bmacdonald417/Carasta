@@ -34,7 +34,7 @@ export default async function EditMarketingPresetPage({
         ← Presets
       </Link>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-2xl font-bold text-neutral-100">
+        <h1 className="font-display text-2xl font-bold text-foreground">
           Edit preset
         </h1>
         <MarketingPresetDeleteButton

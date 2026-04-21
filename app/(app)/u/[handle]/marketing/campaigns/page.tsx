@@ -38,7 +38,7 @@ export default async function MarketingCampaignsPage({
           >
             ← Back to Marketing
           </Link>
-          <h1 className="mt-3 font-display text-2xl font-bold text-neutral-100">
+          <h1 className="mt-3 font-display text-2xl font-bold text-foreground">
             Campaigns
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -80,7 +80,7 @@ export default async function MarketingCampaignsPage({
             <tbody className="divide-y divide-white/5">
               {campaigns.map((c) => (
                 <tr key={c.id} className="text-neutral-300">
-                  <td className="px-4 py-3 font-medium text-neutral-100">
+                  <td className="px-4 py-3 font-medium text-foreground">
                     {c.name}
                   </td>
                   <td className="max-w-[200px] truncate px-4 py-3 text-neutral-400">

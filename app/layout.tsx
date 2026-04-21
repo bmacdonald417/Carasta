@@ -5,6 +5,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { CarastaAssistantLauncher } from "@/components/assistant/carasta-assistant-launcher";
 import { CarastaLayout } from "@/components/carasta/CarastaLayout";
+import { ReviewModeBanner } from "@/components/review-mode/review-mode-banner";
 import { Toaster } from "@/components/ui/toaster";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 
@@ -50,6 +51,7 @@ export default function RootLayout({
         className={`carasta-theme ${inter.variable} ${oswald.variable} ${playfair.variable} min-h-screen bg-background font-sans antialiased text-foreground`}
       >
         <Providers>
+          <ReviewModeBanner />
           <CarastaLayout>{children}</CarastaLayout>
           <CarastaAssistantLauncher />
           <FeedbackWidget />
