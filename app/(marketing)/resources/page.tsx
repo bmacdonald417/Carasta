@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ResourceCardGrid } from "@/components/resources/ResourceCardGrid";
+import { ResourceHubOrientation } from "@/components/resources/ResourceHubOrientation";
 import { resourceSections } from "@/components/resources/resource-links";
 
 export const metadata: Metadata = {
@@ -26,6 +27,8 @@ export default function ResourcesPage() {
             and auction basics fit into the current public experience.
           </p>
         </div>
+
+        <ResourceHubOrientation />
 
         <div className="mt-12 space-y-12">
           {resourceSections.map((section) => (

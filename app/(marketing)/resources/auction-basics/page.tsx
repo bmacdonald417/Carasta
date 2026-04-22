@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ResourceContentSection } from "@/components/resources/ResourceContentSection";
 import { ResourcePageLayout } from "@/components/resources/ResourcePageLayout";
 import { pickResourceLinks } from "@/components/resources/resource-links";
 
@@ -41,27 +42,31 @@ export default function AuctionBasicsPage() {
             body: "Listings, seller identity, and supporting detail help the marketplace feel more legible than a bare bid stream.",
           },
         ].map((item) => (
-          <section
+          <ResourceContentSection
             key={item.title}
-            className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm"
+            as="div"
+            title={item.title}
+            titleAs="h2"
+            surface="default"
+            padding="md"
           >
-            <h2 className="text-2xl font-semibold text-neutral-950">{item.title}</h2>
-            <p className="mt-4 text-sm leading-6 text-neutral-600">{item.body}</p>
-          </section>
+            <p className="text-sm leading-6 text-muted-foreground">{item.body}</p>
+          </ResourceContentSection>
         ))}
       </div>
 
-      <section className="rounded-[2rem] border border-neutral-200 bg-neutral-50 p-8">
-        <h2 className="font-display text-3xl font-semibold tracking-tight text-neutral-950">
-          What bidders and sellers should keep in mind
-        </h2>
-        <ul className="mt-4 space-y-3 text-sm leading-6 text-neutral-600">
+      <ResourceContentSection
+        title="What bidders and sellers should keep in mind"
+        surface="muted"
+        padding="lg"
+      >
+        <ul className="space-y-3 text-sm leading-6 text-muted-foreground">
           <li>Read the listing carefully rather than relying on a short summary alone</li>
           <li>Use the current trust and support pages when you need platform-level guidance</li>
           <li>Do not assume the public overview replaces listing-specific terms or final legal documents</li>
           <li>Use good judgment around payment, inspection, condition review, and communication</li>
         </ul>
-      </section>
+      </ResourceContentSection>
     </ResourcePageLayout>
   );
 }

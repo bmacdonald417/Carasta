@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   BookOpen,
   Car,
+  Compass,
   FileText,
   Gavel,
   HelpCircle,
@@ -38,6 +39,13 @@ export const resourceSections: ResourceSection[] = [
           "A clear overview of how Carmunity, Discussions, Messages, profiles, Garage identity, auctions, and seller tools fit together.",
         href: "/resources/what-is-carasta",
         icon: Sparkles,
+      },
+      {
+        title: "Why Carasta?",
+        description:
+          "A concise positioning pass that connects Carmunity-first identity to marketplace-proven auctions and seller-intelligent direction.",
+        href: "/why-carasta",
+        icon: Compass,
       },
       {
         title: "How It Works",

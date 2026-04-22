@@ -12,9 +12,11 @@ export const metadata = {
 
 export default function HowItWorksPage() {
   const relatedLinks = pickResourceLinks([
+    "/why-carasta",
     "/resources/what-is-carasta",
     "/resources/what-is-carmunity",
     "/resources/auction-basics",
+    "/resources/faq",
     "/resources/trust-and-safety",
   ]);
 
@@ -71,11 +73,11 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="mt-12 grid gap-4 md:grid-cols-2">
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="text-2xl font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-2xl font-semibold text-foreground">
               How the social side fits in
             </h2>
-            <p className="mt-4 text-sm leading-6 text-neutral-600">
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
               Carasta is designed so public identity, Carmunity, Discussions,
               and Garage context help explain who is participating on the
               platform. That makes the experience more legible than a purely

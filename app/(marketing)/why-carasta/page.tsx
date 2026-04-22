@@ -40,9 +40,11 @@ const reasons = [
 
 export default function WhyCarastaPage() {
   const relatedLinks = pickResourceLinks([
+    "/how-it-works",
     "/resources/what-is-carasta",
     "/resources/what-is-carmunity",
     "/resources/profiles-and-garage",
+    "/resources/faq",
     "/resources/trust-and-safety",
   ]);
 

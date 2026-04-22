@@ -56,6 +56,31 @@ const faqs = [
       "Start with Resources for the product guides, glossary, and trust pages. If you still need help, use the contact page to reach the Carasta team.",
   },
   {
+    question: "What is the difference between Carmunity, Market, and Resources?",
+    answer:
+      "Carmunity is the social-first community layer. Market is the commerce umbrella for auctions and buying/selling flows. Resources is the public help and trust layer for orientation, vocabulary, policy structure, and escalation paths.",
+  },
+  {
+    question: "Where should I start if I am brand new to Carasta?",
+    answer:
+      "Read How It Works for the full product map, then What is Carasta? for the concise reference version. Use the glossary when terminology is unclear, and use Trust & Safety when you need moderation, conduct, or escalation context.",
+  },
+  {
+    question: "Where should I go for marketplace questions (bidding, buying, selling)?",
+    answer:
+      "Start with Auction basics, then Buying on Carasta or Selling on Carasta depending on your role. Use Trust & Safety when you need platform-level expectations, and use Contact when a specific situation needs human review.",
+  },
+  {
+    question: "Where should I go for account, access, or product support issues?",
+    answer:
+      "Use the FAQ and glossary first for common questions and definitions. If you are blocked or need account help beyond self-serve pages, use Contact and include enough context for the team to respond quickly.",
+  },
+  {
+    question: "Where should I go if I need to report a trust or safety concern?",
+    answer:
+      "Read Trust & Safety and the Community Guidelines for the current conduct and moderation framing, then use Contact for escalation when a situation needs direct review.",
+  },
+  {
     question: "Are the Terms and Privacy pages final legal documents?",
     answer:
       "No. They are still draft public structures pending legal review. They are written to clarify current expectations and support paths, not to overstate legal finality.",
@@ -69,6 +94,8 @@ export default function ResourcesFaqPage() {
       title="Quick answers about the platform, trust layer, and product language."
       description="This FAQ is written to be useful for both visitors and future assistant retrieval. It keeps the core Carasta concepts short, direct, and low-ambiguity."
       relatedLinks={pickResourceLinks([
+        "/how-it-works",
+        "/why-carasta",
         "/resources/what-is-carasta",
         "/resources/glossary",
         "/resources/trust-and-safety",

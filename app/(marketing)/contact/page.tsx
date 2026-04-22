@@ -2,7 +2,17 @@ import { ContactForm } from "./ContactForm";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 
+import { ResourceCardGrid } from "@/components/resources/ResourceCardGrid";
+import { pickResourceLinks } from "@/components/resources/resource-links";
+
 export default function ContactPage() {
+  const relatedLinks = pickResourceLinks([
+    "/resources/faq",
+    "/resources/glossary",
+    "/resources/trust-and-safety",
+    "/how-it-works",
+  ]);
+
   return (
     <section className="min-h-[80vh] bg-background px-4 py-16 md:py-24">
       <div className="carasta-container grid gap-12 md:grid-cols-2 md:items-start md:gap-16">
@@ -63,6 +73,26 @@ export default function ContactPage() {
             <ContactForm />
           </div>
         </Card>
+
+        <div className="md:col-span-2">
+          <section className="rounded-2xl border border-border bg-muted/30 p-8 shadow-e1">
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
+              Self-serve first
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+              Try these pages before you wait on a reply.
+            </h2>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground">
+              Contact is the right path for escalations, account issues, and
+              situations that need human judgment. For most public questions,
+              the Resources layer is faster because it is written to be
+              scannable, consistent, and easy to navigate.
+            </p>
+            <div className="mt-8">
+              <ResourceCardGrid items={relatedLinks} compact />
+            </div>
+          </section>
+        </div>
       </div>
     </section>
   );

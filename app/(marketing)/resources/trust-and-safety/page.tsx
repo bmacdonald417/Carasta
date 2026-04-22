@@ -16,6 +16,8 @@ export default function TrustAndSafetyPage() {
       title="A clearer public trust layer for how Carasta works."
       description="This page is designed to reduce ambiguity. It explains the current trust posture, what users should expect, and what the platform does and does not claim."
       relatedLinks={pickResourceLinks([
+        "/resources/faq",
+        "/resources/glossary",
         "/community-guidelines",
         "/privacy",
         "/terms",

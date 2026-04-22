@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
 import type { ResourceLinkItem } from "./resource-links";
 import { ResourceCardGrid } from "./ResourceCardGrid";
@@ -11,6 +13,8 @@ export function ResourcePageLayout({
   relatedLinks,
   relatedTitle = "Related resources",
   relatedDescription = "Continue through the public help layer with the guides most relevant to this topic.",
+  backHref = "/resources",
+  backLabel = "All resources",
 }: {
   eyebrow: string;
   title: string;
@@ -19,10 +23,21 @@ export function ResourcePageLayout({
   relatedLinks?: ResourceLinkItem[];
   relatedTitle?: string;
   relatedDescription?: string;
+  backHref?: string;
+  backLabel?: string;
 }) {
   return (
     <section className="min-h-screen bg-background px-4 py-12 md:py-20">
       <div className="carasta-container max-w-5xl">
+        <div className="mb-8">
+          <Link
+            href={backHref}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            {backLabel}
+          </Link>
+        </div>
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
             {eyebrow}

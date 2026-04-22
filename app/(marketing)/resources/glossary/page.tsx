@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ResourceContentSection } from "@/components/resources/ResourceContentSection";
 import { ResourcePageLayout } from "@/components/resources/ResourcePageLayout";
 import { pickResourceLinks } from "@/components/resources/resource-links";
 
@@ -77,15 +78,16 @@ export default function GlossaryPage() {
     >
       <div className="space-y-4">
         {terms.map((item) => (
-          <section
+          <ResourceContentSection
             key={item.term}
-            className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm"
+            as="div"
+            title={item.term}
+            titleAs="h2"
+            surface="default"
+            padding="md"
           >
-            <h2 className="text-2xl font-semibold text-neutral-950">{item.term}</h2>
-            <p className="mt-3 text-sm leading-6 text-neutral-600">
-              {item.definition}
-            </p>
-          </section>
+            <p className="text-sm leading-6 text-muted-foreground">{item.definition}</p>
+          </ResourceContentSection>
         ))}
       </div>
     </ResourcePageLayout>

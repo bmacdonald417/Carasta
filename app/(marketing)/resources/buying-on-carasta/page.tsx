@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ResourceContentSection } from "@/components/resources/ResourceContentSection";
 import { ResourcePageLayout } from "@/components/resources/ResourcePageLayout";
 import { pickResourceLinks } from "@/components/resources/resource-links";
 
@@ -18,6 +19,7 @@ export default function BuyingOnCarastaPage() {
       relatedLinks={pickResourceLinks([
         "/resources/auction-basics",
         "/resources/trust-and-safety",
+        "/resources/faq",
         "/how-it-works",
         "/contact",
       ])}
@@ -37,27 +39,27 @@ export default function BuyingOnCarastaPage() {
             body: "Use the platform's guidance and communication paths to understand next steps, while recognizing that the exact transaction flow can still depend on the listing and parties involved.",
           },
         ].map((step) => (
-          <section
+          <ResourceContentSection
             key={step.title}
-            className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm"
+            as="div"
+            title={step.title}
+            titleAs="h2"
+            surface="default"
+            padding="md"
           >
-            <h2 className="text-2xl font-semibold text-neutral-950">{step.title}</h2>
-            <p className="mt-4 text-sm leading-6 text-neutral-600">{step.body}</p>
-          </section>
+            <p className="text-sm leading-6 text-muted-foreground">{step.body}</p>
+          </ResourceContentSection>
         ))}
       </div>
 
-      <section className="rounded-[2rem] border border-neutral-200 bg-white p-8 shadow-sm">
-        <h2 className="font-display text-3xl font-semibold tracking-tight text-neutral-950">
-          A responsible buyer baseline
-        </h2>
-        <ul className="mt-4 space-y-3 text-sm leading-6 text-neutral-600">
+      <ResourceContentSection title="A responsible buyer baseline" surface="default" padding="lg">
+        <ul className="space-y-3 text-sm leading-6 text-muted-foreground">
           <li>Read listing details carefully and do not rely only on summaries</li>
           <li>Use judgment around condition, fit, shipping, payment, and timing</li>
           <li>Ask questions when you need clarification</li>
           <li>Use trust/support pages when you need platform-level guidance</li>
         </ul>
-      </section>
+      </ResourceContentSection>
     </ResourcePageLayout>
   );
 }

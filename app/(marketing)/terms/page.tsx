@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { LegalDraftBanner } from "@/components/legal/LegalDraftBanner";
+import { ResourceCardGrid } from "@/components/resources/ResourceCardGrid";
+import { pickResourceLinks } from "@/components/resources/resource-links";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions",
@@ -10,10 +12,35 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
+  const relatedLinks = pickResourceLinks([
+    "/privacy",
+    "/community-guidelines",
+    "/resources/trust-and-safety",
+    "/resources/faq",
+  ]);
+
   return (
     <section className="bg-background px-4 py-16 md:py-24">
       <div className="carasta-container max-w-3xl space-y-10">
         <LegalDraftBanner />
+
+        <nav aria-label="Resources breadcrumb" className="text-sm text-muted-foreground">
+          <Link
+            href="/resources"
+            className="font-semibold text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Resources
+          </Link>
+          <span className="px-2 text-muted-foreground">/</span>
+          <Link
+            href="/resources/trust-and-safety"
+            className="font-semibold text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Trust &amp; Safety
+          </Link>
+          <span className="px-2 text-muted-foreground">/</span>
+          <span className="text-foreground">Terms</span>
+        </nav>
 
         <header className="space-y-2">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
@@ -133,6 +160,24 @@ export default function TermsPage() {
             directory.
           </p>
         </div>
+
+        <section className="rounded-2xl border border-border bg-muted/30 p-8 shadow-e1">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
+            Next steps
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+            Related trust and help pages
+          </h2>
+          <p className="mt-4 text-sm leading-6 text-muted-foreground">
+            These pages are part of the same public Resources layer. They are
+            meant to be read together when you need orientation, conduct
+            expectations, or self-serve clarification alongside draft legal
+            structure.
+          </p>
+          <div className="mt-8">
+            <ResourceCardGrid items={relatedLinks} compact />
+          </div>
+        </section>
       </div>
     </section>
   );
