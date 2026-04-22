@@ -17,6 +17,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BookOpen } from "lucide-react";
+import {
+  HelpPaletteProvider,
+  useHelpPalette,
+} from "@/components/help/HelpPaletteProvider";
 import { cn } from "@/lib/utils";
 import {
   shellHeaderAppActive,
@@ -54,9 +58,10 @@ const footerProductLinks = [
   { href: "/sell", label: "Sell" },
 ];
 
-export function CarastaLayout({ children }: { children: React.ReactNode }) {
+function CarastaChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
+  const { openPalette } = useHelpPalette();
   const [logoError, setLogoError] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -195,6 +200,21 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     )}
                     <DropdownMenuItem asChild>
                       <Link href="/settings">Settings</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        openPalette();
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <span className="flex w-full items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-muted-foreground" aria-hidden />
+                        <span>Quick help</span>
+                        <kbd className="ml-auto rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                          ⌃ /
+                        </kbd>
+                      </span>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/resources" className="flex items-center gap-2">
@@ -424,5 +444,13 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
     </div>
+  );
+}
+
+export function CarastaLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <HelpPaletteProvider>
+      <CarastaChrome>{children}</CarastaChrome>
+    </HelpPaletteProvider>
   );
 }

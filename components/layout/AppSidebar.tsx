@@ -25,7 +25,9 @@ import {
   ListOrdered,
   Megaphone,
   MessageSquare,
+  CircleHelp,
 } from "lucide-react";
+import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
 
 const carmunityNav = [
   { href: "/explore", label: "Explore", icon: Users },
@@ -55,6 +57,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function AppSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { openPalette } = useHelpPalette();
   if (!session?.user) return null;
   const handle = (session?.user as { handle?: string } | undefined)?.handle;
   const marketingEnabled = Boolean(
@@ -205,6 +208,26 @@ export function AppSidebar() {
             </Link>
           );
         })}
+
+        <motion.button
+          type="button"
+          onClick={() => openPalette()}
+          className={cn(
+            shellSidebarRowBase,
+            shellSidebarInactive,
+            "w-full text-left font-normal"
+          )}
+          whileHover={hoverScale}
+          whileTap={tapScale}
+        >
+          <CircleHelp className="h-5 w-5 shrink-0" />
+          <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+            <span>Quick help</span>
+            <kbd className="shrink-0 rounded border border-border bg-muted/40 px-1 py-0.5 font-mono text-[9px] text-muted-foreground">
+              ⌃/
+            </kbd>
+          </span>
+        </motion.button>
 
         <div className="my-4 border-t border-border/50" />
         <Link

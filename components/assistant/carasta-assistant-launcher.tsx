@@ -134,6 +134,7 @@ export function CarastaAssistantLauncher() {
             </label>
             <Textarea
               rows={4}
+              data-skip-help-palette-shortcut="true"
               className="mt-3 resize-y border-neutral-200 bg-neutral-50 text-neutral-950"
               placeholder="Example: What is Carmunity and how is it different from Discussions?"
               value={question}
