@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { addComment } from "@/app/(marketing)/explore/actions";
 import { useToast } from "@/components/ui/use-toast";
+import { LoadingButton } from "@/components/ui/loading-button";
 
 export function CommentForm({
   postId,
@@ -42,9 +42,15 @@ export function CommentForm({
         onChange={(e) => setContent(e.target.value)}
         className="min-w-0 flex-1 border-border bg-background"
       />
-      <Button type="submit" size="sm" disabled={loading || !content.trim()}>
-        {loading ? "…" : "Post"}
-      </Button>
+      <LoadingButton
+        type="submit"
+        size="sm"
+        loading={loading}
+        loadingLabel="Posting…"
+        disabled={!content.trim()}
+      >
+        Post
+      </LoadingButton>
     </form>
   );
 }

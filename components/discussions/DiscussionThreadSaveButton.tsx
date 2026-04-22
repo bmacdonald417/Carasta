@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/loading-button";
 import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
 
 export function DiscussionThreadSaveButton({
@@ -45,12 +45,13 @@ export function DiscussionThreadSaveButton({
   }
 
   return (
-    <Button
+    <LoadingButton
       type="button"
       variant="outline"
       size="sm"
       className="relative border-primary/35 bg-primary/5 text-xs font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
-      disabled={busy}
+      loading={busy}
+      loadingLabel={saved ? "Saving…" : "Saving…"}
       onClick={() => void toggle()}
     >
       {saved ? "Saved" : "Save thread"}
@@ -61,6 +62,6 @@ export function DiscussionThreadSaveButton({
           aria-hidden
         />
       ) : null}
-    </Button>
+    </LoadingButton>
   );
 }

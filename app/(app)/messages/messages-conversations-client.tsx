@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { InlineSpinner } from "@/components/ui/inline-spinner";
 import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
 import { cn } from "@/lib/utils";
@@ -78,9 +78,23 @@ export function MessagesConversationsClient() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
-        Loading conversations…
+      <div className="space-y-3" role="status" aria-busy="true" aria-label="Loading conversations">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <InlineSpinner label="Loading conversations" className="text-primary" />
+          Loading conversations…
+        </div>
+        <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-e1">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <li key={`conv-skel-${i}`} className="flex items-center gap-3 px-4 py-3.5">
+              <div className="h-10 w-10 shrink-0 rounded-full border border-border bg-muted/40 animate-pulse" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="h-3 w-36 rounded bg-muted/50 animate-pulse" />
+                <div className="h-3 w-56 max-w-full rounded bg-muted/40 animate-pulse" />
+              </div>
+              <div className="h-3 w-10 rounded bg-muted/40 animate-pulse" />
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }

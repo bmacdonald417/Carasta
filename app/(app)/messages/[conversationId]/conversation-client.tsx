@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { InlineSpinner } from "@/components/ui/inline-spinner";
 import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 import { cn } from "@/lib/utils";
 
@@ -142,9 +142,36 @@ export function ConversationClient({
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
-        Loading thread…
+      <div className="space-y-3" role="status" aria-busy="true" aria-label="Loading conversation">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <InlineSpinner label="Loading conversation" className="text-primary" />
+          Loading thread…
+        </div>
+        <div className="rounded-2xl border border-border bg-card shadow-e2 overflow-hidden">
+          <div className="border-b border-border px-4 py-3">
+            <div className="h-4 w-40 rounded bg-muted/50 animate-pulse" />
+          </div>
+          <div className="space-y-3 px-4 py-4 bg-background/50">
+            {Array.from({ length: 6 }).map((_, i) => {
+              const mine = i % 2 === 0;
+              return (
+                <div key={`msg-skel-${i}`} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+                  <div
+                    className={cn(
+                      "h-12 w-[min(70%,22rem)] rounded-2xl border border-border bg-muted/30 animate-pulse"
+                    )}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="border-t border-border p-3">
+            <div className="flex items-end gap-2">
+              <div className="h-10 flex-1 rounded-xl border border-border bg-muted/20 animate-pulse" />
+              <div className="h-10 w-20 rounded-2xl bg-muted/30 animate-pulse" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -311,7 +338,7 @@ export function ConversationClient({
             onClick={() => void send()}
             className="shrink-0"
           >
-            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
+            {sending ? <InlineSpinner label="Sending" /> : "Send"}
           </Button>
         </div>
         <p className="mt-2 text-[11px] text-muted-foreground">

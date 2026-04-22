@@ -1,6 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+
+import { LoadingButton } from "@/components/ui/loading-button";
 import { useGuestGate, type GuestGateIntent } from "@/components/guest-gate/GuestGateProvider";
 import { cn } from "@/lib/utils";
 
@@ -16,15 +18,28 @@ export function GuestGateCTA({
   className?: string;
 }) {
   const { openGate } = useGuestGate();
+  const [ack, setAck] = useState(false);
+
+  useEffect(() => {
+    if (!ack) return;
+    const t = window.setTimeout(() => setAck(false), 650);
+    return () => window.clearTimeout(t);
+  }, [ack]);
+
   return (
-    <Button
+    <LoadingButton
       type="button"
       size="sm"
       className={cn("rounded-full", className)}
-      onClick={() => openGate({ intent, nextUrl })}
+      loading={ack}
+      loadingLabel="Opening…"
+      onClick={() => {
+        setAck(true);
+        openGate({ intent, nextUrl });
+      }}
     >
       {children}
-    </Button>
+    </LoadingButton>
   );
 }
 

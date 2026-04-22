@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
+import { LoadingButton } from "@/components/ui/loading-button";
 
 export function FollowButton({
   targetUserId,
@@ -46,14 +46,15 @@ export function FollowButton({
   }
 
   return (
-    <Button
+    <LoadingButton
       variant={following ? "secondary" : "default"}
       size="sm"
       onClick={toggle}
-      disabled={loading}
+      loading={loading}
+      loadingLabel={following ? "Updating…" : "Following…"}
       className={className}
     >
       {following ? "Following" : "Follow"}
-    </Button>
+    </LoadingButton>
   );
 }
