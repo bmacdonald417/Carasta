@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { buildOnboardingPack, getCarmunityOnboardingState } from "@/lib/carmunity/onboarding-service";
 import { listDiscussedLiveAuctions } from "@/lib/forums/auction-discussion";
 import { listTrendingThreadsGlobal } from "@/lib/forums/discussions-discovery";
+import { SignedOutPreviewNotice } from "@/components/guest-preview/SignedOutPreviewNotice";
 import { CommunityFeed } from "./community-feed";
 import { TrendingDreamGarage } from "./TrendingDreamGarage";
 
@@ -57,6 +58,13 @@ export default async function ExplorePage({
           for full Gear threads.
         </p>
       </header>
+      {!currentUserId ? (
+        <SignedOutPreviewNotice
+          nextUrl="/explore"
+          className="mt-6"
+          description="You’re viewing a read-only Carmunity preview. Join free to react, comment, follow voices, and shape your feed."
+        />
+      ) : null}
       <TrendingDreamGarage />
       <CommunityFeed
         tab={tab}

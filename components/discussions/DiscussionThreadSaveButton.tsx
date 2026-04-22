@@ -2,8 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
+import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
 
 export function DiscussionThreadSaveButton({
   threadId,
@@ -16,10 +18,16 @@ export function DiscussionThreadSaveButton({
   showNewActivityDot?: boolean;
 }) {
   const router = useRouter();
+  const { data: session } = useSession();
+  const { openGate } = useGuestGate();
   const [saved, setSaved] = useState(initialSaved);
   const [busy, setBusy] = useState(false);
 
   async function toggle() {
+    if (!session?.user) {
+      openGate({ intent: "save" });
+      return;
+    }
     setBusy(true);
     try {
       const res = await fetch(

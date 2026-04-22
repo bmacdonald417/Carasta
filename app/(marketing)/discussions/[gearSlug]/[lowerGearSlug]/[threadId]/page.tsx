@@ -22,6 +22,8 @@ import { touchForumThreadSubscriptionViewed } from "@/lib/forums/thread-subscrip
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
 import { cn } from "@/lib/utils";
+import { SignedOutPreviewNotice } from "@/components/guest-preview/SignedOutPreviewNotice";
+import { PreviewMeter } from "@/components/guest-preview/PreviewMeter";
 
 export const dynamic = "force-dynamic";
 
@@ -190,6 +192,15 @@ export default async function ThreadPage({ params }: Props) {
 
   return (
     <div className="carasta-container max-w-3xl py-8">
+      {!viewerId ? (
+        <>
+          <SignedOutPreviewNotice
+            nextUrl={threadSharePath}
+            description="You’re viewing a read-only preview. Join free to react, reply, save threads, and follow voices."
+          />
+          <PreviewMeter surface="thread_detail" />
+        </>
+      ) : null}
       <nav className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
         <Link
           href="/discussions"
@@ -235,7 +246,7 @@ export default async function ThreadPage({ params }: Props) {
                   <span className="text-muted-foreground/90">· {thread.author.name}</span>
                 ) : null}
                 <span className="text-muted-foreground/90">· {formatLong(thread.createdAt)}</span>
-                {viewerId && viewerId !== thread.author.id ? (
+                {viewerId !== thread.author.id ? (
                   <span className="inline-flex flex-wrap items-center gap-2">
                     <span className="text-muted-foreground/50">·</span>
                     <FollowButton
@@ -251,13 +262,11 @@ export default async function ThreadPage({ params }: Props) {
 
             <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[280px]">
               <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-                {viewerId ? (
-                  <DiscussionThreadSaveButton
-                    threadId={thread.id}
-                    initialSaved={threadSaved}
-                    showNewActivityDot={savedThreadHasNew}
-                  />
-                ) : null}
+                <DiscussionThreadSaveButton
+                  threadId={thread.id}
+                  initialSaved={threadSaved}
+                  showNewActivityDot={savedThreadHasNew}
+                />
                 <ShareButtons
                   url={threadSharePath}
                   title={thread.title}

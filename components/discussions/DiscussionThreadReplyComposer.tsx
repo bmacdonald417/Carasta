@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { MentionComposerTextarea } from "@/components/carmunity/MentionComposerTextarea";
+import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
 import { Button } from "@/components/ui/button";
 
 export function DiscussionThreadReplyComposer({
@@ -24,6 +25,7 @@ export function DiscussionThreadReplyComposer({
   const pathname = usePathname();
   const callbackUrl = signInCallbackUrl ?? (pathname || "/discussions");
   const { data: session, status } = useSession();
+  const { openGate } = useGuestGate();
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,13 +45,25 @@ export function DiscussionThreadReplyComposer({
   if (!session?.user) {
     return (
       <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground shadow-e1">
-        <Link
-          href={`/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-          className="text-primary hover:underline"
-        >
-          Sign in
-        </Link>{" "}
-        to join the conversation.
+        <p className="text-sm text-muted-foreground">
+          You’re viewing a read-only preview.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            className="rounded-full px-4"
+            onClick={() => openGate({ intent: "reply", nextUrl: callbackUrl })}
+          >
+            Join to reply
+          </Button>
+          <Link
+            href={`/auth/sign-in?callbackUrl=${encodeURIComponent(`/welcome?next=${encodeURIComponent(callbackUrl)}`)}`}
+            className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Sign in
+          </Link>
+        </div>
       </div>
     );
   }

@@ -11,6 +11,7 @@ import { DiscussionRichText } from "@/components/discussions/DiscussionRichText"
 import { DiscussionThreadReplyComposer } from "@/components/discussions/DiscussionThreadReplyComposer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
 import { discussionReplyAnchorId } from "@/lib/discussions/discussion-paths";
 import type { DiscussionReactionTotals } from "@/lib/forums/forum-service";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
@@ -60,6 +61,7 @@ export function DiscussionThreadRepliesPanel({
   validMentionHandles: string[];
 }) {
   const pathname = usePathname();
+  const { openGate } = useGuestGate();
   const [parentReplyId, setParentReplyId] = useState<string | null>(null);
   const [replies, setReplies] = useState(initialReplies);
   const [nextCursor, setNextCursor] = useState(initialNextCursor);
@@ -177,7 +179,13 @@ export function DiscussionThreadRepliesPanel({
                         "h-7 px-2 text-xs text-primary hover:bg-muted/60 hover:text-primary",
                         shellFocusRing
                       )}
-                      onClick={() => setParentReplyId(r.id)}
+                      onClick={() => {
+                        if (!viewerUserId) {
+                          openGate({ intent: "reply", nextUrl: pathname || "/discussions" });
+                          return;
+                        }
+                        setParentReplyId(r.id);
+                      }}
                     >
                       Reply
                     </Button>

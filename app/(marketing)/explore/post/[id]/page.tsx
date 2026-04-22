@@ -3,7 +3,6 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CommentForm } from "./comment-form";
 import { getSession } from "@/lib/auth";
@@ -12,6 +11,9 @@ import { cn } from "@/lib/utils";
 import { ReputationBadge } from "@/components/reputation/ReputationBadge";
 import { summarizePostReactionsMerged, viewerPostReactionKinds } from "@/lib/carmunity/post-reactions";
 import { PostEngagementBar } from "./post-engagement";
+import { SignedOutPreviewNotice } from "@/components/guest-preview/SignedOutPreviewNotice";
+import { PreviewMeter } from "@/components/guest-preview/PreviewMeter";
+import { GuestGateCTA } from "@/components/guest-preview/GuestGateCTA";
 
 function formatPostTime(iso: Date): string {
   const d = new Date(iso);
@@ -72,6 +74,15 @@ export default async function PostDetailPage({
 
   return (
     <div className="carasta-container max-w-2xl py-8">
+      {!session?.user ? (
+        <>
+          <SignedOutPreviewNotice
+            nextUrl={`/explore/post/${id}`}
+            description="You’re viewing a read-only preview. Join free to react, comment, and follow voices in Carmunity."
+          />
+          <PreviewMeter surface="post_detail" />
+        </>
+      ) : null}
       <Link
         href="/explore"
         className={cn(
@@ -178,9 +189,13 @@ export default async function PostDetailPage({
                 Short reactions welcome — keep it respectful and specific.
               </p>
               {!session?.user ? (
-                <Button asChild className={cn("mt-5", shellFocusRing)} size="sm">
-                  <Link href="/auth/sign-in">Sign in to comment</Link>
-                </Button>
+                <GuestGateCTA
+                  intent="comment"
+                  nextUrl={`/explore/post/${id}`}
+                  className={cn("mt-5 inline-flex", shellFocusRing)}
+                >
+                  Join to comment
+                </GuestGateCTA>
               ) : null}
             </div>
           ) : (

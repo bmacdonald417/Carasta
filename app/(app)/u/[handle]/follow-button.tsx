@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
+import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
 
 export function FollowButton({
   targetUserId,
@@ -14,6 +16,8 @@ export function FollowButton({
   className?: string;
 }) {
   const router = useRouter();
+  const { data: session } = useSession();
+  const { openGate } = useGuestGate();
   const [following, setFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
 
@@ -22,6 +26,10 @@ export function FollowButton({
   }, [initialFollowing]);
 
   async function toggle() {
+    if (!session?.user) {
+      openGate({ intent: "follow" });
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/user/follow", {

@@ -13,6 +13,7 @@ import { formatCurrency, nextMinBidCents } from "@/lib/utils";
 import { placeBid, quickBid, executeBuyNow, setAutoBid } from "../actions";
 import { useToast } from "@/components/ui/use-toast";
 import { sendMarketingTrack } from "@/lib/marketing/send-marketing-track";
+import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
 
 function trackBidClickIntent(auctionId: string, bidUiSurface: string): void {
   sendMarketingTrack({
@@ -70,6 +71,7 @@ export function AuctionDetailClient({
 }) {
   const router = useRouter();
   const { toast } = useToast();
+  const { openGate } = useGuestGate();
   const [live, setLive] = useState<LiveData>({
     highBidCents: initialHighBidCents,
     highBidderHandle: initialHighBidderHandle,
@@ -132,8 +134,9 @@ export function AuctionDetailClient({
     live.buyNowExpiresAt != null &&
     new Date() < new Date(live.buyNowExpiresAt);
 
-  const signUpHref = `/auth/sign-up?callbackUrl=${encodeURIComponent(`/auctions/${auctionId}`)}`;
-  const signInHref = `/auth/sign-in?callbackUrl=${encodeURIComponent(`/auctions/${auctionId}`)}`;
+  const nextUrl = `/auctions/${auctionId}`;
+  const signUpHref = `/auth/sign-up?callbackUrl=${encodeURIComponent(`/welcome?next=${encodeURIComponent(nextUrl)}`)}`;
+  const signInHref = `/auth/sign-in?callbackUrl=${encodeURIComponent(`/welcome?next=${encodeURIComponent(nextUrl)}`)}`;
 
   async function handleQuickBid() {
     if (!isLoggedIn) {
@@ -275,13 +278,17 @@ export function AuctionDetailClient({
         <>
           {!isLoggedIn ? (
             <div className="space-y-4 rounded-xl border border-border bg-muted/40 p-4">
-              <Button asChild variant="default" size="lg" className="w-full">
-                <Link
-                  href={signUpHref}
-                  onClick={() => trackBidClickIntent(auctionId, "signup_cta")}
-                >
-                  Sign up to bid
-                </Link>
+              <Button
+                type="button"
+                variant="default"
+                size="lg"
+                className="w-full"
+                onClick={() => {
+                  trackBidClickIntent(auctionId, "signup_cta");
+                  openGate({ intent: "bid", nextUrl });
+                }}
+              >
+                Sign up to bid
               </Button>
               <details className="group">
                 <summary className="cursor-pointer text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground">
@@ -293,6 +300,12 @@ export function AuctionDetailClient({
                   <li>Save vehicles to Garage</li>
                 </ul>
               </details>
+              <Link
+                href={signInHref}
+                className="block text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                Already a member? Sign in
+              </Link>
               <Link
                 href="/how-it-works"
                 className="block text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
