@@ -56,6 +56,66 @@ export function getCanonicalHelpTopicById(topicId: string): ProductHelpLink | un
   return canonicalTopicIndex.get(topicId);
 }
 
+/** Normalized public path without query or hash. */
+function normalizeCanonicalHref(href: string) {
+  return href.split("?")[0].split("#")[0];
+}
+
+/**
+ * Resolve a public help URL to the closest canonical `ProductHelpLink` (topic id).
+ * Includes a tiny static table for hub paths that are not represented as single-topic rows
+ * in every context map (e.g. `/resources`, `/why-carasta`, legal drafts).
+ */
+const STATIC_HELP_BY_HREF: Record<string, ProductHelpLink> = {
+  "/resources": {
+    topicId: "palette.resources_hub",
+    href: "/resources",
+    label: "Resources hub",
+    excerpt: "Full index of guides, FAQs, glossary, and trust documents.",
+  },
+  "/why-carasta": {
+    topicId: "palette.why_carasta",
+    href: "/why-carasta",
+    label: "Why Carasta",
+    excerpt: "Positioning: Carmunity-first, market-proven, seller-intelligent direction.",
+  },
+  "/terms": {
+    topicId: "policy.terms",
+    href: "/terms",
+    label: "Terms & Conditions",
+    excerpt: "Draft terms structure and platform expectations.",
+  },
+  "/privacy": {
+    topicId: "policy.privacy",
+    href: "/privacy",
+    label: "Privacy Policy",
+    excerpt: "Draft privacy structure and data expectations.",
+  },
+  "/sell": {
+    topicId: "palette.sell_entry",
+    href: "/sell",
+    label: "Sell",
+    excerpt: "Create listings and enter seller flows inside the product.",
+  },
+};
+
+export function findCanonicalHelpTopicByHref(href: string): ProductHelpLink | undefined {
+  let base = normalizeCanonicalHref(href);
+  if (base.startsWith("http://") || base.startsWith("https://")) {
+    try {
+      base = new URL(base).pathname || "/";
+    } catch {
+      return undefined;
+    }
+  }
+  if (!base.startsWith("/")) base = `/${base}`;
+  if (!canonicalTopicIndex) canonicalTopicIndex = buildCanonicalTopicIndex();
+  for (const link of Array.from(canonicalTopicIndex.values())) {
+    if (link.href === base) return link;
+  }
+  return STATIC_HELP_BY_HREF[base];
+}
+
 function scoreLinkForPathname(
   pathname: string,
   link: ProductHelpLink,

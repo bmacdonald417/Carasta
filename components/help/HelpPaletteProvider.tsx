@@ -38,6 +38,10 @@ type HelpPaletteContextValue = {
   setOpen: (open: boolean) => void;
   openPalette: () => void;
   closePalette: () => void;
+  /** Topic ids from the last assistant-driven open (for row highlighting). */
+  assistantHighlightTopicIds: ReadonlySet<string> | null;
+  /** Open palette and optionally highlight canonical rows matching assistant citations/routes. */
+  openPaletteFromAssistant: (topicIds: string[]) => void;
 };
 
 const HelpPaletteContext = createContext<HelpPaletteContextValue | null>(null);
@@ -72,33 +76,44 @@ function PaletteSection({
 function PaletteLinkList({
   links,
   tier,
+  highlightTopicIds,
 }: {
   links: ProductHelpLink[];
   tier: "primary" | "related" | "global";
+  highlightTopicIds: ReadonlySet<string> | null;
 }) {
   const { closePalette } = useHelpPalette();
   if (links.length === 0) return null;
   return (
     <ul className="space-y-1">
-      {links.map((link) => (
-        <li key={`${tier}-${link.topicId}`}>
-          <Link
-            href={link.href}
-            onClick={() => closePalette()}
-            className="group block rounded-xl border border-transparent px-3 py-2 transition-colors hover:border-border hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            data-help-palette-tier={tier}
-            data-canonical-help-topic={link.topicId}
-            data-canonical-help-href={link.href}
-          >
-            <span className="text-sm font-medium text-foreground group-hover:text-primary">
-              {link.label}
-            </span>
-            <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
-              {link.excerpt}
-            </span>
-          </Link>
-        </li>
-      ))}
+      {links.map((link) => {
+        const highlighted = highlightTopicIds?.has(link.topicId) ?? false;
+        return (
+          <li key={`${tier}-${link.topicId}`}>
+            <Link
+              href={link.href}
+              onClick={() => closePalette()}
+              className={cn(
+                "group block rounded-xl border px-3 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                highlighted
+                  ? "border-primary/40 bg-primary/10 hover:border-primary/50 hover:bg-primary/[0.14]"
+                  : "border-transparent hover:border-border hover:bg-muted/40"
+              )}
+              data-help-palette-tier={tier}
+              data-canonical-help-topic={link.topicId}
+              data-canonical-help-href={link.href}
+              data-assistant-highlight={highlighted ? "true" : undefined}
+            >
+              <span className="text-sm font-medium text-foreground group-hover:text-primary">
+                {link.label}
+              </span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                {link.excerpt}
+              </span>
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -106,9 +121,28 @@ function PaletteLinkList({
 export function HelpPaletteProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [assistantHighlightTopicIds, setAssistantHighlightTopicIds] = useState<
+    ReadonlySet<string> | null
+  >(null);
 
-  const openPalette = useCallback(() => setOpen(true), []);
+  const openPalette = useCallback(() => {
+    setAssistantHighlightTopicIds(null);
+    setOpen(true);
+  }, []);
+
+  const openPaletteFromAssistant = useCallback((topicIds: string[]) => {
+    const next = topicIds.filter(Boolean);
+    setAssistantHighlightTopicIds(next.length > 0 ? new Set(next) : null);
+    setOpen(true);
+  }, []);
+
   const closePalette = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    if (!open) {
+      setAssistantHighlightTopicIds(null);
+    }
+  }, [open]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -116,6 +150,7 @@ export function HelpPaletteProvider({ children }: { children: ReactNode }) {
       if (!(e.ctrlKey || e.metaKey) || e.key !== "/") return;
       if (isTypingShortcutTarget(e.target)) return;
       e.preventDefault();
+      setAssistantHighlightTopicIds(null);
       setOpen(true);
     };
     window.addEventListener("keydown", onKeyDown);
@@ -125,8 +160,15 @@ export function HelpPaletteProvider({ children }: { children: ReactNode }) {
   const model = useMemo(() => getHelpPaletteModel(pathname), [pathname]);
 
   const ctx = useMemo(
-    () => ({ open, setOpen, openPalette, closePalette }),
-    [open, openPalette, closePalette]
+    () => ({
+      open,
+      setOpen,
+      openPalette,
+      closePalette,
+      assistantHighlightTopicIds,
+      openPaletteFromAssistant,
+    }),
+    [open, openPalette, closePalette, assistantHighlightTopicIds, openPaletteFromAssistant]
   );
 
   return (
@@ -139,6 +181,7 @@ export function HelpPaletteProvider({ children }: { children: ReactNode }) {
           data-help-palette-schema-version={model.paletteSchema}
           data-help-retrieval-schema-version={model.retrievalSchema}
           data-product-help-context={model.context}
+          data-assistant-bridge-version="2x.1"
         >
           <DialogHeader className="border-b border-border bg-muted/20 px-5 py-4 text-left">
             <div className="flex items-start gap-3">
@@ -151,7 +194,7 @@ export function HelpPaletteProvider({ children }: { children: ReactNode }) {
                 </DialogTitle>
                 <DialogDescription className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                   Read-only links to canonical Resources and trust pages — not a
-                  chat assistant.                   Press{" "}
+                  chat assistant. Press{" "}
                   <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono text-[10px] text-foreground">
                     Ctrl or ⌘ + /
                   </kbd>{" "}
@@ -176,21 +219,43 @@ export function HelpPaletteProvider({ children }: { children: ReactNode }) {
                 </span>
               )}
             </p>
+            {assistantHighlightTopicIds && assistantHighlightTopicIds.size > 0 ? (
+              <p
+                className="mt-2 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2 text-[11px] leading-relaxed text-foreground"
+                data-assistant-palette-bridge="true"
+              >
+                Topics from your last{" "}
+                <span className="font-medium">Carasta Assistant</span> reply are highlighted
+                below when they match a canonical help row.
+              </p>
+            ) : null}
           </DialogHeader>
 
           <div className="space-y-5 px-5 py-4">
             <PaletteSection eyebrow="Suggested for this page">
-              <PaletteLinkList links={model.primary} tier="primary" />
+              <PaletteLinkList
+                links={model.primary}
+                tier="primary"
+                highlightTopicIds={assistantHighlightTopicIds}
+              />
             </PaletteSection>
 
             {model.related.length > 0 ? (
               <PaletteSection eyebrow="Suggested next">
-                <PaletteLinkList links={model.related} tier="related" />
+                <PaletteLinkList
+                  links={model.related}
+                  tier="related"
+                  highlightTopicIds={assistantHighlightTopicIds}
+                />
               </PaletteSection>
             ) : null}
 
             <PaletteSection eyebrow="Always useful">
-              <PaletteLinkList links={model.globalPins} tier="global" />
+              <PaletteLinkList
+                links={model.globalPins}
+                tier="global"
+                highlightTopicIds={assistantHighlightTopicIds}
+              />
             </PaletteSection>
 
             <div className="flex items-center gap-2 rounded-xl border border-border/80 bg-muted/15 px-3 py-2 text-[11px] text-muted-foreground">

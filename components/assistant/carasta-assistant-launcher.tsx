@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Bot, ExternalLink, Loader2, MessageCircleQuestion, Sparkles } from "lucide-react";
+import {
+  Bot,
+  ExternalLink,
+  Library,
+  Loader2,
+  MessageCircleQuestion,
+  Sparkles,
+} from "lucide-react";
 
 import {
   Dialog,
@@ -12,26 +19,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-
-type AssistantReply = {
-  answer: string;
-  confidence: "high" | "medium" | "low";
-  shouldEscalate: boolean;
-  fallbackReason?: string;
-  recommendedRoutes?: Array<{
-    label: string;
-    href: string;
-    reason: string;
-  }>;
-  suggestedQuestions: string[];
-  citations: Array<{
-    sourceId: string;
-    title: string;
-    href: string;
-    heading?: string;
-    category?: string;
-  }>;
-};
+import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
+import type { AssistantAnswer } from "@/lib/assistant/assistant-types";
+import { collectAssistantPaletteTopicIds } from "@/lib/help/assistant-palette-bridge";
 
 const EXAMPLE_PROMPTS = [
   "What is Carasta?",
@@ -41,10 +31,11 @@ const EXAMPLE_PROMPTS = [
 ];
 
 export function CarastaAssistantLauncher() {
+  const { openPaletteFromAssistant } = useHelpPalette();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
-  const [reply, setReply] = useState<AssistantReply | null>(null);
+  const [reply, setReply] = useState<AssistantAnswer | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const capabilityCopy = useMemo(
@@ -70,7 +61,7 @@ export function CarastaAssistantLauncher() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: prompt }),
       });
-      const data = (await res.json()) as AssistantReply & { message?: string };
+      const data = (await res.json()) as AssistantAnswer & { message?: string };
       if (!res.ok) {
         throw new Error(data.message ?? "Assistant request failed.");
       }
@@ -195,6 +186,37 @@ export function CarastaAssistantLauncher() {
                 ) : null}
                 <div className="mt-4 whitespace-pre-wrap text-sm leading-7 text-neutral-700">
                   {reply.answer}
+                </div>
+                <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/[0.06] p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-start gap-2.5">
+                      <Library className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                      <div>
+                        <p className="text-sm font-semibold text-neutral-950">
+                          View in Quick help
+                        </p>
+                        <p className="mt-1 text-xs leading-relaxed text-neutral-600">
+                          Opens the same read-only palette as{" "}
+                          <kbd className="rounded border border-neutral-200 bg-white px-1 py-0.5 font-mono text-[10px] text-neutral-800">
+                            Ctrl or ⌘ + /
+                          </kbd>
+                          . Matching canonical rows from this reply are highlighted.
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="shrink-0 border-primary/30 bg-white hover:bg-primary/5"
+                      onClick={() => {
+                        const topicIds = collectAssistantPaletteTopicIds(reply);
+                        openPaletteFromAssistant(topicIds);
+                        setOpen(false);
+                      }}
+                    >
+                      Open Quick help
+                    </Button>
+                  </div>
                 </div>
               </div>
 

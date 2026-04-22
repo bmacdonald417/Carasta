@@ -17,10 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BookOpen } from "lucide-react";
-import {
-  HelpPaletteProvider,
-  useHelpPalette,
-} from "@/components/help/HelpPaletteProvider";
+import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
 import { cn } from "@/lib/utils";
 import {
   shellHeaderAppActive,
@@ -58,7 +55,7 @@ const footerProductLinks = [
   { href: "/sell", label: "Sell" },
 ];
 
-function CarastaChrome({ children }: { children: React.ReactNode }) {
+export function CarastaLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const { openPalette } = useHelpPalette();
@@ -444,13 +441,5 @@ function CarastaChrome({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
     </div>
-  );
-}
-
-export function CarastaLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <HelpPaletteProvider>
-      <CarastaChrome>{children}</CarastaChrome>
-    </HelpPaletteProvider>
   );
 }
