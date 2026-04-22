@@ -172,7 +172,7 @@ export default async function MarketingPage({
   return (
     <SellerWorkspaceShell>
       <div className="carasta-container max-w-7xl py-8 md:py-10">
-        <section className="rounded-[2rem] border border-[hsl(var(--seller-border))] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(240,244,255,0.96))] p-6 shadow-[0_24px_70px_-34px_hsl(var(--seller-shadow)/0.35)] md:p-8">
+        <section className="rounded-2xl border border-border bg-card bg-gradient-to-br from-card via-card to-info-soft/35 p-6 shadow-e1 md:p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-3">
@@ -182,7 +182,7 @@ export default async function MarketingPage({
                   tone={overview.liveAuctions > 0 ? "success" : "neutral"}
                 />
               </div>
-              <h1 className="mt-4 font-display text-3xl font-semibold tracking-[0.02em] text-[hsl(var(--seller-foreground))] md:text-4xl">
+              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[hsl(var(--seller-foreground))] md:text-4xl">
                 Marketing command center
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-[hsl(var(--seller-muted))]">
@@ -194,13 +194,13 @@ export default async function MarketingPage({
               <div className="mt-5 flex flex-wrap gap-3 text-sm">
                 <Link
                   href={`/u/${user.handle}`}
-                  className="inline-flex items-center gap-2 font-semibold text-[hsl(var(--seller-info-foreground))] transition hover:opacity-85"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Back to profile
                 </Link>
                 <Link
                   href="/settings"
-                  className="inline-flex items-center gap-2 font-semibold text-[hsl(var(--seller-info-foreground))] transition hover:opacity-85"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Settings → Email
                 </Link>
@@ -216,7 +216,7 @@ export default async function MarketingPage({
                   content. Nothing auto-posts.
                 </p>
               </div>
-              <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--seller-muted))]">
                   Default preset
                 </p>
@@ -328,7 +328,7 @@ export default async function MarketingPage({
             }
           >
             {recentCampaigns.length === 0 ? (
-              <div className="rounded-[1.5rem] border border-dashed border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-5 py-12 text-center">
+              <div className="rounded-2xl border border-dashed border-border bg-muted/30 px-5 py-12 text-center">
                 <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100">
                   <Target className="h-5 w-5 text-slate-600" aria-hidden />
                 </div>
@@ -345,7 +345,7 @@ export default async function MarketingPage({
                 </Button>
               </div>
             ) : (
-              <div className="overflow-hidden rounded-[1.5rem] border border-[hsl(var(--seller-border))]">
+              <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr className="border-b border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] text-xs font-medium uppercase tracking-[0.16em] text-[hsl(var(--seller-muted))]">
@@ -356,7 +356,7 @@ export default async function MarketingPage({
                       <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[hsl(var(--seller-border))] bg-white">
+                  <tbody className="divide-y divide-border bg-card">
                     {recentCampaigns.map((c) => (
                       <tr key={c.id} className="text-[hsl(var(--seller-foreground))]">
                         <td className="px-4 py-3 font-medium">{c.name}</td>
@@ -406,7 +406,7 @@ export default async function MarketingPage({
                 {recentCampaignActivity.map((campaign) => (
                   <li
                     key={campaign.id}
-                    className="rounded-[1.25rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-4"
+                    className="rounded-xl border border-border bg-muted/40 p-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0">
@@ -453,7 +453,7 @@ export default async function MarketingPage({
           className="mt-8"
         >
           {rows.length === 0 ? (
-            <div className="rounded-[1.5rem] border border-dashed border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-6 py-14 text-center">
+            <div className="rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-14 text-center">
               <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100">
                 <Gavel className="h-5 w-5 text-slate-600" aria-hidden />
               </div>
@@ -485,9 +485,9 @@ export default async function MarketingPage({
                 return (
                   <article
                     key={a.id}
-                    className="overflow-hidden rounded-[1.75rem] border border-[hsl(var(--seller-border))] bg-white shadow-[0_22px_54px_-34px_hsl(var(--seller-shadow)/0.32)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_70px_-34px_hsl(var(--seller-shadow)/0.36)]"
+                    className="overflow-hidden rounded-2xl border border-border bg-card shadow-e1 transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-e2"
                   >
-                    <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
+                    <div className="relative aspect-video w-full overflow-hidden bg-muted">
                       <Image
                         src={
                           a.imageUrl ??
@@ -507,7 +507,7 @@ export default async function MarketingPage({
                       <p className="text-xs text-[hsl(var(--seller-muted))]">
                         {a.year} {a.make} {a.model}
                       </p>
-                      <h3 className="mt-1 font-display text-xl font-semibold tracking-[0.02em] text-[hsl(var(--seller-foreground))] line-clamp-1">
+                      <h3 className="mt-1 line-clamp-1 text-xl font-semibold tracking-tight text-[hsl(var(--seller-foreground))]">
                         {a.title}
                       </h3>
                       <div className="mt-4 grid gap-3 sm:grid-cols-3">

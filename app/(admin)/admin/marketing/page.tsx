@@ -49,18 +49,18 @@ function WindowStatsPanel({
     },
   ];
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0a0a0f]/60 p-4">
-      <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-[#ff3b5c]/90">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-e1">
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
       </h4>
       <dl className="mt-3 space-y-2 text-sm">
         {rows.map(({ label, value }) => (
           <div
             key={label}
-            className="flex items-baseline justify-between gap-4 border-b border-white/5 pb-2 last:border-0 last:pb-0"
+            className="flex items-baseline justify-between gap-4 border-b border-border pb-2 last:border-0 last:pb-0"
           >
-            <dt className="text-neutral-500">{label}</dt>
-            <dd className="tabular-nums text-foreground">{value}</dd>
+            <dt className="text-muted-foreground">{label}</dt>
+            <dd className="tabular-nums font-medium text-foreground">{value}</dd>
           </div>
         ))}
       </dl>
@@ -125,26 +125,26 @@ export default async function AdminMarketingPage() {
   ];
 
   return (
-    <div className="carasta-container max-w-6xl py-8">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <div className="carasta-container max-w-6xl py-8 md:py-10">
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
         <div className="min-w-0 flex-1">
           <Link
             href="/admin"
-            className="text-sm text-neutral-500 transition hover:text-neutral-300"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             ← Admin home
           </Link>
-          <h2 className="mt-3 font-display text-xl font-semibold uppercase tracking-wider text-foreground">
+          <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             Marketing summary
-          </h2>
-          <p className="mt-1 text-sm text-neutral-500">
-            Read-only platform aggregates — TrafficEvent, rollups, campaigns, and
-            marketing notifications.
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Read-only platform aggregates — TrafficEvent, rollups, campaigns, and marketing
+            notifications.
           </p>
           {!s.marketingFeatureEnabled ? (
-            <p className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200/90">
-              <strong className="font-medium">MARKETING_ENABLED</strong> is off —
-              seller UI is hidden; historical rows may still exist below.
+            <p className="mt-4 rounded-lg border border-caution/30 bg-caution-soft px-3 py-2 text-xs text-caution-foreground">
+              <strong className="font-medium">MARKETING_ENABLED</strong> is off — seller UI is
+              hidden; historical rows may still exist below.
             </p>
           ) : null}
         </div>
@@ -184,24 +184,23 @@ export default async function AdminMarketingPage() {
       </div>
 
       <section
-        className="mb-10 rounded-xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm"
+        className="mb-10 rounded-xl border border-border bg-card p-6 shadow-e1"
         aria-labelledby="recent-activity-heading"
       >
         <div className="mb-4 flex items-center gap-3">
-          <div className="rounded-lg bg-[#CCFF00]/15 p-2">
-            <CalendarRange className="h-5 w-5 text-[#CCFF00]" />
+          <div className="rounded-lg bg-primary/10 p-2 text-primary">
+            <CalendarRange className="h-5 w-5" />
           </div>
           <div>
-            <h3
+            <h2
               id="recent-activity-heading"
-              className="font-display text-sm font-semibold uppercase tracking-wider text-foreground"
+              className="text-sm font-semibold text-foreground"
             >
               Recent activity
-            </h3>
-            <p className="text-xs text-neutral-500">
-              Rolling windows from server time — TrafficEvent, campaign
-              timestamps, and marketing notification{" "}
-              <code className="text-neutral-400">createdAt</code>.
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Rolling windows from server time — TrafficEvent, campaign timestamps, and marketing
+              notification <code className="rounded bg-muted px-1 py-0.5 text-foreground">createdAt</code>.
             </p>
           </div>
         </div>
@@ -211,48 +210,44 @@ export default async function AdminMarketingPage() {
         </div>
       </section>
 
-      <h3 className="mb-4 font-display text-sm font-semibold uppercase tracking-wider text-neutral-300">
-        All-time platform totals
-      </h3>
+      <h2 className="mb-4 text-lg font-semibold text-foreground">All-time platform totals</h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpi.map(({ label, value, icon: Icon, hint }) => (
           <div
             key={label}
-            className="rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+            className="rounded-xl border border-border bg-card p-5 shadow-e1"
           >
             <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-[#ff3b5c]/20 p-2">
-                <Icon className="h-5 w-5 text-[#ff3b5c]" />
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                <Icon className="h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm text-neutral-500">{label}</p>
-                <p className="text-xl font-semibold text-foreground">{value}</p>
+                <p className="text-sm text-muted-foreground">{label}</p>
+                <p className="text-xl font-semibold tabular-nums text-foreground">{value}</p>
               </div>
             </div>
             {hint ? (
-              <p className="mt-2 text-xs text-neutral-500">{hint}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{hint}</p>
             ) : null}
           </div>
         ))}
       </div>
 
-      <h3 className="mt-10 mb-4 font-display text-sm font-semibold uppercase tracking-wider text-neutral-300">
-        Last 7 days — leaders
-      </h3>
+      <h2 className="mb-4 mt-10 text-lg font-semibold text-foreground">Last 7 days — leaders</h2>
       <div className="grid gap-8 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-xl border border-white/10">
-          <div className="border-b border-white/10 bg-white/5 px-4 py-3">
-            <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-200">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-e1">
+          <div className="border-b border-border bg-muted/40 px-4 py-3">
+            <h3 className="text-sm font-semibold text-foreground">
               Top listings (last 7 days)
             </h3>
-            <p className="mt-0.5 text-xs text-neutral-500">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               TrafficEvent counts in the rolling 7-day window only.
             </p>
           </div>
           <div className="max-h-[22rem] overflow-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-neutral-500">
+                <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2">Listing</th>
                   <th className="px-3 py-2">Seller</th>
                   <th className="px-3 py-2 text-right">Events</th>
@@ -262,34 +257,34 @@ export default async function AdminMarketingPage() {
                   <th className="px-3 py-2 text-right">Ext ref</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-border">
                 {s.topAuctionsLast7Days.length === 0 ? (
                   <tr>
                     <td
                       colSpan={7}
-                      className="px-4 py-8 text-center text-neutral-500"
+                      className="px-4 py-8 text-center text-muted-foreground"
                     >
                       No traffic in the last 7 days.
                     </td>
                   </tr>
                 ) : (
                   s.topAuctionsLast7Days.map((a) => (
-                    <tr key={a.auctionId} className="text-neutral-300">
+                    <tr key={a.auctionId} className="text-foreground">
                       <td className="max-w-[140px] px-3 py-2">
                         <Link
                           href={`/auctions/${a.auctionId}`}
-                          className="line-clamp-2 font-medium text-[#ff3b5c] hover:underline"
+                          className="line-clamp-2 font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           {a.title}
                         </Link>
-                        <span className="mt-0.5 block text-xs text-neutral-500">
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
                           {a.status}
                         </span>
                       </td>
                       <td className="px-3 py-2">
                         <Link
                           href={`/u/${a.sellerHandle}`}
-                          className="text-[#ff3b5c]/90 hover:underline"
+                          className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           @{a.sellerHandle}
                         </Link>
@@ -317,40 +312,40 @@ export default async function AdminMarketingPage() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-white/10">
-          <div className="border-b border-white/10 bg-white/5 px-4 py-3">
-            <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-200">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-e1">
+          <div className="border-b border-border bg-muted/40 px-4 py-3">
+            <h3 className="text-sm font-semibold text-foreground">
               Top sellers (last 7 days)
             </h3>
-            <p className="mt-0.5 text-xs text-neutral-500">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               TrafficEvent rows across all listings, 7-day window.
             </p>
           </div>
           <div className="max-h-[22rem] overflow-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-neutral-500">
+                <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2">Seller</th>
                   <th className="px-3 py-2 text-right">Events</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-border">
                 {s.topSellersLast7Days.length === 0 ? (
                   <tr>
                     <td
                       colSpan={2}
-                      className="px-4 py-8 text-center text-neutral-500"
+                      className="px-4 py-8 text-center text-muted-foreground"
                     >
                       No data.
                     </td>
                   </tr>
                 ) : (
                   s.topSellersLast7Days.map((r) => (
-                    <tr key={r.sellerId} className="text-neutral-300">
+                    <tr key={r.sellerId} className="text-foreground">
                       <td className="px-3 py-2">
                         <Link
                           href={`/u/${r.handle}`}
-                          className="font-medium text-[#ff3b5c]/90 hover:underline"
+                          className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           @{r.handle}
                         </Link>
@@ -367,23 +362,21 @@ export default async function AdminMarketingPage() {
         </div>
       </div>
 
-      <h3 className="mt-12 font-display text-sm font-semibold uppercase tracking-wider text-neutral-300">
-        All-time leaders
-      </h3>
+      <h2 className="mt-12 text-lg font-semibold text-foreground">All-time leaders</h2>
       <div className="mt-4 grid gap-8 lg:grid-cols-2">
-        <div className="overflow-hidden rounded-xl border border-white/10">
-          <div className="border-b border-white/10 bg-white/5 px-4 py-3">
-            <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-200">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-e1">
+          <div className="border-b border-border bg-muted/40 px-4 py-3">
+            <h3 className="text-sm font-semibold text-foreground">
               Top listings by event volume
             </h3>
-            <p className="mt-0.5 text-xs text-neutral-500">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               Ranked by total TrafficEvent rows per auction (lifetime).
             </p>
           </div>
           <div className="max-h-[28rem] overflow-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-neutral-500">
+                <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2">Listing</th>
                   <th className="px-3 py-2">Seller</th>
                   <th className="px-3 py-2 text-right">Events</th>
@@ -393,34 +386,34 @@ export default async function AdminMarketingPage() {
                   <th className="px-3 py-2 text-right">Ext ref</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-border">
                 {s.topAuctions.length === 0 ? (
                   <tr>
                     <td
                       colSpan={7}
-                      className="px-4 py-8 text-center text-neutral-500"
+                      className="px-4 py-8 text-center text-muted-foreground"
                     >
                       No traffic events yet.
                     </td>
                   </tr>
                 ) : (
                   s.topAuctions.map((a) => (
-                    <tr key={a.auctionId} className="text-neutral-300">
+                    <tr key={a.auctionId} className="text-foreground">
                       <td className="max-w-[160px] px-3 py-2">
                         <Link
                           href={`/auctions/${a.auctionId}`}
-                          className="line-clamp-2 font-medium text-[#ff3b5c] hover:underline"
+                          className="line-clamp-2 font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           {a.title}
                         </Link>
-                        <span className="mt-0.5 block text-xs text-neutral-500">
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
                           {a.status}
                         </span>
                       </td>
                       <td className="px-3 py-2">
                         <Link
                           href={`/u/${a.sellerHandle}`}
-                          className="text-[#ff3b5c]/90 hover:underline"
+                          className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           @{a.sellerHandle}
                         </Link>
@@ -448,40 +441,40 @@ export default async function AdminMarketingPage() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-white/10">
-          <div className="border-b border-white/10 bg-white/5 px-4 py-3">
-            <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-200">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-e1">
+          <div className="border-b border-border bg-muted/40 px-4 py-3">
+            <h3 className="text-sm font-semibold text-foreground">
               Top sellers by event volume
             </h3>
-            <p className="mt-0.5 text-xs text-neutral-500">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               Aggregated TrafficEvent counts across all listings (lifetime).
             </p>
           </div>
           <div className="max-h-[28rem] overflow-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-neutral-500">
+                <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2">Seller</th>
                   <th className="px-3 py-2 text-right">Events</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-border">
                 {s.topSellers.length === 0 ? (
                   <tr>
                     <td
                       colSpan={2}
-                      className="px-4 py-8 text-center text-neutral-500"
+                      className="px-4 py-8 text-center text-muted-foreground"
                     >
                       No data.
                     </td>
                   </tr>
                 ) : (
                   s.topSellers.map((r) => (
-                    <tr key={r.sellerId} className="text-neutral-300">
+                    <tr key={r.sellerId} className="text-foreground">
                       <td className="px-3 py-2">
                         <Link
                           href={`/u/${r.handle}`}
-                          className="font-medium text-[#ff3b5c]/90 hover:underline"
+                          className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           @{r.handle}
                         </Link>
@@ -498,20 +491,20 @@ export default async function AdminMarketingPage() {
         </div>
       </div>
 
-      <div className="mt-10 overflow-hidden rounded-xl border border-white/10">
-        <div className="border-b border-white/10 bg-white/5 px-4 py-3">
-          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-200">
+      <div className="mt-10 overflow-hidden rounded-xl border border-border bg-card shadow-e1">
+        <div className="border-b border-border bg-muted/40 px-4 py-3">
+          <h3 className="text-sm font-semibold text-foreground">
             Recent campaign updates
           </h3>
-          <p className="mt-0.5 text-xs text-neutral-500">
-            Newest by <code className="text-neutral-400">updatedAt</code> (all
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Newest by <code className="rounded bg-muted px-1 py-0.5 text-foreground">updatedAt</code> (all
             sellers).
           </p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-neutral-500">
+              <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="px-4 py-2">Campaign</th>
                 <th className="px-4 py-2">Seller</th>
                 <th className="px-4 py-2">Listing</th>
@@ -520,39 +513,39 @@ export default async function AdminMarketingPage() {
                 <th className="px-4 py-2">Updated</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border">
               {s.recentCampaigns.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-4 py-8 text-center text-neutral-500"
+                    className="px-4 py-8 text-center text-muted-foreground"
                   >
                     No campaigns.
                   </td>
                 </tr>
               ) : (
                 s.recentCampaigns.map((c) => (
-                  <tr key={c.id} className="text-neutral-300">
-                    <td className="px-4 py-3 font-medium text-neutral-200">
+                  <tr key={c.id} className="text-foreground">
+                    <td className="px-4 py-3 font-medium">
                       {c.name}
                     </td>
                     <td className="px-4 py-3">
                       <Link
                         href={`/u/${c.sellerHandle}`}
-                        className="text-neutral-400 hover:text-neutral-200"
+                        className="text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         @{c.sellerHandle}
                       </Link>
                     </td>
-                    <td className="max-w-[180px] truncate px-4 py-3 text-neutral-500">
+                    <td className="max-w-[180px] truncate px-4 py-3 text-muted-foreground">
                       <Link
                         href={`/auctions/${c.auctionId}`}
-                        className="hover:text-[#ff3b5c]/90 hover:underline"
+                        className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         {c.auctionTitle}
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-neutral-400">
+                    <td className="px-4 py-3 text-muted-foreground">
                       {campaignTypeLabel(c.type)}
                     </td>
                     <td className="px-4 py-3">
@@ -560,7 +553,7 @@ export default async function AdminMarketingPage() {
                         status={c.status as MarketingCampaignStatus}
                       />
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-xs text-neutral-500">
+                    <td className="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground">
                       {c.updatedAt.toISOString().slice(0, 16).replace("T", " ")}
                     </td>
                   </tr>
@@ -571,9 +564,9 @@ export default async function AdminMarketingPage() {
         </div>
       </div>
 
-      <p className="mt-8 text-xs text-neutral-600">
-        Links go to public listing and profile pages only. Seller marketing
-        tools remain owner-only — no impersonation from this dashboard.
+      <p className="mt-8 text-xs text-muted-foreground">
+        Links go to public listing and profile pages only. Seller marketing tools remain owner-only —
+        no impersonation from this dashboard.
       </p>
     </div>
   );

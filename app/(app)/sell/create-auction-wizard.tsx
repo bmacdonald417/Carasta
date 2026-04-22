@@ -271,16 +271,22 @@ export function CreateAuctionWizard({
   }
 
   const cardClass =
-    "rounded-2xl border border-white/10 bg-black/40 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.05)] backdrop-blur-xl";
+    "rounded-2xl border border-border bg-card p-6 shadow-e1 md:p-8";
 
   return (
-    <div className={`space-y-4 ${className ?? ""}`}>
-      <div className="flex gap-2">
+    <div className={`space-y-6 ${className ?? ""}`}>
+      <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+        <span className="font-medium tabular-nums text-foreground">
+          Step {step} of {TOTAL_STEPS}
+        </span>
+        <span className="hidden sm:inline">Save a draft anytime — nothing publishes until you finish.</span>
+      </div>
+      <div className="flex gap-2" aria-hidden>
         {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
           <div
             key={i}
             className={`h-1 flex-1 rounded-full transition-colors ${
-              i + 1 <= step ? "bg-[#ff3b5c]/60" : "bg-white/10"
+              i + 1 <= step ? "bg-primary" : "bg-muted"
             }`}
           />
         ))}
@@ -289,7 +295,7 @@ export function CreateAuctionWizard({
       <div className={cardClass}>
         {step === 1 && (
           <div className="space-y-4">
-            <h2 className="font-display text-lg font-semibold">Vehicle basics</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">Vehicle basics</h2>
             <div>
               <div className="flex items-center justify-between gap-2">
                 <Label htmlFor="title">Title</Label>
@@ -427,7 +433,7 @@ export function CreateAuctionWizard({
 
         {step === 2 && (
           <div className="space-y-4">
-            <h2 className="font-display text-lg font-semibold">Pricing</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">Pricing</h2>
             <div>
               <Label htmlFor="reserve">Reserve price $ (optional, hidden)</Label>
               <Input
@@ -478,7 +484,7 @@ export function CreateAuctionWizard({
 
         {step === 3 && (
           <div className="space-y-4">
-            <h2 className="font-display text-lg font-semibold">Media</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">Media</h2>
             <div>
               <Label htmlFor="imageUrls">Image URLs (one per line or comma-separated)</Label>
               <Textarea
@@ -505,7 +511,7 @@ export function CreateAuctionWizard({
 
         {step === 4 && (
           <div className="space-y-4">
-            <h2 className="font-display text-lg font-semibold">Condition report</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">Condition report</h2>
             <div>
               <Label htmlFor="conditionGrade">Condition grade</Label>
               <Select
@@ -676,7 +682,7 @@ export function CreateAuctionWizard({
                 {form.damageImages.map((d) => (
                   <div
                     key={d.id}
-                    className="flex gap-2 rounded-lg border border-white/10 bg-white/5 p-3"
+                    className="flex gap-2 rounded-lg border border-border bg-muted/40 p-3"
                   >
                     <Input
                       placeholder="Label (e.g. Door scratch)"
@@ -721,7 +727,7 @@ export function CreateAuctionWizard({
 
         {step === 5 && (
           <div className="space-y-4">
-            <h2 className="font-display text-lg font-semibold">Review</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">Review</h2>
             <div className="grid gap-8 sm:grid-cols-2">
               <div className="space-y-2 text-sm">
                 <p className="font-medium text-muted-foreground">Vehicle</p>
@@ -767,7 +773,7 @@ export function CreateAuctionWizard({
                   !form.model.trim()
                 }
                 className="flex-1"
-                variant="performance"
+                variant="default"
               >
                 {loading ? "Creating…" : "Create auction"}
               </Button>

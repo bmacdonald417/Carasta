@@ -318,18 +318,18 @@ export default async function MarketingAuctionDetailPage({
         elementId="marketing-share-promote"
         active={scrollSharePromoteIntoView}
       />
-      <section className="rounded-[2rem] border border-[hsl(var(--seller-border))] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(240,244,255,0.96))] p-6 shadow-[0_24px_70px_-34px_hsl(var(--seller-shadow)/0.35)] md:p-8">
+      <section className="rounded-2xl border border-border bg-card bg-gradient-to-br from-card via-card to-info-soft/35 p-6 shadow-e1 md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="min-w-0 flex-1">
             <Link
               href={`/u/${user.handle}/marketing`}
-              className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[hsl(var(--seller-info-foreground))] transition hover:opacity-85"
+              className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Marketing
             </Link>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="font-display text-3xl font-semibold tracking-[0.02em] text-[hsl(var(--seller-foreground))] md:text-4xl">
+              <h1 className="text-3xl font-semibold tracking-tight text-[hsl(var(--seller-foreground))] md:text-4xl">
                 {auction.title}
               </h1>
               <SellerStatusBadge label={auction.status} tone={statusTone} />
@@ -363,7 +363,7 @@ export default async function MarketingAuctionDetailPage({
             </div>
           </div>
           <div className="grid min-w-[280px] gap-3">
-            <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-white p-4">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--seller-muted))]">
                 Auction state
               </p>

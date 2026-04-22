@@ -12,9 +12,9 @@ const toneMap: Record<
   }
 > = {
   neutral: {
-    badge: "border-slate-200 bg-white text-slate-700",
-    iconWrap: "bg-slate-100 text-slate-700",
-    panelBorder: "border-[hsl(var(--seller-border))]",
+    badge: "border-border bg-muted/60 text-foreground",
+    iconWrap: "bg-muted text-foreground",
+    panelBorder: "border-border",
   },
   info: {
     badge:
@@ -96,11 +96,11 @@ export function SellerSectionPanel({
   return (
     <section
       id={id}
-      className={`rounded-[1.75rem] border bg-[hsl(var(--seller-panel))] p-6 shadow-[0_20px_50px_-28px_hsl(var(--seller-shadow)/0.35)] ${toneMap[tone].panelBorder} ${className}`}
+      className={`rounded-2xl border bg-card p-6 shadow-e1 md:p-7 ${toneMap[tone].panelBorder} ${className}`}
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-3xl">
-          <h2 className="font-display text-xl font-semibold tracking-[0.02em] text-[hsl(var(--seller-foreground))]">
+          <h2 className="text-lg font-semibold tracking-tight text-[hsl(var(--seller-foreground))] md:text-xl">
             {title}
           </h2>
           {description ? (
@@ -130,7 +130,7 @@ export function SellerKpiCard({
   tone?: SellerTone;
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel))] p-5 shadow-[0_18px_38px_-28px_hsl(var(--seller-shadow)/0.28)]">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-e1">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-medium text-[hsl(var(--seller-muted))]">{label}</p>
@@ -170,7 +170,7 @@ export function SellerInsightCard({
 }) {
   return (
     <div
-      className={`rounded-[1.5rem] border bg-[hsl(var(--seller-panel))] p-5 shadow-[0_18px_38px_-28px_hsl(var(--seller-shadow)/0.28)] ${toneMap[tone].panelBorder}`}
+      className={`rounded-2xl border bg-card p-5 shadow-e1 ${toneMap[tone].panelBorder}`}
     >
       <div className="flex items-start gap-4">
         <div
@@ -202,7 +202,7 @@ export function SellerInsightCard({
           {ctaLabel && ctaHref ? (
             <a
               href={ctaHref}
-              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[hsl(var(--seller-info-foreground))] transition hover:opacity-85"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {ctaLabel}
               <ArrowRight className="h-4 w-4" />
@@ -234,7 +234,7 @@ export function SellerMicroBar({
           : "bg-[hsl(var(--seller-info))]";
 
   return (
-    <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+    <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-muted">
       <div
         className={`h-full rounded-full transition-[width] ${fill}`}
         style={{ width: `${pct}%` }}
