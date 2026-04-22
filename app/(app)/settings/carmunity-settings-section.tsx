@@ -4,8 +4,21 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import type { CarmunityInterestPrefs, OnboardingSpaceOption } from "@/lib/carmunity/onboarding-service";
+import type {
+  CarmunityInterestPrefs,
+  OnboardingSpaceOption,
+} from "@/lib/carmunity/onboarding-service";
+import { shellFocusRing } from "@/lib/shell-nav-styles";
+import { cn } from "@/lib/utils";
 
 export function CarmunitySettingsSection({
   spaces,
@@ -108,109 +121,117 @@ export function CarmunitySettingsSection({
     }
   }
 
+  const chipBase =
+    "rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline-none";
+
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-transparent to-transparent p-[1px]">
-        <div className="rounded-2xl border border-white/5 bg-[#0c0c10]/80 p-6 backdrop-blur-sm">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
-                Carmunity
+    <Card>
+      <CardHeader className="space-y-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 space-y-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-primary">
+              Carmunity
+            </p>
+            <CardTitle className="text-lg">{"Interests & discovery"}</CardTitle>
+            <CardDescription className="max-w-prose text-pretty">
+              Gears and Lower Gears power discovery and recommendations. Updates apply on your
+              next navigation — Discussions and Explore pick them up automatically.
+            </CardDescription>
+            {!onboardingCompleted ? (
+              <p
+                className={cn(
+                  "rounded-lg border border-caution/30 bg-caution-soft/25 px-3 py-2 text-sm",
+                  "text-caution-foreground"
+                )}
+              >
+                Finish onboarding on{" "}
+                <span className="font-medium text-foreground">Explore</span> to unlock the full
+                feed experience.
               </p>
-              <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-foreground">
-                Interests & discovery
-              </h2>
-              <p className="mt-1 max-w-prose text-sm text-muted-foreground">
-                Gears and Lower Gears power discovery and recommendations. Updates apply on your next
-                navigation — Discussions and Explore pick them up automatically.
-              </p>
-              {!onboardingCompleted ? (
-                <p className="mt-2 text-xs text-amber-200/90">
-                  Finish onboarding on{" "}
-                  <span className="font-medium text-foreground">Explore</span> to unlock the full feed
-                  experience.
-                </p>
-              ) : null}
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={busy}
-              onClick={revisitOnboarding}
-              className="shrink-0 border-primary/35 bg-primary/5 text-xs font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
-            >
-              Revisit onboarding
-            </Button>
+            ) : null}
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={busy}
+            onClick={revisitOnboarding}
+            className="shrink-0 text-xs font-medium"
+          >
+            Revisit onboarding
+          </Button>
+        </div>
+      </CardHeader>
 
-          <div className="mt-6 space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Gears</p>
-            <div className="flex flex-wrap gap-2">
-              {spaces.map((s) => {
-                const on = gearSlugs.has(s.slug);
-                return (
-                  <button
-                    key={s.slug}
-                    type="button"
-                    onClick={() => toggleGear(s.slug)}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition ${
-                      on
-                        ? "border-primary/60 bg-primary/15 text-primary"
-                        : "border-border/60 bg-muted/10 text-muted-foreground hover:border-primary/35 hover:text-neutral-200"
-                    }`}
-                  >
-                    {s.title}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {selectedSpaces.length > 0 ? (
-            <div className="mt-6 space-y-4 rounded-xl border border-border/40 bg-muted/5 p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
-                Lower Gears (optional)
-              </p>
-              {selectedSpaces.map((s) => (
-                <div key={s.slug} className="space-y-2">
-                  <p className="text-xs font-medium text-neutral-200">{s.title}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {s.categories.map((c) => {
-                      const on = lowerCats.some((x) => x.spaceSlug === s.slug && x.slug === c.slug);
-                      return (
-                        <button
-                          key={`${s.slug}:${c.slug}`}
-                          type="button"
-                          onClick={() => toggleLower(s.slug, c.slug)}
-                          className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition ${
-                            on
-                              ? "border-primary/50 bg-primary/10 text-primary"
-                              : "border-border/50 text-muted-foreground hover:border-primary/30"
-                          }`}
-                        >
-                          {c.title}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button
-              type="button"
-              disabled={busy}
-              onClick={savePrefs}
-              className="bg-primary/90 text-[#0a0a0f] hover:bg-primary"
-            >
-              {busy ? "Saving…" : "Save Carmunity interests"}
-            </Button>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Gears
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {spaces.map((s) => {
+              const on = gearSlugs.has(s.slug);
+              return (
+                <button
+                  key={s.slug}
+                  type="button"
+                  onClick={() => toggleGear(s.slug)}
+                  className={cn(
+                    chipBase,
+                    shellFocusRing,
+                    on
+                      ? "border-primary/50 bg-primary/15 text-primary"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/35 hover:bg-muted/40 hover:text-foreground"
+                  )}
+                >
+                  {s.title}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
-    </div>
+
+        {selectedSpaces.length > 0 ? (
+          <div className="space-y-4 rounded-xl border border-border bg-muted/20 p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Lower gears (optional)
+            </p>
+            {selectedSpaces.map((s) => (
+              <div key={s.slug} className="space-y-2">
+                <p className="text-xs font-semibold text-foreground">{s.title}</p>
+                <div className="flex flex-wrap gap-2">
+                  {s.categories.map((c) => {
+                    const on = lowerCats.some((x) => x.spaceSlug === s.slug && x.slug === c.slug);
+                    return (
+                      <button
+                        key={`${s.slug}:${c.slug}`}
+                        type="button"
+                        onClick={() => toggleLower(s.slug, c.slug)}
+                        className={cn(
+                          "rounded-lg border px-2.5 py-1 text-[11px] font-medium transition",
+                          "focus-visible:outline-none",
+                          shellFocusRing,
+                          on
+                            ? "border-primary/50 bg-primary/10 text-primary"
+                            : "border-border bg-background text-muted-foreground hover:border-primary/35 hover:text-foreground"
+                        )}
+                      >
+                        {c.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </CardContent>
+
+      <CardFooter className="flex flex-wrap gap-3 border-t border-border pt-6">
+        <Button type="button" disabled={busy} onClick={savePrefs} variant="default">
+          {busy ? "Saving…" : "Save Carmunity interests"}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

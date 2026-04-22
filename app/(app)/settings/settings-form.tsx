@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Facebook, Instagram, Music2, Twitter } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { updateProfile } from "./actions";
 import { useToast } from "@/components/ui/use-toast";
-import { Instagram, Facebook, Twitter, Music2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+import { updateProfile } from "./actions";
 
 export function SettingsForm({
   handle,
@@ -71,52 +74,41 @@ export function SettingsForm({
     }
   }
 
+  const socialIconClass = "h-5 w-5 shrink-0 text-muted-foreground";
+
   return (
-    <form onSubmit={submit} className="mt-6 space-y-4">
-      <div>
-        <Label className="text-neutral-300">Handle</Label>
-        <Input
-          value={handle}
-          disabled
-          className="mt-1 border-white/10 bg-white/5 text-neutral-400"
-        />
-        <p className="text-xs text-neutral-500">Handle cannot be changed.</p>
+    <form onSubmit={submit} className="space-y-6">
+      <div className="space-y-1.5">
+        <Label htmlFor="settings-handle" className="text-foreground">
+          Handle
+        </Label>
+        <Input id="settings-handle" value={handle} disabled readOnly />
+        <p className="text-xs text-muted-foreground">Handle cannot be changed.</p>
       </div>
-      <div>
-        <Label htmlFor="name" className="text-neutral-300">
+
+      <div className="space-y-1.5">
+        <Label htmlFor="name" className="text-foreground">
           Display name
         </Label>
-        <Input
-          id="name"
-          value={n}
-          onChange={(e) => setN(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-foreground"
-        />
+        <Input id="name" value={n} onChange={(e) => setN(e.target.value)} />
       </div>
-      <div>
-        <Label htmlFor="bio" className="text-neutral-300">
+
+      <div className="space-y-1.5">
+        <Label htmlFor="bio" className="text-foreground">
           Bio
         </Label>
-        <Textarea
-          id="bio"
-          value={b}
-          onChange={(e) => setB(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-foreground"
-        />
+        <Textarea id="bio" value={b} onChange={(e) => setB(e.target.value)} rows={4} />
       </div>
-      <div>
-        <Label htmlFor="location" className="text-neutral-300">
+
+      <div className="space-y-1.5">
+        <Label htmlFor="location" className="text-foreground">
           Location
         </Label>
-        <Input
-          id="location"
-          value={loc}
-          onChange={(e) => setLoc(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-foreground"
-        />
+        <Input id="location" value={loc} onChange={(e) => setLoc(e.target.value)} />
       </div>
-      <div>
-        <Label htmlFor="avatarUrl" className="text-neutral-300">
+
+      <div className="space-y-1.5">
+        <Label htmlFor="avatarUrl" className="text-foreground">
           Avatar URL
         </Label>
         <Input
@@ -124,84 +116,90 @@ export function SettingsForm({
           type="url"
           value={avatar}
           onChange={(e) => setAvatar(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-foreground"
+          placeholder="https://…"
         />
       </div>
 
-      {/* Connected Accounts */}
-      <div className="border-t border-white/10 pt-6">
-        <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-200">
-          Connected Accounts
-        </h3>
-        <p className="mt-1 text-xs text-neutral-500">
-          Add your social profile URLs. They will appear on your public profile.
-        </p>
-        <div className="mt-4 space-y-3">
+      <div className="space-y-4 border-t border-border pt-6">
+        <div>
+          <h3 className="text-sm font-semibold tracking-tight text-foreground">
+            Connected accounts
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Social profile URLs appear on your public profile when set.
+          </p>
+        </div>
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <Instagram className="h-5 w-5 shrink-0 text-pink-500" />
+            <Instagram className={socialIconClass} aria-hidden />
             <Input
               placeholder="https://instagram.com/username"
               value={ig}
               onChange={(e) => setIg(e.target.value)}
-              className="border-white/10 bg-white/5 text-foreground"
+              aria-label="Instagram URL"
             />
           </div>
           <div className="flex items-center gap-3">
-            <Facebook className="h-5 w-5 shrink-0 text-blue-500" />
+            <Facebook className={socialIconClass} aria-hidden />
             <Input
               placeholder="https://facebook.com/username"
               value={fb}
               onChange={(e) => setFb(e.target.value)}
-              className="border-white/10 bg-white/5 text-foreground"
+              aria-label="Facebook URL"
             />
           </div>
           <div className="flex items-center gap-3">
-            <Twitter className="h-5 w-5 shrink-0 text-sky-400" />
+            <Twitter className={socialIconClass} aria-hidden />
             <Input
               placeholder="https://x.com/username"
               value={tw}
               onChange={(e) => setTw(e.target.value)}
-              className="border-white/10 bg-white/5 text-foreground"
+              aria-label="X (Twitter) URL"
             />
           </div>
           <div className="flex items-center gap-3">
-            <Music2 className="h-5 w-5 shrink-0 text-foreground" />
+            <Music2 className={socialIconClass} aria-hidden />
             <Input
               placeholder="https://tiktok.com/@username"
               value={tk}
               onChange={(e) => setTk(e.target.value)}
-              className="border-white/10 bg-white/5 text-foreground"
+              aria-label="TikTok URL"
             />
           </div>
         </div>
       </div>
 
-      <div className="border-t border-white/10 pt-6">
-        <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-neutral-200">
-          Email
-        </h3>
-        <p className="mt-1 text-xs text-neutral-500">
-          Weekly summary of your marketing metrics and alerts. Sent only when an
-          admin runs the digest job (not instant). Requires email provider setup
-          — see docs.
-        </p>
-        <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm text-neutral-300">
+      <div className="space-y-4 border-t border-border pt-6">
+        <div>
+          <h3 className="text-sm font-semibold tracking-tight text-foreground">Email</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Weekly summary of marketing metrics and alerts. Sent only when an admin runs
+            the digest job (not instant). Requires email provider setup — see docs.
+          </p>
+        </div>
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-muted/20 p-4 text-sm text-foreground transition hover:bg-muted/30">
           <input
             type="checkbox"
             checked={digest}
             onChange={(e) => setDigest(e.target.checked)}
-            className="mt-1 rounded border-white/20 bg-black/40"
+            className={cn(
+              "mt-0.5 size-4 shrink-0 rounded border border-input bg-background",
+              "text-primary accent-primary",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            )}
           />
-          <span>
-            Send me a <strong className="text-neutral-200">weekly</strong>{" "}
-            marketing digest at <span className="text-neutral-200">{accountEmail}</span>
+          <span className="text-muted-foreground">
+            Send me a <span className="font-medium text-foreground">weekly</span> marketing
+            digest at <span className="font-medium text-foreground">{accountEmail}</span>
           </span>
         </label>
       </div>
 
-      <Button type="submit" disabled={loading} variant="default">
-        {loading ? "Saving…" : "Save"}
-      </Button>
+      <div className="pt-2">
+        <Button type="submit" disabled={loading} variant="default">
+          {loading ? "Saving…" : "Save profile"}
+        </Button>
+      </div>
     </form>
   );
 }

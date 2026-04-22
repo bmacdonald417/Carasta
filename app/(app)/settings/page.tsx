@@ -5,6 +5,13 @@ import {
   getCarmunityOnboardingState,
   listOnboardingSpaceOptions,
 } from "@/lib/carmunity/onboarding-service";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { CarmunitySettingsSection } from "./carmunity-settings-section";
 import { SettingsForm } from "./settings-form";
 
@@ -36,36 +43,46 @@ export default async function SettingsPage() {
   ]);
 
   return (
-    <div className="carasta-container max-w-xl py-8">
-      <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-foreground">
-        Settings
-      </h1>
-      <p className="mt-1 text-neutral-400">
-        Update your profile, bio, and social links.
-      </p>
-      <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-        <SettingsForm
-          handle={user.handle}
-          accountEmail={user.email}
-          name={user.name ?? ""}
-          bio={user.bio ?? ""}
-          location={user.location ?? ""}
-          avatarUrl={user.avatarUrl ?? ""}
-          instagramUrl={user.instagramUrl ?? ""}
-          facebookUrl={user.facebookUrl ?? ""}
-          twitterUrl={user.twitterUrl ?? ""}
-          tiktokUrl={user.tiktokUrl ?? ""}
-          weeklyMarketingDigestOptIn={user.weeklyMarketingDigestOptIn}
-        />
-      </div>
+    <div className="carasta-container max-w-xl space-y-8 py-8">
+      <header className="border-b border-border pb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          Settings
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage your profile, connected links, email preferences, and Carmunity
+          discovery.
+        </p>
+      </header>
 
-      <div className="mt-8">
-        <CarmunitySettingsSection
-          spaces={carmunitySpaces}
-          initialPrefs={carmunityState.prefs}
-          onboardingCompleted={Boolean(carmunityState.completedAt)}
-        />
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile</CardTitle>
+          <CardDescription>
+            This information appears on your public profile where applicable.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SettingsForm
+            handle={user.handle}
+            accountEmail={user.email}
+            name={user.name ?? ""}
+            bio={user.bio ?? ""}
+            location={user.location ?? ""}
+            avatarUrl={user.avatarUrl ?? ""}
+            instagramUrl={user.instagramUrl ?? ""}
+            facebookUrl={user.facebookUrl ?? ""}
+            twitterUrl={user.twitterUrl ?? ""}
+            tiktokUrl={user.tiktokUrl ?? ""}
+            weeklyMarketingDigestOptIn={user.weeklyMarketingDigestOptIn}
+          />
+        </CardContent>
+      </Card>
+
+      <CarmunitySettingsSection
+        spaces={carmunitySpaces}
+        initialPrefs={carmunityState.prefs}
+        onboardingCompleted={Boolean(carmunityState.completedAt)}
+      />
     </div>
   );
 }
