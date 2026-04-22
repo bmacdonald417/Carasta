@@ -47,16 +47,16 @@ export default function WhyCarastaPage() {
   ]);
 
   return (
-    <section className="min-h-screen bg-[linear-gradient(180deg,#fafaf7_0%,#ffffff_100%)] px-4 py-12 md:py-20">
+    <section className="min-h-screen bg-background px-4 py-12 md:py-20">
       <div className="carasta-container max-w-5xl">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
             Why Carasta
           </p>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-neutral-950 md:text-5xl">
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
             A stronger enthusiast platform starts with identity, not just inventory.
           </h1>
-          <p className="mt-5 text-base leading-7 text-neutral-600 md:text-lg">
+          <p className="mt-5 text-base leading-7 text-muted-foreground md:text-lg">
             Carasta is intentionally evolving into a product that reads
             Carmunity-first, marketplace-proven, and seller-intelligent. The
             point is not to hide the auctions. It is to make the full platform
@@ -68,42 +68,42 @@ export default function WhyCarastaPage() {
           {reasons.map(({ title, description, icon: Icon }) => (
             <div
               key={title}
-              className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm"
+              className="rounded-2xl border border-border bg-card p-6 shadow-e1"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-neutral-950 text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
                 <Icon className="h-5 w-5" />
               </div>
-              <h2 className="mt-5 text-2xl font-semibold text-neutral-950">
+              <h2 className="mt-5 text-2xl font-semibold text-foreground">
                 {title}
               </h2>
-              <p className="mt-3 text-sm leading-6 text-neutral-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {description}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 rounded-[2rem] border border-neutral-200 bg-neutral-950 p-8 text-white shadow-sm">
+        <div className="mt-12 rounded-2xl border border-border bg-foreground p-8 text-background shadow-e1 md:p-10">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+              <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
                 Marketplace-proven
               </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight">
+              <h2 className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">
                 The auction layer matters more when it supports a broader product.
               </h2>
-              <p className="mt-4 text-base leading-7 text-neutral-300">
+              <p className="mt-4 text-base leading-7 text-background/75">
                 Live auctions, bids, reserve context, and seller identity are a
                 real proof layer. They validate the platform after Carasta has
                 already explained what it is.
               </p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <div className="rounded-2xl border border-background/15 bg-background/10 p-6 backdrop-blur-sm">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-primary">
+                <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-background/15 text-primary">
                   <Gavel className="h-5 w-5" />
                 </div>
-                <p className="text-sm leading-6 text-neutral-200">
+                <p className="text-sm leading-6 text-background/80">
                   The marketplace is still central to the product. It just no
                   longer needs to dominate the first impression to prove it is
                   real.
@@ -113,14 +113,14 @@ export default function WhyCarastaPage() {
           </div>
         </div>
 
-        <section className="mt-12 rounded-[2rem] border border-neutral-200 bg-neutral-50 p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+        <section className="mt-12 rounded-2xl border border-border bg-muted/30 p-8 shadow-e1">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
             Learn the system
           </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-neutral-950">
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             The public content layer now explains the product in operational terms, not only marketing terms.
           </h2>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-neutral-600">
+          <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">
             If this page explains the positioning, the guides below explain the
             mechanics, concepts, and trust model that support it.
           </p>
@@ -132,13 +132,13 @@ export default function WhyCarastaPage() {
         <div className="mt-12 flex flex-wrap gap-3">
           <Link
             href="/"
-            className="inline-flex items-center rounded-2xl bg-neutral-950 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
+            className="inline-flex items-center rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Back to homepage
           </Link>
           <Link
             href="/resources"
-            className="inline-flex items-center rounded-2xl border border-neutral-300 bg-white px-6 py-3.5 text-sm font-semibold text-neutral-900 transition hover:border-neutral-400 hover:bg-neutral-50"
+            className="inline-flex items-center rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/25 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Visit resources
           </Link>

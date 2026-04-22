@@ -13,11 +13,11 @@ function EventIcon({ type }: { type: ActivityEvent["type"] }) {
     case "new_bid":
       return <Gavel className="h-3.5 w-3.5 text-primary" />;
     case "new_comment":
-      return <MessageSquare className="h-3.5 w-3.5 text-sky-600" />;
+      return <MessageSquare className="h-3.5 w-3.5 text-info-foreground" />;
     case "ending_soon":
-      return <Clock className="h-3.5 w-3.5 text-amber-600" />;
+      return <Clock className="h-3.5 w-3.5 text-caution-foreground" />;
     default:
-      return <Gavel className="h-3.5 w-3.5 text-neutral-500" />;
+      return <Gavel className="h-3.5 w-3.5 text-muted-foreground" />;
   }
 }
 
@@ -40,7 +40,7 @@ function EventLink({ event }: { event: ActivityEvent }) {
   return (
     <Link
       href={href}
-      className="line-clamp-1 text-sm text-neutral-800 transition-colors hover:text-primary"
+      className="line-clamp-1 text-sm text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       {title}
     </Link>
@@ -117,13 +117,13 @@ export function LiveActivityFeed() {
   }, [mounted, addEvent]);
 
   return (
-    <div className="rounded-[1.75rem] border border-neutral-200 bg-white py-4 shadow-sm">
-      <h3 className="px-4 font-display text-xs font-semibold uppercase tracking-wider text-neutral-500">
+    <div className="rounded-2xl border border-border bg-card py-4 shadow-sm">
+      <h3 className="px-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Live Activity
       </h3>
       <div className="mt-3 max-h-[280px] overflow-y-auto">
         {events.length === 0 ? (
-          <p className="px-4 py-6 text-center text-sm text-neutral-500">
+          <p className="px-4 py-6 text-center text-sm text-muted-foreground">
             No recent activity yet.
           </p>
         ) : (
@@ -136,15 +136,15 @@ export function LiveActivityFeed() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="flex items-start gap-3 border-b border-neutral-100 px-4 py-2.5 last:border-0 hover:bg-neutral-50"
+                  className="flex items-start gap-3 border-b border-border px-4 py-2.5 last:border-0 hover:bg-muted/40"
                 >
                   <EventIcon type={event.type} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-muted-foreground">
                       <EventLabel event={event} />
                     </p>
                     <EventLink event={event} />
-                    <p className="mt-0.5 text-xs text-neutral-500">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                       {formatTime(event.timestamp)}
                     </p>
                   </div>

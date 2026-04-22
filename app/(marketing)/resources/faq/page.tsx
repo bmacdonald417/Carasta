@@ -79,12 +79,12 @@ export default function ResourcesFaqPage() {
           {faqs.map(({ question, answer }) => (
             <div
               key={question}
-              className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm"
+              className="rounded-2xl border border-border bg-card p-6 shadow-e1"
             >
-              <h2 className="text-xl font-semibold text-neutral-950">
+              <h2 className="text-xl font-semibold text-foreground">
                 {question}
               </h2>
-              <p className="mt-3 text-sm leading-6 text-neutral-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {answer}
               </p>
             </div>

@@ -11,22 +11,22 @@ export const metadata: Metadata = {
 
 export default function CommunityGuidelinesPage() {
   return (
-    <section className="bg-[linear-gradient(180deg,#fafaf7_0%,#ffffff_100%)] px-4 py-16 md:py-24">
+    <section className="bg-background px-4 py-16 md:py-24">
       <div className="carasta-container max-w-3xl space-y-8">
         <LegalDraftBanner />
         <header className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
             Community Guidelines
           </p>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-neutral-950 md:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
             Community Guidelines
           </h1>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             Last updated: April 21, 2026 (draft structure)
           </p>
         </header>
 
-        <div className="space-y-8 text-neutral-600">
+        <div className="space-y-8 text-muted-foreground">
           <p>
             Carasta needs community standards that are understandable now, even
             while the final legal and policy drafting is still evolving. These
@@ -34,8 +34,8 @@ export default function CommunityGuidelinesPage() {
             Carmunity, Discussions, and direct user interaction.
           </p>
 
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               1. Be respectful
             </h2>
             <p className="mt-2 text-sm leading-relaxed">
@@ -44,8 +44,8 @@ export default function CommunityGuidelinesPage() {
               or targeted abuse.
             </p>
           </section>
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               2. Safety &amp; lawful behavior
             </h2>
             <p className="mt-2 text-sm leading-relaxed">
@@ -54,8 +54,8 @@ export default function CommunityGuidelinesPage() {
               encouraging dangerous conduct.
             </p>
           </section>
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               3. Authenticity &amp; spam
             </h2>
             <p className="mt-2 text-sm leading-relaxed">
@@ -64,8 +64,8 @@ export default function CommunityGuidelinesPage() {
               commercial behavior where disclosure is appropriate.
             </p>
           </section>
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               4. Marketplace and direct interaction
             </h2>
             <p className="mt-2 text-sm leading-relaxed">
@@ -74,8 +74,8 @@ export default function CommunityGuidelinesPage() {
               for honesty, clarity, and user judgment.
             </p>
           </section>
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               5. Moderation &amp; appeals
             </h2>
             <p className="mt-2 text-sm leading-relaxed">
@@ -87,14 +87,14 @@ export default function CommunityGuidelinesPage() {
           </section>
         </div>
 
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           Questions?{" "}
           <Link href="/contact" className="text-primary hover:underline">
             Contact us
           </Link>
           .
         </p>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           For the broader trust layer, visit{" "}
           <Link href="/resources/trust-and-safety" className="text-primary hover:underline">
             Trust &amp; Safety

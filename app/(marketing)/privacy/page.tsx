@@ -11,23 +11,23 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <section className="bg-[linear-gradient(180deg,#fafaf7_0%,#ffffff_100%)] px-4 py-16 md:py-24">
+    <section className="bg-background px-4 py-16 md:py-24">
       <div className="carasta-container max-w-3xl space-y-10">
         <LegalDraftBanner />
 
         <header className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
             Privacy policy
           </p>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-neutral-950 md:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
             Privacy Policy
           </h1>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             Last updated: April 21, 2026 (draft structure)
           </p>
         </header>
 
-        <div className="space-y-8 text-sm leading-relaxed text-neutral-600">
+        <div className="space-y-8 text-sm leading-relaxed text-muted-foreground">
           <p>
             This page is not final legal text, but it now explains the current
             privacy structure more clearly. Carasta needs a public statement of
@@ -35,8 +35,8 @@ export default function PrivacyPage() {
             about them while the final policy is still under review.
           </p>
 
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               1. What kinds of data exist on Carasta
             </h2>
             <p className="mt-2">
@@ -46,8 +46,8 @@ export default function PrivacyPage() {
               will define these categories more formally.
             </p>
           </section>
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               2. Why that data may be used
             </h2>
             <p>
@@ -57,8 +57,8 @@ export default function PrivacyPage() {
               uses and any applicable legal bases.
             </p>
           </section>
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               3. What users should understand about public and private areas
             </h2>
             <p className="mt-2">
@@ -68,8 +68,8 @@ export default function PrivacyPage() {
               Users should not assume that every surface behaves the same way.
             </p>
           </section>
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               4. Processors, analytics, and infrastructure
             </h2>
             <p className="mt-2">
@@ -79,8 +79,8 @@ export default function PrivacyPage() {
               operations may involve supporting providers.
             </p>
           </section>
-          <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="font-display text-lg font-semibold text-neutral-950">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-e1">
+            <h2 className="text-lg font-semibold text-foreground">
               5. Rights, questions, and future finalization
             </h2>
             <p className="mt-2">

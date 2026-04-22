@@ -11,6 +11,7 @@ import { formatCurrency } from "@/lib/utils";
 import { CountdownTimer } from "@/components/auction/CountdownTimer";
 import { ReserveMeter } from "@/components/auction/ReserveMeter";
 import { computeReserveMetPercent } from "@/lib/auction-metrics";
+import { Badge } from "@/components/ui/badge";
 
 type FeaturedAuction = {
   id: string;
@@ -65,18 +66,18 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
 
   if (auctions.length === 0) {
     return (
-      <section className="relative min-h-[70vh] bg-neutral-100">
-        <div className="flex min-h-[70vh] items-center justify-center">
+      <section className="relative min-h-[50vh] bg-background">
+        <div className="flex min-h-[50vh] items-center justify-center px-4">
           <div className="text-center">
-            <h1 className="font-display text-4xl font-semibold tracking-tight text-neutral-900 md:text-5xl lg:text-6xl">
-              Built by Enthusiasts, for Enthusiasts.
-            </h1>
-            <p className="mt-4 text-lg text-neutral-600">
+            <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+              Built by enthusiasts, for enthusiasts.
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
               No live auctions yet. Check back soon.
             </p>
             <Link
               href="/auctions"
-              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-6 py-3 font-medium text-white transition hover:bg-neutral-800"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Browse Auctions
               <Gavel className="h-4 w-4" />
@@ -88,7 +89,7 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
   }
 
   return (
-    <section className="relative min-h-[70vh] overflow-hidden bg-neutral-950">
+    <section className="relative min-h-[70vh] overflow-hidden bg-foreground">
       {/* Carousel */}
       <div className="embla overflow-hidden" ref={emblaRef}>
         <div className="embla__container flex">
@@ -128,11 +129,17 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
                         transition={{ duration: 0.5 }}
                         className="max-w-2xl"
                       >
-                        <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-red-500/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white">
-                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+                        <Badge
+                          variant="default"
+                          className="mb-2 gap-1.5 border-0 bg-primary/95 uppercase tracking-wide text-primary-foreground shadow-md backdrop-blur-sm"
+                        >
+                          <span
+                            className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary-foreground/90 motion-reduce:animate-none animate-pulse"
+                            aria-hidden
+                          />
                           Live
-                        </span>
-                        <h2 className="font-display text-3xl font-semibold text-white md:text-4xl lg:text-5xl">
+                        </Badge>
+                        <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl lg:text-5xl">
                           {auction.year} {auction.make} {auction.model}
                         </h2>
                         <p className="mt-1 text-lg text-white/90">
@@ -173,7 +180,7 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
 
                         <div className="mt-6 flex flex-col gap-3">
                           <span
-                            className="inline-flex w-fit items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-neutral-900 transition hover:bg-neutral-100"
+                            className="inline-flex w-fit items-center gap-2 rounded-xl bg-background px-6 py-3 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-background/90"
                           >
                             {requireAuth ? "Sign up to bid" : "Quick Bid"}
                             <Gavel className="h-4 w-4" />
@@ -224,14 +231,14 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
         <>
           <button
             onClick={scrollPrev}
-            className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition hover:bg-white/30 md:left-6"
+            className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/20 bg-background/10 p-2 text-background backdrop-blur-md transition hover:border-white/30 hover:bg-background/20 md:left-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
           <button
             onClick={scrollNext}
-            className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition hover:bg-white/30 md:right-6"
+            className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/20 bg-background/10 p-2 text-background backdrop-blur-md transition hover:border-white/30 hover:bg-background/20 md:right-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-label="Next slide"
           >
             <ChevronRight className="h-6 w-6" />
@@ -245,8 +252,8 @@ export function ShowroomHero({ auctions, requireAuth = false }: { auctions: Feat
                 onClick={() => emblaApi?.scrollTo(i)}
                 className={`h-2 rounded-full transition ${
                   i === selectedIndex
-                    ? "w-8 bg-white"
-                    : "w-2 bg-white/50 hover:bg-white/70"
+                    ? "w-8 bg-background shadow-sm"
+                    : "w-2 bg-background/45 hover:bg-background/70"
                 }`}
                 aria-label={`Go to slide ${i + 1}`}
               />

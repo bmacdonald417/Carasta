@@ -21,13 +21,13 @@ export function ResourceCardGrid({
         <Link
           key={href}
           href={href}
-          className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md"
+          className="rounded-2xl border border-border bg-card p-6 shadow-e1 transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-neutral-950 text-white">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Icon className="h-5 w-5" />
           </div>
-          <h2 className="mt-5 text-xl font-semibold text-neutral-950">{title}</h2>
-          <p className="mt-3 text-sm leading-6 text-neutral-600">{description}</p>
+          <h2 className="mt-5 text-xl font-semibold text-foreground">{title}</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">{description}</p>
         </Link>
       ))}
     </div>

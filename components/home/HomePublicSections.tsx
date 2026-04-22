@@ -140,13 +140,13 @@ function SectionHeading({
 }) {
   return (
     <div className={centered ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
-      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+      <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
         {eyebrow}
       </p>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-neutral-950 md:text-4xl">
+      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
         {title}
       </h2>
-      <p className="mt-4 text-base leading-7 text-neutral-600 md:text-lg">
+      <p className="mt-4 text-base leading-7 text-muted-foreground md:text-lg">
         {description}
       </p>
     </div>
@@ -155,17 +155,17 @@ function SectionHeading({
 
 export function CarmunityHero() {
   return (
-    <section className="border-b border-border/60 bg-[linear-gradient(180deg,#fafaf7_0%,#f5f0e6_100%)]">
+    <section className="border-b border-border bg-gradient-to-b from-background via-background to-muted/25">
       <div className="carasta-container py-14 md:py-20">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] lg:items-center">
           <div>
-            <p className="inline-flex items-center rounded-full border border-neutral-300 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.26em] text-neutral-700 shadow-sm">
+            <p className="inline-flex items-center rounded-full border border-border bg-card px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground shadow-sm">
               Carmunity-first. Marketplace-proven. Seller-intelligent.
             </p>
-            <h1 className="mt-6 max-w-4xl font-display text-4xl font-semibold tracking-tight text-neutral-950 md:text-5xl lg:text-6xl">
+            <h1 className="mt-6 max-w-4xl text-4xl font-semibold tracking-tight text-foreground md:text-5xl lg:text-6xl">
               The automotive platform for people who want more than a transaction.
             </h1>
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-neutral-700">
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">
               Carasta brings Carmunity, Discussions, Messages, profiles, and
               Garage identity together with transparent live auctions and smarter
               seller tools. It is built for enthusiasts who want the social side
@@ -174,71 +174,71 @@ export function CarmunityHero() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href={joinCarmunityHref}
-                className="inline-flex items-center gap-2 rounded-2xl bg-neutral-950 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
+                className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Join Carmunity
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/discussions"
-                className="inline-flex items-center gap-2 rounded-2xl border border-neutral-300 bg-white px-6 py-3.5 text-sm font-semibold text-neutral-900 transition hover:border-neutral-400 hover:bg-neutral-50"
+                className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground shadow-sm transition-colors hover:border-primary/30 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Explore Discussions
               </Link>
               <Link
                 href="/auctions"
-                className="inline-flex items-center gap-2 rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-neutral-700 transition hover:text-neutral-950"
+                className="inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Browse Live Auctions
               </Link>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-neutral-200 bg-white/85 p-6 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-e1 md:p-7">
             <div className="grid gap-4">
-              <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">
+              <div className="rounded-2xl border border-border bg-muted/40 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   What Carasta is
                 </p>
-                <p className="mt-3 text-base leading-7 text-neutral-700">
+                <p className="mt-3 text-base leading-7 text-foreground">
                   A social automotive platform where enthusiast identity, live
                   marketplace activity, and seller confidence reinforce each
                   other instead of living on separate islands.
                 </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-neutral-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-neutral-900">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                  <p className="text-sm font-semibold text-foreground">
                     Social-first core
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-neutral-600">
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     Carmunity, Discussions, Messages, profiles, and Garage
                     identity shape the first impression.
                   </p>
                 </div>
-                <div className="rounded-2xl border border-neutral-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-neutral-900">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                  <p className="text-sm font-semibold text-foreground">
                     Marketplace proof
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-neutral-600">
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     Real auctions and active listings validate the broader
                     product story rather than replacing it.
                   </p>
                 </div>
-                <div className="rounded-2xl border border-neutral-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-neutral-900">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                  <p className="text-sm font-semibold text-foreground">
                     Seller intelligence
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-neutral-600">
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     Marketing workflows and AI-assisted tools support stronger
                     listings without overpromising.
                   </p>
                 </div>
-                <div className="rounded-2xl border border-neutral-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-neutral-900">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                  <p className="text-sm font-semibold text-foreground">
                     Built for enthusiasts
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-neutral-600">
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     The product is designed to be useful before, during, and
                     after the sale.
                   </p>
@@ -254,7 +254,7 @@ export function CarmunityHero() {
 
 export function ProductPillarsSection() {
   return (
-    <section className="border-b border-border/60 bg-neutral-50 py-16 md:py-20">
+    <section className="border-b border-border bg-muted/30 py-16 md:py-20">
       <div className="carasta-container">
         <SectionHeading
           eyebrow="Platform pillars"
@@ -266,18 +266,18 @@ export function ProductPillarsSection() {
             <Link
               key={title}
               href={href}
-              className="group rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md"
+              className="group rounded-2xl border border-border bg-card p-5 shadow-e1 transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-neutral-950 text-white shadow-sm">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
                 <Icon className="h-5 w-5" />
               </div>
-              <h3 className="mt-5 text-lg font-semibold text-neutral-950">
+              <h3 className="mt-5 text-lg font-semibold text-foreground">
                 {title}
               </h3>
-              <p className="mt-3 text-sm leading-6 text-neutral-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {description}
               </p>
-              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-neutral-900">
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary">
                 Explore
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
@@ -291,7 +291,7 @@ export function ProductPillarsSection() {
 
 export function WhyCarastaSection() {
   return (
-    <section className="border-b border-border/60 bg-[linear-gradient(180deg,#ffffff_0%,#f7f7f6_100%)] py-16 md:py-20">
+    <section className="border-b border-border bg-background py-16 md:py-20">
       <div className="carasta-container">
         <SectionHeading
           eyebrow="Why Carasta"
@@ -302,15 +302,15 @@ export function WhyCarastaSection() {
           {differentiationCards.map(({ title, description, icon: Icon }) => (
             <div
               key={title}
-              className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm"
+              className="rounded-2xl border border-border bg-card p-6 shadow-e1"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" />
               </div>
-              <h3 className="mt-5 text-xl font-semibold text-neutral-950">
+              <h3 className="mt-5 text-xl font-semibold text-foreground">
                 {title}
               </h3>
-              <p className="mt-3 text-sm leading-6 text-neutral-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {description}
               </p>
             </div>
@@ -319,7 +319,7 @@ export function WhyCarastaSection() {
         <div className="mt-8">
           <Link
             href="/why-carasta"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-900 transition hover:text-primary"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Read why Carasta is different
             <ArrowRight className="h-4 w-4" />
@@ -332,17 +332,17 @@ export function WhyCarastaSection() {
 
 export function SellerIntelligenceSection() {
   return (
-    <section className="border-b border-border/60 bg-neutral-950 py-16 text-white md:py-20">
+    <section className="border-b border-border bg-muted/40 py-16 md:py-20">
       <div className="carasta-container">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] lg:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
               Seller tools
             </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl">
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
               Seller support that goes beyond posting a listing.
             </h2>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-neutral-300 md:text-lg">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
               Carasta is building toward a stronger seller workspace with
               marketing support, promotion planning, analytics, and AI-assisted
               drafting. This phase keeps that story at teaser level, but it
@@ -352,13 +352,13 @@ export function SellerIntelligenceSection() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/sell"
-                className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-neutral-950 transition hover:bg-neutral-100"
+                className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 See seller tools
               </Link>
               <Link
                 href={joinCarmunityHref}
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card px-6 py-3.5 text-sm font-semibold text-foreground shadow-sm transition-colors hover:border-primary/30 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Start selling
               </Link>
@@ -372,13 +372,13 @@ export function SellerIntelligenceSection() {
             ].map((item) => (
               <div
                 key={item}
-                className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur"
+                className="rounded-2xl border border-border bg-card p-5 shadow-sm"
               >
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10 text-primary">
+                  <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                     <Sparkles className="h-4 w-4" />
                   </div>
-                  <p className="text-sm leading-6 text-neutral-200">{item}</p>
+                  <p className="text-sm leading-6 text-foreground">{item}</p>
                 </div>
               </div>
             ))}
@@ -391,7 +391,7 @@ export function SellerIntelligenceSection() {
 
 export function HowItWorksSnapshot() {
   return (
-    <section className="border-b border-border/60 bg-neutral-50 py-16 md:py-20">
+    <section className="border-b border-border bg-muted/30 py-16 md:py-20">
       <div className="carasta-container">
         <SectionHeading
           eyebrow="How it works"
@@ -402,13 +402,13 @@ export function HowItWorksSnapshot() {
           {howItWorksSteps.map((step, index) => (
             <div
               key={step.title}
-              className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm"
+              className="rounded-2xl border border-border bg-card p-5 shadow-e1"
             >
               <p className="text-sm font-semibold text-primary">0{index + 1}</p>
-              <h3 className="mt-4 text-lg font-semibold text-neutral-950">
+              <h3 className="mt-4 text-lg font-semibold text-foreground">
                 {step.title}
               </h3>
-              <p className="mt-3 text-sm leading-6 text-neutral-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {step.description}
               </p>
             </div>
@@ -417,7 +417,7 @@ export function HowItWorksSnapshot() {
         <div className="mt-8">
           <Link
             href="/how-it-works"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-900 transition hover:text-primary"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Read the full How It Works guide
             <ArrowRight className="h-4 w-4" />
@@ -430,7 +430,7 @@ export function HowItWorksSnapshot() {
 
 export function TrustResourcesBand() {
   return (
-    <section className="bg-[linear-gradient(180deg,#fff7ec_0%,#ffffff_100%)] py-16 md:py-20">
+    <section className="border-t border-border bg-gradient-to-b from-info-soft/25 via-background to-background py-16 md:py-20">
       <div className="carasta-container">
         <SectionHeading
           eyebrow="Support + trust"
@@ -443,18 +443,18 @@ export function TrustResourcesBand() {
             <Link
               key={title}
               href={href}
-              className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md"
+              className="rounded-2xl border border-border bg-card p-6 shadow-e1 transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-neutral-950 text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" />
               </div>
-              <h3 className="mt-5 text-xl font-semibold text-neutral-950">
+              <h3 className="mt-5 text-xl font-semibold text-foreground">
                 {title}
               </h3>
-              <p className="mt-3 text-sm leading-6 text-neutral-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {description}
               </p>
-              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-neutral-900">
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary">
                 Open
                 <ArrowRight className="h-4 w-4" />
               </span>
@@ -464,7 +464,7 @@ export function TrustResourcesBand() {
         <div className="mt-8 text-center">
           <Link
             href={joinCarmunityHref}
-            className="inline-flex items-center gap-2 rounded-2xl bg-neutral-950 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
+            className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Join Carmunity
             <ArrowRight className="h-4 w-4" />

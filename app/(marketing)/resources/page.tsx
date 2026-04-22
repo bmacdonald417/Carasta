@@ -11,16 +11,16 @@ export const metadata: Metadata = {
 
 export default function ResourcesPage() {
   return (
-    <section className="min-h-screen bg-[linear-gradient(180deg,#fafaf7_0%,#ffffff_100%)] px-4 py-12 md:py-20">
+    <section className="min-h-screen bg-background px-4 py-12 md:py-20">
       <div className="carasta-container max-w-6xl">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
             Resources
           </p>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight text-neutral-950 md:text-5xl">
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
             A real public knowledge layer for how Carasta works.
           </h1>
-          <p className="mt-5 text-base leading-7 text-neutral-600 md:text-lg">
+          <p className="mt-5 text-base leading-7 text-muted-foreground md:text-lg">
             Use these guides to understand the platform, learn the product
             vocabulary, find support, and see where trust, moderation, privacy,
             and auction basics fit into the current public experience.
@@ -31,10 +31,10 @@ export default function ResourcesPage() {
           {resourceSections.map((section) => (
             <section key={section.title}>
               <div className="max-w-3xl">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary/80">
+                <p className="text-sm font-semibold uppercase tracking-wide text-primary/90">
                   {section.title}
                 </p>
-                <p className="mt-3 text-base leading-7 text-neutral-600">
+                <p className="mt-3 text-base leading-7 text-muted-foreground">
                   {section.description}
                 </p>
               </div>

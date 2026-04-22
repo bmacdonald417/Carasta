@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 type AuctionThumb = {
   id: string;
@@ -21,36 +22,43 @@ export function AuctionImageStrip({
   const duplicated = [...auctions, ...auctions];
 
   return (
-    <section className="overflow-hidden border-b border-white/10 bg-black/30 py-6">
-      <div className="flex items-center gap-2 overflow-hidden">
-        <span className="shrink-0 pl-4 font-display text-sm font-semibold uppercase tracking-widest text-[#ff3b5c]">
-          Live Now
-        </span>
-        <div className="relative flex w-full overflow-hidden">
-          <div className="flex animate-auction-strip gap-4">
+    <section className="border-b border-border bg-muted/30 py-5 md:py-6">
+      <div className="flex items-center gap-3 overflow-hidden">
+        <Badge
+          variant="default"
+          className="ml-4 shrink-0 gap-1.5 uppercase tracking-wide shadow-sm"
+        >
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary-foreground/90 motion-reduce:animate-none animate-pulse"
+            aria-hidden
+          />
+          Live
+        </Badge>
+        <div className="relative flex min-w-0 flex-1 overflow-hidden">
+          <div className="flex animate-auction-strip gap-3 pr-4 md:gap-4">
             {duplicated.map((a, i) => {
               const href = requireAuth
                 ? `/auth/sign-up?callbackUrl=${encodeURIComponent(`/auctions/${a.id}`)}`
                 : `/auctions/${a.id}`;
               const img =
                 a.images[0]?.url ??
-                "https://placehold.co/200x120/1a1a1a/666?text=No+image";
+                "https://placehold.co/200x120/e2e8f0/64748b?text=No+image";
               return (
                 <Link
                   key={`${a.id}-${i}`}
                   href={href}
-                  className="group relative h-24 w-40 shrink-0 overflow-hidden rounded-lg border border-white/10 transition hover:border-[#ff3b5c]/50"
+                  className="group relative h-24 w-40 shrink-0 overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-[border-color,box-shadow] hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <Image
                     src={img}
                     alt={a.title}
                     fill
                     unoptimized
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="object-cover transition-transform duration-300 motion-reduce:transition-none group-hover:scale-[1.03]"
                     sizes="160px"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                  <span className="absolute bottom-1 left-1 right-1 truncate text-xs font-medium text-white drop-shadow-lg">
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <span className="absolute bottom-1.5 left-2 right-2 truncate text-[11px] font-medium text-white drop-shadow-md">
                     {a.title}
                   </span>
                 </Link>
