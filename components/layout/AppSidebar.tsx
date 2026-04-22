@@ -20,24 +20,42 @@ import {
   Car,
   ShoppingBag,
   PlusCircle,
-  LayoutGrid,
+  BookOpen,
+  UserRound,
   ListOrdered,
   Megaphone,
   MessageSquare,
 } from "lucide-react";
 
-const mainNav = [
-  { href: "/", label: "Home", icon: LayoutGrid },
-  { href: "/explore", label: "Carmunity", icon: Users },
+const carmunityNav = [
+  { href: "/explore", label: "Explore", icon: Users },
   { href: "/discussions", label: "Discussions", icon: MessageSquare },
   { href: "/messages", label: "Messages", icon: MessageSquare },
-  { href: "/auctions", label: "Auctions", icon: Gavel },
+] as const;
+
+const marketNav = [
+  { href: "/auctions", label: "Live auctions", icon: Gavel },
   { href: "/sell", label: "Sell", icon: PlusCircle },
 ] as const;
+
+const resourcesNav = [
+  { href: "/how-it-works", label: "How it works", icon: BookOpen },
+  { href: "/why-carasta", label: "Why Carasta", icon: BookOpen },
+  { href: "/resources", label: "Resources", icon: BookOpen },
+] as const;
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="px-2 pt-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+      {children}
+    </p>
+  );
+}
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  if (!session?.user) return null;
   const handle = (session?.user as { handle?: string } | undefined)?.handle;
   const marketingEnabled = Boolean(
     (session?.user as { marketingEnabled?: boolean } | undefined)
@@ -47,9 +65,46 @@ export function AppSidebar() {
   return (
     <aside className="hidden w-56 shrink-0 border-r border-border bg-card/50 backdrop-blur-sm lg:block">
       <nav className="sticky top-20 space-y-1 p-4">
-        {mainNav.map(({ href, label, icon: Icon }) => {
-          const isActive =
-            href === "/" ? pathname === "/" : pathname.startsWith(href);
+        <SectionLabel>Carmunity</SectionLabel>
+        {carmunityNav.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname.startsWith(href);
+          return (
+            <Link key={href} href={href}>
+              <motion.div
+                className={cn(
+                  shellSidebarRowBase,
+                  isActive ? shellSidebarActive : shellSidebarInactive
+                )}
+                whileHover={hoverScale}
+                whileTap={tapScale}
+              >
+                <Icon className="h-5 w-5 shrink-0" />
+                {label}
+              </motion.div>
+            </Link>
+          );
+        })}
+        {handle ? (
+          <Link href={`/u/${handle}`}>
+            <motion.div
+              className={cn(
+                shellSidebarRowBase,
+                pathname.startsWith(`/u/${handle}`) ? shellSidebarActive : shellSidebarInactive
+              )}
+              whileHover={hoverScale}
+              whileTap={tapScale}
+            >
+              <UserRound className="h-5 w-5 shrink-0" />
+              Profile
+            </motion.div>
+          </Link>
+        ) : null}
+
+        <div className="my-3 border-t border-border/50" />
+
+        <SectionLabel>Market</SectionLabel>
+        {marketNav.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname.startsWith(href);
           if (href === "/sell") {
             const listingsHref = handle ? `/u/${handle}/listings` : null;
             const marketingHref =
@@ -128,6 +183,29 @@ export function AppSidebar() {
             </Link>
           );
         })}
+
+        <div className="my-3 border-t border-border/50" />
+
+        <SectionLabel>Resources</SectionLabel>
+        {resourcesNav.map(({ href, label, icon: Icon }) => {
+          const isActive = href === "/resources" ? pathname.startsWith("/resources") : pathname === href;
+          return (
+            <Link key={href} href={href}>
+              <motion.div
+                className={cn(
+                  shellSidebarRowBase,
+                  isActive ? shellSidebarActive : shellSidebarInactive
+                )}
+                whileHover={hoverScale}
+                whileTap={tapScale}
+              >
+                <Icon className="h-5 w-5 shrink-0" />
+                {label}
+              </motion.div>
+            </Link>
+          );
+        })}
+
         <div className="my-4 border-t border-border/50" />
         <Link
           href={

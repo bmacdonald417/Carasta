@@ -34,10 +34,22 @@ const marketingNav = [
   { href: "/contact", label: "Contact" },
 ];
 
-const appNav = [
+const signedInTopNav = [
+  { href: "/explore", label: "Carmunity" },
+  { href: "/auctions", label: "Market" },
+  { href: "/resources", label: "Resources" },
+];
+
+const publicTopNav = [
+  { href: "/explore", label: "Carmunity (Preview)" },
+  { href: "/auctions", label: "Market (Browse)" },
+  { href: "/resources", label: "Resources" },
+];
+
+const footerProductLinks = [
   { href: "/explore", label: "Carmunity" },
   { href: "/discussions", label: "Discussions" },
-  { href: "/auctions", label: "Auctions" },
+  { href: "/auctions", label: "Market" },
   { href: "/sell", label: "Sell" },
 ];
 
@@ -64,7 +76,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
       >
         <div className="carasta-container flex h-16 items-center gap-4 md:h-20 md:gap-6">
           <Link
-            href="/"
+            href={session ? "/explore" : "/"}
             className="flex items-center gap-3 transition-opacity hover:opacity-90"
           >
             {!logoError ? (
@@ -82,25 +94,29 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
           <div className="hidden min-w-0 flex-1 items-center justify-between gap-4 lg:flex">
-            <nav className="flex min-w-0 items-center gap-1">
-              {marketingNav.map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    shellHeaderMarketingLinkBase,
-                    pathname === href
-                      ? shellHeaderMarketingActive
-                      : shellHeaderMarketingInactive
-                  )}
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
+            {!session ? (
+              <nav className="flex min-w-0 items-center gap-1">
+                {marketingNav.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      shellHeaderMarketingLinkBase,
+                      pathname === href
+                        ? shellHeaderMarketingActive
+                        : shellHeaderMarketingInactive
+                    )}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+            ) : (
+              <div />
+            )}
             <nav className="flex items-center gap-1">
-              {appNav.map(({ href, label }) => {
-                const appActive = pathname.startsWith(href);
+              {(session ? signedInTopNav : publicTopNav).map(({ href, label }) => {
+                const appActive = href === "/resources" ? pathname.startsWith("/resources") : pathname.startsWith(href);
                 return (
                   <Link
                     key={href}
@@ -197,9 +213,9 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                       </>
                     )}
                     <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild>
                       <Link href="/api/auth/signout">Sign out</Link>
-                      </DropdownMenuItem>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
@@ -209,7 +225,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   href="/auctions"
                   className="hidden font-medium text-muted-foreground transition hover:text-foreground md:inline-flex"
                 >
-                  Browse Auctions
+                  Browse Market
                 </Link>
                 <Link
                   href="/auth/sign-in"
@@ -218,7 +234,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   Sign in
                 </Link>
                 <Link
-                  href="/auth/sign-up?callbackUrl=%2Fexplore"
+                  href="/auth/sign-up?callbackUrl=%2Fwelcome%3Fnext%3D%252Fexplore"
                   className="hidden rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 md:inline-flex"
                 >
                   Join Carmunity
@@ -265,7 +281,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3 text-sm">
                   <Link
-                    href="/auth/sign-up?callbackUrl=%2Fexplore"
+                    href="/auth/sign-up?callbackUrl=%2Fwelcome%3Fnext%3D%252Fexplore"
                     className="rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground transition hover:bg-primary/90"
                   >
                     Join Carmunity
@@ -274,7 +290,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     href="/auctions"
                     className="rounded-full border border-border px-4 py-2 font-semibold text-foreground transition hover:bg-muted/60"
                   >
-                    Browse Auctions
+                    Browse Market
                   </Link>
                 </div>
               </div>
@@ -324,7 +340,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </p>
                   <nav className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
                     {[
-                      ...appNav,
+                      ...footerProductLinks,
                       { href: "/messages", label: "Messages" },
                       { href: "/community-guidelines", label: "Community Guidelines" },
                     ].map(({ href, label }) => (

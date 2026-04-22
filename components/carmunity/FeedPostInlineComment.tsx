@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 import { addComment } from "@/app/(marketing)/explore/actions";
+import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
@@ -20,12 +22,19 @@ export function FeedPostInlineComment({
   onCommented?: (nextCount: number) => void;
   className?: string;
 }) {
+  const { data: session } = useSession();
+  const signedIn = Boolean(session?.user);
+  const { openGate } = useGuestGate();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
 
   async function submit() {
+    if (!signedIn) {
+      openGate({ intent: "comment" });
+      return;
+    }
     const trimmed = text.trim();
     if (!trimmed) {
       toast({ title: "Write a comment first", variant: "destructive" });
@@ -52,7 +61,13 @@ export function FeedPostInlineComment({
           variant="ghost"
           size="sm"
           className="h-9 gap-1.5 rounded-full px-3 text-muted-foreground transition-colors duration-150 hover:bg-muted/50 hover:text-foreground active:scale-[0.98]"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            if (!signedIn) {
+              openGate({ intent: "comment" });
+              return;
+            }
+            setOpen(true);
+          }}
         >
           <MessageCircle className="h-[18px] w-[18px] shrink-0" />
           <span className="text-xs font-medium">Comment</span>

@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState, useTransition } from "react";
 
 import { DiscussionReactionSummary } from "@/components/discussions/DiscussionReactionSummary";
+import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -40,7 +41,8 @@ export function DiscussionReactionPicker({
   className?: string;
 }) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const { openGate } = useGuestGate();
   const { open, setOpen, openNow, scheduleClose, cancelClose } = useHoverDropdown(240);
   const [kind, setKind] = useState<DiscussionReactionKind | null>(initialKind);
   const [pending, startTransition] = useTransition();
@@ -89,6 +91,16 @@ export function DiscussionReactionPicker({
     return (
       <div className={cn("flex items-center gap-2", className)}>
         <DiscussionReactionSummary summary={summary} compact={false} />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-8 min-w-[2.5rem] gap-1 border-primary/35 bg-primary/5 px-2 text-sm text-primary transition-[transform,box-shadow,opacity,background-color] duration-150 ease-out hover:bg-primary/10 active:scale-[0.98]"
+          onClick={() => openGate({ intent: "react" })}
+        >
+          <SmilePlus className="h-4 w-4" aria-hidden />
+          <span className="sr-only">React</span>
+        </Button>
       </div>
     );
   }
