@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getSession } from "@/lib/auth";
 import { isReviewModeEnabled } from "@/lib/review-mode";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { MessagesConversationsClient } from "./messages-conversations-client";
 
 export default async function MessagesPage() {
@@ -19,6 +20,7 @@ export default async function MessagesPage() {
           supported yet.
         </p>
       </header>
+      <ContextualHelpCard context="product.messages" className="mt-5" />
       <div className="mt-6">
         <MessagesConversationsClient />
       </div>

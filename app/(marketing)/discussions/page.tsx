@@ -22,6 +22,7 @@ import { getSession } from "@/lib/auth";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
 import { cn } from "@/lib/utils";
 import { SignedOutPreviewNotice } from "@/components/guest-preview/SignedOutPreviewNotice";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 
 export const dynamic = "force-dynamic";
 
@@ -109,6 +110,8 @@ export default async function DiscussionsPage() {
           description="You’re viewing public Discussions in preview mode. Join free to save threads, reply, react, and follow voices."
         />
       ) : null}
+
+      <ContextualHelpCard context="carmunity.discussions" className="mt-6" />
 
       {followedThreads.length > 0 ? (
         <section className="mt-8 space-y-3 rounded-2xl border border-border bg-card p-4 shadow-e1">

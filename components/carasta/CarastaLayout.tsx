@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   shellHeaderAppActive,
@@ -194,6 +195,12 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     )}
                     <DropdownMenuItem asChild>
                       <Link href="/settings">Settings</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/resources" className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-muted-foreground" aria-hidden />
+                        Help center
+                      </Link>
                     </DropdownMenuItem>
                     {(session.user as any)?.role === "ADMIN" && (
                       <>

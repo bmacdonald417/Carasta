@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import type { GuestGateIntent } from "@/components/guest-gate/GuestGateProvider";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -88,6 +89,10 @@ export function GuestGateModal({
           <p className="text-xs leading-relaxed text-muted-foreground">
             You can still browse public previews, but reactions, comments, saves, bids, and seller tools require an account.
           </p>
+          <ContextualHelpCard
+            context="guest.gate"
+            className="border-border/50 bg-muted/5"
+          />
         </div>
 
         <DialogFooter className="sm:justify-between">

@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { CarmunitySettingsSection } from "./carmunity-settings-section";
 import { SettingsForm } from "./settings-form";
 
@@ -53,6 +54,8 @@ export default async function SettingsPage() {
           discovery.
         </p>
       </header>
+
+      <ContextualHelpCard context="settings.account" />
 
       <Card>
         <CardHeader>

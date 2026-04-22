@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { CreateAuctionWizard } from "./create-auction-wizard";
 import { isListingAiEnabled } from "@/lib/listing-ai/listing-ai-feature-flag";
 
@@ -32,6 +33,7 @@ export default async function SellPage() {
           .
         </p>
       </header>
+      <ContextualHelpCard context="market.sell" className="mt-6" />
       <CreateAuctionWizard className="mt-8" listingAiEnabled={listingAiEnabled} />
     </div>
   );

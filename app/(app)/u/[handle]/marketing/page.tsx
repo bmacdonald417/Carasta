@@ -27,6 +27,7 @@ import { ensureSellerMarketingNotifications } from "@/lib/marketing/generate-mar
 import { getSellerMarketingNotifications } from "@/lib/marketing/get-seller-marketing-notifications";
 import { getMarketingPresetsForUser } from "@/lib/marketing/get-seller-marketing-presets";
 import { formatMarketingDate } from "@/lib/marketing/marketing-display";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { MarketingAlertsPanel } from "@/components/marketing/marketing-alerts-panel";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
@@ -205,6 +206,7 @@ export default async function MarketingPage({
                   Settings → Email
                 </Link>
               </div>
+              <ContextualHelpCard context="seller.marketing" className="mt-6 max-w-xl" />
             </div>
             <div className="grid gap-3 sm:min-w-[280px]">
               <div className="rounded-[1.5rem] border border-[hsl(var(--seller-info))]/15 bg-[hsl(var(--seller-info-soft))] p-4">

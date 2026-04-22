@@ -7,6 +7,7 @@ import {
 } from "@/lib/search/auction-search-service";
 import { AuctionCard } from "./auction-card";
 import { AuctionFilters } from "./auction-filters";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 
 const AuctionsMapView = dynamic(
   () =>
@@ -221,6 +222,8 @@ export default async function AuctionsPage({
           Browse verified listings. Reserve progress, auto-bid, and buy-now when available.
         </p>
       </header>
+
+      <ContextualHelpCard context="market.auctions" className="mt-5" />
 
       <AuctionFilters
         makes={makes}

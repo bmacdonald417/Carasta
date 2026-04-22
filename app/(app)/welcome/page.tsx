@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getSession } from "@/lib/auth";
 import { buildOnboardingPack, getCarmunityOnboardingState } from "@/lib/carmunity/onboarding-service";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { WelcomeActivationDialog } from "@/components/welcome/WelcomeActivationDialog";
 import { Button } from "@/components/ui/button";
 
@@ -53,6 +54,8 @@ export default async function WelcomePage({
             <Link href="/discussions">Browse Discussions</Link>
           </Button>
         </div>
+
+        <ContextualHelpCard context="product.welcome" className="mt-6" />
 
         <p className="mt-4 text-xs text-muted-foreground">
           Get in the car and drive with Carasta.

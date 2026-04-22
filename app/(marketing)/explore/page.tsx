@@ -7,6 +7,7 @@ import { buildOnboardingPack, getCarmunityOnboardingState } from "@/lib/carmunit
 import { listDiscussedLiveAuctions } from "@/lib/forums/auction-discussion";
 import { listTrendingThreadsGlobal } from "@/lib/forums/discussions-discovery";
 import { SignedOutPreviewNotice } from "@/components/guest-preview/SignedOutPreviewNotice";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { CommunityFeed } from "./community-feed";
 import { TrendingDreamGarage } from "./TrendingDreamGarage";
 
@@ -64,6 +65,9 @@ export default async function ExplorePage({
           className="mt-6"
           description="You’re viewing a read-only Carmunity preview. Join free to react, comment, follow voices, and shape your feed."
         />
+      ) : null}
+      {currentUserId ? (
+        <ContextualHelpCard context="carmunity.explore" className="mt-6" />
       ) : null}
       <TrendingDreamGarage />
       <CommunityFeed

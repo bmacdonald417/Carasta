@@ -17,6 +17,7 @@ import type {
   CarmunityInterestPrefs,
   OnboardingSpaceOption,
 } from "@/lib/carmunity/onboarding-service";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
 import { cn } from "@/lib/utils";
 
@@ -149,6 +150,10 @@ export function CarmunitySettingsSection({
                 feed experience.
               </p>
             ) : null}
+            <ContextualHelpCard
+              context="carmunity.settings_interests"
+              className="mt-4"
+            />
           </div>
           <Button
             type="button"
