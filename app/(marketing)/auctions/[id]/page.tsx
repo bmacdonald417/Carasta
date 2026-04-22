@@ -14,6 +14,7 @@ import { AuctionViewTracker } from "@/components/marketing/auction-view-tracker"
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { AuctionDiscussPanel } from "@/components/auction/AuctionDiscussPanel";
 import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { MessageSellerButton } from "./message-seller-button";
 import {
   countAuctionDiscussionThreads,
@@ -189,6 +190,8 @@ export default async function AuctionDetailPage({
             isLoggedIn={!!session?.user}
             currentUserHandle={(session?.user as any)?.handle ?? null}
           />
+
+          <ContextualHelpCard context="market.auctions" className="border-border/60 bg-muted/10" />
 
           {session?.user?.id && (session.user as any).id !== auction.sellerId ? (
             <MessageSellerButton auctionId={auction.id} sellerId={auction.sellerId} />

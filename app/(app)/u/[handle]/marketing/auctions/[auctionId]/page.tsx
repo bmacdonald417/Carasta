@@ -47,6 +47,7 @@ import { Button } from "@/components/ui/button";
 import { MarketingCampaignStatus, MarketingTrafficEventType } from "@prisma/client";
 import { serializeWorkspacePlan } from "@/lib/marketing/listing-marketing-workspace-serialize";
 import { SellerMarketingWorkspace } from "@/components/marketing/seller-marketing-workspace";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { HashScrollIntoView } from "@/components/marketing/hash-scroll-into-view";
 import { MarketingAuctionStickyNav } from "@/components/marketing/marketing-auction-sticky-nav";
 import { buildMarketingCopilotIntakeMetricsFromDetail } from "@/lib/marketing/marketing-copilot-intake-metrics";
@@ -340,6 +341,10 @@ export default async function MarketingAuctionDetailPage({
               prioritizes status, momentum, next actions, AI support, and
               execution context before long-tail analytics.
             </p>
+            <ContextualHelpCard
+              context="seller.marketing"
+              className="mt-6 max-w-2xl border-border/70 bg-muted/15"
+            />
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <Button variant="outline" size="sm" asChild>
                 <a

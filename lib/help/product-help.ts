@@ -1,5 +1,7 @@
 /**
  * Phase 2U — in-product help surfacing + retrieval readiness.
+ * Phase 2V — deterministic pathname-aware ranking lives in `help-retrieval.ts`
+ * (read-only; reuses these topic ids and link sets).
  *
  * Stable `topicId` values identify canonical public Resources / trust destinations
  * from product surfaces. They are safe to use later for assistant routing,

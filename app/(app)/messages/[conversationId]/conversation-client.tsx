@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineSpinner } from "@/components/ui/inline-spinner";
+import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 import { cn } from "@/lib/utils";
 
@@ -229,6 +230,14 @@ export function ConversationClient({
           )}
         </div>
       </div>
+
+      <ContextualHelpCard
+        context="product.messages"
+        showIntro={false}
+        maxPrimaryLinks={2}
+        relatedLimit={1}
+        className="rounded-none border-x-0 border-t-0 border-b border-border/80 bg-muted/10 py-3 shadow-none md:px-4"
+      />
 
       {conversation?.auction ? (
         <div className="shrink-0 border-b border-border bg-muted/25 px-4 py-3">
