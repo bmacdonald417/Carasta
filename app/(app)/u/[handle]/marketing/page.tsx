@@ -172,7 +172,7 @@ export default async function MarketingPage({
   return (
     <SellerWorkspaceShell>
       <div className="carasta-container max-w-7xl py-8 md:py-10">
-        <section className="rounded-2xl border border-border bg-card bg-gradient-to-br from-card via-card to-info-soft/35 p-6 shadow-e1 md:p-8">
+        <section className="rounded-2xl border border-border bg-card bg-gradient-to-br from-card via-card to-info-soft/20 p-6 shadow-e1 md:p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-3">

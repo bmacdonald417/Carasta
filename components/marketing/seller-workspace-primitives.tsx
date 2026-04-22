@@ -54,8 +54,10 @@ export function SellerWorkspaceShell({
   className?: string;
 }) {
   return (
-    <div className={`seller-workspace-shell min-h-full ${className}`}>
-      <div className="seller-grid min-h-full">{children}</div>
+    <div
+      className={`min-h-full bg-background text-foreground ${className}`.trim()}
+    >
+      {children}
     </div>
   );
 }

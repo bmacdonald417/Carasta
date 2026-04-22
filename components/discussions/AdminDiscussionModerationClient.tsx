@@ -99,16 +99,16 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
   }
 
   return (
-    <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+    <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-e1">
       {reviewMode ? (
-        <div className="border-b border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-200">
-          Review mode: moderation actions are disabled. This surface is available
-          for visual and workflow review only.
+        <div className="border-b border-caution/25 bg-caution-soft px-4 py-3 text-xs text-caution-foreground">
+          Review mode: moderation actions are disabled. This surface is available for visual and
+          workflow review only.
         </div>
       ) : null}
       <table className="w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-white/10 bg-white/[0.04] text-xs uppercase tracking-wide text-neutral-400">
+          <tr className="border-b border-border bg-muted/50 text-xs font-medium uppercase tracking-wide text-muted-foreground">
             <th className="px-4 py-3">When</th>
             <th className="px-4 py-3">Reporter</th>
             <th className="px-4 py-3">Target</th>
@@ -118,10 +118,10 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
             <th className="px-4 py-3 text-right">Open</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">
+        <tbody className="divide-y divide-border">
           {rows.length === 0 ? (
             <tr>
-              <td className="px-4 py-10 text-center text-neutral-500" colSpan={7}>
+              <td className="px-4 py-10 text-center text-muted-foreground" colSpan={7}>
                 No reports yet.
               </td>
             </tr>
@@ -143,27 +143,30 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                   (r.reply ? busyId === `r:${r.reply.id}` : false)
               );
               return (
-                <tr key={r.id} className="align-top text-neutral-200">
-                  <td className="px-4 py-3 text-xs text-neutral-400">
+                <tr key={r.id} className="align-top text-foreground transition-colors hover:bg-muted/30">
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(r.createdAt).toLocaleString()}
                   </td>
                   <td className="px-4 py-3 text-xs">
-                    <Link className="text-primary hover:underline" href={`/u/${r.reporterHandle}`}>
+                    <Link
+                      className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      href={`/u/${r.reporterHandle}`}
+                    >
                       @{r.reporterHandle}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-xs text-neutral-300">
+                  <td className="px-4 py-3 text-xs text-foreground">
                     <p className="line-clamp-2">{label}</p>
                     {r.details ? (
-                      <p className="mt-1 line-clamp-2 text-[11px] text-neutral-500">{r.details}</p>
+                      <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">{r.details}</p>
                     ) : null}
                     {r.moderatorNote ? (
-                      <p className="mt-1 line-clamp-2 text-[11px] text-neutral-400">
-                        <span className="font-semibold text-neutral-300">Note:</span> {r.moderatorNote}
+                      <p className="mt-1 line-clamp-2 text-[11px] text-muted-foreground">
+                        <span className="font-semibold text-foreground">Note:</span> {r.moderatorNote}
                       </p>
                     ) : null}
                     {r.reviewedAt ? (
-                      <p className="mt-1 text-[10px] text-neutral-500">
+                      <p className="mt-1 text-[10px] text-muted-foreground">
                         Reviewed{" "}
                         {r.reviewedByHandle ? (
                           <>
@@ -175,14 +178,14 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                       </p>
                     ) : null}
                   </td>
-                  <td className="px-4 py-3 text-xs font-semibold text-neutral-200">{r.reason}</td>
-                  <td className="px-4 py-3 text-xs text-neutral-300">
+                  <td className="px-4 py-3 text-xs font-semibold text-foreground">{r.reason}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
                     <label className="sr-only" htmlFor={`status-${r.id}`}>
                       Status
                     </label>
                     <select
                       id={`status-${r.id}`}
-                      className="w-full max-w-[140px] rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[11px] text-foreground"
+                      className="w-full max-w-[140px] rounded-md border border-border bg-background px-2 py-1 text-[11px] text-foreground shadow-sm"
                       value={r.status}
                       disabled={targetBusy || reviewMode}
                       onChange={(e) => void patchReport(r.id, { status: e.target.value })}
@@ -194,10 +197,10 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                       ))}
                     </select>
                   </td>
-                  <td className="px-4 py-3 text-xs text-neutral-300">
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
                     <div className="flex flex-col gap-2">
                       <textarea
-                        className="min-h-[52px] w-full max-w-[220px] rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[11px] text-foreground"
+                        className="min-h-[52px] w-full max-w-[220px] rounded-md border border-border bg-background px-2 py-1 text-[11px] text-foreground shadow-sm"
                         placeholder="Moderator note…"
                         defaultValue={r.moderatorNote ?? ""}
                         disabled={targetBusy || reviewMode}
@@ -213,7 +216,7 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-7 border-white/15 text-[10px] font-semibold uppercase tracking-wide"
+                          className="h-7 text-[10px] font-medium"
                           disabled={targetBusy || reviewMode}
                           onClick={() => void setThreadHidden(r.thread!.id, !r.thread!.isHidden)}
                         >
@@ -226,7 +229,7 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                             type="button"
                             size="sm"
                             variant="outline"
-                            className="h-7 border-white/15 text-[10px] font-semibold uppercase tracking-wide"
+                            className="h-7 text-[10px] font-medium"
                             disabled={targetBusy || reviewMode || r.reply.threadIsHidden}
                             onClick={() => void setReplyHidden(r.reply!.id, !r.reply!.isHidden)}
                           >
@@ -236,7 +239,7 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                             type="button"
                             size="sm"
                             variant="outline"
-                            className="h-7 border-white/15 text-[10px] font-semibold uppercase tracking-wide"
+                            className="h-7 text-[10px] font-medium"
                             disabled={targetBusy || reviewMode}
                             onClick={() => void setThreadHidden(r.reply!.threadId, !r.reply!.threadIsHidden)}
                           >
@@ -248,11 +251,14 @@ export function AdminDiscussionModerationClient({ rows }: { rows: SerializableAd
                   </td>
                   <td className="px-4 py-3 text-right text-xs">
                     {href ? (
-                      <Link className="text-primary hover:underline" href={href}>
+                      <Link
+                        className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                        href={href}
+                      >
                         View thread
                       </Link>
                     ) : (
-                      <span className="text-neutral-600">—</span>
+                      <span className="text-muted-foreground">—</span>
                     )}
                   </td>
                 </tr>

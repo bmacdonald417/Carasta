@@ -35,101 +35,100 @@ export default async function AdminReputationPage({
   });
 
   return (
-    <div className="carasta-container max-w-4xl py-8">
+    <div className="carasta-container max-w-4xl py-8 md:py-10">
       <Link
         href="/admin"
-        className="text-sm text-neutral-400 hover:text-foreground"
+        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
-        ← Admin
+        ← Admin home
       </Link>
 
-      <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-6">
-        <h1 className="font-display text-xl font-semibold">
-          Reputation: @{user.handle}
+      <header className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-e1 md:p-8">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+          Reputation · @{user.handle}
         </h1>
-        <p className="mt-1 text-sm text-neutral-400">{user.name ?? "—"}</p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <p className="text-xs text-neutral-500">Score</p>
-            <p className="font-semibold">{user.reputationScore}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{user.name ?? "—"}</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Score</p>
+            <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{user.reputationScore}</p>
           </div>
-          <div>
-            <p className="text-xs text-neutral-500">Tier</p>
-            <p className="font-semibold">{user.collectorTier}</p>
+          <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Tier</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{user.collectorTier}</p>
           </div>
-          <div>
-            <p className="text-xs text-neutral-500">Sales / Purchases</p>
-            <p className="font-semibold">
+          <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Sales / purchases
+            </p>
+            <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">
               {user.completedSalesCount} / {user.completedPurchasesCount}
             </p>
           </div>
-          <div>
-            <p className="text-xs text-neutral-500">Disputes Lost</p>
-            <p className="font-semibold">{user.disputesLostCount}</p>
+          <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Disputes lost</p>
+            <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{user.disputesLostCount}</p>
           </div>
         </div>
-        {user.reputationUpdatedAt && (
-          <p className="mt-2 text-xs text-neutral-500">
-            Updated: {user.reputationUpdatedAt.toISOString()}
+        {user.reputationUpdatedAt ? (
+          <p className="mt-4 text-xs text-muted-foreground">
+            Updated {user.reputationUpdatedAt.toISOString()}
           </p>
-        )}
-      </div>
+        ) : null}
+      </header>
 
-      <div className="mt-8">
-        <h2 className="font-display text-lg font-semibold">
-          Last 50 Reputation Events
-        </h2>
-        <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold text-foreground">Last 50 reputation events</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Newest first — read-only debug view.</p>
+        <div className="mt-4 overflow-hidden rounded-xl border border-border bg-card shadow-e1">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10 bg-white/5">
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-neutral-400">
+              <tr className="border-b border-border bg-muted/50">
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Type
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-neutral-400">
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Points
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-neutral-400">
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Base
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-neutral-400">
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Created
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-neutral-400">
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Meta
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border">
               {events.map((e) => (
-                <tr key={e.id} className="hover:bg-white/5">
-                  <td className="px-4 py-3">{e.type}</td>
+                <tr key={e.id} className="transition-colors hover:bg-muted/30">
+                  <td className="px-4 py-3 text-foreground">{e.type}</td>
                   <td
-                    className={`px-4 py-3 font-medium ${
-                      e.points >= 0 ? "text-emerald-400" : "text-red-400"
+                    className={`px-4 py-3 font-medium tabular-nums ${
+                      e.points >= 0 ? "text-success" : "text-destructive"
                     }`}
                   >
                     {e.points >= 0 ? "+" : ""}
                     {e.points}
                   </td>
-                  <td className="px-4 py-3 text-neutral-400">{e.basePoints}</td>
-                  <td className="px-4 py-3 text-neutral-400">
-                    {e.createdAt.toISOString()}
-                  </td>
-                  <td className="max-w-[200px] truncate px-4 py-3 text-neutral-500">
+                  <td className="px-4 py-3 text-muted-foreground">{e.basePoints}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">{e.createdAt.toISOString()}</td>
+                  <td className="max-w-[200px] truncate px-4 py-3 text-xs text-muted-foreground">
                     {e.meta ? JSON.stringify(e.meta) : "—"}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {events.length === 0 && (
-            <div className="py-12 text-center text-neutral-500">
+          {events.length === 0 ? (
+            <div className="border-t border-border px-4 py-12 text-center text-sm text-muted-foreground">
               No reputation events yet.
             </div>
-          )}
+          ) : null}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

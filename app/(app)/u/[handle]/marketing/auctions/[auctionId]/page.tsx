@@ -318,7 +318,7 @@ export default async function MarketingAuctionDetailPage({
         elementId="marketing-share-promote"
         active={scrollSharePromoteIntoView}
       />
-      <section className="rounded-2xl border border-border bg-card bg-gradient-to-br from-card via-card to-info-soft/35 p-6 shadow-e1 md:p-8">
+      <section className="rounded-2xl border border-border bg-card bg-gradient-to-br from-card via-card to-info-soft/20 p-6 shadow-e1 md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="min-w-0 flex-1">
             <Link

@@ -43,19 +43,22 @@ export default async function AdminDiscussionModerationPage() {
   }));
 
   return (
-    <div className="carasta-container max-w-6xl py-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">Admin</p>
-          <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wider text-foreground">
+    <div className="carasta-container max-w-6xl py-8 md:py-10">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Admin</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             Discussion moderation
           </h1>
-          <p className="mt-2 max-w-prose text-sm text-neutral-400">
+          <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted-foreground">
             Review reports, update status, leave internal notes, and soft-hide threads or replies. Hidden
             content stays in the database; regular members no longer see it in lists or on thread pages.
           </p>
         </div>
-        <Link href="/admin" className="text-sm text-primary hover:underline">
+        <Link
+          href="/admin"
+          className="shrink-0 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
           ← Admin home
         </Link>
       </div>
