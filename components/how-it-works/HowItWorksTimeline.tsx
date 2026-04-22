@@ -13,7 +13,7 @@ export function HowItWorksTimeline() {
     <div ref={ref} className="relative">
       {/* Vertical timeline line */}
       <div
-        className="absolute left-5 top-8 bottom-8 w-px bg-gradient-to-b from-[#ff3b5c]/50 via-[#ff3b5c]/25 to-transparent md:left-6"
+        className="absolute left-5 top-8 bottom-8 w-px bg-gradient-to-b from-primary/45 via-primary/20 to-transparent md:left-6"
         aria-hidden
       />
 

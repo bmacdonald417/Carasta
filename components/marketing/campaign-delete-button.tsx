@@ -44,12 +44,15 @@ export function CampaignDeleteButton({
     }
   }
 
+  const destructiveOutline =
+    "border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive";
+
   return (
     <Button
       type="button"
-      variant={variant}
+      variant={variant === "destructive" ? "destructive" : "outline"}
       size="sm"
-      className="text-neutral-400 hover:text-red-400"
+      className={variant !== "destructive" ? destructiveOutline : undefined}
       onClick={onDelete}
       disabled={loading}
     >

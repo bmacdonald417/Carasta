@@ -101,9 +101,9 @@ export function CampaignForm({
 
   if (auctions.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.03] px-6 py-10 text-center">
-        <p className="font-medium text-neutral-200">You need a listing first</p>
-        <p className="mt-2 text-sm text-neutral-500">
+      <div className="rounded-2xl border border-dashed border-border bg-muted/25 px-6 py-10 text-center shadow-e1">
+        <p className="font-medium text-foreground">You need a listing first</p>
+        <p className="mt-2 text-sm text-muted-foreground">
           Create an auction, then you can attach a campaign to it.
         </p>
         <Button className="mt-6" asChild variant="secondary">
@@ -116,14 +116,14 @@ export function CampaignForm({
   return (
     <form onSubmit={submit} className="space-y-6">
       <div>
-        <Label htmlFor="campaign-name" className="text-neutral-300">
+        <Label htmlFor="campaign-name" className="text-foreground">
           Campaign name
         </Label>
         <Input
           id="campaign-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 border-white/10 bg-white/5 text-foreground"
+          className="mt-1"
           placeholder="e.g. Instagram launch week"
           maxLength={200}
           required
@@ -131,12 +131,12 @@ export function CampaignForm({
       </div>
 
       <div>
-        <Label className="text-neutral-300">Listing</Label>
+        <Label className="text-foreground">Listing</Label>
         <Select value={auctionId} onValueChange={setAuctionId}>
-          <SelectTrigger className="mt-1 border-white/10 bg-white/5 text-foreground">
+          <SelectTrigger className="mt-1">
             <SelectValue placeholder="Select a listing" />
           </SelectTrigger>
-          <SelectContent className="border-white/10 bg-[#121218] text-foreground">
+          <SelectContent>
             {auctions.map((a) => (
               <SelectItem key={a.id} value={a.id}>
                 {a.title}
@@ -148,15 +148,15 @@ export function CampaignForm({
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
-          <Label className="text-neutral-300">Type</Label>
+          <Label className="text-foreground">Type</Label>
           <Select
             value={type}
             onValueChange={(v) => setType(v as MarketingCampaignType)}
           >
-            <SelectTrigger className="mt-1 border-white/10 bg-white/5 text-foreground">
+            <SelectTrigger className="mt-1">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-[#121218] text-foreground">
+            <SelectContent>
               <SelectItem value="social">Social</SelectItem>
               <SelectItem value="email">Email</SelectItem>
               <SelectItem value="featured">Featured</SelectItem>
@@ -185,7 +185,7 @@ export function CampaignForm({
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div>
-          <Label htmlFor="startAt" className="text-neutral-300">
+          <Label htmlFor="startAt" className="text-foreground">
             Start (optional)
           </Label>
           <Input
@@ -193,11 +193,11 @@ export function CampaignForm({
             type="datetime-local"
             value={startAt}
             onChange={(e) => setStartAt(e.target.value)}
-            className="mt-1 border-white/10 bg-white/5 text-foreground"
+            className="mt-1"
           />
         </div>
         <div>
-          <Label htmlFor="endAt" className="text-neutral-300">
+          <Label htmlFor="endAt" className="text-foreground">
             End (optional)
           </Label>
           <Input
@@ -205,13 +205,13 @@ export function CampaignForm({
             type="datetime-local"
             value={endAt}
             onChange={(e) => setEndAt(e.target.value)}
-            className="mt-1 border-white/10 bg-white/5 text-foreground"
+            className="mt-1"
           />
         </div>
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button type="submit" disabled={loading} className="bg-[#ff3b5c] hover:bg-[#ff3b5c]/90">
+        <Button type="submit" disabled={loading} variant="default">
           {loading ? "Saving…" : mode === "create" ? "Create campaign" : "Save changes"}
         </Button>
         <Button type="button" variant="outline" asChild>

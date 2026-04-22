@@ -41,7 +41,7 @@ export default async function EditMarketingCampaignPage({
       </Link>
       <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Edit campaign
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{campaign.name}</p>
@@ -53,7 +53,7 @@ export default async function EditMarketingCampaignPage({
           redirectAfterDelete
         />
       </div>
-      <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+      <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-e1">
         <CampaignForm
           handle={user.handle}
           mode="edit"

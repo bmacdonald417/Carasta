@@ -36,13 +36,13 @@ export default async function NewMarketingCampaignPage({
       >
         ← All campaigns
       </Link>
-      <h1 className="mt-4 font-display text-2xl font-bold text-foreground">
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
         New campaign
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Attach a campaign to one of your listings to keep work organized.
       </p>
-      <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+      <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-e1">
         <CampaignForm
           handle={user.handle}
           mode="create"

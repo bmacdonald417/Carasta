@@ -93,7 +93,7 @@ export function ContactForm() {
           )}
         />
       </div>
-      <Button type="submit" className="w-full" variant="performance" disabled={loading}>
+      <Button type="submit" className="w-full" variant="default" disabled={loading}>
         {loading ? "Sending…" : "Send message"}
       </Button>
     </form>

@@ -38,7 +38,7 @@ export default function HowItWorksPage() {
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-border bg-card p-6 shadow-e1">
-            <p className="text-sm font-semibold text-neutral-950">
+            <p className="text-sm font-semibold text-foreground">
               Carmunity-first
             </p>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -47,7 +47,7 @@ export default function HowItWorksPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card p-6 shadow-e1">
-            <p className="text-sm font-semibold text-neutral-950">
+            <p className="text-sm font-semibold text-foreground">
               Marketplace-proven
             </p>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -56,7 +56,7 @@ export default function HowItWorksPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-card p-6 shadow-e1">
-            <p className="text-sm font-semibold text-neutral-950">
+            <p className="text-sm font-semibold text-foreground">
               Seller-intelligent
             </p>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -113,7 +113,7 @@ export default function HowItWorksPage() {
         </section>
 
         <div className="mt-14 flex flex-col items-center gap-5 text-center md:mt-20">
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             Ready to explore the platform from the community side or the marketplace side?
           </p>
           <div className="flex flex-wrap justify-center gap-3">

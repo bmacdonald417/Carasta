@@ -38,23 +38,23 @@ export default async function MarketingCampaignsPage({
           >
             ← Back to Marketing
           </Link>
-          <h1 className="mt-3 font-display text-2xl font-bold text-foreground">
+          <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
             Campaigns
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Track promotion work per listing — no auto-post or email from here.
           </p>
         </div>
-        <Button asChild className="bg-[#ff3b5c] hover:bg-[#ff3b5c]/90">
+        <Button asChild variant="default">
           <Link href={`/u/${user.handle}/marketing/campaigns/new`}>
             New campaign
           </Link>
         </Button>
       </div>
       {campaigns.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-6 py-16 text-center">
-          <p className="font-medium text-neutral-200">No campaigns yet</p>
-          <p className="mt-2 text-sm text-neutral-500">
+        <div className="rounded-2xl border border-dashed border-border bg-muted/25 px-6 py-16 text-center shadow-e1">
+          <p className="font-medium text-foreground">No campaigns yet</p>
+          <p className="mt-2 text-sm text-muted-foreground">
             Create a campaign to track how you&apos;re promoting a listing — use
             it alongside Share &amp; Promote on your auction marketing page.
           </p>
@@ -77,13 +77,13 @@ export default async function MarketingCampaignsPage({
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border">
               {campaigns.map((c) => (
-                <tr key={c.id} className="text-neutral-300">
+                <tr key={c.id} className="text-muted-foreground">
                   <td className="px-4 py-3 font-medium text-foreground">
                     {c.name}
                   </td>
-                  <td className="max-w-[200px] truncate px-4 py-3 text-neutral-400">
+                  <td className="max-w-[200px] truncate px-4 py-3 text-muted-foreground">
                     {c.auctionTitle}
                   </td>
                   <td className="px-4 py-3">{campaignTypeLabel(c.type)}</td>
@@ -92,14 +92,14 @@ export default async function MarketingCampaignsPage({
                       status={c.status as MarketingCampaignStatus}
                     />
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-xs text-neutral-500">
+                  <td className="whitespace-nowrap px-4 py-3 text-xs text-muted-foreground">
                     {c.startAt || c.endAt ? (
                       <>
                         {c.startAt ? formatMarketingDate(c.startAt) : "—"} →{" "}
                         {c.endAt ? formatMarketingDate(c.endAt) : "—"}
                       </>
                     ) : (
-                      <span className="text-neutral-600">
+                      <span className="text-muted-foreground/80">
                         Added {formatMarketingDate(c.createdAt)}
                       </span>
                     )}
