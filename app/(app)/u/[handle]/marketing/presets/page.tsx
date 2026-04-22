@@ -50,7 +50,7 @@ export default async function MarketingPresetsPage({
             UTM labels and copy. Nothing posts automatically.
           </p>
         </div>
-        <Button asChild variant="performance" size="sm">
+        <Button asChild variant="default" size="sm">
           <Link href={`/u/${user.handle}/marketing/presets/new`}>
             New preset
           </Link>

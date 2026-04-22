@@ -127,7 +127,7 @@ export function AddGarageCarForm({
         <Button type="button" variant="outline" asChild>
           <Link href="/settings">Cancel</Link>
         </Button>
-        <Button type="submit" variant="performance" disabled={loading}>
+        <Button type="submit" variant="default" disabled={loading}>
           {loading ? "Adding…" : "Add car"}
         </Button>
       </div>

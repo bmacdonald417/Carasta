@@ -166,7 +166,7 @@ export function ListingAiFieldImprove({
       type="button"
       variant="ghost"
       size="sm"
-      className="h-8 shrink-0 text-xs text-[#ff3b5c]/90 hover:text-[#ff3b5c]"
+      className="h-8 shrink-0 text-xs text-primary hover:text-primary/90"
       disabled={busy}
       onClick={() => void run()}
     >

@@ -199,11 +199,7 @@ export function SettingsForm({
         </label>
       </div>
 
-      <Button
-        type="submit"
-        disabled={loading}
-        className="bg-[#ff3b5c] text-[#0a0a0f] hover:bg-[#ff3b5c]/90"
-      >
+      <Button type="submit" disabled={loading} variant="default">
         {loading ? "Saving…" : "Save"}
       </Button>
     </form>

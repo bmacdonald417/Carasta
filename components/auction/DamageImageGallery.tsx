@@ -29,7 +29,7 @@ export function DamageImageGallery({ images }: { images: DamageImage[] }) {
               key={d.id}
               type="button"
               onClick={() => setSelected(d)}
-              className="relative h-24 w-32 shrink-0 overflow-hidden rounded-xl border border-white/10 transition-all hover:border-[#ff3b5c]/40 hover:shadow-[0_0_12px_rgba(255,59,92,0.2)] focus:outline-none focus:ring-2 focus:ring-[#ff3b5c]/50"
+              className="relative h-24 w-32 shrink-0 overflow-hidden rounded-xl border border-border transition-all hover:border-primary/40 hover:shadow-[0_0_12px_hsl(var(--primary)/0.15)] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >

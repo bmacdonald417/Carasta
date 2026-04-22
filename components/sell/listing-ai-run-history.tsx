@@ -58,7 +58,7 @@ export function ListingAiRunHistory({
     <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium text-neutral-200">
-          <History className="h-4 w-4 text-[#ff3b5c]/80" />
+          <History className="h-4 w-4 text-primary/80" />
           Recent AI activity
         </div>
         <Button
@@ -106,7 +106,7 @@ export function ListingAiRunHistory({
               ) : null}
               {r.preview ? (
                 <details className="mt-2 group">
-                  <summary className="flex cursor-pointer list-none items-center gap-1 text-xs font-medium text-[#ff3b5c]/90 hover:text-[#ff3b5c]">
+                  <summary className="flex cursor-pointer list-none items-center gap-1 text-xs font-medium text-primary hover:text-primary/90">
                     <ChevronDown className="h-3.5 w-3.5 transition group-open:rotate-180" />
                     Output preview
                   </summary>

@@ -12,7 +12,7 @@ const TIER_STYLES: Record<
   },
   APEX: {
     label: "Apex",
-    className: "text-[#ff3b5c] shadow-[0_0_12px_rgba(255,59,92,0.4)]",
+    className: "text-primary shadow-[0_0_12px_hsl(var(--primary)/0.35)]",
   },
 };
 

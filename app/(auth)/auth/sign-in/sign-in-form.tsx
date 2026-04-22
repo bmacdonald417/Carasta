@@ -77,7 +77,7 @@ export function SignInForm({ googleEnabled = false }: { googleEnabled?: boolean 
           </button>
         </div>
       </div>
-      <Button type="submit" className="w-full" variant="performance" disabled={loading}>
+      <Button type="submit" className="w-full" variant="default" disabled={loading}>
         {loading ? "Signing in…" : "Sign in"}
       </Button>
       {googleEnabled && (

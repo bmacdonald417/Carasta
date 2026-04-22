@@ -242,7 +242,7 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
       <Button
         type="submit"
         className="w-full"
-        variant="performance"
+        variant="default"
         disabled={loading || !consentComplete}
       >
         {loading ? "Creating account…" : "Create account"}

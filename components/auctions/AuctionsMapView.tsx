@@ -62,7 +62,7 @@ export function AuctionMapPreview({
       <div className="relative aspect-video w-full overflow-hidden bg-neutral-900">
         <img src={img} alt={auction.title} className="h-full w-full object-cover" />
         {auction.status === "LIVE" && (
-          <span className="absolute left-2 top-2 rounded bg-[#ff3b5c]/90 px-2 py-0.5 text-xs font-medium text-white">
+          <span className="absolute left-2 top-2 rounded bg-signal px-2 py-0.5 text-xs font-medium text-white">
             Live
           </span>
         )}
@@ -80,7 +80,7 @@ export function AuctionMapPreview({
         </p>
         <Link
           href={href}
-          className="mt-2 block w-full rounded-lg bg-[hsl(var(--performance-red))] px-3 py-2 text-center text-sm font-medium text-white hover:opacity-90"
+          className="mt-2 block w-full rounded-lg bg-signal px-3 py-2 text-center text-sm font-medium text-white hover:opacity-90"
         >
           View auction
         </Link>

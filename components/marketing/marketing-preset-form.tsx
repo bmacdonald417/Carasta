@@ -212,7 +212,7 @@ export function MarketingPresetForm({
       </div>
 
       <div className="flex flex-wrap gap-3 pt-2">
-        <Button type="submit" variant="performance" disabled={loading}>
+        <Button type="submit" variant="default" disabled={loading}>
           {loading ? "Saving…" : mode === "create" ? "Create preset" : "Save"}
         </Button>
         <Button type="button" variant="outline" asChild>

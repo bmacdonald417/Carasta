@@ -61,7 +61,7 @@ export function Nav() {
           ) : session ? (
             <>
               <Link href="/sell" className="hidden md:inline-flex">
-                <Button size="sm" variant="performance">
+                <Button size="sm" variant="default">
                   <PlusCircle className="mr-1.5 h-4 w-4" />
                   Sell
                 </Button>
@@ -121,7 +121,7 @@ export function Nav() {
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/auth/sign-in">Sign in</Link>
               </Button>
-              <Button size="sm" variant="performance" asChild>
+              <Button size="sm" variant="default" asChild>
                 <Link href="/auth/sign-up">Sign up</Link>
               </Button>
             </>

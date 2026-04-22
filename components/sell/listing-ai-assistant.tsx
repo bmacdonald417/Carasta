@@ -238,10 +238,10 @@ export function ListingAiAssistant({
   if (!enabled) return null;
 
   return (
-    <div className="rounded-2xl border border-[#ff3b5c]/25 bg-gradient-to-b from-[#ff3b5c]/[0.07] to-transparent p-5">
+    <div className="rounded-2xl border border-primary/25 bg-gradient-to-b from-primary/[0.07] to-transparent p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[#ff3b5c]">
+          <div className="flex items-center gap-2 text-primary">
             <Sparkles className="h-5 w-5 shrink-0" />
             <h3 className="font-display text-base font-semibold text-foreground">{heading}</h3>
           </div>
@@ -250,7 +250,8 @@ export function ListingAiAssistant({
         <Button
           type="button"
           size="sm"
-          className="shrink-0 bg-[#ff3b5c] text-white hover:bg-[#ff3b5c]/90"
+          variant="default"
+          className="shrink-0"
           disabled={busy}
           onClick={() => void generate()}
         >

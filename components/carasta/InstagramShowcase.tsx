@@ -157,7 +157,7 @@ export function InstagramShowcase() {
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 flex items-center gap-2 rounded-lg border border-[#ff3b5c]/30 bg-[#ff3b5c]/10 px-4 py-2.5 text-sm font-medium text-[#ff3b5c] transition hover:bg-[#ff3b5c]/20 md:mt-0"
+            className="mt-4 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition hover:bg-primary/20 md:mt-0"
           >
             View on Instagram
             <ExternalLink className="h-4 w-4" />
@@ -174,7 +174,7 @@ export function InstagramShowcase() {
             <button
               type="button"
               onClick={() => scroll("left")}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/60 backdrop-blur-sm text-neutral-300 transition hover:border-[#ff3b5c]/50 hover:bg-black/80 hover:text-white md:h-14 md:w-14"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/60 backdrop-blur-sm text-neutral-300 transition hover:border-primary/50 hover:bg-black/80 hover:text-white md:h-14 md:w-14"
               aria-label="Scroll backward"
             >
               <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
@@ -184,7 +184,7 @@ export function InstagramShowcase() {
             <button
               type="button"
               onClick={() => scroll("right")}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/60 backdrop-blur-sm text-neutral-300 transition hover:border-[#ff3b5c]/50 hover:bg-black/80 hover:text-white md:h-14 md:w-14"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/60 backdrop-blur-sm text-neutral-300 transition hover:border-primary/50 hover:bg-black/80 hover:text-white md:h-14 md:w-14"
               aria-label="Scroll forward"
             >
               <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
@@ -232,7 +232,7 @@ function MediaCard({ post }: { post: Post }) {
       href={post.permalink}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all duration-300 hover:border-[#ff3b5c]/30 hover:shadow-[0_0_20px_rgba(255,59,92,0.15)]"
+      className="group relative flex shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.12)]"
       style={{ width: CARD_WIDTH, aspectRatio: CARD_ASPECT }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -269,7 +269,7 @@ function MediaCard({ post }: { post: Post }) {
           <span className="text-sm font-medium">{post.likes.toLocaleString()}</span>
         </div>
         <div>
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-[#ff3b5c]/90 px-2.5 py-1.5 text-xs font-medium text-white">
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-primary px-2.5 py-1.5 text-xs font-medium text-primary-foreground">
             View on Instagram
             <ExternalLink className="h-3 w-3" />
           </span>
