@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 /// Carmunity by Carasta — semantic colors aligned with web `styles/carmunity-tokens.css`.
 ///
 /// Roles:
-/// - [accent] / [accentMuted]: primary **brand** copper (nav, links, Carmunity chrome).
-/// - [auctionSignal]: performance **red** — bids, live urgency, high bid, countdown stress.
+/// - [accent] / [accentMuted]: functional blue-violet (nav, links, inputs) — matches web `--primary`.
+/// - [heritageCopper]: Carmasta heritage only; do not use for routine product chrome.
+/// - [auctionSignal]: performance **red** — live urgency, bid stress (matches web `--performance-red`).
 /// - Surfaces: deeper blacks, subtle borders (not gray-heavy).
 abstract final class AppColors {
   // --- Surfaces (match web `--background`, `--card`) ---
@@ -22,9 +23,12 @@ abstract final class AppColors {
   static const Color textSecondary = Color(0xFF9AA3B5);
   static const Color textTertiary = Color(0xFF6B7287);
 
-  // --- Brand accent — copper #E8A54B (same as web `--primary`) ---
-  static const Color accent = Color(0xFFE8A54B);
-  static const Color accentMuted = Color(0xFF8F6A2E);
+  // --- Functional accent — blue-violet (same family as web `.dark` `--primary` @ 258 86% 62%) ---
+  static const Color accent = Color(0xFF8B6BFF);
+  static const Color accentMuted = Color(0xFF5340A8);
+
+  /// Heritage copper — marketing/brand-only; mirrors web `--legacy-brand-copper`.
+  static const Color heritageCopper = Color(0xFFE8A54B);
 
   // --- Auction / bid / live urgency (web `--performance-red` / `signal`) ---
   static const Color auctionSignal = Color(0xFFFF3B5C);

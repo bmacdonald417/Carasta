@@ -72,7 +72,7 @@ export function AuctionMapPreview({
           {auction.year} {auction.make} {auction.model}
         </p>
         <p className="mt-0.5 font-medium line-clamp-1">{auction.title}</p>
-        <p className="mt-1 text-sm font-semibold text-[hsl(var(--performance-red))]">
+        <p className="mt-1 text-sm font-semibold text-primary">
           {formatCurrency(highBidCents)}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -80,7 +80,7 @@ export function AuctionMapPreview({
         </p>
         <Link
           href={href}
-          className="mt-2 block w-full rounded-lg bg-signal px-3 py-2 text-center text-sm font-medium text-white hover:opacity-90"
+          className="mt-2 block w-full rounded-lg bg-primary px-3 py-2 text-center text-sm font-medium text-primary-foreground shadow-e1 hover:bg-primary/90 hover:shadow-e2"
         >
           View auction
         </Link>

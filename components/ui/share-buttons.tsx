@@ -47,7 +47,7 @@ export function ShareButtons({
   /** When set with `trackMarketing`, records SHARE_CLICK for auction analytics. */
   auctionId?: string;
   trackMarketing?: boolean;
-  /** Optional classes for the trigger button (e.g. Carmunity copper outline). */
+  /** Optional classes for the trigger button (e.g. outline tuned to a dark hero). */
   triggerClassName?: string;
   /** Lightweight Carmunity share attribution (Phase L). */
   carmunityShareMeta?: Record<string, unknown>;
@@ -158,7 +158,7 @@ export function ShareButtons({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="min-w-[220px] border-white/10 bg-[#121218]/95 backdrop-blur-xl"
+        className="min-w-[220px] border-border bg-popover/95 text-popover-foreground backdrop-blur-xl"
       >
         {typeof navigator !== "undefined" && typeof navigator.share === "function" ? (
           <>

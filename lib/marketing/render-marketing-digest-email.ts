@@ -3,6 +3,10 @@ import type {
   DigestAuctionLine,
 } from "@/lib/marketing/generate-marketing-digest";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
+import { designTokens } from "@/lib/design-tokens";
+
+/** Inline email styles cannot use CSS variables; mirror web functional accent (blue-violet). */
+const DIGEST_ACCENT = designTokens.colors.accentBlueVioletApproxHex;
 
 function esc(s: string): string {
   return s
@@ -21,7 +25,7 @@ function absUrl(origin: string, path: string | null): string | null {
 function section(title: string, inner: string): string {
   return `
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;font-family:system-ui,Segoe UI,sans-serif;font-size:14px;color:#1a1a1a;">
-    <tr><td style="padding-bottom:8px;border-bottom:2px solid #ff3b5c;font-weight:600;font-size:15px;">${esc(title)}</td></tr>
+    <tr><td style="padding-bottom:8px;border-bottom:2px solid ${DIGEST_ACCENT};font-weight:600;font-size:15px;">${esc(title)}</td></tr>
     <tr><td style="padding-top:12px;">${inner}</td></tr>
   </table>`;
 }
@@ -54,7 +58,7 @@ function listAlerts(origin: string, alerts: MarketingDigestSnapshot["recentAlert
     .map((a) => {
       const href = absUrl(origin, a.marketingHref);
       if (href) {
-        return `<li style="margin-bottom:8px;"><a href="${href}" style="color:#cc2244;">${esc(a.title)}</a></li>`;
+        return `<li style="margin-bottom:8px;"><a href="${href}" style="color:${DIGEST_ACCENT};">${esc(a.title)}</a></li>`;
       }
       return `<li style="margin-bottom:8px;">${esc(a.title)}</li>`;
     })
@@ -69,7 +73,7 @@ function listCampaigns(origin: string, camps: MarketingDigestSnapshot["activeCam
     .map((c) => {
       const href = absUrl(origin, c.marketingHref);
       const line = `${c.name} (${c.status}) — ${c.auctionTitle}`;
-      return `<li style="margin-bottom:8px;"><a href="${href}" style="color:#cc2244;">${esc(line)}</a></li>`;
+      return `<li style="margin-bottom:8px;"><a href="${href}" style="color:${DIGEST_ACCENT};">${esc(line)}</a></li>`;
     })
     .join("")}</ul>`;
 }
@@ -94,7 +98,7 @@ export function renderMarketingDigestEmail(snapshot: MarketingDigestSnapshot): {
   <p style="margin:0 0 8px;line-height:1.5;">
     <strong>At a glance:</strong> ${snapshot.overview.liveAuctions} live · ${snapshot.overview.totalViews} total views · ${snapshot.overview.totalShareClicks} share clicks · ${snapshot.overview.totalBidClicks} bid clicks (intent) · ${snapshot.overview.activeCampaigns} active campaigns
   </p>
-  <p style="margin:0 0 24px;"><a href="${marketingHome}" style="color:#cc2244;font-weight:600;">Open Marketing dashboard →</a></p>`;
+  <p style="margin:0 0 24px;"><a href="${marketingHome}" style="color:${DIGEST_ACCENT};font-weight:600;">Open Marketing dashboard →</a></p>`;
 
   const html = `<!DOCTYPE html><html><body style="margin:0;padding:24px;background:#f4f4f5;">
   <div style="max-width:560px;margin:0 auto;background:#fff;padding:28px;border-radius:12px;border:1px solid #e5e5e5;">

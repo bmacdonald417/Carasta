@@ -145,8 +145,14 @@ body.carasta-theme .carasta-body {
 
 /* Live pulse animation */
 @keyframes live-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 59, 92, 0.6); }
-  50% { opacity: 0.9; box-shadow: 0 0 0 8px rgba(255, 59, 92, 0); }
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 hsl(var(--performance-red) / 0.6);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 0 8px hsl(var(--performance-red) / 0);
+  }
 }
 
 .live-pulse {
