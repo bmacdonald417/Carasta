@@ -90,19 +90,31 @@ function resourcesMenuActive(pathname: string) {
 const pillarMenuContentClass =
   "z-[100] min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2";
 
+/**
+ * Must forward arbitrary props from Radix `DropdownMenuTrigger asChild` (Slot merge):
+ * pointer handlers, aria-*, data-state, etc. Omitting them breaks open/close and pill affordances.
+ */
 const PillarChevronTrigger = forwardRef<
   HTMLButtonElement,
-  { children: React.ReactNode; active: boolean }
->(function PillarChevronTrigger({ children, active }, ref) {
+  React.ComponentPropsWithoutRef<"button"> & {
+    active: boolean;
+    children: React.ReactNode;
+  }
+>(function PillarChevronTrigger(
+  { children, active, className, type = "button", ...props },
+  ref
+) {
   return (
     <button
       ref={ref}
-      type="button"
+      type={type}
       className={cn(
         "inline-flex items-center gap-0.5",
         shellHeaderAppLinkBase,
-        active ? shellHeaderAppActive : shellHeaderAppInactive
+        active ? shellHeaderAppActive : shellHeaderAppInactive,
+        className
       )}
+      {...props}
     >
       {children}
       <ChevronDown className="h-3.5 w-3.5 opacity-70" aria-hidden />
@@ -155,7 +167,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
       >
         Market
       </Link>
-      <DropdownMenu modal={false}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={resourcesMenuActive(pathname)}>
             Resources
@@ -178,7 +190,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
   const signedInPillarNav = (
     <>
-      <DropdownMenu modal={false}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={carmunityMenuActive(pathname, handle)}>
             Carmunity
@@ -207,7 +219,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DropdownMenu modal={false}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={marketMenuActive(pathname, handle)}>Market</PillarChevronTrigger>
         </DropdownMenuTrigger>
@@ -239,7 +251,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DropdownMenu modal={false}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={resourcesMenuActive(pathname)}>Resources</PillarChevronTrigger>
         </DropdownMenuTrigger>
@@ -267,7 +279,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             : "border-transparent bg-transparent"
         }`}
       >
-        <div className="carasta-container flex h-16 items-center gap-4 md:h-20 md:gap-6">
+        <div className="relative z-10 carasta-container flex h-16 items-center gap-4 md:h-20 md:gap-6">
           <Link
             href={session ? "/explore" : "/"}
             className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-90"
