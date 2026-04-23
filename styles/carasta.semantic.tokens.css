@@ -39,9 +39,9 @@
   --muted: 220 14% 96%;
   --muted-foreground: 220 9% 42%;
 
-  /* shadcn "accent" is a muted interactive surface (NOT the brand accent color) */
-  --accent: 220 14% 96%;
-  --accent-foreground: 224 32% 12%;
+  /* shadcn "accent" — interactive hover/selection (menus, ghost buttons); aligned with primary tint */
+  --accent: 258 76% 96%;
+  --accent-foreground: 258 45% 36%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
@@ -126,8 +126,8 @@
   --muted: 222 14% 12%;
   --muted-foreground: 220 10% 65%;
 
-  --accent: 222 14% 14%;
-  --accent-foreground: 220 14% 96%;
+  --accent: 258 32% 18%;
+  --accent-foreground: 258 42% 94%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;

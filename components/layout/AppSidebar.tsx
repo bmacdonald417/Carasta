@@ -82,7 +82,7 @@ function JumperRow({
     <Link href={href} className="block">
       <motion.div
         className={cn(
-          "flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+          "flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
         )}
         whileHover={hoverScale}
         whileTap={tapScale}
@@ -503,7 +503,7 @@ export function AppSidebar() {
           <button
             type="button"
             onClick={() => openPalette()}
-            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
           >
             <span className="truncate">Quick help</span>
             <kbd className="ml-auto shrink-0 rounded border border-border/80 bg-muted/30 px-1 py-0.5 font-mono text-[9px] text-muted-foreground">

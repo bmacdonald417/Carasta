@@ -440,7 +440,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                             e.preventDefault();
                             void signOut({ callbackUrl: "/" });
                           }}
-                          className="cursor-pointer text-destructive focus:text-destructive"
+                          className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive"
                         >
                           Sign out
                         </DropdownMenuItem>
@@ -536,7 +536,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                   <Link
                     href="/auctions"
-                    className="rounded-full border border-border px-4 py-2 font-semibold text-foreground transition hover:bg-muted/60"
+                    className="rounded-full border border-border px-4 py-2 font-semibold text-foreground transition hover:bg-primary/12 hover:text-primary"
                   >
                     Market
                   </Link>

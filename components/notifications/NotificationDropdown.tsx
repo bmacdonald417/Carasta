@@ -128,7 +128,7 @@ export function NotificationDropdown() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-muted-foreground hover:text-foreground"
+          className="relative text-muted-foreground hover:text-primary"
           aria-label="Notifications — Carmunity and listing alerts"
         >
           <Bell className="h-5 w-5" />
@@ -159,7 +159,7 @@ export function NotificationDropdown() {
             <button
               type="button"
               onClick={handleMarkAllRead}
-              className="shrink-0 rounded-md pt-0.5 text-xs font-medium text-primary hover:bg-muted/60 hover:underline"
+              className="shrink-0 rounded-md pt-0.5 text-xs font-medium text-primary hover:bg-primary/10 hover:underline"
             >
               Mark all read
             </button>
@@ -186,7 +186,7 @@ export function NotificationDropdown() {
                   asChild
                   variant="ghost"
                   size="sm"
-                  className="text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  className="text-muted-foreground hover:bg-primary/10 hover:text-primary"
                 >
                   <Link href="/discussions">Browse discussions</Link>
                 </Button>
@@ -213,7 +213,7 @@ export function NotificationDropdown() {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="w-full text-xs font-medium text-primary hover:bg-muted/60"
+                    className="w-full text-xs font-medium text-primary hover:bg-primary/10"
                     disabled={loadingMore}
                     onClick={() => void loadMore()}
                   >
@@ -277,7 +277,7 @@ function NotificationRow({
         onClick={() => {
           void markRead();
         }}
-        className="block rounded-md hover:bg-muted/40 hover:text-foreground"
+        className="block rounded-md hover:bg-primary/10 hover:text-foreground"
       >
         {content}
         <span className="mt-0.5 block text-xs text-muted-foreground">
