@@ -90,7 +90,6 @@ export default async function MarketingPage({
       label: "Marketing events",
       value: overview.marketingEvents,
       icon: Megaphone,
-      hint: "Views, shares, bid intent — all tracked events",
     },
     {
       label: "Total views",
@@ -106,7 +105,6 @@ export default async function MarketingPage({
       label: "Bid clicks",
       value: overview.totalBidClicks,
       icon: Hand,
-      hint: "Bid button taps (not completed bids)",
     },
   ];
 

@@ -343,16 +343,24 @@ export function CommunityFeed({
       )}
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid w-full grid-cols-2 border border-border bg-muted/30 p-1 shadow-e1">
+        <TabsList className="grid h-11 w-full grid-cols-2 gap-0 overflow-hidden rounded-2xl border border-border bg-muted/30 p-1 shadow-e1">
           <TabsTrigger
             value="trending"
-            className="rounded-xl text-muted-foreground transition-colors duration-150 ease-out data-[state=active]:bg-primary/15 data-[state=active]:text-primary data-[state=active]:shadow-none"
+            className={cn(
+              "flex h-full min-h-0 items-center justify-center rounded-l-xl rounded-r-none py-0 text-sm font-medium text-muted-foreground transition-colors duration-150 ease-out",
+              "data-[state=active]:bg-primary/15 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:ring-0",
+              "data-[state=inactive]:hover:bg-primary/10 data-[state=inactive]:hover:text-primary"
+            )}
           >
             Trending
           </TabsTrigger>
           <TabsTrigger
             value="following"
-            className="rounded-xl text-muted-foreground transition-colors duration-150 ease-out data-[state=active]:bg-primary/15 data-[state=active]:text-primary data-[state=active]:shadow-none"
+            className={cn(
+              "flex h-full min-h-0 items-center justify-center rounded-l-none rounded-r-xl py-0 text-sm font-medium text-muted-foreground transition-colors duration-150 ease-out",
+              "data-[state=active]:bg-primary/15 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:ring-0",
+              "data-[state=inactive]:hover:bg-primary/10 data-[state=inactive]:hover:text-primary"
+            )}
           >
             Following
           </TabsTrigger>
