@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 
 import { getSession } from "@/lib/auth";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 import { ConversationClient } from "./conversation-client";
 
 export default async function ConversationPage({
@@ -10,9 +9,8 @@ export default async function ConversationPage({
   params: Promise<{ conversationId: string }>;
 }) {
   const session = await getSession();
-  const reviewCtx = isReviewModeEnabled() ? await getReviewModeContext() : null;
-  if (!session?.user?.id && !reviewCtx) redirect("/auth/sign-in");
-  const viewerId = ((session?.user as any)?.id as string | undefined) ?? reviewCtx?.sellerUserId;
+  if (!session?.user?.id) redirect("/auth/sign-in");
+  const viewerId = (session.user as { id?: string }).id as string;
 
   const { conversationId } = await params;
   if (!conversationId || !viewerId) redirect("/messages");

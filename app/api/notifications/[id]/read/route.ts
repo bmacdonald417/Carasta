@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getJwtSubjectUserId } from "@/lib/auth/api-user";
 import { prisma } from "@/lib/db";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 export const dynamic = "force-dynamic";
 
@@ -10,16 +9,9 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let userId = await getJwtSubjectUserId(req);
-  if (!userId && isReviewModeEnabled()) {
-    userId = (await getReviewModeContext())?.sellerUserId;
-  }
+  const userId = await getJwtSubjectUserId(req);
   if (!userId) {
     return NextResponse.json({ message: "Sign in required." }, { status: 401 });
-  }
-
-  if (isReviewModeEnabled()) {
-    return NextResponse.json({ ok: true, reviewMode: true });
   }
 
   const { id } = await params;

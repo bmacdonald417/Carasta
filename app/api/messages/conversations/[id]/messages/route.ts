@@ -6,7 +6,6 @@ import { prisma } from "@/lib/db";
 import { getJwtSubjectUserId } from "@/lib/auth/api-user";
 import { allowAction } from "@/lib/api-rate-limit";
 import { usersAreBlockedEitherWay, recipientHasMutedActor } from "@/lib/user-safety";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -33,19 +32,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let senderId = await getJwtSubjectUserId(req);
-  if (!senderId && isReviewModeEnabled()) {
-    senderId = (await getReviewModeContext())?.sellerUserId;
-  }
+  const senderId = await getJwtSubjectUserId(req);
   if (!senderId) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (isReviewModeEnabled()) {
-    return NextResponse.json(
-      { ok: false, error: "Review mode is read-only for messaging send actions." },
-      { status: 403 }
-    );
   }
 
   const { id: conversationId } = await params;

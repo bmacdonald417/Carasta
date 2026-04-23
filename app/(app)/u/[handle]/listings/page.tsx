@@ -14,7 +14,6 @@ import { ListingsFilters } from "./listings-filters";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
 import { isListingAiEnabled } from "@/lib/listing-ai/listing-ai-feature-flag";
 import { ListingsAiRefineDialog } from "@/components/sell/listings-ai-refine-dialog";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 const PAGE_SIZE = 20;
 const STATUSES = ["LIVE", "DRAFT", "SOLD", "ENDED"] as const;
@@ -39,10 +38,7 @@ export default async function ListingsPage({
     where: { handle: handle.toLowerCase() },
   });
   if (!user) notFound();
-  const reviewCtx = isReviewModeEnabled() ? await getReviewModeContext() : null;
-  const isOwn =
-    (session?.user as any)?.id === user.id ||
-    (reviewCtx?.sellerUserId === user.id && reviewCtx?.sellerHandle === handle.toLowerCase());
+  const isOwn = (session?.user as { id?: string } | undefined)?.id === user.id;
 
   if (!isOwn) notFound();
 

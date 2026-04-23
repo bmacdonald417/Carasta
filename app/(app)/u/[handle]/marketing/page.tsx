@@ -31,7 +31,6 @@ import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { MarketingAlertsPanel } from "@/components/marketing/marketing-alerts-panel";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 import {
   SellerInsightCard,
   SellerKpiCard,
@@ -53,10 +52,7 @@ export default async function MarketingPage({
     where: { handle: handle.toLowerCase() },
   });
   if (!user) notFound();
-  const reviewCtx = isReviewModeEnabled() ? await getReviewModeContext() : null;
-  const isOwn =
-    (session?.user as any)?.id === user.id ||
-    (reviewCtx?.sellerUserId === user.id && reviewCtx?.sellerHandle === handle.toLowerCase());
+  const isOwn = (session?.user as { id?: string } | undefined)?.id === user.id;
   if (!isOwn) notFound();
 
   await ensureSellerMarketingNotifications(user.id, user.handle);

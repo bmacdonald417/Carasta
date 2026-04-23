@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 export type MarketingWorkspaceUser = { id: string };
 
@@ -16,10 +15,6 @@ export type MarketingWorkspaceAuthResult =
 export async function requireMarketingWorkspaceSession(): Promise<MarketingWorkspaceAuthResult> {
   if (!isMarketingEnabled()) {
     return { ok: false, response: NextResponse.json({ message: "Not found." }, { status: 404 }) };
-  }
-  if (isReviewModeEnabled()) {
-    const ctx = await getReviewModeContext();
-    if (ctx) return { ok: true, user: { id: ctx.sellerUserId } };
   }
   const session = await getSession();
   const id = (session?.user as { id?: string } | undefined)?.id;

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineSpinner } from "@/components/ui/inline-spinner";
 import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
-import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 import { cn } from "@/lib/utils";
 
 type UserMini = {
@@ -57,7 +56,6 @@ export function ConversationClient({
   conversationId: string;
   viewerId: string;
 }) {
-  const reviewMode = isReviewModeClient();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -321,12 +319,6 @@ export function ConversationClient({
       </div>
 
       <div className="shrink-0 border-t border-border bg-card p-3">
-        {reviewMode ? (
-          <p className="mb-3 rounded-md border border-caution/30 bg-caution-soft/40 px-3 py-2 text-xs text-caution-foreground">
-            Review mode: sending is disabled. Scroll and layout are for visual review
-            only.
-          </p>
-        ) : null}
         {error && conversation ? (
           <p className="mb-2 text-xs font-medium text-destructive" role="status">
             {error}
@@ -339,11 +331,10 @@ export function ConversationClient({
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Write a message…"
-            disabled={reviewMode}
           />
           <Button
             type="button"
-            disabled={reviewMode || sending || body.trim().length === 0}
+            disabled={sending || body.trim().length === 0}
             onClick={() => void send()}
             className="shrink-0"
           >

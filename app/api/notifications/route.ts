@@ -3,7 +3,6 @@ import { z } from "zod";
 
 import { getJwtSubjectUserId } from "@/lib/auth/api-user";
 import { prisma } from "@/lib/db";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +11,7 @@ export const dynamic = "force-dynamic";
  * Returns `{ items, nextCursor }` for Carmunity + legacy in-app notifications.
  */
 export async function GET(req: NextRequest) {
-  let userId = await getJwtSubjectUserId(req);
-  if (!userId && isReviewModeEnabled()) {
-    userId = (await getReviewModeContext())?.sellerUserId;
-  }
+  const userId = await getJwtSubjectUserId(req);
   if (!userId) {
     return NextResponse.json({ items: [], nextCursor: null });
   }

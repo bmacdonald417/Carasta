@@ -73,7 +73,6 @@ So a **default `npm run build`** on Railway **already** runs **`prisma db push`*
 **In-repo mitigations (ship with the repo; no Railway UI change required):**
 
 - `scripts/build-with-public-db.cjs` appends Prisma URL params **`connection_limit`** (default **`1`**) and **`pool_timeout`** to `DATABASE_URL` for the build subprocess when they are absent. Override with Railway variable **`DATABASE_BUILD_CONNECTION_LIMIT`** (digits only) if you need a slightly higher cap.
-- **`lib/review-mode.ts`**: when `REVIEW_MODE_ENABLED` is true, the root layout’s `ReviewModeBanner` runs during **every** prerender. The review-mode context loader previously used **`Promise.all` for four Prisma reads**, which spikes concurrent connections; it is now **sequential** to stay within small Postgres limits.
 
 **Optional Railway-only tweaks (no code):**
 

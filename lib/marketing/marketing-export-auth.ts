@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { isMarketingEnabled } from "@/lib/marketing/feature-flag";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 export type SellerMarketingExportUser = { id: string; handle: string };
 
@@ -21,15 +20,6 @@ export async function requireSellerMarketingCsvAccess(
       ok: false,
       response: NextResponse.json({ ok: false }, { status: 404 }),
     };
-  }
-  if (isReviewModeEnabled()) {
-    const ctx = await getReviewModeContext();
-    if (ctx && ctx.sellerHandle === handleParam.trim().toLowerCase()) {
-      return {
-        ok: true,
-        user: { id: ctx.sellerUserId, handle: ctx.sellerHandle },
-      };
-    }
   }
   const session = await getSession();
   const uid = (session?.user as { id?: string } | undefined)?.id;

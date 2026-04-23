@@ -5,7 +5,6 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getJwtSubjectUserId } from "@/lib/auth/api-user";
 import { usersAreBlockedEitherWay } from "@/lib/user-safety";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,10 +24,7 @@ function directKeyFor(userA: string, userB: string, auctionId?: string): string 
  * List current user's conversations with other participant(s), preview, and unread count.
  */
 export async function GET(req: NextRequest) {
-  let userId = await getJwtSubjectUserId(req);
-  if (!userId && isReviewModeEnabled()) {
-    userId = (await getReviewModeContext())?.sellerUserId;
-  }
+  const userId = await getJwtSubjectUserId(req);
   if (!userId) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
@@ -91,10 +87,7 @@ export async function GET(req: NextRequest) {
  * Create-or-get an existing 1:1 conversation for current user and targetUserId.
  */
 export async function POST(req: NextRequest) {
-  let userId = await getJwtSubjectUserId(req);
-  if (!userId && isReviewModeEnabled()) {
-    userId = (await getReviewModeContext())?.sellerUserId;
-  }
+  const userId = await getJwtSubjectUserId(req);
   if (!userId) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }

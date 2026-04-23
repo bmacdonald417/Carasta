@@ -1,13 +1,12 @@
 import { redirect } from "next/navigation";
 
 import { getSession } from "@/lib/auth";
-import { isReviewModeEnabled } from "@/lib/review-mode";
 import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { MessagesConversationsClient } from "./messages-conversations-client";
 
 export default async function MessagesPage() {
   const session = await getSession();
-  if (!session?.user?.id && !isReviewModeEnabled()) redirect("/auth/sign-in");
+  if (!session?.user?.id) redirect("/auth/sign-in");
 
   return (
     <div className="carasta-container max-w-3xl py-8">

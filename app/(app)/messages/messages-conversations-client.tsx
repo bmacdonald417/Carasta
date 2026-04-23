@@ -6,7 +6,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InlineSpinner } from "@/components/ui/inline-spinner";
-import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +39,6 @@ type ConversationListRow = {
 };
 
 export function MessagesConversationsClient() {
-  const reviewMode = isReviewModeClient();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rows, setRows] = useState<ConversationListRow[]>([]);
@@ -127,11 +125,6 @@ export function MessagesConversationsClient() {
           When someone messages you, or you start a thread from a profile or
           listing context, it will appear here.
         </p>
-        {reviewMode ? (
-          <p className="mt-4 rounded-md border border-caution/30 bg-caution-soft/40 px-3 py-2 text-left text-xs text-caution-foreground">
-            Review mode: demo conversations appear when seeded data is present.
-          </p>
-        ) : null}
       </div>
     );
   }

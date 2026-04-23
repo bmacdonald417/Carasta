@@ -25,7 +25,6 @@ import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { listProfileDiscussionActivityPage } from "@/lib/forums/profile-discussion-activity";
 import { listSavedThreadsForUser, savedThreadHref } from "@/lib/forums/thread-subscriptions";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
 import { cn } from "@/lib/utils";
 
@@ -83,8 +82,7 @@ export default async function ProfilePage({
   const { handle } = await params;
   const sp = (await searchParams) ?? {};
   const session = await getSession();
-  const reviewCtx = isReviewModeEnabled() ? await getReviewModeContext() : null;
-  const currentUserId = (session?.user as any)?.id;
+  const currentUserId = (session?.user as { id?: string } | undefined)?.id;
 
   const user = await prisma.user.findUnique({
     where: { handle: handle.toLowerCase() },
@@ -128,9 +126,7 @@ export default async function ProfilePage({
 
   if (!user) notFound();
 
-  const isOwnProfile =
-    currentUserId === user.id ||
-    (reviewCtx?.profileHandle === user.handle.toLowerCase());
+  const isOwnProfile = currentUserId === user.id;
   const following = currentUserId
     ? await prisma.follow.findUnique({
         where: {

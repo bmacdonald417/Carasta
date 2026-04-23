@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { markAllNotificationsRead } from "@/app/(app)/notifications/actions";
-import { isReviewModeClient } from "@/components/review-mode/review-mode-client";
 
 type NotificationItem = {
   id: string;
@@ -55,7 +54,6 @@ function parseNotificationListPayload(json: unknown): {
 }
 
 export function NotificationDropdown() {
-  const reviewMode = isReviewModeClient();
   const [unreadCount, setUnreadCount] = useState(0);
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [nextCursor, setNextCursor] = useState<NotificationCursor | null>(null);
@@ -156,11 +154,6 @@ export function NotificationDropdown() {
             <p className="text-[11px] leading-snug text-muted-foreground">
               Carmunity + listing alerts for this account (same model as Carmunity mobile).
             </p>
-            {reviewMode ? (
-              <p className="mt-1 rounded-md border border-caution/30 bg-caution-soft/30 px-2 py-1 text-[11px] text-caution-foreground">
-                Review mode: notification actions are preview-only.
-              </p>
-            ) : null}
           </div>
           {unreadCount > 0 && (
             <button

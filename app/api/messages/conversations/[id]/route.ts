@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/db";
 import { getJwtSubjectUserId } from "@/lib/auth/api-user";
-import { getReviewModeContext, isReviewModeEnabled } from "@/lib/review-mode";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -16,10 +15,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let userId = await getJwtSubjectUserId(req);
-  if (!userId && isReviewModeEnabled()) {
-    userId = (await getReviewModeContext())?.sellerUserId;
-  }
+  const userId = await getJwtSubjectUserId(req);
   if (!userId) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
