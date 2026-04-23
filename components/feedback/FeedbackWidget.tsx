@@ -6,6 +6,7 @@ import { MessageSquarePlus } from "lucide-react";
 import FeedbackModal from "./FeedbackModal";
 import { ElementSelector } from "./ElementSelector";
 import type { FeedbackCategory, PinnedElement } from "./types";
+import { FLOATING_PILL_LAUNCHER_CLASS } from "@/components/shell/floating-launcher-styles";
 
 export default function FeedbackWidget() {
   const { data: session, status } = useSession();
@@ -64,9 +65,10 @@ export default function FeedbackWidget() {
         type="button"
         aria-label="Open feedback"
         onClick={() => setOpen(true)}
-        className="pointer-events-auto fixed bottom-6 right-6 z-[80] flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-primary/90 to-emerald-600/90 text-white shadow-xl shadow-black/40 transition hover:scale-[1.03] hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className={`pointer-events-auto ${FLOATING_PILL_LAUNCHER_CLASS}`}
       >
-        <MessageSquarePlus className="h-7 w-7" />
+        <MessageSquarePlus className="h-4 w-4 shrink-0 text-primary" />
+        Feedback
       </button>
 
       <FeedbackModal

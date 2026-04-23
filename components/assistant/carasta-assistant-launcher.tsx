@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
 import type { AssistantAnswer } from "@/lib/assistant/assistant-types";
 import { collectAssistantPaletteTopicIds } from "@/lib/help/assistant-palette-bridge";
+import { FLOATING_PILL_LAUNCHER_CLASS } from "@/components/shell/floating-launcher-styles";
 
 const EXAMPLE_PROMPTS = [
   "What is Carasta?",
@@ -81,9 +82,9 @@ export function CarastaAssistantLauncher() {
         type="button"
         aria-label="Open Carasta Assistant"
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-[60] inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-950 shadow-[0_18px_60px_-26px_rgba(15,23,42,0.35)] transition hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-neutral-50"
+        className={FLOATING_PILL_LAUNCHER_CLASS}
       >
-        <MessageCircleQuestion className="h-4 w-4 text-primary" />
+        <MessageCircleQuestion className="h-4 w-4 shrink-0 text-primary" />
         Carasta Assistant
       </button>
 

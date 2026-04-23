@@ -51,8 +51,13 @@ export default function RootLayout({
       >
         <Providers>
           <CarastaLayout>{children}</CarastaLayout>
-          <CarastaAssistantLauncher />
-          <FeedbackWidget />
+          {/* Assistant above, Feedback below — shared pill stack, bottom-right */}
+          <div className="pointer-events-none fixed bottom-6 right-6 z-[70] flex flex-col gap-2">
+            <div className="pointer-events-auto flex flex-col gap-2">
+              <CarastaAssistantLauncher />
+              <FeedbackWidget />
+            </div>
+          </div>
           <Toaster />
         </Providers>
       </body>
