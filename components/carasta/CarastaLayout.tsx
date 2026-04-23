@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { forwardRef, useState, useEffect } from "react";
 import type { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -86,6 +86,10 @@ function resourcesMenuActive(pathname: string) {
   return false;
 }
 
+/** Pillar menus: higher z than sticky header (z-50) so portaled content paints above page chrome. */
+const pillarMenuContentClass =
+  "z-[100] min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2";
+
 const PillarChevronTrigger = forwardRef<
   HTMLButtonElement,
   { children: React.ReactNode; active: boolean }
@@ -112,6 +116,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
   const { openPalette } = useHelpPalette();
   const [logoError, setLogoError] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [avatarSignOutStep, setAvatarSignOutStep] = useState<"idle" | "confirm">("idle");
 
   const handle = (session?.user as { handle?: string } | undefined)?.handle ?? null;
   const marketingEnabled = Boolean(
@@ -150,16 +155,13 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
       >
         Market
       </Link>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={resourcesMenuActive(pathname)}>
             Resources
           </PillarChevronTrigger>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          className="min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2"
-        >
+        <DropdownMenuContent align="start" className={pillarMenuContentClass}>
           <DropdownMenuItem asChild>
             <Link href="/resources">Resources hub</Link>
           </DropdownMenuItem>
@@ -176,16 +178,13 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
   const signedInPillarNav = (
     <>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={carmunityMenuActive(pathname, handle)}>
             Carmunity
           </PillarChevronTrigger>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          className="min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2"
-        >
+        <DropdownMenuContent align="start" className={pillarMenuContentClass}>
           <DropdownMenuItem asChild>
             <Link href="/explore">Explore</Link>
           </DropdownMenuItem>
@@ -208,14 +207,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={marketMenuActive(pathname, handle)}>Market</PillarChevronTrigger>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          className="min-w-[220px] border border-border bg-popover text-popover-foreground shadow-e2"
-        >
+        <DropdownMenuContent align="start" className={cn(pillarMenuContentClass, "min-w-[220px]")}>
           <DropdownMenuItem asChild>
             <Link href="/auctions">Live Auctions</Link>
           </DropdownMenuItem>
@@ -243,14 +239,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={resourcesMenuActive(pathname)}>Resources</PillarChevronTrigger>
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          className="min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2"
-        >
+        <DropdownMenuContent align="start" className={pillarMenuContentClass}>
           <DropdownMenuItem asChild>
             <Link href="/resources">Resources hub</Link>
           </DropdownMenuItem>
@@ -294,27 +287,14 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          {/* Mobile / tablet: compact pillar links (no duplicate marketing strip). */}
-          {!session && !isAuthShell ? (
-            <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:hidden">
-              {signedOutPillarLinks}
+          {/* Single pillar nav mount (mobile + desktop) — duplicate mounts broke Radix pillar dropdowns. */}
+          {isAuthShell && !session ? (
+            <span className="hidden min-w-0 flex-1 lg:block" aria-hidden />
+          ) : session || !isAuthShell ? (
+            <nav className="flex min-w-0 flex-1 items-center justify-end gap-1 overflow-x-auto lg:overflow-visible">
+              {session ? signedInPillarNav : signedOutPillarLinks}
             </nav>
           ) : null}
-          {session ? (
-            <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:hidden">
-              {signedInPillarNav}
-            </nav>
-          ) : null}
-
-          <div className="hidden min-w-0 flex-1 items-center justify-end gap-4 lg:flex">
-            {isAuthShell && !session ? (
-              <span className="flex-1" aria-hidden />
-            ) : session ? (
-              <nav className="flex items-center gap-1">{signedInPillarNav}</nav>
-            ) : (
-              <nav className="flex items-center gap-1">{signedOutPillarLinks}</nav>
-            )}
-          </div>
 
           <nav className="ml-auto flex shrink-0 items-center gap-2 text-sm sm:gap-3">
             {status === "loading" ? (
@@ -335,7 +315,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   <MessageSquare className="h-5 w-5" />
                 </Link>
                 <NotificationDropdown />
-                <DropdownMenu>
+                <DropdownMenu
+                  onOpenChange={(open) => {
+                    if (!open) setAvatarSignOutStep("idle");
+                  }}
+                >
                   <DropdownMenuTrigger className="rounded-full outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring">
                     <Avatar className="h-8 w-8 border border-border">
                       <AvatarImage src={session.user?.image ?? undefined} />
@@ -415,9 +399,41 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     ) : null}
 
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/api/auth/signout">Sign out</Link>
-                    </DropdownMenuItem>
+                    {avatarSignOutStep === "idle" ? (
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          setAvatarSignOutStep("confirm");
+                        }}
+                        className="cursor-pointer"
+                      >
+                        Sign out
+                      </DropdownMenuItem>
+                    ) : (
+                      <>
+                        <div className="px-2 py-2 text-xs leading-snug text-muted-foreground">
+                          Sign out of Carasta?
+                        </div>
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            setAvatarSignOutStep("idle");
+                          }}
+                          className="cursor-pointer"
+                        >
+                          Cancel
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            void signOut({ callbackUrl: "/" });
+                          }}
+                          className="cursor-pointer text-destructive focus:text-destructive"
+                        >
+                          Sign out
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
