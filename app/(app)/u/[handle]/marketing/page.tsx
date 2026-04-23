@@ -13,7 +13,6 @@ import {
   Share2,
   Sparkles,
   Target,
-  type LucideIcon,
 } from "lucide-react";
 import { MarketingCampaignStatus } from "@prisma/client";
 import { getRecentSellerCampaigns } from "@/lib/marketing/get-seller-campaigns";
@@ -86,12 +85,7 @@ export default async function MarketingPage({
     },
   ];
 
-  const engagementCards: {
-    label: string;
-    value: number;
-    icon: LucideIcon;
-    hint?: string;
-  }[] = [
+  const engagementCards = [
     {
       label: "Marketing events",
       value: overview.marketingEvents,
@@ -237,14 +231,13 @@ export default async function MarketingPage({
               <SellerKpiCard label={label} value={value} icon={Icon} tone="info" />
             </div>
           ))}
-          {engagementCards.map(({ label, value, icon: Icon, hint }) => (
+          {engagementCards.map(({ label, value, icon: Icon }) => (
             <div key={label} className="xl:col-span-1">
               <SellerKpiCard
                 label={label}
                 value={value}
                 icon={Icon}
                 tone={label === "Bid clicks" ? "success" : "neutral"}
-                detail={hint}
               />
             </div>
           ))}
