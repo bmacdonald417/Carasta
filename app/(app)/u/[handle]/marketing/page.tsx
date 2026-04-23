@@ -180,7 +180,7 @@ export default async function MarketingPage({
                 />
               </div>
               <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[hsl(var(--seller-foreground))] md:text-4xl">
-                Marketing command center
+                Marketing
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-[hsl(var(--seller-muted))]">
                 This workspace is now organized around what needs attention,

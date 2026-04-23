@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { forwardRef, useState, useEffect } from "react";
+import type { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
@@ -16,37 +17,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BookOpen } from "lucide-react";
+import { BookOpen, ChevronDown, MessageSquare } from "lucide-react";
 import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
 import { cn } from "@/lib/utils";
 import {
   shellHeaderAppActive,
   shellHeaderAppInactive,
   shellHeaderAppLinkBase,
-  shellHeaderMarketingActive,
-  shellHeaderMarketingInactive,
-  shellHeaderMarketingLinkBase,
 } from "@/lib/shell-nav-styles";
-
-const marketingNav = [
-  { href: "/", label: "Home" },
-  { href: "/how-it-works", label: "How It Works" },
-  { href: "/why-carasta", label: "Why Carasta" },
-  { href: "/resources", label: "Resources" },
-  { href: "/contact", label: "Contact" },
-];
-
-const signedInTopNav = [
-  { href: "/explore", label: "Carmunity" },
-  { href: "/auctions", label: "Market" },
-  { href: "/resources", label: "Resources" },
-];
-
-const publicTopNav = [
-  { href: "/explore", label: "Carmunity (Preview)" },
-  { href: "/auctions", label: "Market (Browse)" },
-  { href: "/resources", label: "Resources" },
-];
 
 const footerProductLinks = [
   { href: "/explore", label: "Carmunity" },
@@ -55,6 +33,79 @@ const footerProductLinks = [
   { href: "/sell", label: "Sell" },
 ];
 
+/** Footer column: learn / trust paths (no longer mirrors removed marketing top strip). */
+const footerLearnLinks = [
+  { href: "/", label: "Home" },
+  { href: "/resources", label: "Resources" },
+  { href: "/how-it-works", label: "How It Works" },
+  { href: "/why-carasta", label: "Why Carasta" },
+  { href: "/contact", label: "Contact" },
+];
+
+const resourcesMenuLinks = [
+  { href: "/how-it-works", label: "How It Works" },
+  { href: "/why-carasta", label: "Why Carasta" },
+  { href: "/resources/faq", label: "FAQ" },
+  { href: "/resources/trust-and-safety", label: "Trust & Safety" },
+  { href: "/contact", label: "Contact" },
+] as const;
+
+function displayMenuName(session: Session | null): string {
+  const u = session?.user;
+  if (!u) return "Account";
+  if (u.name?.trim()) return u.name.trim();
+  const handle = (u as { handle?: string }).handle;
+  if (handle) return `@${handle}`;
+  if (u.email) return u.email.split("@")[0] ?? "Account";
+  return "Account";
+}
+
+function carmunityMenuActive(pathname: string, handle?: string | null) {
+  if (pathname.startsWith("/explore") || pathname.startsWith("/discussions")) return true;
+  if (pathname.startsWith("/messages")) return true;
+  if (handle && pathname.startsWith(`/u/${handle}`)) {
+    if (pathname.includes("/listings") || pathname.includes("/marketing")) return false;
+    return true;
+  }
+  return false;
+}
+
+function marketMenuActive(pathname: string, handle?: string | null) {
+  if (pathname.startsWith("/auctions") || pathname.startsWith("/sell") || pathname.startsWith("/merch"))
+    return true;
+  if (handle && (pathname.startsWith(`/u/${handle}/listings`) || pathname.startsWith(`/u/${handle}/marketing`)))
+    return true;
+  return false;
+}
+
+function resourcesMenuActive(pathname: string) {
+  if (pathname.startsWith("/resources")) return true;
+  if (pathname === "/how-it-works") return true;
+  if (pathname === "/why-carasta") return true;
+  if (pathname === "/contact" || pathname.startsWith("/contact/")) return true;
+  return false;
+}
+
+const PillarChevronTrigger = forwardRef<
+  HTMLButtonElement,
+  { children: React.ReactNode; active: boolean }
+>(function PillarChevronTrigger({ children, active }, ref) {
+  return (
+    <button
+      ref={ref}
+      type="button"
+      className={cn(
+        "inline-flex items-center gap-0.5",
+        shellHeaderAppLinkBase,
+        active ? shellHeaderAppActive : shellHeaderAppInactive
+      )}
+    >
+      {children}
+      <ChevronDown className="h-3.5 w-3.5 opacity-70" aria-hidden />
+    </button>
+  );
+});
+
 export function CarastaLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -62,11 +113,157 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
   const [logoError, setLogoError] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  const handle = (session?.user as { handle?: string } | undefined)?.handle ?? null;
+  const marketingEnabled = Boolean(
+    (session?.user as { marketingEnabled?: boolean } | undefined)?.marketingEnabled
+  );
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
+  const isAuthShell = pathname.startsWith("/auth");
+  const joinHref =
+    "/auth/sign-up?callbackUrl=%2Fwelcome%3Fnext%3D%252Fexplore";
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const signedOutPillarLinks = (
+    <>
+      <Link
+        href="/explore"
+        data-active={pathname.startsWith("/explore") ? "true" : "false"}
+        className={cn(
+          shellHeaderAppLinkBase,
+          pathname.startsWith("/explore") ? shellHeaderAppActive : shellHeaderAppInactive
+        )}
+      >
+        Carmunity
+      </Link>
+      <Link
+        href="/auctions"
+        data-active={pathname.startsWith("/auctions") ? "true" : "false"}
+        className={cn(
+          shellHeaderAppLinkBase,
+          pathname.startsWith("/auctions") ? shellHeaderAppActive : shellHeaderAppInactive
+        )}
+      >
+        Market
+      </Link>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <PillarChevronTrigger active={resourcesMenuActive(pathname)}>
+            Resources
+          </PillarChevronTrigger>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2"
+        >
+          <DropdownMenuItem asChild>
+            <Link href="/resources">Resources hub</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          {resourcesMenuLinks.map(({ href, label }) => (
+            <DropdownMenuItem key={href} asChild>
+              <Link href={href}>{label}</Link>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+
+  const signedInPillarNav = (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <PillarChevronTrigger active={carmunityMenuActive(pathname, handle)}>
+            Carmunity
+          </PillarChevronTrigger>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2"
+        >
+          <DropdownMenuItem asChild>
+            <Link href="/explore">Explore</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/discussions">Discussions</Link>
+          </DropdownMenuItem>
+          {handle ? (
+            <DropdownMenuItem asChild>
+              <Link href={`/u/${handle}/garage`}>Garage</Link>
+            </DropdownMenuItem>
+          ) : null}
+          <DropdownMenuItem asChild>
+            <Link href="/messages">Messages</Link>
+          </DropdownMenuItem>
+          {handle ? (
+            <DropdownMenuItem asChild>
+              <Link href={`/u/${handle}`}>Profile</Link>
+            </DropdownMenuItem>
+          ) : null}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <PillarChevronTrigger active={marketMenuActive(pathname, handle)}>Market</PillarChevronTrigger>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="min-w-[220px] border border-border bg-popover text-popover-foreground shadow-e2"
+        >
+          <DropdownMenuItem asChild>
+            <Link href="/auctions">Live Auctions</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/sell">Sell</Link>
+          </DropdownMenuItem>
+          {handle ? (
+            <DropdownMenuItem asChild>
+              <Link href={`/u/${handle}/listings`}>My Listings</Link>
+            </DropdownMenuItem>
+          ) : null}
+          {handle && marketingEnabled ? (
+            <>
+              <DropdownMenuItem asChild>
+                <Link href={`/u/${handle}/marketing`}>Marketing</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/u/${handle}/marketing/campaigns`}>Campaigns</Link>
+              </DropdownMenuItem>
+            </>
+          ) : null}
+          <DropdownMenuItem asChild>
+            <Link href="/merch">Merch</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <PillarChevronTrigger active={resourcesMenuActive(pathname)}>Resources</PillarChevronTrigger>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2"
+        >
+          <DropdownMenuItem asChild>
+            <Link href="/resources">Resources hub</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          {resourcesMenuLinks.map(({ href, label }) => (
+            <DropdownMenuItem key={href} asChild>
+              <Link href={href}>{label}</Link>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
 
   return (
     <div className="carasta-theme flex min-h-screen flex-col bg-background">
@@ -80,7 +277,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         <div className="carasta-container flex h-16 items-center gap-4 md:h-20 md:gap-6">
           <Link
             href={session ? "/explore" : "/"}
-            className="flex items-center gap-3 transition-opacity hover:opacity-90"
+            className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-90"
           >
             {!logoError ? (
               <img
@@ -96,63 +293,46 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               Carasta
             </span>
           </Link>
-          <div className="hidden min-w-0 flex-1 items-center justify-between gap-4 lg:flex">
-            {!session ? (
-              <nav className="flex min-w-0 items-center gap-1">
-                {marketingNav.map(({ href, label }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      shellHeaderMarketingLinkBase,
-                      pathname === href
-                        ? shellHeaderMarketingActive
-                        : shellHeaderMarketingInactive
-                    )}
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </nav>
-            ) : (
-              <div />
-            )}
-            <nav className="flex items-center gap-1">
-              {(session ? signedInTopNav : publicTopNav).map(({ href, label }) => {
-                const appActive = href === "/resources" ? pathname.startsWith("/resources") : pathname.startsWith(href);
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    data-active={appActive ? "true" : "false"}
-                    className={cn(
-                      shellHeaderAppLinkBase,
-                      appActive ? shellHeaderAppActive : shellHeaderAppInactive
-                    )}
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
+
+          {/* Mobile / tablet: compact pillar links (no duplicate marketing strip). */}
+          {!session && !isAuthShell ? (
+            <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:hidden">
+              {signedOutPillarLinks}
             </nav>
+          ) : null}
+          {session ? (
+            <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:hidden">
+              {signedInPillarNav}
+            </nav>
+          ) : null}
+
+          <div className="hidden min-w-0 flex-1 items-center justify-end gap-4 lg:flex">
+            {isAuthShell && !session ? (
+              <span className="flex-1" aria-hidden />
+            ) : session ? (
+              <nav className="flex items-center gap-1">{signedInPillarNav}</nav>
+            ) : (
+              <nav className="flex items-center gap-1">{signedOutPillarLinks}</nav>
+            )}
           </div>
-          <nav className="ml-auto flex items-center gap-3 text-sm">
+
+          <nav className="ml-auto flex shrink-0 items-center gap-2 text-sm sm:gap-3">
             {status === "loading" ? (
               <span className="text-muted-foreground">…</span>
             ) : session ? (
               <>
                 <Link
                   href="/messages"
+                  title="Messages"
+                  aria-label="Messages"
                   data-active={pathname.startsWith("/messages") ? "true" : "false"}
                   className={cn(
-                    "hidden xl:inline-flex",
+                    "inline-flex rounded-full p-2",
                     shellHeaderAppLinkBase,
-                    pathname.startsWith("/messages")
-                      ? shellHeaderAppActive
-                      : shellHeaderAppInactive
+                    pathname.startsWith("/messages") ? shellHeaderAppActive : shellHeaderAppInactive
                   )}
                 >
-                  Messages
+                  <MessageSquare className="h-5 w-5" />
                 </Link>
                 <NotificationDropdown />
                 <DropdownMenu>
@@ -166,38 +346,37 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="min-w-[180px] border border-border bg-popover text-popover-foreground shadow-e2 backdrop-blur-xl"
+                    className="min-w-[220px] border border-border bg-popover text-popover-foreground shadow-e2 backdrop-blur-xl"
                   >
                     <DropdownMenuItem asChild>
                       <Link
                         href={
-                          (session.user as any)?.handle
-                            ? `/u/${(session.user as any).handle}`
-                            : "/settings"
+                          handle ? `/u/${handle}` : "/settings"
                         }
+                        className="font-medium"
                       >
-                        You
+                        {displayMenuName(session)}
                       </Link>
                     </DropdownMenuItem>
-                    {(session.user as any)?.handle && (
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href={`/u/${(session.user as any).handle}/listings`}
-                        >
-                          My listings
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    {session.user?.handle && session.user.marketingEnabled && (
-                      <DropdownMenuItem asChild>
-                        <Link href={`/u/${session.user.handle}/marketing`}>
-                          Marketing dashboard
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
                     <DropdownMenuItem asChild>
                       <Link href="/settings">Settings</Link>
                     </DropdownMenuItem>
+
+                    {handle ? (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href={`/u/${handle}/listings`}>My Listings</Link>
+                        </DropdownMenuItem>
+                        {session.user?.handle && session.user.marketingEnabled ? (
+                          <DropdownMenuItem asChild>
+                            <Link href={`/u/${session.user.handle}/marketing`}>Marketing</Link>
+                          </DropdownMenuItem>
+                        ) : null}
+                      </>
+                    ) : null}
+
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onSelect={(e) => {
                         e.preventDefault();
@@ -219,23 +398,22 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                         Help center
                       </Link>
                     </DropdownMenuItem>
-                    {(session.user as any)?.role === "ADMIN" && (
+
+                    {isAdmin ? (
                       <>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                           <Link href="/admin">Admin</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/dashboard/feedback">
-                            Element feedback
-                          </Link>
+                          <Link href="/admin/marketing">Marketing summary</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/admin/marketing">
-                            Seller marketing (review)
-                          </Link>
+                          <Link href="/dashboard/feedback">Element Feedback</Link>
                         </DropdownMenuItem>
                       </>
-                    )}
+                    ) : null}
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/api/auth/signout">Sign out</Link>
@@ -243,14 +421,32 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
-            ) : (
+            ) : isAuthShell ? (
               <>
                 <Link
-                  href="/auctions"
-                  className="hidden font-medium text-muted-foreground transition hover:text-foreground md:inline-flex"
+                  href="/"
+                  className="font-medium text-muted-foreground transition hover:text-foreground"
                 >
-                  Browse Market
+                  Home
                 </Link>
+                {pathname.includes("sign-in") ? (
+                  <Link
+                    href={joinHref}
+                    className="rounded-full bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90 sm:px-4 sm:text-sm"
+                  >
+                    Join Carmunity
+                  </Link>
+                ) : (
+                  <Link
+                    href="/auth/sign-in"
+                    className="font-medium text-muted-foreground transition hover:text-primary"
+                  >
+                    Sign in
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
                 <Link
                   href="/auth/sign-in"
                   className="font-medium text-muted-foreground transition hover:text-primary"
@@ -258,8 +454,8 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   Sign in
                 </Link>
                 <Link
-                  href="/auth/sign-up?callbackUrl=%2Fwelcome%3Fnext%3D%252Fexplore"
-                  className="hidden rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 md:inline-flex"
+                  href={joinHref}
+                  className="rounded-full bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90 sm:px-4 sm:text-sm md:inline-flex"
                 >
                   Join Carmunity
                 </Link>
@@ -305,7 +501,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3 text-sm">
                   <Link
-                    href="/auth/sign-up?callbackUrl=%2Fwelcome%3Fnext%3D%252Fexplore"
+                    href={joinHref}
                     className="rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground transition hover:bg-primary/90"
                   >
                     Join Carmunity
@@ -314,17 +510,17 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     href="/auctions"
                     className="rounded-full border border-border px-4 py-2 font-semibold text-foreground transition hover:bg-muted/60"
                   >
-                    Browse Market
+                    Market
                   </Link>
                 </div>
               </div>
               <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-1">
                 <div>
                   <p className="text-lg font-semibold tracking-tight text-foreground">
-                    Explore
+                    Learn
                   </p>
                   <nav className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
-                    {marketingNav.map(({ href, label }) => (
+                    {footerLearnLinks.map(({ href, label }) => (
                       <Link
                         key={href}
                         href={href}
