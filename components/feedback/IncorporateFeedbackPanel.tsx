@@ -98,14 +98,14 @@ export default function IncorporateFeedbackPanel({ className }: Props) {
 
   return (
     <section
-      className={`rounded-2xl border border-white/10 bg-white/5 p-5 ${className ?? ""}`}
+      className={`rounded-2xl border border-border bg-card p-5 shadow-e1 ${className ?? ""}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-display text-lg font-semibold tracking-wide text-foreground">
             Incorporate feedback
           </h2>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Creates an agent run and event log. Wire your Claude Code routine or
             local script to the shim endpoints.
           </p>
@@ -128,8 +128,8 @@ export default function IncorporateFeedbackPanel({ className }: Props) {
       {runId ? (
         <div className="mt-4 space-y-2">
           <div className="flex items-center gap-2">
-            <p className="text-xs text-neutral-500">
-              Run <span className="font-mono text-neutral-300">{runId}</span>
+            <p className="text-xs text-muted-foreground">
+              Run <span className="font-mono text-foreground">{runId}</span>
             </p>
             {runStatus === "done" && (
               <span className="flex items-center gap-1 text-xs font-medium text-emerald-400">
@@ -142,22 +142,22 @@ export default function IncorporateFeedbackPanel({ className }: Props) {
               </span>
             )}
             {isRunning && (
-              <span className="flex items-center gap-1 text-xs text-neutral-400">
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" /> Polling…
               </span>
             )}
           </div>
-          <div className="max-h-56 overflow-y-auto rounded-2xl border border-white/10 bg-black/40 p-3 font-mono text-[11px] leading-relaxed text-emerald-100/90">
+          <div className="max-h-56 overflow-y-auto rounded-2xl border border-border bg-muted/50 p-3 font-mono text-[11px] leading-relaxed text-foreground">
             {events.length === 0 ? (
-              <span className="text-neutral-500">Waiting for events…</span>
+              <span className="text-muted-foreground">Waiting for events…</span>
             ) : (
               events.map((ev) => (
                 <div key={ev.id} className="mb-2 last:mb-0">
-                  <span className="text-neutral-500">
+                  <span className="text-muted-foreground">
                     [{new Date(ev.createdAt).toLocaleTimeString()}] {ev.kind}
                   </span>
                   {ev.payload != null ? (
-                    <pre className="mt-1 whitespace-pre-wrap break-words text-neutral-300">
+                    <pre className="mt-1 whitespace-pre-wrap break-words text-muted-foreground">
                       {JSON.stringify(ev.payload, null, 2)}
                     </pre>
                   ) : null}

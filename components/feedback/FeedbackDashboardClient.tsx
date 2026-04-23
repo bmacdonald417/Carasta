@@ -98,7 +98,7 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
         <h1 className="font-display text-3xl font-semibold tracking-wide text-foreground">
           Element feedback
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-neutral-500">
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Submissions from the floating widget (signed-in users). Resolve items
           here and attach commit provenance when fixes land.
         </p>
@@ -106,8 +106,9 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
 
       <IncorporateFeedbackPanel />
 
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-e1 md:p-6">
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-2xl bg-white/5 p-1">
+        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-2xl border border-border bg-muted/40 p-1 shadow-e1">
           <TabsTrigger value="all" className="rounded-xl">
             All ({counts.all})
           </TabsTrigger>
@@ -125,12 +126,14 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
         {(["all", "pending", "reviewed", "resolved"] as const).map((tab) => (
           <TabsContent key={tab} value={tab} className="mt-4 space-y-4">
             {filterRows(tab).length === 0 ? (
-              <p className="text-sm text-neutral-500">No items.</p>
+              <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-10 text-center text-sm text-muted-foreground">
+                No items.
+              </p>
             ) : (
               filterRows(tab).map((r) => (
                 <article
                   key={r.id}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+                  className="rounded-2xl border border-border bg-card p-5 shadow-e1"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="space-y-2">
@@ -138,14 +141,14 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
                         <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide text-primary">
                           {r.category}
                         </span>
-                        <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-xs text-neutral-400">
+                        <span className="rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground">
                           {r.status}
                         </span>
-                        <span className="text-xs text-neutral-600">
+                        <span className="text-xs text-muted-foreground">
                           {new Date(r.createdAt).toLocaleString()}
                         </span>
                       </div>
-                      <p className="text-sm text-neutral-200">{r.content}</p>
+                      <p className="text-sm text-foreground">{r.content}</p>
                       {r.pageUrl ? (
                         <a
                           href={r.pageUrl}
@@ -158,12 +161,12 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
                         </a>
                       ) : null}
                       {r.elementSelector ? (
-                        <p className="font-mono text-[11px] text-neutral-500">
+                        <p className="font-mono text-[11px] text-muted-foreground">
                           {r.elementType}: {r.elementSelector}
                         </p>
                       ) : null}
                       {r.elementText ? (
-                        <p className="text-xs text-neutral-500 line-clamp-3">
+                        <p className="text-xs text-muted-foreground line-clamp-3">
                           {r.elementText}
                         </p>
                       ) : null}
@@ -174,7 +177,7 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
                           type="button"
                           variant="outline"
                           size="sm"
-                          className="rounded-2xl border-white/15"
+                          className="rounded-2xl"
                           disabled={loadingIds.has(r.id)}
                           onClick={() => void patchStatus(r.id, "reviewed")}
                         >
@@ -199,14 +202,14 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
                   (r.resolutionCommitSha ||
                     r.resolutionSummary ||
                     r.resolutionFiles) ? (
-                    <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-emerald-50/90">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-200/80">
+                    <div className="mt-4 rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-4 text-sm text-foreground">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-200/80">
                         Resolution
                       </p>
                       {r.resolutionCommitUrl && r.resolutionCommitSha ? (
                         <a
                           href={r.resolutionCommitUrl}
-                          className="mt-2 inline-flex items-center gap-1 font-mono text-xs text-emerald-200 hover:underline"
+                          className="mt-2 inline-flex items-center gap-1 font-mono text-xs text-emerald-700 hover:underline dark:text-emerald-200"
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -219,12 +222,12 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
                         </p>
                       ) : null}
                       {r.resolutionSummary ? (
-                        <p className="mt-2 text-neutral-200">
+                        <p className="mt-2 text-foreground">
                           {r.resolutionSummary}
                         </p>
                       ) : null}
                       {r.resolutionFiles != null ? (
-                        <pre className="mt-2 max-h-40 overflow-auto rounded-xl bg-black/40 p-3 text-[11px] text-neutral-300">
+                        <pre className="mt-2 max-h-40 overflow-auto rounded-xl border border-border bg-muted/60 p-3 text-[11px] text-muted-foreground">
                           {JSON.stringify(r.resolutionFiles, null, 2)}
                         </pre>
                       ) : null}
@@ -236,6 +239,7 @@ export default function FeedbackDashboardClient({ initialRows }: Props) {
           </TabsContent>
         ))}
       </Tabs>
+      </div>
     </div>
   );
 }
