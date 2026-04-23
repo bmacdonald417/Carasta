@@ -493,9 +493,9 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex min-h-0 flex-1">
         <AppSidebar />
-        <main className="min-w-0 flex-1 bg-background pb-16 text-foreground lg:pb-0">
+        <main className="min-h-0 min-w-0 flex-1 bg-background pb-16 text-foreground lg:pb-0">
           {children}
         </main>
       </div>
