@@ -59,44 +59,59 @@ export function GuestGateModal({
   const signInHref = `/auth/sign-in?callbackUrl=${encodeURIComponent(activationCallback)}`;
   const signUpHref = `/auth/sign-up?callbackUrl=${encodeURIComponent(activationCallback)}`;
 
+  const steps = [
+    "Create your account",
+    "Set up your Carmunity identity",
+    "Start exploring, posting, and engaging",
+  ] as const;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn("max-w-lg border-primary/15 bg-[#0c0c10]/95", className)}>
+      <DialogContent
+        className={cn(
+          "max-w-lg border-border bg-popover text-popover-foreground shadow-e3",
+          className
+        )}
+      >
         <DialogHeader>
           <DialogTitle className="text-primary">Join Carmunity</DialogTitle>
-          <DialogDescription className="text-neutral-400">
+          <DialogDescription>
             {intentLine(intent)} Joining is free — and it opens the full Carmunity + Market experience.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-border/60 bg-muted/10 p-4">
-            <p className="text-sm text-foreground">
-              <span className="font-semibold">Get in the car and drive with Carasta.</span>
-            </p>
-            <ol className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-              <li>
-                <span className="font-medium text-foreground">1.</span> Create your account
+          <p className="text-sm font-semibold leading-snug text-foreground">
+            Get in the car and drive with Carasta.
+          </p>
+          <ol className="space-y-2">
+            {steps.map((label, index) => (
+              <li
+                key={label}
+                className="flex gap-3 rounded-xl border border-border bg-secondary/50 px-3 py-2.5 shadow-e1"
+              >
+                <span
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/12 text-xs font-semibold text-primary"
+                  aria-hidden
+                >
+                  {index + 1}
+                </span>
+                <span className="min-w-0 self-center text-sm text-foreground">{label}</span>
               </li>
-              <li>
-                <span className="font-medium text-foreground">2.</span> Set up your Carmunity identity
-              </li>
-              <li>
-                <span className="font-medium text-foreground">3.</span> Start exploring, posting, and engaging
-              </li>
-            </ol>
-          </div>
+            ))}
+          </ol>
           <p className="text-xs leading-relaxed text-muted-foreground">
             You can still browse public previews, but reactions, comments, saves, bids, and seller tools require an account.
           </p>
-          <ContextualHelpCard
-            context="guest.gate"
-            className="border-border/50 bg-muted/5"
-          />
+          <ContextualHelpCard context="guest.gate" />
         </div>
 
         <DialogFooter className="sm:justify-between">
-          <Button variant="ghost" asChild className="sm:mr-auto">
+          <Button
+            variant="ghost"
+            asChild
+            className="sm:mr-auto text-primary hover:bg-primary/10 hover:text-primary"
+          >
             <Link href={signInHref}>Sign in</Link>
           </Button>
           <Button variant="default" asChild className="rounded-full px-5">
