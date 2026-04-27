@@ -117,13 +117,13 @@ export function CarmunityOnboardingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border-primary/20 bg-[#0c0c10]/95 sm:max-w-xl">
+      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border-border bg-card text-card-foreground shadow-e3 sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="text-primary">Welcome to Carmunity</DialogTitle>
-          <DialogDescription className="text-neutral-400">
+          <DialogDescription className="text-muted-foreground">
             Pick a few Gears you care about, optionally tune Lower Gears, follow a voice or two, then
             dive into threads — one identity at{" "}
-            <span className="text-neutral-200">/u/your-handle</span>.
+            <span className="text-foreground">/u/your-handle</span>.
           </DialogDescription>
         </DialogHeader>
 
@@ -132,7 +132,7 @@ export function CarmunityOnboardingDialog({
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Interests</p>
             <p className="text-xs text-muted-foreground">
               Tap Gears to personalize discovery — adjust anytime in{" "}
-            <span className="text-neutral-200">Settings → Carmunity</span>.
+              <span className="text-foreground">Settings → Carmunity</span>.
             </p>
             <div className="flex flex-wrap gap-2">
               {pack.spaces.map((s) => {
@@ -145,7 +145,7 @@ export function CarmunityOnboardingDialog({
                     className={`rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition ${
                       on
                         ? "border-primary/60 bg-primary/15 text-primary"
-                        : "border-border/60 bg-muted/10 text-muted-foreground hover:border-primary/35 hover:text-neutral-200"
+                        : "border-border/60 bg-muted/10 text-muted-foreground hover:border-primary/35 hover:text-foreground"
                     }`}
                   >
                     {s.title}
@@ -162,7 +162,7 @@ export function CarmunityOnboardingDialog({
               </p>
               {selectedSpaces.map((s) => (
                 <div key={s.slug} className="space-y-2">
-                  <p className="text-xs font-medium text-neutral-200">{s.title}</p>
+                  <p className="text-xs font-medium text-foreground">{s.title}</p>
                   <div className="flex flex-wrap gap-2">
                     {s.categories.map((c) => {
                       const on = lowerCats.some((x) => x.spaceSlug === s.slug && x.slug === c.slug);
@@ -191,14 +191,14 @@ export function CarmunityOnboardingDialog({
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
               People to follow
             </p>
-            <ul className="divide-y divide-white/5 rounded-xl border border-border/40">
+            <ul className="divide-y divide-border rounded-xl border border-border/40">
               {pack.suggestedUsers.slice(0, 6).map((u) => (
                 <li
                   key={u.id}
-                  className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm text-neutral-200"
+                  className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm text-foreground"
                 >
                   <Link href={`/u/${encodeURIComponent(u.handle)}`} className="flex min-w-0 items-center gap-2">
-                    <Avatar className="h-8 w-8 border border-white/10">
+                    <Avatar className="h-8 w-8 border border-border">
                       <AvatarImage src={u.avatarUrl ?? undefined} alt="" />
                       <AvatarFallback className="text-[10px]">
                         {(u.name ?? u.handle).slice(0, 2).toUpperCase()}
@@ -229,7 +229,7 @@ export function CarmunityOnboardingDialog({
                 <li key={t.id}>
                   <Link
                     href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
-                    className="line-clamp-2 text-neutral-200 hover:text-primary"
+                    className="line-clamp-2 text-foreground hover:text-primary"
                   >
                     {t.title}
                   </Link>
@@ -241,7 +241,7 @@ export function CarmunityOnboardingDialog({
             </ul>
           </section>
 
-          {error ? <p className="text-sm text-red-400">{error}</p> : null}
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
         </div>
 
         <DialogFooter className="flex-col gap-2 sm:flex-col">
