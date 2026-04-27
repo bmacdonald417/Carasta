@@ -16,6 +16,7 @@ import { ProfileGaragePreviewGrid } from "@/components/profile/ProfileGaragePrev
 import { ProfilePostsEmpty } from "@/components/carmunity/ProfilePostsEmpty";
 import { ProfileCarmunitySetupStrip } from "@/components/profile/ProfileCarmunitySetupStrip";
 import { ShareButtons } from "@/components/ui/share-buttons";
+import { ProfileQrDialog } from "@/components/profile/ProfileQrDialog";
 import { DemoProfileBanner } from "@/components/discussions/DemoProfileBanner";
 import { DiscussionAuthorBadges } from "@/components/discussions/DiscussionAuthorBadges";
 import { DiscussionPeerSafetyMenu } from "@/components/discussions/DiscussionPeerSafetyMenu";
@@ -365,6 +366,10 @@ export default async function ProfilePage({
               ? { surface: "profile", profileUserId: user.id, handle: user.handle }
               : undefined
           }
+        />
+        <ProfileQrDialog
+          profilePath={`/u/${encodeURIComponent(user.handle)}`}
+          displayName={displayName}
         />
         {!isOwnProfile && currentUserId ? (
           <FollowButton targetUserId={user.id} initialFollowing={!!following} />
