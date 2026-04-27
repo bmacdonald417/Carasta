@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en">
       <body
         className={`carasta-theme ${inter.variable} ${oswald.variable} ${playfair.variable} min-h-screen bg-background font-sans antialiased text-foreground`}
       >
