@@ -1,0 +1,141 @@
+name: UI Modernization (Screenshot → Code)
+description: Screenshot-based UI modernization task for the demo web app.
+title: "[UI] <screen/page>: <short change>"
+labels:
+  - ui
+  - modernization
+  - demo
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for screenshot-driven UI modernization tasks.
+
+        **Guardrails (must follow)**
+        - No direct pushes to `main`
+        - Use feature branches + PRs
+        - Do **not** touch auth, database schema, environment variables, deployment settings, routing, or payment logic unless explicitly authorized
+        - Keep work scoped to this issue
+        - Include before/after screenshots in the PR when possible
+        - Run lint/typecheck/build before recommending merge
+
+  - type: input
+    id: screen_name
+    attributes:
+      label: Screen / Page name
+      description: Human-friendly name (e.g. "Profile header", "Explore feed", "Auction detail hero").
+      placeholder: Profile header
+    validations:
+      required: true
+
+  - type: input
+    id: route
+    attributes:
+      label: Route / URL
+      description: Exact route in the web app (e.g. /u/[handle], /explore, /auctions/[id]).
+      placeholder: /u/[handle]
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshot links / attachments
+      description: Paste links (or upload images to the issue) for before state and target inspiration.
+      placeholder: |
+        - Before: <link or attachment>
+        - Target inspiration: <link or attachment>
+        - Notes: <anything to call out>
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired_changes
+    attributes:
+      label: Desired visual changes
+      description: Bullet the exact UI changes. Be concrete (layout, spacing, typography, states, responsive).
+      placeholder: |
+        - Tighten header spacing on mobile
+        - Replace heavy borders with subtle separators
+        - Make primary action feel more premium (button style)
+        - Improve empty state hierarchy
+    validations:
+      required: true
+
+  - type: textarea
+    id: must_preserve
+    attributes:
+      label: What must be preserved
+      description: Behaviors, semantics, and information hierarchy that must not change.
+      placeholder: |
+        - Keep follow button behavior and loading states
+        - Keep existing copy/content
+        - Maintain keyboard focus outlines
+    validations:
+      required: true
+
+  - type: textarea
+    id: must_not_touch
+    attributes:
+      label: What must NOT be touched
+      description: Explicit no-go areas for this issue.
+      placeholder: |
+        - Auth / NextAuth
+        - Prisma schema / migrations
+        - API routes
+        - Env / deployment config
+        - Payment / checkout logic
+        - Routing changes
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance criteria
+      description: Testable checklist. Include UI states and any "done means…" details.
+      placeholder: |
+        - [ ] Matches target screenshot within reasonable tolerance
+        - [ ] No layout shift on load
+        - [ ] Hover/focus/active states look intentional
+        - [ ] Mobile and desktop look good
+        - [ ] No regressions to existing actions
+    validations:
+      required: true
+
+  - type: textarea
+    id: responsive
+    attributes:
+      label: Responsive requirements
+      description: What to verify across breakpoints and devices.
+      placeholder: |
+        - Mobile (<= 430px): stacked header, no overflow, tap targets >= 44px
+        - Tablet (768px): spacing and type scale
+        - Desktop (>= 1024px): max-width + alignment
+    validations:
+      required: true
+
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation commands
+      description: Commands that must be run before merge recommendation.
+      value: |
+        npm run lint
+        npx tsc --noEmit
+        npm run build
+    validations:
+      required: true
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk level
+      description: How likely is this change to cause regressions?
+      options:
+        - Low (styles only, minimal component touch)
+        - Medium (layout + shared component updates)
+        - High (complex interactions, refactors, wide blast radius)
+    validations:
+      required: true
+
