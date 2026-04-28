@@ -630,13 +630,13 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
         </div>
-        <div className="border-t border-border/60 bg-background py-6">
+        <div className="border-t border-border/60 bg-[hsl(var(--navy))] py-6 text-white">
           <div className="carasta-container flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
             <div className="text-center md:text-left">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-white/75">
                 © {new Date().getFullYear()} Carasta. All rights reserved.
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-xs text-white/70">
                 Carmunity by Carasta — feed, discussions, garage, and auctions
                 in one place.
               </p>
@@ -644,19 +644,19 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             <nav className="flex flex-wrap justify-center gap-6 text-sm md:justify-end">
               <Link
                 href="/terms"
-                className="text-muted-foreground transition hover:text-primary"
+                className="text-white/75 transition hover:text-white"
               >
                 Terms &amp; Conditions
               </Link>
               <Link
                 href="/privacy"
-                className="text-muted-foreground transition hover:text-primary"
+                className="text-white/75 transition hover:text-white"
               >
                 Privacy Policy
               </Link>
               <Link
                 href="/community-guidelines"
-                className="text-muted-foreground transition hover:text-primary"
+                className="text-white/75 transition hover:text-white"
               >
                 Community Guidelines
               </Link>

@@ -19,40 +19,47 @@
   --motion-ease-emphasized: cubic-bezier(0.2, 0.9, 0.2, 1);
 
   /* Core surfaces (light-first) */
-  --background: 220 33% 98%;
-  --foreground: 224 32% 12%;
+  /* Target palette (design-system-color-normalization) */
+  --background: 220 14% 97%;
+  --foreground: 230 14% 11%;
+
+  /* Deep navy surfaces (for header/footer chrome) */
+  --navy: 231 49% 14%;
+  --navy-soft: 232 45% 19%;
 
   --card: 0 0% 100%;
-  --card-foreground: 224 32% 12%;
+  --card-foreground: 230 14% 11%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 224 32% 12%;
+  --popover-foreground: 230 14% 11%;
 
-  /* Functional accent (blue-violet) — mapped into shadcn primary for compatibility */
-  --primary: 258 86% 58%;
+  /* Functional accent — royal/cobalt blue (mapped into shadcn primary) */
+  --primary: 238 65% 45%;
   --primary-foreground: 0 0% 100%;
-  --ring: 258 86% 58%;
+  --ring: 238 65% 45%;
 
-  --secondary: 220 14% 96%;
-  --secondary-foreground: 224 32% 12%;
+  /* Subtle surface (F1F4F8) */
+  --secondary: 215 33% 95%;
+  --secondary-foreground: 230 14% 11%;
 
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 9% 42%;
+  --muted: 215 33% 95%;
+  --muted-foreground: 220 9% 45%;
 
-  /* shadcn "accent" — interactive hover/selection (menus, ghost buttons); aligned with primary tint */
-  --accent: 258 76% 96%;
-  --accent-foreground: 258 45% 36%;
+  /* Interactive hover/selection: primary-soft (E8EAFF) */
+  --accent: 235 100% 96%;
+  --accent-foreground: 238 65% 30%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 220 13% 90%;
-  --input: 220 13% 90%;
+  /* Borders */
+  --border: 218 18% 88%;
+  --input: 218 18% 86%;
 
   /* Semantic states */
-  --info: 258 86% 58%;
-  --info-soft: 258 86% 97%;
-  --info-foreground: 258 42% 34%;
+  --info: 238 65% 45%;
+  --info-soft: 235 100% 96%;
+  --info-foreground: 238 52% 30%;
 
   --success: 160 84% 39%;
   --success-soft: 150 60% 96%;
@@ -67,10 +74,10 @@
   --danger-foreground: 0 58% 38%;
 
   /* Elevation / scrim */
-  --shadow-e1: 0 1px 0 rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-e2: 0 10px 30px rgba(15, 23, 42, 0.12);
-  --shadow-e3: 0 24px 80px rgba(15, 23, 42, 0.22);
-  --scrim: 224 32% 12%;
+  --shadow-e1: 0 1px 0 rgba(18, 23, 53, 0.04), 0 1px 2px rgba(18, 23, 53, 0.06);
+  --shadow-e2: 0 12px 32px rgba(18, 23, 53, 0.12);
+  --shadow-e3: 0 28px 90px rgba(18, 23, 53, 0.22);
+  --scrim: 231 49% 14%;
 
   /* Auction / bid / live urgency — scoped vivid signal */
   --performance-red: 348 100% 60%;
@@ -107,36 +114,37 @@
 
 .dark {
   /* Dark mode is secondary: calm graphite, not neon cyber */
-  --background: 222 24% 6%;
+  /* Dark surfaces lean navy (121735 / 1A2045) */
+  --background: 231 49% 14%;
   --foreground: 220 14% 96%;
 
-  --card: 222 18% 9%;
+  --card: 232 45% 19%;
   --card-foreground: 220 14% 96%;
 
-  --popover: 222 18% 9%;
+  --popover: 232 45% 19%;
   --popover-foreground: 220 14% 96%;
 
-  --primary: 258 86% 62%;
+  --primary: 238 65% 55%;
   --primary-foreground: 0 0% 100%;
-  --ring: 258 86% 62%;
+  --ring: 238 65% 55%;
 
-  --secondary: 222 16% 12%;
+  --secondary: 232 40% 22%;
   --secondary-foreground: 220 14% 96%;
 
-  --muted: 222 14% 12%;
+  --muted: 232 40% 22%;
   --muted-foreground: 220 10% 65%;
 
-  --accent: 258 32% 18%;
-  --accent-foreground: 258 42% 94%;
+  --accent: 232 35% 24%;
+  --accent-foreground: 220 14% 96%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 220 14% 18%;
-  --input: 220 14% 18%;
+  --border: 232 30% 30%;
+  --input: 232 30% 30%;
 
-  --info: 258 86% 62%;
-  --info-soft: 258 40% 16%;
+  --info: 238 65% 55%;
+  --info-soft: 232 35% 24%;
   --info-foreground: 220 14% 96%;
 
   --success: 160 84% 39%;
