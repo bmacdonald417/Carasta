@@ -26,6 +26,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
+import {
+  campaignsNavHref,
+  garageNavHref,
+  listingsNavHref,
+  marketingNavHref,
+  normalizePublicHandle,
+  profileNavActive,
+  profileNavHref,
+} from "@/lib/profile-nav";
 
 type Pillar = "carmunity" | "market" | "resources";
 
@@ -148,27 +157,23 @@ export function AppSidebar() {
 
   if (!session?.user) return null;
 
-  const rawHandle = (session?.user as { handle?: string } | undefined)?.handle?.trim();
-  const handle = rawHandle && rawHandle.length > 0 ? rawHandle : undefined;
+  const sessionHandle = (session?.user as { handle?: string } | undefined)?.handle;
+  const handle = normalizePublicHandle(sessionHandle);
   const marketingEnabled = Boolean(
     (session?.user as { marketingEnabled?: boolean } | undefined)?.marketingEnabled
   );
 
   const pillar = getActivePillar(pathname, handle ?? null);
 
-  const profileHref = handle ? `/u/${encodeURIComponent(handle)}` : "/settings";
-  const garageHref = handle ? `/u/${encodeURIComponent(handle)}/garage` : "/settings";
-  const listingsHref = handle ? `/u/${encodeURIComponent(handle)}/listings` : null;
-  const marketingHref = handle && marketingEnabled ? `/u/${encodeURIComponent(handle)}/marketing` : null;
+  const profileHref = profileNavHref(sessionHandle);
+  const garageHref = garageNavHref(sessionHandle);
+  const listingsHref = listingsNavHref(sessionHandle);
+  const marketingHref =
+    handle && marketingEnabled ? marketingNavHref(sessionHandle) : null;
   const campaignsHref =
-    handle && marketingEnabled ? `/u/${encodeURIComponent(handle)}/marketing/campaigns` : null;
+    handle && marketingEnabled ? campaignsNavHref(sessionHandle) : null;
 
-  const profileActive =
-    (!handle && pathname.startsWith("/settings")) ||
-    (Boolean(handle) &&
-      (pathname === `/u/${handle}` ||
-        pathname.startsWith(`/u/${handle}/followers`) ||
-        pathname.startsWith(`/u/${handle}/following`)));
+  const profileActive = profileNavActive(pathname, sessionHandle);
 
   const garageActive = pathname.includes("/garage");
   const listingsActive = listingsHref != null && pathname.startsWith(listingsHref);

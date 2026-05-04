@@ -37,6 +37,14 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SiteFooter } from "@/components/marketplace/site-footer";
 import { getPublicSocialLinks } from "@/lib/marketing/social-links";
+import {
+  campaignsNavHref,
+  garageNavHref,
+  listingsNavHref,
+  marketingNavHref,
+  normalizePublicHandle,
+  profileNavHref,
+} from "@/lib/profile-nav";
 
 const resourcesMenuLinks = [
   { href: "/how-it-works", label: "How It Works" },
@@ -55,17 +63,19 @@ function displayMenuName(session: Session | null): string {
   return "Account";
 }
 
-function carmunityMenuActive(pathname: string, handle?: string | null) {
+function carmunityMenuActive(pathname: string, handle: string | null | undefined) {
   if (pathname.startsWith("/explore") || pathname.startsWith("/discussions")) return true;
   if (pathname.startsWith("/messages")) return true;
-  if (handle && pathname.startsWith(`/u/${handle}`)) {
+  const base = profileNavHref(handle);
+  if (base === "/settings") return false;
+  if (pathname.startsWith(base)) {
     if (pathname.includes("/listings") || pathname.includes("/marketing")) return false;
     return true;
   }
   return false;
 }
 
-function marketMenuActive(pathname: string, handle?: string | null) {
+function marketMenuActive(pathname: string, handle: string | null | undefined) {
   if (
     pathname.startsWith("/auctions") ||
     pathname.startsWith("/sell") ||
@@ -73,8 +83,10 @@ function marketMenuActive(pathname: string, handle?: string | null) {
     pathname.startsWith("/wallet")
   )
     return true;
-  if (handle && (pathname.startsWith(`/u/${handle}/listings`) || pathname.startsWith(`/u/${handle}/marketing`)))
-    return true;
+  const listings = listingsNavHref(handle);
+  const marketing = marketingNavHref(handle);
+  if (listings && pathname.startsWith(listings)) return true;
+  if (marketing && pathname.startsWith(marketing)) return true;
   return false;
 }
 
@@ -138,13 +150,16 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
   const [avatarSignOutStep, setAvatarSignOutStep] = useState<"idle" | "confirm">("idle");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const rawHandle = (session?.user as { handle?: string } | undefined)?.handle?.trim();
-  const handle = rawHandle && rawHandle.length > 0 ? rawHandle : null;
-  const profilePath = handle ? `/u/${encodeURIComponent(handle)}` : "/settings";
-  const garagePath = handle ? `/u/${encodeURIComponent(handle)}/garage` : "/settings";
+  const sessionHandle = (session?.user as { handle?: string } | undefined)?.handle;
+  const handle = normalizePublicHandle(sessionHandle) ?? null;
+  const profilePath = profileNavHref(sessionHandle);
+  const garagePath = garageNavHref(sessionHandle);
   const marketingEnabled = Boolean(
     (session?.user as { marketingEnabled?: boolean } | undefined)?.marketingEnabled
   );
+  const listingsPath = listingsNavHref(sessionHandle);
+  const marketingPath = marketingEnabled ? marketingNavHref(sessionHandle) : null;
+  const campaignsPath = marketingEnabled ? campaignsNavHref(sessionHandle) : null;
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
   const isAuthShell = pathname.startsWith("/auth");
   const joinHref =
@@ -203,7 +218,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
       </DropdownMenu>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <PillarChevronTrigger active={carmunityMenuActive(pathname, handle)}>
+          <PillarChevronTrigger active={carmunityMenuActive(pathname, sessionHandle)}>
             Carmunity
           </PillarChevronTrigger>
         </DropdownMenuTrigger>
@@ -259,7 +274,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
       </Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <PillarChevronTrigger active={carmunityMenuActive(pathname, handle)}>
+          <PillarChevronTrigger active={carmunityMenuActive(pathname, sessionHandle)}>
             Carmunity
           </PillarChevronTrigger>
         </DropdownMenuTrigger>
@@ -284,7 +299,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <PillarChevronTrigger active={marketMenuActive(pathname, handle)}>Selling</PillarChevronTrigger>
+          <PillarChevronTrigger active={marketMenuActive(pathname, sessionHandle)}>Selling</PillarChevronTrigger>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className={cn(pillarMenuContentClass, "min-w-[220px]")}>
           <DropdownMenuItem asChild>
@@ -293,18 +308,18 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           <DropdownMenuItem asChild>
             <Link href="/sell">Sell</Link>
           </DropdownMenuItem>
-          {handle ? (
+          {listingsPath ? (
             <DropdownMenuItem asChild>
-              <Link href={`/u/${handle}/listings`}>My Listings</Link>
+              <Link href={listingsPath}>My Listings</Link>
             </DropdownMenuItem>
           ) : null}
-          {handle && marketingEnabled ? (
+          {marketingPath && campaignsPath ? (
             <>
               <DropdownMenuItem asChild>
-                <Link href={`/u/${handle}/marketing`}>Marketing</Link>
+                <Link href={marketingPath}>Marketing</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/u/${handle}/marketing/campaigns`}>Campaigns</Link>
+                <Link href={campaignsPath}>Campaigns</Link>
               </DropdownMenuItem>
             </>
           ) : null}
@@ -489,17 +504,15 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                       <Link href="/settings">Settings</Link>
                     </DropdownMenuItem>
 
-                    {handle ? (
+                    {listingsPath ? (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <Link href={`/u/${encodeURIComponent(handle)}/listings`}>My Listings</Link>
+                          <Link href={listingsPath}>My Listings</Link>
                         </DropdownMenuItem>
-                        {session.user?.handle && session.user.marketingEnabled ? (
+                        {marketingPath ? (
                           <DropdownMenuItem asChild>
-                            <Link href={`/u/${encodeURIComponent(session.user.handle)}/marketing`}>
-                              Marketing
-                            </Link>
+                            <Link href={marketingPath}>Marketing</Link>
                           </DropdownMenuItem>
                         ) : null}
                       </>
@@ -737,9 +750,9 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   >
                     Profile
                   </Link>
-                  {handle ? (
+                  {listingsPath ? (
                     <Link
-                      href={`/u/${encodeURIComponent(handle)}/listings`}
+                      href={listingsPath}
                       onClick={() => setMobileNavOpen(false)}
                       className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
                     >

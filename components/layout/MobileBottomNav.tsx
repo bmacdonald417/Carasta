@@ -9,7 +9,9 @@ import {
   MessageSquare,
   PlusCircle,
   BookOpen,
+  UserRound,
 } from "lucide-react";
+import { profileNavActive, profileNavHref } from "@/lib/profile-nav";
 import { cn } from "@/lib/utils";
 import {
   shellMobileActive,
@@ -17,12 +19,11 @@ import {
   shellMobileItemBase,
 } from "@/lib/shell-nav-styles";
 
-const signedInNavItems = [
+const signedInNavBase = [
   { href: "/explore", label: "Carmunity", icon: Users },
   { href: "/discussions", label: "Discussions", icon: MessageSquare },
   { href: "/auctions", label: "Market", icon: Gavel },
   { href: "/sell", label: "Sell", icon: PlusCircle },
-  { href: "/resources", label: "Resources", icon: BookOpen },
 ] as const;
 
 const publicNavItems = [
@@ -35,6 +36,8 @@ const publicNavItems = [
 export function MobileBottomNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const sessionHandle = (session?.user as { handle?: string } | undefined)?.handle;
+  const profileHref = profileNavHref(sessionHandle);
 
   const hideNav =
     pathname === "/contact" ||
@@ -57,12 +60,21 @@ export function MobileBottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur-xl lg:hidden">
       <div className="flex justify-around gap-0.5 py-1.5">
-        {(session?.user ? signedInNavItems : publicNavItems).map(({ href, label, icon: Icon }) => {
-          const isActive =
-            href === "/resources" ? pathname.startsWith("/resources") : pathname.startsWith(href);
+        {(session?.user
+          ? [
+              ...signedInNavBase.map((i) => ({ ...i, profile: false as const })),
+              { href: profileHref, label: "Profile", icon: UserRound, profile: true as const },
+            ]
+          : publicNavItems.map((i) => ({ ...i, profile: false as const }))
+        ).map(({ href, label, icon: Icon, profile }) => {
+          const isActive = profile
+            ? profileNavActive(pathname, sessionHandle)
+            : href === "/resources"
+              ? pathname.startsWith("/resources")
+              : pathname.startsWith(href);
           return (
             <Link
-              key={href}
+              key={`${label}-${href}`}
               href={href}
               className={cn(
                 shellMobileItemBase,
