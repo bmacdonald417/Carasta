@@ -20,8 +20,8 @@
 
   /* Core surfaces (light-first) */
   /* Target palette (design-system-color-normalization) */
-  --background: 220 14% 97%;
-  --foreground: 230 14% 11%;
+  --background: 222 18% 96%;
+  --foreground: 228 22% 11%;
 
   /* Deep navy surfaces (for header/footer chrome) */
   --navy: 231 49% 14%;
@@ -43,8 +43,8 @@
   --secondary: 215 33% 95%;
   --secondary-foreground: 230 14% 11%;
 
-  --muted: 215 33% 95%;
-  --muted-foreground: 220 9% 45%;
+  --muted: 218 28% 94%;
+  --muted-foreground: 220 10% 40%;
 
   /* Interactive hover/selection: primary-soft (E8EAFF) */
   --accent: 235 100% 96%;
@@ -54,8 +54,8 @@
   --destructive-foreground: 0 0% 98%;
 
   /* Borders */
-  --border: 218 18% 88%;
-  --input: 218 18% 86%;
+  --border: 220 22% 86%;
+  --input: 220 24% 84%;
 
   /* Semantic states */
   --info: 238 65% 45%;
@@ -81,8 +81,8 @@
   --danger-foreground: 0 58% 38%;
 
   /* Elevation / scrim */
-  --shadow-e1: 0 1px 0 rgba(18, 23, 53, 0.04), 0 1px 2px rgba(18, 23, 53, 0.06);
-  --shadow-e2: 0 12px 32px rgba(18, 23, 53, 0.12);
+  --shadow-e1: 0 1px 0 rgba(24, 36, 72, 0.05), 0 2px 8px rgba(24, 36, 72, 0.07);
+  --shadow-e2: 0 14px 36px rgba(24, 36, 72, 0.13);
   --shadow-e3: 0 28px 90px rgba(18, 23, 53, 0.22);
   --scrim: 231 49% 14%;
 

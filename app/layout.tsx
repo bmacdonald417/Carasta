@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { Inter, Oswald, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Space_Grotesk, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { CarastaAssistantLauncher } from "@/components/assistant/carasta-assistant-launcher";
@@ -13,14 +13,16 @@ const FeedbackWidget = dynamic(
   { ssr: false }
 );
 
-const inter = Inter({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
 });
 
-const oswald = Oswald({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-oswald",
+  variable: "--font-display",
+  weight: ["500", "600", "700"],
 });
 
 const playfair = Playfair_Display({
@@ -47,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`carasta-theme ${inter.variable} ${oswald.variable} ${playfair.variable} min-h-screen bg-background font-sans antialiased text-foreground`}
+        className={`carasta-theme ${plusJakarta.variable} ${spaceGrotesk.variable} ${playfair.variable} min-h-screen bg-background font-sans antialiased text-foreground`}
       >
         <Providers>
           <CarastaLayout>{children}</CarastaLayout>

@@ -36,7 +36,8 @@
 
   /* Typography */
   --carasta-font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
-  --carasta-font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --carasta-font-sans: var(--font-sans), "Plus Jakarta Sans", system-ui, sans-serif;
+  --carasta-font-display: var(--font-display), "Space Grotesk", system-ui, sans-serif;
 }
 
 /* Theme hook: keep typography defaults calm; color comes from Tailwind tokens on <body> */
@@ -48,11 +49,30 @@ body.carasta-theme {
 /* Opt-in marketing/display typography (do not apply to all headings globally) */
 .carasta-marketing-display,
 .carasta-heading {
-  font-family: var(--font-oswald), "Oswald", system-ui, sans-serif;
+  font-family: var(--carasta-font-display);
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  line-height: 1.2;
+  line-height: 1.15;
+}
+
+/**
+ * Product page titles — premium sans display, opt-in on key routes.
+ * Pair with `.carasta-page-eyebrow` for section chrome.
+ */
+.carasta-page-title {
+  font-family: var(--carasta-font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.carasta-page-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: hsl(var(--primary));
 }
 
 body.carasta-theme p,

@@ -215,7 +215,7 @@ export default async function AuctionsPage({
   return (
     <div className="carasta-container max-w-6xl py-8">
       <header className="border-b border-border pb-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+        <h1 className="carasta-page-title text-3xl md:text-[2rem]">
           {status === "LIVE" ? "Live" : status === "ENDED" ? "Ended" : "Sold"} auctions
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">

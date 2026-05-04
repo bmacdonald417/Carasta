@@ -58,12 +58,8 @@ export default async function ExplorePage({
       <div className="carasta-container max-w-7xl px-4 sm:px-6">
         <header className="border-b border-border/70 pb-5 md:flex md:items-end md:justify-between md:gap-6">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-              Social feed
-            </p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground antialiased md:text-3xl">
-              Carmunity
-            </h1>
+            <p className="carasta-page-eyebrow">Social feed</p>
+            <h1 className="carasta-page-title mt-1 text-2xl md:text-3xl">Carmunity</h1>
             <p className="mt-0.5 text-xs font-medium text-muted-foreground">by Carasta</p>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
               Posts and motion from people you follow — plus{" "}

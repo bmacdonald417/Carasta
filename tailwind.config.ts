@@ -59,8 +59,8 @@ const config: Config = {
         "carasta-white": "var(--carasta-white)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        display: ["var(--font-oswald)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
         serif: ["var(--font-playfair)", "Playfair Display", "Georgia", "serif"],
       },
       borderRadius: {

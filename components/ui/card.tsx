@@ -9,7 +9,7 @@ const cardVariants = cva(
     variants: {
       variant: {
         solid:
-          "border-border bg-card shadow-e1 hover:shadow-e2 hover:border-primary/20",
+          "border-border/90 bg-card shadow-e1 transition-[box-shadow,transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-e2 motion-reduce:transform-none",
         subtle:
           "border-border bg-muted/30 shadow-e1 hover:shadow-e2 hover:border-primary/15",
         glass:
@@ -51,7 +51,10 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-xl font-semibold leading-tight tracking-tight text-foreground", className)}
+    className={cn(
+      "font-display text-xl font-bold leading-tight tracking-tight text-foreground",
+      className
+    )}
     {...props}
   />
 ));

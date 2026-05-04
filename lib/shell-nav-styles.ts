@@ -8,18 +8,19 @@ export const shellFocusRing =
 
 /** Header marketing links (desktop) */
 export const shellHeaderMarketingLinkBase =
-  `rounded-full px-3 py-2 text-[13px] font-medium transition ${shellFocusRing}`;
+  `rounded-full px-3 py-2 text-[13px] font-semibold tracking-tight transition duration-200 ${shellFocusRing}`;
 export const shellHeaderMarketingInactive =
-  "text-muted-foreground hover:bg-primary/12 hover:text-primary";
-export const shellHeaderMarketingActive = "bg-muted text-foreground";
+  "text-muted-foreground hover:bg-primary/12 hover:text-primary hover:shadow-sm";
+export const shellHeaderMarketingActive =
+  "bg-primary/10 text-primary shadow-sm ring-1 ring-inset ring-primary/20";
 
 /** Header app rail (Carmunity, Discussions, …) — dense top nav */
 export const shellHeaderAppLinkBase =
-  `carmunity-nav-link rounded-full px-2.5 py-1.5 text-[12px] font-medium transition sm:px-3 sm:py-2 sm:text-[13px] ${shellFocusRing}`;
+  `carmunity-nav-link rounded-full px-2.5 py-1.5 text-[12px] font-semibold tracking-tight transition duration-200 sm:px-3 sm:py-2 sm:text-[13px] ${shellFocusRing}`;
 export const shellHeaderAppInactive =
-  "text-muted-foreground hover:bg-primary/12 hover:text-primary";
+  "text-muted-foreground hover:bg-primary/12 hover:text-primary hover:shadow-sm";
 export const shellHeaderAppActive =
-  "bg-primary/15 text-primary ring-1 ring-inset ring-primary/25 font-semibold";
+  "bg-primary/12 text-primary shadow-sm ring-2 ring-inset ring-primary/30";
 
 /** Desktop sidebar rows */
 export const shellSidebarRowBase =
@@ -27,7 +28,7 @@ export const shellSidebarRowBase =
 export const shellSidebarInactive =
   "text-muted-foreground hover:bg-primary/12 hover:text-primary";
 export const shellSidebarActive =
-  "bg-primary/15 text-primary ring-1 ring-inset ring-primary/25 font-semibold";
+  "bg-primary/12 text-primary ring-2 ring-inset ring-primary/28 font-semibold shadow-sm";
 
 /** Sidebar nested items (listings, marketing) */
 export const shellSidebarSubRowBase =

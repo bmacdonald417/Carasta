@@ -91,9 +91,7 @@ export default async function DiscussionsPage() {
   return (
     <div className="carasta-container max-w-3xl py-8">
       <header className="border-b border-border pb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Discussions
-        </h1>
+        <h1 className="carasta-page-title text-3xl md:text-[2rem]">Discussions</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           Reddit-style threads with a premium automotive lens — organized as{" "}
           <span className="font-medium text-foreground">Gears</span> (top-level) and{" "}

@@ -95,7 +95,7 @@ function aboutMenuActive(pathname: string) {
 
 /** Pillar menus: higher z than sticky header (z-50) so portaled content paints above page chrome. */
 const pillarMenuContentClass =
-  "z-[100] min-w-[200px] border border-border bg-popover text-popover-foreground shadow-e2";
+  "z-[100] min-w-[220px] rounded-2xl border border-border/90 bg-popover/98 p-1.5 text-popover-foreground shadow-e2 ring-1 ring-primary/[0.06] backdrop-blur-md";
 
 /**
  * Must forward arbitrary props from Radix `DropdownMenuTrigger asChild` (Slot merge):
