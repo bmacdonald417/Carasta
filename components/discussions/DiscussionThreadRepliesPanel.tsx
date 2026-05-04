@@ -9,6 +9,7 @@ import { DiscussionReactionPicker } from "@/components/discussions/DiscussionRea
 import { DiscussionReportDialog } from "@/components/discussions/DiscussionReportDialog";
 import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
 import { DiscussionThreadReplyComposer } from "@/components/discussions/DiscussionThreadReplyComposer";
+import { ThreadVoteButton } from "@/components/discussions/ThreadVoteButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useGuestGate } from "@/components/guest-gate/GuestGateProvider";
@@ -108,19 +109,19 @@ export function DiscussionThreadRepliesPanel({
 
   return (
     <section className="mt-8 space-y-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 border-b border-border pb-3">
         <h2 className="text-sm font-semibold text-foreground">
-          Replies <span className="font-normal text-muted-foreground">({replyCount})</span>
+          Comments <span className="font-normal text-muted-foreground">({replyCount})</span>
         </h2>
+        <p className="text-[11px] text-muted-foreground">sorted by best</p>
       </div>
 
-      <ul className="space-y-3">
+      <ul className="space-y-0">
         {replies.length === 0 ? (
-          <li className="rounded-2xl border border-dashed border-border bg-muted/20 px-5 py-8 text-center shadow-e1">
-            <p className="text-sm font-semibold text-foreground">Start the thread momentum</p>
+          <li className="rounded-xl border border-dashed border-border bg-muted/20 px-5 py-8 text-center shadow-e1">
+            <p className="text-sm font-semibold text-foreground">No comments yet</p>
             <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-              A clear question or reference photo invites better answers. Mention someone with{" "}
-              <span className="font-mono text-primary/90">@handle</span> when you want them in the loop.
+              Add the first comment — type <span className="font-mono text-primary/90">@handle</span> to mention someone.
             </p>
           </li>
         ) : (
@@ -128,81 +129,90 @@ export function DiscussionThreadRepliesPanel({
             <li
               key={r.id}
               id={discussionReplyAnchorId(r.id)}
-              className="scroll-mt-24 rounded-2xl border border-border bg-card px-4 py-3 shadow-e1"
+              className="scroll-mt-24 border-b border-border/50 py-3"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <p className="text-xs text-muted-foreground">
-                  <AuthorHandleLink handle={r.author.handle} className="text-xs" />
-                  {r.author.name ? (
-                    <span className="text-muted-foreground/90"> · {r.author.name}</span>
-                  ) : null}
-                  <span className="text-muted-foreground/90"> · {formatLong(r.createdAt)}</span>
-                  {r.demoSeed ? (
-                    <Badge
-                      variant="secondary"
-                      className="ml-2 h-5 px-1.5 text-[10px] font-semibold uppercase"
-                    >
-                      Demo
-                    </Badge>
-                  ) : null}
-                </p>
-                {!r.contentWithdrawn ? (
-                  <DiscussionReactionPicker
-                    target="reply"
-                    targetId={r.id}
-                    summary={r.reactionSummary}
-                    initialKind={r.viewerReactionKind}
+              <div className="flex gap-2">
+                {/* Vote column for reply */}
+                <div className="flex shrink-0 flex-col items-center pt-0.5">
+                  <ThreadVoteButton
+                    threadId={threadId}
+                    replyId={r.id}
+                    initialUpCount={r.reactionSummary?.byKind?.LIKE ?? 0}
+                    initialDownCount={r.reactionSummary?.byKind?.DISLIKE ?? 0}
+                    compact
                   />
-                ) : (
-                  <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                    Unavailable
-                  </span>
-                )}
-              </div>
-              <p className="mt-2 text-sm leading-relaxed text-foreground">
-                {r.contentWithdrawn ? (
-                  <span className="rounded-md border border-border bg-muted/40 px-2 py-1 text-muted-foreground">
-                    This content has been removed.
-                  </span>
-                ) : (
-                  <DiscussionRichText text={r.body} validHandles={validMentionHandles} />
-                )}
-              </p>
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  {!r.contentWithdrawn ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className={cn(
-                        "h-7 px-2 text-xs text-primary hover:bg-muted/60 hover:text-primary",
-                        shellFocusRing
-                      )}
-                      onClick={() => {
-                        if (!viewerUserId) {
-                          openGate({ intent: "reply", nextUrl: pathname || "/discussions" });
-                          return;
-                        }
-                        setParentReplyId(r.id);
-                      }}
-                    >
-                      Reply
-                    </Button>
-                  ) : null}
-                  {viewerUserId && viewerUserId !== r.authorId && !r.contentWithdrawn ? (
-                    <DiscussionReportDialog
-                      target="reply"
-                      threadId={threadId}
-                      replyId={r.id}
-                      contentLabel={`Reporting a reply by @${r.author.handle}`}
-                      variant="ghost"
-                    />
-                  ) : null}
                 </div>
-                {parentReplyId === r.id ? (
-                  <span className="text-[11px] text-muted-foreground">Replying to this comment</span>
-                ) : null}
+
+                {/* Reply body */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+                    <AuthorHandleLink handle={r.author.handle} className="text-xs font-semibold text-foreground" />
+                    {r.author.name && (
+                      <span className="text-muted-foreground">· {r.author.name}</span>
+                    )}
+                    <span>·</span>
+                    <span>{formatLong(r.createdAt)}</span>
+                    {r.demoSeed && (
+                      <Badge variant="secondary" className="ml-1 h-4 px-1.5 text-[9px] font-semibold uppercase">
+                        Demo
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="mt-1.5 text-sm leading-relaxed text-foreground">
+                    {r.contentWithdrawn ? (
+                      <span className="italic text-muted-foreground">[comment removed]</span>
+                    ) : (
+                      <DiscussionRichText text={r.body} validHandles={validMentionHandles} />
+                    )}
+                  </div>
+
+                  {/* Reply actions */}
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    {!r.contentWithdrawn && (
+                      <>
+                        {!r.contentWithdrawn ? (
+                          <DiscussionReactionPicker
+                            target="reply"
+                            targetId={r.id}
+                            summary={r.reactionSummary}
+                            initialKind={r.viewerReactionKind}
+                          />
+                        ) : null}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className={cn(
+                            "h-6 px-2 text-[11px] font-semibold text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                            shellFocusRing
+                          )}
+                          onClick={() => {
+                            if (!viewerUserId) {
+                              openGate({ intent: "reply", nextUrl: pathname || "/discussions" });
+                              return;
+                            }
+                            setParentReplyId(r.id);
+                          }}
+                        >
+                          Reply
+                        </Button>
+                        {viewerUserId && viewerUserId !== r.authorId && (
+                          <DiscussionReportDialog
+                            target="reply"
+                            threadId={threadId}
+                            replyId={r.id}
+                            contentLabel={`Reporting a reply by @${r.author.handle}`}
+                            variant="ghost"
+                          />
+                        )}
+                      </>
+                    )}
+                    {parentReplyId === r.id && (
+                      <span className="text-[11px] font-medium text-primary">↩ replying to this</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </li>
           ))

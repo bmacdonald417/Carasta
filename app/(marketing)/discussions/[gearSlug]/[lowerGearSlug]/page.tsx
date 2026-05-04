@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MessageSquare, TrendingUp, Clock, ChevronUp } from "lucide-react";
 
 import { AuthorHandleLink } from "@/components/discussions/AuthorHandleLink";
 import { DiscussionReactionSummary } from "@/components/discussions/DiscussionReactionSummary";
-import { Badge } from "@/components/ui/badge";
+import { NewThreadComposer } from "@/components/discussions/NewThreadComposer";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   getLowerGearBySlugs,
   listThreadsForCategory,
@@ -45,40 +47,51 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function formatShort(iso: string) {
-  try {
-    return new Date(iso).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  } catch {
-    return iso;
-  }
+function timeAgo(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d}d ago`;
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function sortLink(
-  gearSlug: string,
-  lowerGearSlug: string,
-  mode: DiscussionSortMode,
-  active: DiscussionSortMode
-) {
+function SortLink({
+  gearSlug,
+  lowerGearSlug,
+  mode,
+  active,
+  icon: Icon,
+  label,
+}: {
+  gearSlug: string;
+  lowerGearSlug: string;
+  mode: DiscussionSortMode;
+  active: DiscussionSortMode;
+  icon: React.ElementType;
+  label: string;
+}) {
   const params = new URLSearchParams();
   if (mode !== "trending") params.set("sort", mode);
   const qs = params.toString();
-  const suffix = qs ? `?${qs}` : "";
+  const href = `/discussions/${gearSlug}/${lowerGearSlug}${qs ? `?${qs}` : ""}`;
   const isActive = mode === active;
   return (
     <Link
-      href={`/discussions/${gearSlug}/${lowerGearSlug}${suffix}`}
+      href={href}
       className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
         shellFocusRing,
         isActive
-          ? "rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary"
-          : "rounded-full px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+          ? "bg-primary text-primary-foreground shadow-sm"
+          : "border border-border text-muted-foreground hover:border-primary/30 hover:bg-muted/50 hover:text-foreground"
       )}
     >
-      {mode === "trending" ? "Trending" : mode === "new" ? "New" : "Top"}
+      <Icon className="h-3.5 w-3.5" />
+      {label}
     </Link>
   );
 }
@@ -100,144 +113,166 @@ export default async function LowerGearPage({ params, searchParams }: Props) {
   const threadsRes = await listThreadsForCategory({
     categoryId: category.id,
     page,
-    take: 20,
+    take: 25,
     sort,
     viewerUserId,
     viewerIsAdmin,
   });
   if (!threadsRes.ok) notFound();
   const { threads, hasNextPage, totalCount } = threadsRes;
-  const totalPages = Math.max(1, Math.ceil(totalCount / 20));
+  const totalPages = Math.max(1, Math.ceil(totalCount / 25));
 
   return (
     <div className="carasta-container max-w-3xl py-8">
-      <nav className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
-        <Link href="/discussions" className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}>
+      {/* Breadcrumb */}
+      <nav className="mb-5 flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
+        <Link href="/discussions" className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-sm")}>
           Discussions
         </Link>
-        <span aria-hidden className="text-muted-foreground/40">/</span>
-        <Link
-          href={`/discussions/${category.space.slug}`}
-          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
-        >
+        <span aria-hidden>/</span>
+        <Link href={`/discussions/${category.space.slug}`} className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-sm")}>
           {category.space.title}
         </Link>
-        <span aria-hidden className="text-muted-foreground/40">/</span>
+        <span aria-hidden>/</span>
         <span className="font-medium text-foreground">{category.title}</span>
       </nav>
 
-      <header className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-e1">
-        <Badge variant="outline" className="text-[10px] font-medium uppercase tracking-wide">
-          Lower Gear
-        </Badge>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">{category.title}</h1>
-        {category.description ? (
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{category.description}</p>
-        ) : null}
-        <div className="mt-4 flex flex-wrap gap-1 rounded-full border border-border bg-muted/30 p-1">
-          {sortLink(gearSlug, lowerGearSlug, "trending", sort)}
-          {sortLink(gearSlug, lowerGearSlug, "new", sort)}
-          {sortLink(gearSlug, lowerGearSlug, "top", sort)}
+      {/* Community header card */}
+      <div className="mb-6 overflow-hidden rounded-xl border border-border bg-card shadow-e1">
+        <div className="bg-gradient-to-r from-primary/10 to-accent/60 px-5 py-4">
+          <PageHeader
+            eyebrow={`r/${category.slug}`}
+            title={category.title}
+            subtitle={category.description ?? `Discussions in ${category.title} · ${category.space.title}`}
+            border={false}
+            className="mb-0"
+          />
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-          New = recency · Top = replies + reactions (last 90 days) · Trending = engagement with recency decay. See
-          CARMUNITY_PHASE_G_MODERATION_AND_SCALE.md for formulas.
-        </p>
-      </header>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card/60 px-5 py-2.5">
+          <p className="text-xs text-muted-foreground">
+            <span className="font-semibold tabular-nums text-foreground">{totalCount}</span>{" "}
+            thread{totalCount === 1 ? "" : "s"} total
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            <SortLink gearSlug={gearSlug} lowerGearSlug={lowerGearSlug} mode="trending" active={sort} icon={TrendingUp} label="Hot" />
+            <SortLink gearSlug={gearSlug} lowerGearSlug={lowerGearSlug} mode="new" active={sort} icon={Clock} label="New" />
+            <SortLink gearSlug={gearSlug} lowerGearSlug={lowerGearSlug} mode="top" active={sort} icon={ChevronUp} label="Top" />
+          </div>
+        </div>
+      </div>
 
-      <ul className="mt-8 space-y-2">
+      {/* New thread composer */}
+      <NewThreadComposer
+        categoryId={category.id}
+        gearSlug={gearSlug}
+        lowerGearSlug={lowerGearSlug}
+        className="mb-5"
+      />
+
+      {/* Thread list */}
+      <div className="space-y-2">
         {threads.length === 0 ? (
-          <li className="rounded-2xl border border-border bg-muted/25 px-4 py-6 text-sm text-muted-foreground shadow-e1">
-            No threads in this Lower Gear yet.
-          </li>
+          <div className="rounded-xl border border-dashed border-border bg-muted/20 px-5 py-10 text-center shadow-e1">
+            <p className="text-base font-semibold text-foreground">No threads yet</p>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Be the first to start a conversation in {category.title}.
+            </p>
+          </div>
         ) : (
           threads.map((t) => (
-            <li key={t.id}>
+            <div
+              key={t.id}
+              className="flex gap-0 overflow-hidden rounded-xl border border-border bg-card shadow-e1 transition-colors hover:border-primary/25"
+            >
+              {/* Vote column — placeholder (votes wired client-side on thread detail page) */}
+              <div className="flex w-10 shrink-0 flex-col items-center gap-0.5 border-r border-border bg-muted/20 px-1 py-3">
+                <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                <span className="text-[11px] font-semibold tabular-nums text-muted-foreground">
+                  {t.reactionSummary?.total ?? 0}
+                </span>
+              </div>
+
+              {/* Main content */}
               <Link
                 href={discussionThreadPath(category.space.slug, category.slug, t.id)}
-                className={cn(
-                  "block rounded-2xl border border-border bg-card px-4 py-3 shadow-e1 transition-colors",
-                  shellFocusRing,
-                  "hover:border-primary/30 hover:bg-muted/30"
-                )}
+                className={cn("min-w-0 flex-1 px-3 py-2.5 block", shellFocusRing)}
               >
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium text-foreground">{t.title}</span>
-                  {t.demoSeed ? (
-                    <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-semibold uppercase tracking-wide">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <p className="text-sm font-semibold text-foreground leading-snug hover:text-primary transition-colors">
+                    {t.title}
+                  </p>
+                  {t.demoSeed && (
+                    <span className="shrink-0 rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
                       Demo
-                    </Badge>
-                  ) : null}
+                    </span>
+                  )}
                 </div>
-                <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                  <AuthorHandleLink handle={t.author.handle} className="text-xs" />
-                  <span className="text-muted-foreground/60">·</span>
-                  <span>{formatShort(t.lastActivityAt)}</span>
-                  <span className="text-muted-foreground/60">·</span>
+
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
                   <span>
-                    {t.replyCount} repl{t.replyCount === 1 ? "y" : "ies"}
+                    by <AuthorHandleLink handle={t.author.handle} className="text-[11px] font-medium" />
                   </span>
-                  <span className="text-muted-foreground/60">·</span>
-                  <DiscussionReactionSummary summary={t.reactionSummary} />
-                </p>
+                  <span className="text-muted-foreground/40">·</span>
+                  <span>{timeAgo(t.lastActivityAt)}</span>
+                  <span className="text-muted-foreground/40">·</span>
+                  <span className="inline-flex items-center gap-1">
+                    <MessageSquare className="h-3 w-3" />
+                    {t.replyCount} {t.replyCount === 1 ? "comment" : "comments"}
+                  </span>
+                  {(t.reactionSummary?.total ?? 0) > 0 && (
+                    <>
+                      <span className="text-muted-foreground/40">·</span>
+                      <DiscussionReactionSummary summary={t.reactionSummary} />
+                    </>
+                  )}
+                </div>
               </Link>
-            </li>
+            </div>
           ))
         )}
-      </ul>
+      </div>
 
+      {/* Pagination */}
       {totalPages > 1 || hasNextPage ? (
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground shadow-e1">
-          <p className="text-xs">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-e1">
+          <p className="text-xs text-muted-foreground">
             Page <span className="font-semibold text-primary">{page}</span> of{" "}
             <span className="font-semibold text-foreground">{totalPages}</span>
           </p>
           <div className="flex flex-wrap gap-2">
-            {page > 1 ? (
+            {page > 1 && (
               <Link
-                href={(() => {
+                href={`/discussions/${gearSlug}/${lowerGearSlug}?${(() => {
                   const p = new URLSearchParams();
                   if (sort !== "trending") p.set("sort", sort);
                   p.set("page", String(page - 1));
-                  const qs = p.toString();
-                  return `/discussions/${gearSlug}/${lowerGearSlug}${qs ? `?${qs}` : ""}`;
-                })()}
-                className={cn(
-                  "rounded-full border border-border bg-background px-4 py-1.5 text-xs font-semibold text-primary transition-colors",
-                  shellFocusRing,
-                  "hover:border-primary/35 hover:bg-muted/40"
-                )}
+                  return p.toString();
+                })()}`}
+                className={cn("rounded-full border border-border bg-background px-4 py-1.5 text-xs font-semibold text-primary transition hover:bg-muted/40", shellFocusRing)}
               >
-                Previous
+                ← Previous
               </Link>
-            ) : null}
-            {hasNextPage ? (
+            )}
+            {hasNextPage && (
               <Link
-                href={(() => {
+                href={`/discussions/${gearSlug}/${lowerGearSlug}?${(() => {
                   const p = new URLSearchParams();
                   if (sort !== "trending") p.set("sort", sort);
                   p.set("page", String(page + 1));
-                  return `/discussions/${gearSlug}/${lowerGearSlug}?${p.toString()}`;
-                })()}
-                className={cn(
-                  "rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary transition-colors",
-                  shellFocusRing,
-                  "hover:bg-primary/15"
-                )}
+                  return p.toString();
+                })()}`}
+                className={cn("rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/15", shellFocusRing)}
               >
-                Next
+                Next →
               </Link>
-            ) : null}
+            )}
           </div>
         </div>
       ) : null}
 
-      <p className="mt-10 text-sm text-muted-foreground">
-        <Link
-          href={`/discussions/${category.space.slug}`}
-          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
-        >
-          ← Back to Gear
+      <p className="mt-8 text-sm">
+        <Link href={`/discussions/${category.space.slug}`} className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-sm")}>
+          ← Back to {category.space.title}
         </Link>
       </p>
     </div>

@@ -9,8 +9,10 @@ import { getJwtSubjectUserId } from "@/lib/auth/api-user";
 import {
   buildCarmunityUploadRelativePath,
   CARMUNITY_IMAGE_MAX_BYTES,
-  extensionForCarmunityImageMime,
-  isAllowedCarmunityImageMime,
+  CARMUNITY_VIDEO_MAX_BYTES,
+  extensionForCarmunityMime,
+  isAllowedCarmunityMime,
+  isVideo,
 } from "@/lib/carmunity/carmunity-image-upload";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +21,7 @@ export const runtime = "nodejs";
 /**
  * POST /api/carmunity/media/upload — multipart form, field `file`.
  * Authenticated. Writes to `public` under `/uploads/carmunity/{userId}/…`.
+ * Supports: JPEG, PNG, WebP, GIF, SVG, HEIC, AVIF + MP4, MOV, WebM.
  *
  * Production: prefer a CDN or object storage; local `public/` is ephemeral on many hosts.
  * See CARMUNITY_MEDIA_UPLOAD_CONTRACT.md.
@@ -47,24 +50,34 @@ export async function POST(req: NextRequest) {
   if (file.size <= 0) {
     return NextResponse.json({ ok: false, error: "Empty file." }, { status: 400 });
   }
-  if (file.size > CARMUNITY_IMAGE_MAX_BYTES) {
-    return NextResponse.json(
-      { ok: false, error: `Image must be ${CARMUNITY_IMAGE_MAX_BYTES / (1024 * 1024)} MB or smaller.` },
-      { status: 400 }
-    );
-  }
 
   const mime = file.type || "application/octet-stream";
-  if (!isAllowedCarmunityImageMime(mime)) {
+
+  if (!isAllowedCarmunityMime(mime)) {
     return NextResponse.json(
-      { ok: false, error: "Only JPEG, PNG, WebP, and GIF images are allowed." },
+      {
+        ok: false,
+        error:
+          "Unsupported file type. Allowed: JPEG, PNG, WebP, GIF, SVG, HEIC, AVIF, MP4, MOV, WebM.",
+      },
       { status: 400 }
     );
   }
 
-  const ext = extensionForCarmunityImageMime(mime);
+  const fileIsVideo = isVideo(mime);
+  const maxBytes = fileIsVideo ? CARMUNITY_VIDEO_MAX_BYTES : CARMUNITY_IMAGE_MAX_BYTES;
+  const maxLabel = fileIsVideo ? "100 MB" : "10 MB";
+
+  if (file.size > maxBytes) {
+    return NextResponse.json(
+      { ok: false, error: `File must be ${maxLabel} or smaller.` },
+      { status: 400 }
+    );
+  }
+
+  const ext = extensionForCarmunityMime(mime);
   if (!ext) {
-    return NextResponse.json({ ok: false, error: "Unsupported image type." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Unsupported file type." }, { status: 400 });
   }
 
   const id = randomUUID();
@@ -83,7 +96,7 @@ export async function POST(req: NextRequest) {
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
     requestOrigin;
 
-  const imageUrl = `${publicBase}${relPath}`;
+  const mediaUrl = `${publicBase}${relPath}`;
 
-  return NextResponse.json({ ok: true, imageUrl });
+  return NextResponse.json({ ok: true, imageUrl: mediaUrl, mediaUrl, isVideo: fileIsVideo, mime });
 }

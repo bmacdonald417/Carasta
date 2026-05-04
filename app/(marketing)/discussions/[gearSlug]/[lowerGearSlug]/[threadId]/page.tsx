@@ -12,6 +12,7 @@ import { DiscussionThreadSaveButton } from "@/components/discussions/DiscussionT
 import { DiscussionReportDialog } from "@/components/discussions/DiscussionReportDialog";
 import { DiscussionRichText } from "@/components/discussions/DiscussionRichText";
 import { DiscussionThreadRepliesPanel } from "@/components/discussions/DiscussionThreadRepliesPanel";
+import { ThreadVoteButton } from "@/components/discussions/ThreadVoteButton";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { DiscussionAuctionContextCard } from "@/components/discussions/DiscussionAuctionContextCard";
 import { getSession } from "@/lib/auth";
@@ -34,7 +35,7 @@ type Props = {
 function threadDescriptionSnippet(body: string, max = 180) {
   const plain = body.replace(/\s+/g, " ").trim();
   if (plain.length <= max) return plain;
-  return `${plain.slice(0, max - 1)}…`;
+  return `${plain.slice(0, max - 1)}\u2026`;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -51,18 +52,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: url },
-    openGraph: {
-      title,
-      description,
-      url,
-      siteName: "Carmunity by Carasta",
-      type: "article",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
+    openGraph: { title, description, url, siteName: "Carmunity by Carasta", type: "article" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -86,9 +77,7 @@ async function resolveValidMentionHandlesForThread(args: {
 }): Promise<string[]> {
   const handles = new Set<string>();
   extractMentionHandles(args.opBody).forEach((h) => handles.add(h));
-  for (const b of args.replyBodies) {
-    extractMentionHandles(b).forEach((h) => handles.add(h));
-  }
+  for (const b of args.replyBodies) extractMentionHandles(b).forEach((h) => handles.add(h));
   if (handles.size === 0) return [];
   const rows = await prisma.user.findMany({
     where: { handle: { in: Array.from(handles), mode: "insensitive" } },
@@ -102,20 +91,13 @@ export default async function ThreadPage({ params }: Props) {
   const session = await getSession();
   const viewerId = (session?.user as { id?: string } | undefined)?.id ?? null;
   const viewerIsAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
-  const detail = await getForumThreadDetail(threadId, {
-    viewerUserId: viewerId,
-    viewerIsAdmin,
-  });
-  if (!detail?.ok) notFound();
 
+  const detail = await getForumThreadDetail(threadId, { viewerUserId: viewerId, viewerIsAdmin });
+  if (!detail?.ok) notFound();
   const { thread } = detail;
+
   const threadSharePath = `/discussions/${thread.category.space.slug}/${thread.category.slug}/${thread.id}`;
-  if (
-    thread.category.space.slug !== gearSlug ||
-    thread.category.slug !== lowerGearSlug
-  ) {
-    notFound();
-  }
+  if (thread.category.space.slug !== gearSlug || thread.category.slug !== lowerGearSlug) notFound();
 
   const validMentionHandles = await resolveValidMentionHandlesForThread({
     opBody: thread.body,
@@ -126,29 +108,23 @@ export default async function ThreadPage({ params }: Props) {
     viewerId && viewerId !== thread.author.id
       ? await Promise.all([
           prisma.userBlock.findUnique({
-            where: {
-              blockerId_blockedId: { blockerId: viewerId, blockedId: thread.author.id },
-            },
+            where: { blockerId_blockedId: { blockerId: viewerId, blockedId: thread.author.id } },
             select: { id: true },
           }),
           prisma.userMute.findUnique({
-            where: {
-              userId_mutedUserId: { userId: viewerId, mutedUserId: thread.author.id },
-            },
+            where: { userId_mutedUserId: { userId: viewerId, mutedUserId: thread.author.id } },
             select: { id: true },
           }),
         ])
       : null;
 
-  const subscriptionRow =
-    viewerId
-      ? await prisma.forumThreadSubscription.findUnique({
-          where: {
-            userId_threadId: { userId: viewerId, threadId: thread.id },
-          },
-          select: { createdAt: true, lastViewedAt: true },
-        })
-      : null;
+  const subscriptionRow = viewerId
+    ? await prisma.forumThreadSubscription.findUnique({
+        where: { userId_threadId: { userId: viewerId, threadId: thread.id } },
+        select: { createdAt: true, lastViewedAt: true },
+      })
+    : null;
+
   const threadSaved = Boolean(subscriptionRow);
   const lastActivityMs = new Date(thread.lastActivityAt).getTime();
   const savedThreadHasNew =
@@ -156,11 +132,7 @@ export default async function ThreadPage({ params }: Props) {
     lastActivityMs > (subscriptionRow.lastViewedAt ?? subscriptionRow.createdAt).getTime();
 
   if (subscriptionRow && viewerId) {
-    await touchForumThreadSubscriptionViewed({
-      prisma,
-      userId: viewerId,
-      threadId: thread.id,
-    });
+    await touchForumThreadSubscriptionViewed({ prisma, userId: viewerId, threadId: thread.id });
   }
 
   const viewerFollowsAuthor =
@@ -168,10 +140,7 @@ export default async function ThreadPage({ params }: Props) {
       ? Boolean(
           await prisma.follow.findUnique({
             where: {
-              followerId_followingId: {
-                followerId: viewerId,
-                followingId: thread.author.id,
-              },
+              followerId_followingId: { followerId: viewerId, followingId: thread.author.id },
             },
             select: { id: true },
           })
@@ -190,36 +159,32 @@ export default async function ThreadPage({ params }: Props) {
     author: { handle: r.author.handle, name: r.author.name },
   }));
 
+  const upCount = thread.reactionSummary?.byKind?.LIKE ?? 0;
+  const downCount = thread.reactionSummary?.byKind?.DISLIKE ?? 0;
+
   return (
     <div className="carasta-container max-w-3xl py-8">
       {!viewerId ? (
         <>
           <SignedOutPreviewNotice
             nextUrl={threadSharePath}
-            description="You’re viewing a read-only preview. Join free to react, reply, save threads, and follow voices."
+            description="You're viewing a read-only preview. Join free to react, reply, save threads, and follow voices."
           />
           <PreviewMeter surface="thread_detail" />
         </>
       ) : null}
+
+      {/* Breadcrumb */}
       <nav className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
-        <Link
-          href="/discussions"
-          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
-        >
+        <Link href="/discussions" className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-sm")}>
           Discussions
         </Link>
         <span aria-hidden className="text-muted-foreground/40">/</span>
-        <Link
-          href={`/discussions/${thread.category.space.slug}`}
-          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
-        >
+        <Link href={`/discussions/${thread.category.space.slug}`} className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-sm")}>
           {thread.category.space.title}
         </Link>
         <span aria-hidden className="text-muted-foreground/40">/</span>
-        <Link
-          href={`/discussions/${thread.category.space.slug}/${thread.category.slug}`}
-          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
-        >
+        <Link href={`/discussions/${thread.category.space.slug}/${thread.category.slug}`} className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-sm")}>
           {thread.category.title}
         </Link>
       </nav>
@@ -232,36 +197,60 @@ export default async function ThreadPage({ params }: Props) {
         </div>
       ) : null}
 
-      <article className="mt-6 rounded-2xl border border-border bg-card p-5 shadow-e1 md:p-6">
-        <header className="space-y-4">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-            {thread.title}
-          </h1>
+      {/* Main thread article — Reddit layout */}
+      <article className="mt-5 rounded-2xl border border-border bg-card shadow-e1 overflow-hidden">
+        <div className="flex">
+          {/* Desktop vote column */}
+          <div className="hidden sm:flex w-12 shrink-0 flex-col items-center border-r border-border bg-muted/20 px-1 py-5">
+            <ThreadVoteButton threadId={thread.id} initialUpCount={upCount} initialDownCount={downCount} />
+          </div>
 
-          <div className="flex flex-col gap-3 border-b border-border pb-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0 space-y-2">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground">
-                <AuthorHandleLink handle={thread.author.handle} className="text-sm" />
-                {thread.author.name ? (
-                  <span className="text-muted-foreground/90">· {thread.author.name}</span>
-                ) : null}
-                <span className="text-muted-foreground/90">· {formatLong(thread.createdAt)}</span>
-                {viewerId !== thread.author.id ? (
-                  <span className="inline-flex flex-wrap items-center gap-2">
-                    <span className="text-muted-foreground/50">·</span>
-                    <FollowButton
-                      targetUserId={thread.author.id}
-                      initialFollowing={viewerFollowsAuthor}
-                      className="h-7 border-border bg-muted/40 px-2 text-[10px] font-semibold uppercase tracking-wide text-foreground hover:bg-muted/60"
-                    />
-                  </span>
-                ) : null}
-              </div>
-              <DiscussionAuthorBadges badges={thread.author.badges} className="flex flex-wrap gap-2" />
+          {/* Thread content */}
+          <div className="min-w-0 flex-1 p-5">
+            {/* Meta row */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground mb-3">
+              <span className="font-medium text-primary/80 text-[11px] uppercase tracking-wide">
+                {thread.category.slug}
+              </span>
+              <span className="text-muted-foreground/40">·</span>
+              <span>Posted by <AuthorHandleLink handle={thread.author.handle} className="text-xs" /></span>
+              <span className="text-muted-foreground/40">·</span>
+              <span>{formatLong(thread.createdAt)}</span>
+              {viewerId !== thread.author.id ? (
+                <FollowButton
+                  targetUserId={thread.author.id}
+                  initialFollowing={viewerFollowsAuthor}
+                  className="h-6 border-border bg-muted/40 px-2 text-[10px] font-semibold uppercase tracking-wide text-foreground hover:bg-muted/60"
+                />
+              ) : null}
+              <DiscussionAuthorBadges badges={thread.author.badges} className="flex flex-wrap gap-1.5 ml-0.5" />
             </div>
 
-            <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[280px]">
-              <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+            {/* Title */}
+            <h1 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl mb-4">
+              {thread.title}
+            </h1>
+
+            {/* Body */}
+            <div className="text-sm leading-relaxed text-foreground">
+              <DiscussionRichText text={thread.body} validHandles={validMentionHandles} />
+            </div>
+
+            {/* Bottom action bar */}
+            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border/50 pt-3">
+              {/* Mobile vote */}
+              <div className="flex sm:hidden">
+                <ThreadVoteButton threadId={thread.id} initialUpCount={upCount} initialDownCount={downCount} compact />
+              </div>
+
+              <DiscussionReactionPicker
+                target="thread"
+                targetId={thread.id}
+                summary={thread.reactionSummary}
+                initialKind={thread.viewerReactionKind}
+              />
+
+              <div className="ml-auto flex flex-wrap items-center gap-1.5">
                 <DiscussionThreadSaveButton
                   threadId={thread.id}
                   initialSaved={threadSaved}
@@ -270,18 +259,16 @@ export default async function ThreadPage({ params }: Props) {
                 <ShareButtons
                   url={threadSharePath}
                   title={thread.title}
-                  description={`${thread.category.space.title} · ${thread.category.title}`}
+                  description={`${thread.category.space.title} \u00b7 ${thread.category.title}`}
                   triggerClassName="border-border bg-muted/40 text-xs text-foreground hover:bg-muted/60"
-                  carmunityShareMeta={
-                    viewerId ? { surface: "discussion_thread", threadId: thread.id } : undefined
-                  }
+                  carmunityShareMeta={viewerId ? { surface: "discussion_thread", threadId: thread.id } : undefined}
                 />
                 {viewerId && viewerId !== thread.author.id ? (
                   <>
                     <DiscussionReportDialog
                       target="thread"
                       threadId={thread.id}
-                      contentLabel={`Reporting “${thread.title.slice(0, 120)}${thread.title.length > 120 ? "…" : ""}”`}
+                      contentLabel={`Reporting "${thread.title.slice(0, 120)}${thread.title.length > 120 ? "\u2026" : ""}"`}
                       variant="outline"
                       className="border-border"
                     />
@@ -296,25 +283,8 @@ export default async function ThreadPage({ params }: Props) {
                   </>
                 ) : null}
               </div>
-
-              <div className="flex flex-col gap-2 rounded-xl border border-border bg-muted/20 p-3 lg:items-end">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Reactions
-                </p>
-                <DiscussionReactionPicker
-                  target="thread"
-                  targetId={thread.id}
-                  summary={thread.reactionSummary}
-                  initialKind={thread.viewerReactionKind}
-                  className="w-full justify-between lg:justify-end"
-                />
-              </div>
             </div>
           </div>
-        </header>
-
-        <div className="mt-5 text-sm leading-relaxed text-foreground">
-          <DiscussionRichText text={thread.body} validHandles={validMentionHandles} />
         </div>
       </article>
 
@@ -328,12 +298,12 @@ export default async function ThreadPage({ params }: Props) {
         validMentionHandles={validMentionHandles}
       />
 
-      <p className="mt-10 text-sm text-muted-foreground">
+      <p className="mt-10 text-sm">
         <Link
           href={`/discussions/${thread.category.space.slug}/${thread.category.slug}`}
-          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
+          className={cn("font-medium text-primary hover:underline", shellFocusRing, "rounded-sm")}
         >
-          ← Back to {thread.category.title}
+          {"\u2190"} Back to {thread.category.title}
         </Link>
       </p>
     </div>

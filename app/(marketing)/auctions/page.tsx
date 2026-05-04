@@ -8,6 +8,7 @@ import {
 import { AuctionCard } from "./auction-card";
 import { AuctionFilters } from "./auction-filters";
 import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
+import { PageHeader } from "@/components/ui/page-header";
 
 const AuctionsMapView = dynamic(
   () =>
@@ -214,14 +215,11 @@ export default async function AuctionsPage({
 
   return (
     <div className="carasta-container max-w-6xl py-8">
-      <header className="border-b border-border pb-6">
-        <h1 className="carasta-page-title text-3xl md:text-[2rem]">
-          {status === "LIVE" ? "Live" : status === "ENDED" ? "Ended" : "Sold"} auctions
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Browse verified listings. Reserve progress, auto-bid, and buy-now when available.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Marketplace"
+        title={`${status === "LIVE" ? "Live" : status === "ENDED" ? "Ended" : "Sold"} Auctions`}
+        subtitle="Browse verified listings. Reserve progress, auto-bid, and buy-now when available."
+      />
 
       <ContextualHelpCard context="market.auctions" className="mt-5" />
 

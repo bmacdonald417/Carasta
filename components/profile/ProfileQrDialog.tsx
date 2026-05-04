@@ -68,11 +68,15 @@ export function ProfileQrDialog({
           type="button"
           variant="outline"
           size="sm"
-          title="Profile QR"
+          title="Share profile via QR code"
           aria-label="Open profile QR code"
-          className={cn("w-9 px-0 border-border bg-muted/40 text-foreground hover:bg-muted/60", className)}
+          className={cn(
+            "gap-1.5 border-primary/25 bg-primary/8 text-primary hover:bg-primary/15 hover:border-primary/40",
+            className
+          )}
         >
           <QrCode className="h-4 w-4" aria-hidden />
+          <span className="hidden sm:inline">QR</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm border-border bg-popover text-popover-foreground shadow-e3">

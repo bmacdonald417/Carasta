@@ -5,7 +5,6 @@ import {
   useEffect,
   useRef,
   useState,
-  useTransition,
 } from "react";
 import {
   Bot,
@@ -94,9 +93,6 @@ function renderMarkdown(text: string): React.ReactNode[] {
   while (i < lines.length) {
     const line = lines[i];
 
-    // Bold: **text**
-    const boldLine = line.replace(/\*\*(.+?)\*\*/g, (_, m) => `<b>${m}</b>`);
-
     if (line.startsWith("### ")) {
       elements.push(
         <p key={i} className="mt-2 text-xs font-bold uppercase tracking-wide text-primary">
@@ -153,7 +149,6 @@ export function CarastaAssistantChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
-  const [, startTransition] = useTransition();
 
   const pageContext = pageContextFromPath(pathname ?? "");
 

@@ -104,6 +104,7 @@ enum DiscussionReactionKind {
   MIND_BLOWN
   LAUGH
   RESPECT
+  DISLIKE
 }
 
 enum DiscussionReportReason {

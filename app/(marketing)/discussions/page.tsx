@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/ui/page-header";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { getCarmunityOnboardingState } from "@/lib/carmunity/onboarding-service";
 import {
@@ -90,17 +91,11 @@ export default async function DiscussionsPage() {
 
   return (
     <div className="carasta-container max-w-3xl py-8">
-      <header className="border-b border-border pb-6">
-        <h1 className="carasta-page-title text-3xl md:text-[2rem]">Discussions</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Reddit-style threads with a premium automotive lens — organized as{" "}
-          <span className="font-medium text-foreground">Gears</span> (top-level) and{" "}
-          <span className="font-medium text-foreground">Lower Gears</span> (sub-topics). One
-          Carmunity identity: every <span className="font-mono text-foreground/90">@handle</span>{" "}
-          links to the same <span className="font-mono text-foreground/90">/u/[handle]</span>{" "}
-          profile.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Carmunity"
+        title="Discussions"
+        subtitle="Gear-organized threads with a premium automotive lens. One Carmunity identity across every thread."
+      />
       {!viewerId ? (
         <SignedOutPreviewNotice
           nextUrl="/discussions"

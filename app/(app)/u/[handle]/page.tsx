@@ -4,6 +4,13 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  MapPin,
+  MessageSquare,
+  Settings,
+  Star,
+  Users,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FollowButton } from "./follow-button";
@@ -104,9 +111,7 @@ export default async function ProfilePage({
       userBadges: {
         orderBy: { awardedAt: "desc" },
         take: 10,
-        select: {
-          badge: { select: { slug: true, name: true } },
-        },
+        select: { badge: { select: { slug: true, name: true } } },
       },
       reputationScore: true,
       completedSalesCount: true,
@@ -128,13 +133,11 @@ export default async function ProfilePage({
   if (!user) notFound();
 
   const isOwnProfile = currentUserId === user.id;
+
   const following = currentUserId
     ? await prisma.follow.findUnique({
         where: {
-          followerId_followingId: {
-            followerId: currentUserId,
-            followingId: user.id,
-          },
+          followerId_followingId: { followerId: currentUserId, followingId: user.id },
         },
       })
     : null;
@@ -170,10 +173,7 @@ export default async function ProfilePage({
   const wonAuctions = await prisma.auction.findMany({
     where: {
       status: "SOLD",
-      OR: [
-        { buyerId: user.id },
-        { bids: { some: { bidderId: user.id } } },
-      ],
+      OR: [{ buyerId: user.id }, { bids: { some: { bidderId: user.id } } }],
     },
     include: {
       bids: { orderBy: { amountCents: "desc" }, take: 1 },
@@ -195,15 +195,11 @@ export default async function ProfilePage({
     currentUserId && !isOwnProfile
       ? await Promise.all([
           prisma.userBlock.findUnique({
-            where: {
-              blockerId_blockedId: { blockerId: currentUserId, blockedId: user.id },
-            },
+            where: { blockerId_blockedId: { blockerId: currentUserId, blockedId: user.id } },
             select: { id: true },
           }),
           prisma.userMute.findUnique({
-            where: {
-              userId_mutedUserId: { userId: currentUserId, mutedUserId: user.id },
-            },
+            where: { userId_mutedUserId: { userId: currentUserId, mutedUserId: user.id } },
             select: { id: true },
           }),
         ])
@@ -213,11 +209,7 @@ export default async function ProfilePage({
 
   const activity = viewerBlocksProfile
     ? { items: [], hasNextPage: false, page: activityPage }
-    : await listProfileDiscussionActivityPage({
-        userId: user.id,
-        page: activityPage,
-        take: 15,
-      });
+    : await listProfileDiscussionActivityPage({ userId: user.id, page: activityPage, take: 15 });
 
   const activityItems: CarmunityActivityItem[] = activity.items.map((row) => {
     if (row.kind === "thread") {
@@ -255,93 +247,112 @@ export default async function ProfilePage({
     imageUrl: c.images[0]?.url ?? null,
   }));
 
-  return (
-    <div className="carasta-container max-w-3xl space-y-8 py-10 pb-16">
-      {user.isDemoSeed ? <DemoProfileBanner /> : null}
-      {/* 1 — Profile header */}
-      <section className="carmunity-profile-enter overflow-hidden rounded-2xl border border-border bg-card shadow-e1">
-        <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-start sm:gap-8">
-          <Avatar className="mx-auto h-28 w-28 shrink-0 border-2 border-border sm:mx-0 sm:h-32 sm:w-32">
-            <AvatarImage src={user.avatarUrl ?? user.image ?? undefined} alt="" />
-            <AvatarFallback className="text-2xl font-semibold">
-              {(user.name ?? user.handle).slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+  const avatarSrc = user.avatarUrl ?? user.image ?? undefined;
 
-          <div className="min-w-0 flex-1 text-center sm:text-left">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              Carmunity
-            </p>
-            <div className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-              <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+  return (
+    <div className="carasta-container max-w-3xl pb-16 pt-6 space-y-8">
+      {user.isDemoSeed ? <DemoProfileBanner /> : null}
+
+      {/* ── Hero card ─────────────────────────────────────────── */}
+      <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-e1">
+        {/* Banner strip */}
+        <div
+          className="h-28 w-full bg-gradient-to-br from-primary/30 via-accent/40 to-primary/10"
+          aria-hidden
+        />
+
+        {/* Avatar + identity */}
+        <div className="px-5 pb-5">
+          {/* Avatar overlapping the banner */}
+          <div className="flex items-end justify-between gap-4 -mt-12 mb-4">
+            <Avatar className="h-24 w-24 shrink-0 border-4 border-card shadow-e2">
+              <AvatarImage src={avatarSrc} alt={displayName} />
+              <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
+                {(user.name ?? user.handle).slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* Quick actions on own profile, follow on other */}
+            <div className="flex flex-wrap items-center gap-2 pb-1">
+              {isOwnProfile ? (
+                <Button variant="outline" size="sm" asChild className={cn("border-border gap-1.5", shellFocusRing)}>
+                  <Link href="/settings">
+                    <Settings className="h-3.5 w-3.5" />
+                    Edit profile
+                  </Link>
+                </Button>
+              ) : (
+                currentUserId && (
+                  <FollowButton targetUserId={user.id} initialFollowing={!!following} />
+                )
+              )}
+            </div>
+          </div>
+
+          {/* Name + handle + badges */}
+          <div className="space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                 {displayName}
               </h1>
               <ReputationBadge tier={user.collectorTier} />
             </div>
-            <p className="mt-0.5 text-sm text-muted-foreground">@{user.handle}</p>
-            <DiscussionAuthorBadges
-              badges={profileBadges}
-              className="mt-2 flex justify-center sm:justify-start"
-            />
-            {user.location ? (
-              <p className="mt-1 text-xs text-muted-foreground">{user.location}</p>
-            ) : null}
-            {user.bio ? (
-              <p className="mt-3 max-w-prose text-sm leading-relaxed text-foreground">{user.bio}</p>
-            ) : null}
+            <p className="text-sm font-medium text-muted-foreground">@{user.handle}</p>
+            <DiscussionAuthorBadges badges={profileBadges} className="flex flex-wrap gap-1.5" />
+          </div>
 
-            <div className="mt-4 flex justify-center sm:justify-start">
-              <SocialLinks
-                instagramUrl={user.instagramUrl}
-                facebookUrl={user.facebookUrl}
-                twitterUrl={user.twitterUrl}
-                tiktokUrl={user.tiktokUrl}
-              />
-            </div>
+          {/* Bio + location */}
+          {user.bio ? (
+            <p className="mt-3 text-sm leading-relaxed text-foreground max-w-prose">{user.bio}</p>
+          ) : null}
+          {user.location ? (
+            <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              {user.location}
+            </p>
+          ) : null}
+
+          {/* Social links */}
+          <div className="mt-3">
+            <SocialLinks
+              instagramUrl={user.instagramUrl}
+              facebookUrl={user.facebookUrl}
+              twitterUrl={user.twitterUrl}
+              tiktokUrl={user.tiktokUrl}
+            />
           </div>
         </div>
 
-        {/* Stats — identity hub: posts + social first */}
-        <div className="grid grid-cols-3 border-t border-border bg-muted/20 sm:grid-cols-6">
+        {/* Stat strip */}
+        <div className="grid grid-cols-3 divide-x divide-border border-t border-border bg-muted/20 sm:grid-cols-6">
           {(
             [
-              { label: "Posts", value: user._count.posts, href: null as string | null },
-              {
-                label: "Followers",
-                value: user._count.followers,
-                href: `/u/${encodeURIComponent(user.handle)}/followers`,
-              },
-              {
-                label: "Following",
-                value: user._count.following,
-                href: `/u/${encodeURIComponent(user.handle)}/following`,
-              },
-              { label: "Garage", value: user._count.garageCars, href: null },
-              { label: "Listings", value: user._count.auctions, href: null },
-              { label: "Bids", value: user._count.bids, href: null },
+              { label: "Posts", value: user._count.posts, href: null as string | null, icon: null },
+              { label: "Followers", value: user._count.followers, href: `/u/${encodeURIComponent(user.handle)}/followers`, icon: Users },
+              { label: "Following", value: user._count.following, href: `/u/${encodeURIComponent(user.handle)}/following`, icon: null },
+              { label: "Garage", value: user._count.garageCars, href: null, icon: null },
+              { label: "Listings", value: user._count.auctions, href: null, icon: null },
+              { label: "Bids", value: user._count.bids, href: null, icon: null },
             ] as const
           ).map((s) => (
-            <div
-              key={s.label}
-              className="border-border/40 px-2 py-4 text-center sm:border-r sm:border-border sm:last:border-r-0"
-            >
+            <div key={s.label} className="px-2 py-3 text-center">
               {s.href ? (
                 <Link
                   href={s.href}
                   className={cn(
-                    "-m-2 block rounded-lg px-2 py-2 transition-colors hover:bg-muted/40",
+                    "-m-1 block rounded-lg px-1 py-1 transition-colors hover:bg-muted/50",
                     shellFocusRing
                   )}
                 >
-                  <p className="text-lg font-semibold tabular-nums text-foreground sm:text-xl">{s.value}</p>
-                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-primary sm:text-xs">
+                  <p className="text-base font-bold tabular-nums text-foreground sm:text-lg">{s.value}</p>
+                  <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
                     {s.label}
                   </p>
                 </Link>
               ) : (
                 <>
-                  <p className="text-lg font-semibold tabular-nums text-foreground sm:text-xl">{s.value}</p>
-                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
+                  <p className="text-base font-bold tabular-nums text-foreground sm:text-lg">{s.value}</p>
+                  <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                     {s.label}
                   </p>
                 </>
@@ -351,14 +362,15 @@ export default async function ProfilePage({
         </div>
       </section>
 
-      {/* 2 — Action row */}
+      {/* ── Action bar ──────────────────────────────────────────── */}
       <section className="flex flex-wrap items-center gap-2">
+        {/* Share + QR — always visible */}
         <ShareButtons
           url={`/u/${encodeURIComponent(user.handle)}`}
           title={`${displayName} · @${user.handle}`}
           description={
             user.bio?.replace(/\s+/g, " ").trim().slice(0, 140) ||
-            `Carmunity profile — garage, posts, and discussions.`
+            "Carmunity profile — garage, posts, and discussions."
           }
           triggerClassName="border-border bg-muted/40 text-xs text-foreground hover:bg-muted/60"
           carmunityShareMeta={
@@ -371,9 +383,18 @@ export default async function ProfilePage({
           profilePath={`/u/${encodeURIComponent(user.handle)}`}
           displayName={displayName}
         />
+
+        {/* Message — non-self, signed in */}
         {!isOwnProfile && currentUserId ? (
-          <FollowButton targetUserId={user.id} initialFollowing={!!following} />
+          <Button variant="outline" size="sm" asChild className={cn("gap-1.5 border-border", shellFocusRing)}>
+            <Link href={`/messages?with=${encodeURIComponent(user.handle)}`}>
+              <MessageSquare className="h-3.5 w-3.5" />
+              Message
+            </Link>
+          </Button>
         ) : null}
+
+        {/* Follow / safety — non-self */}
         {!isOwnProfile && currentUserId ? (
           <DiscussionPeerSafetyMenu
             targetUserId={user.id}
@@ -382,32 +403,36 @@ export default async function ProfilePage({
             initialMuted={Boolean(muteRow)}
           />
         ) : null}
+
+        {/* Own profile quick nav */}
         {isOwnProfile ? (
           <>
             <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
-              <Link href="/explore">Open Carmunity</Link>
+              <Link href="/explore">Carmunity feed</Link>
             </Button>
-            <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
-              <Link href="/settings">Settings</Link>
-            </Button>
+            {isMarketingEnabled() ? (
+              <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
+                <Link href={`/u/${user.handle}/marketing`}>Marketing</Link>
+              </Button>
+            ) : null}
           </>
         ) : null}
-        <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
-          <Link href={`/u/${user.handle}/garage`}>Garage</Link>
-        </Button>
-        <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
-          <Link href={`/u/${user.handle}/dream`}>Dream garage</Link>
-        </Button>
-        <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
-          <Link href={`/u/${user.handle}/listings`}>Listings</Link>
-        </Button>
-        {isOwnProfile && isMarketingEnabled() ? (
-          <Button variant="outline" size="sm" asChild className={cn("border-border", shellFocusRing)}>
-            <Link href={`/u/${user.handle}/marketing`}>Marketing</Link>
+
+        {/* Section nav — always */}
+        <div className="flex flex-wrap gap-1.5 border-l border-border pl-2 ml-0.5">
+          <Button variant="ghost" size="sm" asChild className={cn("text-muted-foreground hover:text-primary px-2.5", shellFocusRing)}>
+            <Link href={`/u/${user.handle}/garage`}>Garage</Link>
           </Button>
-        ) : null}
+          <Button variant="ghost" size="sm" asChild className={cn("text-muted-foreground hover:text-primary px-2.5", shellFocusRing)}>
+            <Link href={`/u/${user.handle}/dream`}>Dream Garage</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild className={cn("text-muted-foreground hover:text-primary px-2.5", shellFocusRing)}>
+            <Link href={`/u/${user.handle}/listings`}>Listings</Link>
+          </Button>
+        </div>
       </section>
 
+      {/* ── Discussion activity ──────────────────────────────────── */}
       <CarmunityActivitySection
         items={activityItems}
         handle={user.handle}
@@ -416,90 +441,22 @@ export default async function ProfilePage({
         nextPageHref={activityNextHref}
       />
 
+      {/* ── Empty state for new own profile ─────────────────────── */}
       {isOwnProfile &&
-      user._count.posts === 0 &&
-      user._count.garageCars === 0 &&
-      activityItems.length === 0 ? (
+        user._count.posts === 0 &&
+        user._count.garageCars === 0 &&
+        activityItems.length === 0 ? (
         <ProfileCarmunitySetupStrip handle={user.handle} />
       ) : null}
 
-      {isOwnProfile ? (
-        <section className="space-y-3">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Saved discussions</h2>
-            <p className="text-sm text-muted-foreground">
-              Threads you saved for quick return — same as &quot;Save thread&quot; in discussions.
-            </p>
-          </div>
-          {savedThreads.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-muted/20 px-5 py-8 text-center shadow-e1">
-              <p className="text-base font-semibold text-foreground">Saved threads are your reading list</p>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-                When a build thread or tech debate deserves a bookmark, tap{" "}
-                <span className="font-medium text-primary">Save thread</span> — we’ll surface light
-                activity hints here when there’s fresh discussion.
-              </p>
-              <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-                <Button asChild size="sm" className={cn(shellFocusRing)}>
-                  <Link href="/discussions">Browse discussions</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline" className={cn("border-border", shellFocusRing)}>
-                  <Link href="/explore?tab=following">Open Following feed</Link>
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <ul className="space-y-2">
-              {savedThreads.map((t) => (
-                <li key={t.id}>
-                  <Link
-                    href={savedThreadHref(t)}
-                    className={cn(
-                      "relative block rounded-xl border border-border bg-card px-4 py-3 shadow-e1 transition-colors hover:border-primary/30 hover:bg-muted/30",
-                      shellFocusRing
-                    )}
-                  >
-                    {t.hasNewActivity ? (
-                      <span
-                        className="absolute right-3 top-3 h-2 w-2 rounded-full bg-primary shadow-sm shadow-primary/30"
-                        title="New activity since you last opened this thread"
-                        aria-hidden
-                      />
-                    ) : null}
-                    <p className="pr-6 font-medium text-foreground line-clamp-2">{t.title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {t.gearSlug} / {t.lowerGearSlug} · last activity{" "}
-                      {t.lastActivityAt.toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      ) : null}
-
-      {isOwnProfile ? (
-        <section className="rounded-2xl border border-border bg-muted/20 px-4 py-5 shadow-e1">
-          <h2 className="text-sm font-semibold text-foreground">Following activity</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Use <span className="font-medium text-primary">Carmunity → Following</span> for a unified
-            stream of posts plus discussion threads and replies from people you follow.
-          </p>
-        </section>
-      ) : null}
-
-      {/* 3 — Garage spotlight */}
+      {/* ── Garage spotlight ─────────────────────────────────────── */}
       <section className="space-y-3">
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Garage</h2>
             <p className="text-sm text-muted-foreground">
               {user._count.garageCars === 0
-                ? "Collection portfolio — add cars on the web."
+                ? "No cars in garage yet"
                 : `${user._count.garageCars} car${user._count.garageCars === 1 ? "" : "s"} on file`}
             </p>
           </div>
@@ -509,12 +466,13 @@ export default async function ProfilePage({
             className={cn("shrink-0 text-primary hover:text-primary", shellFocusRing)}
             asChild
           >
-            <Link href={`/u/${user.handle}/garage`}>View all</Link>
+            <Link href={`/u/${user.handle}/garage`}>View all →</Link>
           </Button>
         </div>
         <ProfileGaragePreviewGrid handle={user.handle} cars={garageTiles} isOwnProfile={isOwnProfile} />
       </section>
 
+      {/* ── Trust panel ─────────────────────────────────────────── */}
       <TrustPanel
         collectorTier={user.collectorTier}
         reputationScore={user.reputationScore}
@@ -523,7 +481,7 @@ export default async function ProfilePage({
         disputesLostCount={user.disputesLostCount}
       />
 
-      {/* 4 — Posts (Carmunity card language) */}
+      {/* ── Posts ────────────────────────────────────────────────── */}
       <section className="space-y-3">
         <div className="flex items-end justify-between gap-4">
           <div>
@@ -532,7 +490,7 @@ export default async function ProfilePage({
           </div>
           {recentPosts.length > 0 ? (
             <Button variant="ghost" size="sm" className={cn("shrink-0 text-primary", shellFocusRing)} asChild>
-              <Link href="/explore">Explore feed</Link>
+              <Link href="/explore">Explore feed →</Link>
             </Button>
           ) : null}
         </div>
@@ -557,10 +515,13 @@ export default async function ProfilePage({
         )}
       </section>
 
+      {/* ── Won auctions ────────────────────────────────────────── */}
       {wonAuctionsFiltered.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">Won auctions</h2>
-          <p className="text-sm text-muted-foreground">Auctions won by @{user.handle}</p>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Won auctions</h2>
+            <p className="text-sm text-muted-foreground">Auctions won by @{user.handle}</p>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {wonAuctionsFiltered.map((a) => (
               <Link
@@ -589,7 +550,8 @@ export default async function ProfilePage({
                     <p className="text-sm text-muted-foreground">
                       {a.year} {a.make} {a.model}
                     </p>
-                    <p className="text-sm font-semibold tabular-nums text-foreground">
+                    <p className="mt-1 flex items-center gap-1 text-sm font-semibold tabular-nums text-foreground">
+                      <Star className="h-3.5 w-3.5 text-primary" aria-hidden />
                       Won at $
                       {(
                         ((a.buyerId ? a.buyNowPriceCents : a.bids[0]?.amountCents) ?? 0) / 100
@@ -602,6 +564,77 @@ export default async function ProfilePage({
           </div>
         </section>
       )}
+
+      {/* ── Saved threads (own profile only) ────────────────────── */}
+      {isOwnProfile ? (
+        <section className="space-y-3">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Saved discussions</h2>
+            <p className="text-sm text-muted-foreground">
+              Threads you saved — new activity shown with a dot.
+            </p>
+          </div>
+          {savedThreads.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border bg-muted/20 px-5 py-8 text-center shadow-e1">
+              <p className="text-base font-semibold text-foreground">Your reading list lives here</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+                Tap{" "}
+                <span className="font-medium text-primary">Save thread</span> in any discussion to
+                bookmark it. We'll surface a dot when there&apos;s fresh activity.
+              </p>
+              <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
+                <Button asChild size="sm" className={cn(shellFocusRing)}>
+                  <Link href="/discussions">Browse discussions</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline" className={cn("border-border", shellFocusRing)}>
+                  <Link href="/explore?tab=following">Following feed</Link>
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {savedThreads.map((t) => (
+                <li key={t.id}>
+                  <Link
+                    href={savedThreadHref(t)}
+                    className={cn(
+                      "relative block rounded-xl border border-border bg-card px-4 py-3 shadow-e1 transition-colors hover:border-primary/30 hover:bg-muted/30",
+                      shellFocusRing
+                    )}
+                  >
+                    {t.hasNewActivity ? (
+                      <span
+                        className="absolute right-3 top-3 h-2 w-2 rounded-full bg-primary shadow-sm shadow-primary/30"
+                        title="New activity since you last opened this thread"
+                        aria-hidden
+                      />
+                    ) : null}
+                    <p className="pr-6 font-medium text-foreground line-clamp-2">{t.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t.gearSlug} / {t.lowerGearSlug} · last activity{" "}
+                      {t.lastActivityAt.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ) : null}
+
+      {/* ── Following strip (own profile only) ──────────────────── */}
+      {isOwnProfile ? (
+        <div className="rounded-xl border border-border bg-muted/20 px-4 py-4 shadow-e1">
+          <p className="text-sm font-medium text-foreground">Following activity</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Head to{" "}
+            <Link href="/explore?tab=following" className="font-medium text-primary hover:underline">
+              Carmunity &rarr; Following
+            </Link>{" "}
+            for a unified stream of posts and discussion threads from people you follow.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
