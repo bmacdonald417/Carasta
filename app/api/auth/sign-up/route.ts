@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { signUpSchema } from "@/lib/validations/auth";
+import { sendWelcomeMessage } from "@/lib/messages/welcome-message";
 
 function sanitizeHandleBase(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 28);
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
     }
 
     const passwordHash = await hash(password, 10);
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         email,
         passwordHash,
@@ -67,6 +68,8 @@ export async function POST(req: Request) {
         acceptedCommunityGuidelinesAt: consentAt,
       },
     });
+    // Fire welcome message non-blocking
+    void sendWelcomeMessage(newUser.id);
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[sign-up] Error:", e);

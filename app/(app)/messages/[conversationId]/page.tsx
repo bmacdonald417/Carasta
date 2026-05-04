@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-
 import { getSession } from "@/lib/auth";
 import { ConversationClient } from "./conversation-client";
 
@@ -16,9 +15,8 @@ export default async function ConversationPage({
   if (!conversationId || !viewerId) redirect("/messages");
 
   return (
-    <div className="carasta-container max-w-3xl py-6 md:max-w-4xl">
+    <div className="flex h-[calc(100dvh-3.75rem)] overflow-hidden">
       <ConversationClient conversationId={conversationId} viewerId={viewerId} />
     </div>
   );
 }
-

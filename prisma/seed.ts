@@ -129,7 +129,34 @@ async function ensureForumSpacesAndCategories() {
   console.log("Forum spaces ensured:", mechanics.slug, gear.slug, listings.slug);
 }
 
+/** Ensure the canonical Carasta team system user exists (used for welcome messages). */
+async function ensureCarastaSystemUser() {
+  const passwordHash = await hash("carasta-system-no-login-" + Math.random(), 12);
+  const user = await prisma.user.upsert({
+    where: { email: "hello@carasta.com" },
+    create: {
+      email: "hello@carasta.com",
+      passwordHash,
+      handle: "carasta",
+      name: "Carasta Team",
+      bio: "The official Carmunity team account. Welcome to Carasta — the social-first platform for collector car enthusiasts.",
+      avatarUrl: "/brand/carasta/logo-circle.png",
+      role: "ADMIN",
+      isDemoSeed: false,
+    },
+    update: {
+      name: "Carasta Team",
+      bio: "The official Carmunity team account.",
+      avatarUrl: "/brand/carasta/logo-circle.png",
+      role: "ADMIN",
+    },
+  });
+  console.log("Carasta system user ensured:", user.handle);
+  return user;
+}
+
 async function main() {
+  await ensureCarastaSystemUser();
   await ensureForumSpacesAndCategories();
   await ensureTaxonomyGearsFromDoc(prisma);
   await ensureDemoDiscussionSeed(prisma);
