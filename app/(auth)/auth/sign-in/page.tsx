@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -28,7 +29,6 @@ export default async function SignInPage() {
               src="/brand/carasta/logo-circle.png"
               alt="Carasta"
               className="h-9 w-9 object-contain"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
             <span className="carasta-marketing-display text-lg font-semibold tracking-[0.14em] text-white">
               Carmunity
@@ -79,7 +79,6 @@ export default async function SignInPage() {
               src="/brand/carasta/logo-circle.png"
               alt="Carasta"
               className="h-8 w-8 object-contain"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
             <span className="carasta-marketing-display text-base font-semibold tracking-[0.14em] text-foreground">
               Carmunity
@@ -95,7 +94,17 @@ export default async function SignInPage() {
             </p>
           </div>
 
-          <SignInForm googleEnabled={googleEnabled} />
+          <Suspense
+            fallback={
+              <div className="space-y-4" aria-busy="true" aria-label="Loading sign-in form">
+                <div className="h-10 animate-pulse rounded-2xl bg-muted" />
+                <div className="h-10 animate-pulse rounded-2xl bg-muted" />
+                <div className="h-10 animate-pulse rounded-2xl bg-muted/80" />
+              </div>
+            }
+          >
+            <SignInForm googleEnabled={googleEnabled} />
+          </Suspense>
 
           <p className="text-center text-xs text-muted-foreground">
             By signing in, you agree to our{" "}

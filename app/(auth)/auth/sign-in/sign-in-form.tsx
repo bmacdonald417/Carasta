@@ -3,15 +3,25 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+/** Only allow same-origin relative paths (blocks open redirects like `//evil.com`). */
+function safeCallbackPath(raw: string | null): string {
+  const fallback = "/";
+  if (raw == null || raw === "") return fallback;
+  const p = raw.trim();
+  if (!p.startsWith("/") || p.startsWith("//")) return fallback;
+  return p;
+}
+
 export function SignInForm({ googleEnabled = false }: { googleEnabled?: boolean }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const callbackUrl = safeCallbackPath(searchParams.get("callbackUrl"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -32,7 +42,8 @@ export function SignInForm({ googleEnabled = false }: { googleEnabled?: boolean 
         setError("Invalid email or password.");
         return;
       }
-      window.location.href = callbackUrl;
+      router.push(callbackUrl);
+      router.refresh();
     } finally {
       setLoading(false);
     }
@@ -104,7 +115,7 @@ export function SignInForm({ googleEnabled = false }: { googleEnabled?: boolean 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
         <Link
-          href={callbackUrl ? `/auth/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/auth/sign-up"}
+          href={`/auth/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}
           className="font-medium text-foreground underline-offset-4 hover:underline"
         >
           Sign up
