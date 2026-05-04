@@ -141,7 +141,7 @@ export function LiveAuctionStrip({
     <section
       aria-labelledby={titleId}
       className={cn(
-        "border-b border-border bg-background py-2 md:py-3",
+        "border-b border-border bg-background pt-0 pb-2 md:pb-2.5",
         "overflow-x-hidden",
         className
       )}
