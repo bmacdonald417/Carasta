@@ -68,14 +68,17 @@ export function CreatePostForm({
       id="carmunity-create-post"
       onSubmit={submit}
       className={cn(
-        "scroll-mt-28 rounded-2xl border border-border bg-card p-4 shadow-e1 sm:p-5",
+        "scroll-mt-28 rounded-2xl border border-border/80 bg-card p-4 shadow-e2 ring-1 ring-primary/[0.08] sm:p-5",
         className
       )}
     >
       <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <PenLine className="h-4 w-4 text-primary" aria-hidden />
-          <span className="text-xs font-semibold tracking-wide text-foreground">Share to Carmunity</span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-foreground">
+            <PenLine className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+            <span className="text-sm font-bold tracking-tight">What&apos;s on your mind?</span>
+          </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">Share to your followers — type @ to mention.</p>
         </div>
         <span className="tabular-nums text-[11px] text-muted-foreground">{content.length} / 8000</span>
       </div>
@@ -86,7 +89,7 @@ export function CreatePostForm({
         id="post-content"
         value={content}
         onChange={setContent}
-        placeholder="Garage shot, build note, or a question for the lane — type @ to mention someone."
+        placeholder="Garage shot, build update, or a question for the lane…"
         className="min-h-[96px] resize-none border-border bg-background text-[15px] leading-relaxed"
         maxLength={8000}
       />

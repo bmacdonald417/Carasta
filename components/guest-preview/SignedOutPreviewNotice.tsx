@@ -22,26 +22,31 @@ export function SignedOutPreviewNotice({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border bg-muted/20 px-4 py-3 shadow-e1",
+        "overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.07] via-card to-muted/40 px-4 py-4 shadow-e2 ring-1 ring-primary/10 sm:px-5 sm:py-4",
         className
       )}
       role="note"
       aria-label="Signed out preview"
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/90">
             {title}
           </p>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-1.5 text-sm font-medium leading-relaxed text-foreground">
             {description}
           </p>
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <Button asChild variant="ghost" size="sm" className="rounded-full">
+        <div className="flex w-full shrink-0 flex-wrap items-center justify-end gap-2 sm:w-auto sm:justify-start">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="rounded-full border-border/80 bg-background/90 font-semibold text-foreground shadow-sm"
+          >
             <Link href={signInHref}>Sign in</Link>
           </Button>
-          <Button asChild size="sm" className="rounded-full px-4">
+          <Button asChild size="sm" className="rounded-full px-5 font-semibold shadow-sm">
             <Link href={signUpHref}>Join free</Link>
           </Button>
         </div>

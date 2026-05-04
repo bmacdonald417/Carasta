@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import type { OnboardingPack } from "@/lib/carmunity/onboarding-service";
 import type { DiscussedLiveAuctionRow } from "@/lib/forums/auction-discussion";
 import type { DiscussionReactionTotals } from "@/lib/forums/forum-service";
@@ -135,13 +134,6 @@ function fireCarmunityClientEvent(type: string, meta?: Record<string, unknown>) 
   });
 }
 
-export type TrendingDiscussionThreadLite = {
-  id: string;
-  title: string;
-  gearSlug: string;
-  lowerGearSlug: string;
-};
-
 function formatPostTime(iso: string): string {
   const d = new Date(iso);
   const diffMs = Date.now() - d.getTime();
@@ -158,15 +150,12 @@ function formatPostTime(iso: string): string {
 export function CommunityFeed({
   tab: initialTab,
   currentUserId,
-  trendingDiscussionThreads = [],
   discussedAuctions = [],
   needsCarmunityOnboarding = false,
   onboardingPack = null,
 }: {
   tab: string;
   currentUserId: string | null;
-  /** Shown above the feed tabs — reuses Phase I discovery on the server. */
-  trendingDiscussionThreads?: TrendingDiscussionThreadLite[];
   /** Phase M: LIVE auctions with linked discussion (real counts). */
   discussedAuctions?: DiscussedLiveAuctionRow[];
   needsCarmunityOnboarding?: boolean;
@@ -292,64 +281,21 @@ export function CommunityFeed({
   }
 
   return (
-    <div className="mt-8">
+    <div id="carmunity-feed" className="scroll-mt-24">
       <DiscussedAuctionsStrip items={discussedAuctions} />
-      {trendingDiscussionThreads.length > 0 ? (
-        <section className="mb-8 space-y-3 rounded-2xl border border-border bg-card p-4 shadow-e1 sm:p-5">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <p className="text-xs font-medium text-primary">From discussions</p>
-              <h2 className="mt-1 text-base font-semibold text-foreground">Trending threads</h2>
-            </div>
-            <Link
-              href="/discussions"
-              className={cn("text-xs font-medium text-primary hover:underline", shellFocusRing, "rounded-md")}
-            >
-              Browse all
-            </Link>
-          </div>
-          <ul className="divide-y divide-border">
-            {trendingDiscussionThreads.map((t) => (
-              <li key={t.id}>
-                <Link
-                  href={discussionThreadPath(t.gearSlug, t.lowerGearSlug, t.id)}
-                  className={cn(
-                    "block py-3 text-sm text-foreground transition-colors",
-                    shellFocusRing,
-                    "-mx-1 rounded-lg px-1 hover:bg-muted/50 hover:text-primary"
-                  )}
-                  onClick={() => {
-                    if (currentUserId) {
-                      fireCarmunityClientEvent("thread_open_feed", {
-                        threadId: t.id,
-                        surface: "explore_trending_strip",
-                      });
-                    }
-                  }}
-                >
-                  <span className="line-clamp-2 font-medium">{t.title}</span>
-                  <span className="mt-0.5 block text-[11px] text-muted-foreground">
-                    {t.gearSlug} / {t.lowerGearSlug}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
 
       {currentUserId && (
         <CreatePostForm onCreated={onPostCreated} className="mb-8" />
       )}
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid h-11 w-full grid-cols-2 gap-0 overflow-hidden rounded-2xl border border-border bg-muted/30 p-1 shadow-e1">
+        <TabsList className="grid h-12 w-full grid-cols-2 gap-1 overflow-hidden rounded-2xl border border-border/80 bg-muted/40 p-1.5 shadow-e2 ring-1 ring-primary/[0.06]">
           <TabsTrigger
             value="trending"
             className={cn(
-              "flex h-full min-h-0 items-center justify-center rounded-l-xl rounded-r-none py-0 text-sm font-medium text-muted-foreground transition-colors duration-150 ease-out",
-              "data-[state=active]:bg-primary/15 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:ring-0",
-              "data-[state=inactive]:hover:bg-primary/10 data-[state=inactive]:hover:text-primary"
+              "flex h-full min-h-0 items-center justify-center rounded-xl py-0 text-sm font-semibold text-muted-foreground transition-all duration-150 ease-out",
+              "data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-e1",
+              "data-[state=inactive]:hover:bg-background/60 data-[state=inactive]:hover:text-foreground"
             )}
           >
             Trending
@@ -357,9 +303,9 @@ export function CommunityFeed({
           <TabsTrigger
             value="following"
             className={cn(
-              "flex h-full min-h-0 items-center justify-center rounded-l-none rounded-r-xl py-0 text-sm font-medium text-muted-foreground transition-colors duration-150 ease-out",
-              "data-[state=active]:bg-primary/15 data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:ring-0",
-              "data-[state=inactive]:hover:bg-primary/10 data-[state=inactive]:hover:text-primary"
+              "flex h-full min-h-0 items-center justify-center rounded-xl py-0 text-sm font-semibold text-muted-foreground transition-all duration-150 ease-out",
+              "data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-e1",
+              "data-[state=inactive]:hover:bg-background/60 data-[state=inactive]:hover:text-foreground"
             )}
           >
             Following
@@ -450,10 +396,10 @@ function FollowingThreadCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
     >
-      <Card className="carmunity-feed-card overflow-hidden border border-border bg-card p-0 shadow-e1 transition-[border-color,box-shadow] duration-200 hover:border-primary/30 hover:shadow-e2">
+      <Card className="carmunity-feed-card overflow-hidden rounded-2xl border border-border/80 bg-card p-0 shadow-e2 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-e2 motion-reduce:transform-none">
         <div className="flex items-start gap-3 px-4 pt-4 pb-2">
           <Link href={`/u/${thread.author.handle}`} className={cn("shrink-0", shellFocusRing, "rounded-full")}>
-            <Avatar className="h-11 w-11 border border-border">
+            <Avatar className="h-11 w-11 border-2 border-background shadow-md ring-2 ring-primary/10">
               <AvatarImage src={thread.author.avatarUrl ?? undefined} alt="" />
               <AvatarFallback className="bg-muted text-sm font-medium">
                 {(thread.author.name ?? thread.author.handle).slice(0, 2).toUpperCase()}
@@ -528,10 +474,10 @@ function FollowingReplyCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
     >
-      <Card className="carmunity-feed-card overflow-hidden border border-border bg-card p-0 shadow-e1 transition-[border-color,box-shadow] duration-200 hover:border-primary/30 hover:shadow-e2">
+      <Card className="carmunity-feed-card overflow-hidden rounded-2xl border border-border/80 bg-card p-0 shadow-e2 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-e2 motion-reduce:transform-none">
         <div className="flex items-start gap-3 px-4 pt-4 pb-2">
           <Link href={`/u/${reply.author.handle}`} className={cn("shrink-0", shellFocusRing, "rounded-full")}>
-            <Avatar className="h-11 w-11 border border-border">
+            <Avatar className="h-11 w-11 border-2 border-background shadow-md ring-2 ring-primary/10">
               <AvatarImage src={reply.author.avatarUrl ?? undefined} alt="" />
               <AvatarFallback className="bg-muted text-sm font-medium">
                 {(reply.author.name ?? reply.author.handle).slice(0, 2).toUpperCase()}
@@ -597,7 +543,7 @@ function FeedSkeletonList({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <Card
           key={`feed-skeleton-${i}`}
-          className="carmunity-feed-card overflow-hidden border border-border bg-muted/20 p-0 shadow-e1"
+          className="overflow-hidden rounded-2xl border border-border/80 bg-card p-0 shadow-e2"
         >
           <div className="flex items-center gap-3 px-4 pt-4 pb-3">
             <div className="carmunity-skeleton-pulse h-11 w-11 shrink-0 rounded-full bg-muted" />
@@ -665,10 +611,10 @@ function PostCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduceMotion ? 0.12 : 0.22, ease: "easeOut" }}
     >
-      <Card className="carmunity-feed-card overflow-hidden border border-border bg-card p-0 shadow-e1 transition-[border-color,box-shadow] duration-200 hover:border-primary/30 hover:shadow-e2">
+      <Card className="carmunity-feed-card overflow-hidden rounded-2xl border border-border/80 bg-card p-0 shadow-e2 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-e2 motion-reduce:transform-none">
         <div className="flex items-start gap-3 px-4 pt-4 pb-2">
           <Link href={`/u/${post.author.handle}`} className={cn("shrink-0", shellFocusRing, "rounded-full")}>
-            <Avatar className="h-11 w-11 border border-border">
+            <Avatar className="h-11 w-11 border-2 border-background shadow-md ring-2 ring-primary/10">
               <AvatarImage src={post.author.avatarUrl ?? undefined} alt="" />
               <AvatarFallback className="bg-muted text-sm font-medium">
                 {(post.author.name ?? post.author.handle).slice(0, 2).toUpperCase()}
@@ -694,12 +640,12 @@ function PostCard({
         </div>
 
         {hasImage && (
-          <Link href={sharePath} className="relative block aspect-[4/3] w-full bg-muted sm:aspect-video">
+          <Link href={sharePath} className="relative block aspect-[4/3] w-full overflow-hidden bg-muted sm:aspect-video">
             <Image
               src={post.imageUrl!.trim()}
               alt=""
               fill
-              className="object-cover transition duration-300 hover:opacity-[0.98]"
+              className="object-cover transition duration-300 hover:scale-[1.02] motion-reduce:hover:scale-100"
               sizes="(max-width: 640px) 100vw, 640px"
             />
           </Link>
@@ -724,7 +670,7 @@ function PostCard({
           </div>
         )}
 
-        <div className="space-y-2 border-t border-border px-3 py-3">
+        <div className="space-y-2 border-t border-border/80 bg-muted/[0.35] px-3 py-3">
           <div className="flex flex-wrap items-center gap-2">
             <PostReactionPicker
               postId={post.id}

@@ -38,7 +38,7 @@ export function GarageCard3D({
       className="group"
     >
       <Link href={`/u/${ownerHandle}/garage`}>
-        <Card className="carmunity-feed-card overflow-hidden border border-border/50 bg-card/60 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <Card className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-e2 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-e2 motion-reduce:transform-none">
           <div
             className="relative aspect-[4/3] w-full overflow-hidden bg-muted sm:aspect-video"
             style={

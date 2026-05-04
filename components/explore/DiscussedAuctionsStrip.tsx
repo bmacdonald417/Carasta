@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export function DiscussedAuctionsStrip({ items }: { items: DiscussedLiveAuctionRow[] }) {
   if (items.length === 0) return null;
   return (
-    <section className="mb-8 space-y-3 rounded-2xl border border-border bg-card p-4 shadow-e1 sm:p-5">
+    <section className="mb-8 space-y-3 rounded-2xl border border-border/80 bg-card p-4 shadow-e2 ring-1 ring-primary/[0.06] sm:p-5">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <Badge variant="outline" className="text-[10px] font-medium uppercase tracking-wide">
