@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { Film, ImageIcon, PenLine, X, Upload, Loader2 } from "lucide-react";
 
 import { MentionComposerTextarea } from "@/components/carmunity/MentionComposerTextarea";
@@ -127,16 +126,13 @@ export function CreatePostForm({
               />
             </div>
           ) : (
-            <div className="relative aspect-[16/9] max-h-48 w-full bg-muted">
-              <Image
-                src={media.url}
-                alt="Media preview"
-                fill
-                unoptimized
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 640px"
-              />
-            </div>
+            // Use plain <img> — the URL is a relative path from local upload
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={media.url}
+              alt="Media preview"
+              className="max-h-48 w-full object-cover"
+            />
           )}
           <div className="flex items-center justify-between gap-2 px-3 py-2">
             <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground truncate">

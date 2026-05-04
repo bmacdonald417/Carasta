@@ -3,7 +3,6 @@
 import type { DiscussionReactionKind } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
@@ -643,17 +642,40 @@ function PostCard({
           </div>
         </div>
 
-        {hasImage && (
-          <Link href={sharePath} className="relative block aspect-[4/3] w-full overflow-hidden bg-muted sm:aspect-video">
-            <Image
-              src={post.imageUrl!.trim()}
-              alt=""
-              fill
-              className="object-cover transition duration-300 hover:scale-[1.02] motion-reduce:hover:scale-100"
-              sizes="(max-width: 640px) 100vw, 640px"
-            />
-          </Link>
-        )}
+        {hasImage && (() => {
+          const src = post.imageUrl!.trim();
+          const isVid = /\.(mp4|mov|webm|avi|mpeg)$/i.test(src);
+          return (
+            <Link href={sharePath} className="relative block w-full overflow-hidden bg-muted">
+              {isVid ? (
+                <video
+                  src={src}
+                  controls
+                  className="w-full max-h-96 object-contain bg-black"
+                  preload="metadata"
+                />
+              ) : (
+                // Use <img> so relative paths (/uploads/...) and any external URL work without
+                // needing every hostname in next.config remotePatterns.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={src}
+                  alt=""
+                  className="w-full max-h-96 object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    const el = e.currentTarget;
+                    el.style.display = "none";
+                    const parent = el.parentElement;
+                    if (parent) {
+                      parent.style.display = "none";
+                    }
+                  }}
+                />
+              )}
+            </Link>
+          );
+        })()}
 
         {(hasContent || !hasImage) && (
           <div className="px-4 pb-2 pt-1">

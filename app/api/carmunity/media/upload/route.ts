@@ -96,7 +96,9 @@ export async function POST(req: NextRequest) {
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
     requestOrigin;
 
-  const mediaUrl = `${publicBase}${relPath}`;
+  // Store as a relative path so it works across environments (localhost, prod, staging).
+  // The client can prepend window.location.origin if an absolute URL is needed for sharing.
+  const mediaUrl = relPath; // e.g. /uploads/carmunity/{userId}/{uuid}.jpg
 
   return NextResponse.json({ ok: true, imageUrl: mediaUrl, mediaUrl, isVideo: fileIsVideo, mime });
 }

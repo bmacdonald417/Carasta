@@ -155,8 +155,9 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
         />
       </div>
 
-      <fieldset className="space-y-3 rounded-2xl border border-border/60 bg-card/40 p-4">
+      <fieldset className="space-y-3 rounded-xl border border-border/50 bg-muted/30 p-4">
         <legend className="sr-only">Legal agreements</legend>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Agreements</p>
         <ConsentRow
           id="accept-terms"
           checked={acceptTerms}
@@ -241,11 +242,11 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
 
       <Button
         type="submit"
-        className="w-full"
+        className="w-full rounded-xl py-3 text-base font-semibold shadow-e1"
         variant="default"
         disabled={loading || !consentComplete}
       >
-        {loading ? "Creating account…" : "Create account"}
+        {loading ? "Creating account…" : consentComplete ? "Create my account →" : "Complete agreements above"}
       </Button>
       {googleEnabled && (
         <>
@@ -273,15 +274,7 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
         </>
       )}
 
-      <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <Link
-          href={callbackUrl ? `/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/auth/sign-in"}
-          className="font-medium text-foreground underline-offset-4 hover:underline"
-        >
-          Sign in
-        </Link>
-      </p>
+      {/* Sign-in link handled by parent page */}
     </form>
   );
 }

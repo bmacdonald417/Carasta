@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Heart, MessageCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -60,13 +59,17 @@ export function ProfilePostPreview({ post }: { post: ProfilePostPreviewData }) {
       </div>
 
       {hasImage && (
-        <Link href={detailHref} className="relative block aspect-[4/3] w-full bg-muted sm:aspect-video">
-          <Image
+        <Link href={detailHref} className="relative block w-full bg-muted overflow-hidden">
+          {/* Plain <img> handles relative /uploads/... paths without needing remotePatterns */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={post.imageUrl!.trim()}
             alt=""
-            fill
-            className="object-cover transition duration-300 hover:opacity-[0.98]"
-            sizes="(max-width: 640px) 100vw, 480px"
+            className="w-full max-h-64 object-cover transition duration-300 hover:opacity-[0.98]"
+            loading="lazy"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
           />
         </Link>
       )}
