@@ -234,11 +234,11 @@ export default async function HomePage() {
         requireAuth={requireAuth}
       />
 
-      <SellerCtaStrip />
-
-      <section className="border-b border-border bg-background py-5 md:py-6">
+      {/* Three-column social layout */}
+      <section className="border-b border-border bg-background py-4 md:py-5">
         <div className="carasta-container">
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start lg:gap-7">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start">
+            {/* Left: profile/nav sidebar */}
             <div className="order-2 lg:order-1 lg:col-span-3">
               {viewerGarage ? (
                 <UserGarageCard
@@ -254,10 +254,13 @@ export default async function HomePage() {
                 <UserGarageCard variant="guest" garage={[]} />
               )}
             </div>
+            {/* Center: social feed */}
             <div className="order-1 lg:order-2 lg:col-span-6">
               <CarmunityFeedPanel posts={feedPreviewPosts} currentUserId={viewerId} />
             </div>
-            <div className="order-3 lg:col-span-3">
+            {/* Right: forums + sell CTA */}
+            <div className="order-3 lg:col-span-3 flex flex-col gap-4">
+              <SellerCtaStrip inline />
               <CarmunityForumsPanel threads={trendingThreads} />
             </div>
           </div>

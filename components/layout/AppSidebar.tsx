@@ -29,6 +29,7 @@ import {
   Wallet,
   ChevronLeft,
   ChevronRight,
+  type LucideIcon,
 } from "lucide-react";
 import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
 
@@ -89,7 +90,7 @@ function NavItem({
   collapsed,
 }: {
   href: string;
-  icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  icon: LucideIcon;
   label: string;
   active: boolean;
   collapsed: boolean;

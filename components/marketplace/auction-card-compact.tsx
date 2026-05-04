@@ -8,24 +8,19 @@ import { CountdownTimer } from "@/components/auction/CountdownTimer";
 import { computeReserveMetPercent } from "@/lib/auction-metrics";
 import { useMounted } from "@/hooks";
 
-function GaugeDot({ percent }: { percent: number | null }) {
-  if (percent == null) {
-    return (
-      <span
-        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border/80 bg-muted/40 text-[9px] font-semibold text-muted-foreground"
-        title="Reserve status"
-      >
-        —
-      </span>
-    );
-  }
-  const hue =
-    percent >= 100 ? "bg-[hsl(var(--reserve-emerald))]" : percent >= 70 ? "bg-caution" : "bg-[hsl(var(--performance-red))]";
+function ReserveBar({ percent }: { percent: number | null }) {
+  if (percent == null) return null;
+  const fill = percent >= 100 ? "bg-[hsl(var(--reserve-emerald))]" : percent >= 70 ? "bg-caution" : "bg-[hsl(var(--performance-red))]";
+  const label = percent >= 100 ? "Reserve met" : `${percent}% to reserve`;
   return (
-    <span
-      className={cn("inline-block h-3 w-3 shrink-0 rounded-full shadow-sm ring-2 ring-border/60", hue)}
-      title={percent >= 100 ? "Reserve met" : `${percent}% to reserve`}
-    />
+    <div className="flex items-center gap-1" title={label}>
+      <div className="h-1.5 w-8 overflow-hidden rounded-full bg-white/20">
+        <div
+          className={cn("h-full rounded-full transition-all", fill)}
+          style={{ width: `${Math.min(percent, 100)}%` }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -112,7 +107,7 @@ export function AuctionCardCompact({
                 )}
               </span>
             </span>
-            <GaugeDot percent={reservePercent} />
+            <ReserveBar percent={reservePercent} />
           </div>
         </div>
       </div>
