@@ -134,7 +134,7 @@ export function AuctionFilters({
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-e2 ring-1 ring-primary/[0.08]">
+      <div className="overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-primary/[0.05] via-card to-card shadow-e2 ring-1 ring-primary/12">
         <div className="flex flex-nowrap items-end gap-2 overflow-x-auto p-3 [-ms-overflow-style:none] [scrollbar-width:none] md:gap-3 md:p-4 [&::-webkit-scrollbar]:hidden">
           <div className="min-w-0 flex-1 shrink basis-[min(100%,12rem)]">
             <Label htmlFor="auction-q-compact" className="text-xs text-muted-foreground">
@@ -170,14 +170,14 @@ export function AuctionFilters({
           </div>
           <div className="flex shrink-0 items-center gap-1.5 pb-0.5">
             <span className="sr-only">Layout</span>
-            <div className="flex rounded-lg border border-border bg-muted/40 p-0.5">
+            <div className="flex rounded-xl border border-border/70 bg-gradient-to-b from-muted/80 to-muted/50 p-0.5 shadow-inner ring-1 ring-primary/[0.06]">
               <button
                 type="button"
                 onClick={() => update("view", undefined)}
-                className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-[color,background-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   (view ?? "grid") === "grid"
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-card text-primary shadow-md ring-1 ring-inset ring-primary/20"
+                    : "text-muted-foreground hover:bg-background/60 hover:text-foreground motion-safe:active:scale-[0.98]"
                 }`}
               >
                 Grid
@@ -185,10 +185,10 @@ export function AuctionFilters({
               <button
                 type="button"
                 onClick={() => update("view", "map")}
-                className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-[color,background-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   view === "map"
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-card text-primary shadow-md ring-1 ring-inset ring-primary/20"
+                    : "text-muted-foreground hover:bg-background/60 hover:text-foreground motion-safe:active:scale-[0.98]"
                 }`}
               >
                 Map
@@ -202,7 +202,7 @@ export function AuctionFilters({
             aria-expanded={filtersExpanded}
             aria-controls={filtersExpanded ? advancedPanelId : undefined}
             onClick={() => setFiltersExpanded((v) => !v)}
-            className="h-9 shrink-0 gap-1 border-border/80 bg-background/80 px-2.5 text-xs font-medium shadow-sm hover:bg-muted/50"
+            className="h-9 shrink-0 gap-1 border-primary/20 bg-primary/[0.06] px-2.5 text-xs font-semibold text-primary shadow-sm ring-1 ring-inset ring-primary/10 hover:bg-primary/12 hover:ring-primary/20"
           >
             {filtersExpanded ? "Fewer" : "More"}
             <ChevronDown
@@ -217,7 +217,7 @@ export function AuctionFilters({
             id={advancedPanelId}
             role="region"
             aria-label="Advanced auction filters"
-            className="border-t border-border/80 bg-muted/[0.35] p-3 md:p-4"
+            className="border-t border-border/80 bg-gradient-to-b from-primary/[0.04] to-muted/30 p-3 md:p-4"
           >
             <div className="flex flex-wrap items-end gap-4">
         <div className="w-full min-w-[120px] max-w-[140px]">
@@ -460,7 +460,7 @@ export function AuctionFilters({
               key={key}
               type="button"
               onClick={() => removeFilter(key)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/8 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-gradient-to-b from-primary/12 to-primary/8 px-3 py-1 text-xs font-semibold text-primary shadow-sm shadow-primary/10 ring-1 ring-inset ring-primary/15 transition-[transform,box-shadow,background-color] duration-200 hover:shadow-md hover:shadow-primary/15 motion-safe:hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {label}
               <X className="h-3 w-3" />

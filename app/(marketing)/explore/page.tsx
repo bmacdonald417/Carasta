@@ -17,10 +17,10 @@ type SearchParams = { tab?: string } | Promise<{ tab?: string }>;
 
 function navPillClass(active: boolean) {
   return cn(
-    "inline-flex items-center justify-center rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors",
+    "inline-flex items-center justify-center rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-[color,background-color,border-color,box-shadow,transform] duration-200",
     active
-      ? "border-primary/30 bg-primary/12 text-primary shadow-sm"
-      : "border-border/80 bg-card text-muted-foreground hover:border-primary/20 hover:bg-primary/[0.06] hover:text-foreground",
+      ? "border-primary/35 bg-gradient-to-b from-primary/[0.16] to-primary/[0.08] text-primary shadow-md ring-1 ring-inset ring-primary/25"
+      : "border-border/70 bg-card/95 text-muted-foreground shadow-sm ring-1 ring-inset ring-border/40 hover:border-primary/25 hover:bg-primary/[0.07] hover:text-foreground hover:shadow-md hover:ring-primary/15 motion-safe:hover:-translate-y-px motion-reduce:hover:translate-y-0",
     shellFocusRing
   );
 }

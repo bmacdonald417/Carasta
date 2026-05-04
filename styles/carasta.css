@@ -63,16 +63,19 @@ body.carasta-theme {
 .carasta-page-title {
   font-family: var(--carasta-font-display);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: hsl(var(--foreground));
+  text-shadow: 0 1px 0 hsl(0 0% 100% / 0.45);
 }
 
 .carasta-page-eyebrow {
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: hsl(var(--primary));
+  opacity: 0.92;
 }
 
 body.carasta-theme p,

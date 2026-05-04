@@ -9,9 +9,9 @@ const cardVariants = cva(
     variants: {
       variant: {
         solid:
-          "border-border/90 bg-card shadow-e1 transition-[box-shadow,transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-e2 motion-reduce:transform-none",
+          "border-border/75 bg-card shadow-e2 ring-1 ring-inset ring-white/60 transition-[box-shadow,transform,border-color] duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-e3 hover:ring-white/80 motion-reduce:transform-none",
         subtle:
-          "border-border bg-muted/30 shadow-e1 hover:shadow-e2 hover:border-primary/15",
+          "border-border/80 bg-muted/35 shadow-e1 ring-1 ring-inset ring-white/40 hover:shadow-e2 hover:border-primary/25 hover:ring-white/55",
         glass:
           "border-border/60 bg-background/70 shadow-e2 backdrop-blur-xl hover:shadow-e3",
       },

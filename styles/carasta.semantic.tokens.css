@@ -20,8 +20,8 @@
 
   /* Core surfaces (light-first) */
   /* Target palette (design-system-color-normalization) */
-  --background: 222 18% 96%;
-  --foreground: 228 22% 11%;
+  --background: 224 22% 96%;
+  --foreground: 228 24% 10%;
 
   /* Deep navy surfaces (for header/footer chrome) */
   --navy: 231 49% 14%;
@@ -34,8 +34,8 @@
   --popover-foreground: 230 14% 11%;
 
   /* Functional accent — royal/cobalt blue (mapped into shadcn primary) */
-  --primary: 238 65% 45%;
-  --primary-hover: 238 61% 38%;
+  --primary: 238 68% 44%;
+  --primary-hover: 238 64% 36%;
   --primary-foreground: 0 0% 100%;
   --ring: 238 65% 45%;
 
@@ -43,19 +43,19 @@
   --secondary: 215 33% 95%;
   --secondary-foreground: 230 14% 11%;
 
-  --muted: 218 28% 94%;
-  --muted-foreground: 220 10% 40%;
+  --muted: 224 26% 93%;
+  --muted-foreground: 220 11% 38%;
 
   /* Interactive hover/selection: primary-soft (E8EAFF) */
-  --accent: 235 100% 96%;
-  --accent-foreground: 238 65% 30%;
+  --accent: 236 100% 96%;
+  --accent-foreground: 238 62% 28%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
 
   /* Borders */
-  --border: 220 22% 86%;
-  --input: 220 24% 84%;
+  --border: 225 24% 85%;
+  --input: 226 26% 83%;
 
   /* Semantic states */
   --info: 238 65% 45%;
@@ -81,8 +81,9 @@
   --danger-foreground: 0 58% 38%;
 
   /* Elevation / scrim */
-  --shadow-e1: 0 1px 0 rgba(24, 36, 72, 0.05), 0 2px 8px rgba(24, 36, 72, 0.07);
-  --shadow-e2: 0 14px 36px rgba(24, 36, 72, 0.13);
+  --shadow-e1: 0 1px 0 rgba(255, 255, 255, 0.65) inset, 0 1px 2px rgba(40, 56, 120, 0.06),
+    0 4px 14px rgba(28, 42, 98, 0.09);
+  --shadow-e2: 0 12px 32px rgba(28, 42, 98, 0.14), 0 2px 6px rgba(28, 42, 98, 0.06);
   --shadow-e3: 0 28px 90px rgba(18, 23, 53, 0.22);
   --scrim: 231 49% 14%;
 
