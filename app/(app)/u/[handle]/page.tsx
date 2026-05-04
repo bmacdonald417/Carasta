@@ -580,7 +580,7 @@ export default async function ProfilePage({
               <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
                 Tap{" "}
                 <span className="font-medium text-primary">Save thread</span> in any discussion to
-                bookmark it. We'll surface a dot when there&apos;s fresh activity.
+                bookmark it. We&apos;ll surface a dot when there&apos;s fresh activity.
               </p>
               <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
                 <Button asChild size="sm" className={cn(shellFocusRing)}>
