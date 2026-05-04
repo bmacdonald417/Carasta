@@ -36,10 +36,10 @@ import {
 } from "@/lib/shell-nav-styles";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SiteFooter } from "@/components/marketplace/site-footer";
+import { getPublicSocialLinks } from "@/lib/marketing/social-links";
 
 const resourcesMenuLinks = [
   { href: "/how-it-works", label: "How It Works" },
-  { href: "/why-carasta", label: "Why Carasta" },
   { href: "/resources/faq", label: "FAQ" },
   { href: "/resources/trust-and-safety", label: "Trust & Safety" },
   { href: "/contact", label: "Contact" },
@@ -79,14 +79,18 @@ function marketMenuActive(pathname: string, handle?: string | null) {
 }
 
 function howCarmunityWorksMenuActive(pathname: string) {
-  if (pathname === "/how-it-works" || pathname === "/why-carasta" || pathname === "/resources")
-    return true;
+  if (pathname === "/how-it-works" || pathname === "/resources") return true;
   if (pathname.startsWith("/resources/")) return true;
   return false;
 }
 
 function aboutMenuActive(pathname: string) {
-  return pathname === "/contact" || pathname.startsWith("/contact/") || pathname === "/community-guidelines";
+  return (
+    pathname === "/contact" ||
+    pathname.startsWith("/contact/") ||
+    pathname === "/community-guidelines" ||
+    pathname === "/why-carasta"
+  );
 }
 
 /** Pillar menus: higher z than sticky header (z-50) so portaled content paints above page chrome. */
@@ -143,6 +147,8 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
   const joinHref =
     "/auth/sign-up?callbackUrl=%2Fwelcome%3Fnext%3D%252Fexplore";
 
+  const publicSocialLinks = getPublicSocialLinks();
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -186,9 +192,6 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/resources/faq">FAQ</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/why-carasta">Why Carmunity</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/resources/trust-and-safety">Trust &amp; Safety</Link>
@@ -364,7 +367,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           scrolled && "shadow-e2"
         )}
       >
-        <div className="relative z-10 carasta-container flex h-14 items-center gap-2 sm:gap-3 md:h-16 md:gap-4">
+        <div className="relative z-10 carasta-container flex h-14 min-w-0 max-w-full items-center gap-2 overflow-x-hidden sm:gap-3 md:h-[3.75rem] md:gap-4">
           {isAuthShell && !session ? null : (
             <button
               type="button"
@@ -408,46 +411,38 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           <nav className="ml-auto flex shrink-0 items-center gap-1.5 text-sm sm:gap-2 md:gap-3">
             {isAuthShell && !session ? null : (
               <>
-                <span className="hidden items-center gap-1.5 lg:inline-flex" aria-label="Follow Carmunity">
-                  <a
-                    href="https://www.instagram.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full p-2 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground"
-                  >
-                    <Instagram className="h-4 w-4" />
-                    <span className="sr-only">Instagram</span>
-                  </a>
-                  <a
-                    href="https://www.youtube.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full p-2 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground"
-                  >
-                    <Youtube className="h-4 w-4" />
-                    <span className="sr-only">YouTube</span>
-                  </a>
-                  <a
-                    href="https://www.facebook.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full p-2 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground"
-                  >
-                    <Facebook className="h-4 w-4" />
-                    <span className="sr-only">Facebook</span>
-                  </a>
-                </span>
+                {publicSocialLinks.length > 0 ? (
+                  <span className="hidden shrink-0 items-center gap-0.5 lg:inline-flex" aria-label="Carmunity social profiles">
+                    {publicSocialLinks.map(({ key, href }) => {
+                      const Icon = key === "instagram" ? Instagram : key === "youtube" ? Youtube : Facebook;
+                      const label =
+                        key === "instagram" ? "Instagram" : key === "youtube" ? "YouTube" : "Facebook";
+                      return (
+                        <a
+                          key={key}
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded-full p-2 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground"
+                        >
+                          <Icon className="h-4 w-4" aria-hidden />
+                          <span className="sr-only">{label}</span>
+                        </a>
+                      );
+                    })}
+                  </span>
+                ) : null}
                 <Link
                   href="/explore"
-                  title="Search Carmunity"
-                  aria-label="Search Carmunity"
+                  title="Open Carmunity feed"
+                  aria-label="Open Carmunity feed"
                   className={cn(
-                    "hidden rounded-full p-2 sm:inline-flex",
+                    "hidden shrink-0 rounded-full p-2 sm:inline-flex",
                     shellHeaderAppLinkBase,
                     pathname.startsWith("/explore") ? shellHeaderAppActive : shellHeaderAppInactive
                   )}
                 >
-                  <Search className="h-5 w-5" />
+                  <Search className="h-5 w-5" aria-hidden />
                 </Link>
               </>
             )}
@@ -635,11 +630,14 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         <Dialog open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
-          <DialogContent variant="left-drawer" className="max-h-[100dvh] gap-0 border-0 p-0">
+          <DialogContent
+            variant="left-drawer"
+            className="max-h-[100dvh] max-w-[min(100vw,400px)] gap-0 overflow-x-hidden border-0 p-0"
+          >
             <div className="border-b border-white/15 px-5 pb-6 pt-14">
               {session?.user ? (
                 <div className="flex items-start gap-4">
-                  <Avatar className="h-16 w-16 border-2 border-white/80 bg-white/10">
+                  <Avatar className="h-16 w-16 shrink-0 rounded-full border-2 border-white/80 bg-white/10 ring-2 ring-white/20">
                     <AvatarImage src={session.user?.image ?? undefined} />
                     <AvatarFallback className="bg-white/20 text-lg font-semibold text-primary-foreground">
                       {(session.user?.name ?? "U").slice(0, 2).toUpperCase()}
@@ -685,7 +683,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
               )}
             </div>
 
-            <nav className="flex max-h-[calc(100dvh-12rem)] flex-col gap-0.5 overflow-y-auto overscroll-contain px-3 py-4 pb-10">
+            <nav className="flex max-h-[calc(100dvh-12rem)] flex-col gap-0.5 overflow-y-auto overscroll-y-contain px-3 py-4 pb-10 touch-pan-y">
               <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">
                 Marketplace
               </p>
@@ -818,7 +816,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-h-0 flex-1">
         <AppSidebar />
-        <main className="min-h-0 min-w-0 flex-1 bg-background pb-16 text-foreground lg:pb-0">
+        <main className="min-h-0 min-w-0 flex-1 overflow-x-clip bg-background pb-16 text-foreground lg:pb-0">
           {children}
         </main>
       </div>

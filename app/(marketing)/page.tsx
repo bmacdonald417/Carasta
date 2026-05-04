@@ -192,8 +192,8 @@ export default async function HomePage() {
         };
       }
     }
-  } catch (err) {
-    console.error("[home] Failed to fetch:", err);
+  } catch {
+    /* graceful degradation — leave previews empty */
   }
 
   const stripAuctions =
@@ -236,9 +236,9 @@ export default async function HomePage() {
 
       <SellerCtaStrip />
 
-      <section className="border-b border-border bg-background py-6 md:py-8">
+      <section className="border-b border-border bg-background py-5 md:py-6">
         <div className="carasta-container">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start lg:gap-7">
             <div className="order-2 lg:order-1 lg:col-span-3">
               {viewerGarage ? (
                 <UserGarageCard
@@ -264,7 +264,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-b border-border bg-muted/15 py-8 md:py-10">
+      <section className="border-b border-border bg-muted/15 py-7 md:py-8">
         <div className="carasta-container">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)] lg:items-start">
             <div>
@@ -279,7 +279,7 @@ export default async function HomePage() {
                 <HomeStatsStrip stats={homeStats} />
               </div>
             </div>
-            <div className="rounded-3xl border border-border bg-card p-4 shadow-e1 md:p-5">
+            <div className="rounded-2xl border border-border bg-card p-4 shadow-e1 md:p-5">
               <LiveActivityFeed />
             </div>
           </div>
@@ -324,7 +324,7 @@ export default async function HomePage() {
         title="Ending soon"
         description="Auctions closing next — follow the market as bidding gets tighter."
         auctions={endingSoonAuctions}
-        viewAllHref="/auctions?sort=ending"
+        viewAllHref="/auctions"
         requireAuth={requireAuth}
       />
 
@@ -332,7 +332,7 @@ export default async function HomePage() {
         title="Recently added"
         description="Fresh collector cars entering the marketplace right now."
         auctions={recentAuctions}
-        viewAllHref="/auctions?sort=newest"
+        viewAllHref="/auctions"
         requireAuth={requireAuth}
       />
 

@@ -12,7 +12,7 @@ function GaugeDot({ percent }: { percent: number | null }) {
   if (percent == null) {
     return (
       <span
-        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] font-semibold text-white/70"
+        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border/80 bg-muted/40 text-[9px] font-semibold text-muted-foreground"
         title="Reserve status"
       >
         —
@@ -23,7 +23,7 @@ function GaugeDot({ percent }: { percent: number | null }) {
     percent >= 100 ? "bg-[hsl(var(--reserve-emerald))]" : percent >= 70 ? "bg-caution" : "bg-[hsl(var(--performance-red))]";
   return (
     <span
-      className={cn("inline-block h-3 w-3 shrink-0 rounded-full shadow-sm ring-2 ring-white/30", hue)}
+      className={cn("inline-block h-3 w-3 shrink-0 rounded-full shadow-sm ring-2 ring-border/60", hue)}
       title={percent >= 100 ? "Reserve met" : `${percent}% to reserve`}
     />
   );
@@ -69,37 +69,51 @@ export function AuctionCardCompact({
     <Link
       href={href}
       className={cn(
-        "group flex w-[200px] shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-e1 transition-[border-color,box-shadow] hover:border-primary/35 hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-[220px]",
+        "group relative flex h-[104px] w-[min(46vw,200px)] max-w-[220px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border bg-muted shadow-e1 transition-[border-color,box-shadow] hover:border-primary/35 hover:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:h-[108px] sm:w-[220px]",
         className
       )}
     >
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
-        <Image
-          src={img}
-          alt={auction.title}
-          fill
-          unoptimized
-          className="object-cover transition-transform duration-300 motion-reduce:transition-none group-hover:scale-[1.03]"
-          sizes="220px"
-        />
-      </div>
-      <div className="flex flex-1 flex-col gap-2 p-3">
-        <p className="line-clamp-1 text-[11px] font-semibold uppercase tracking-wide text-foreground">
+      <Image
+        src={img}
+        alt={auction.title}
+        fill
+        unoptimized
+        className="object-cover transition-transform duration-300 motion-reduce:transition-none group-hover:scale-[1.03]"
+        sizes="220px"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/88 via-black/45 to-black/15"
+        aria-hidden
+      />
+      <div className="absolute inset-0 flex flex-col justify-end p-2 sm:p-2.5">
+        <p className="line-clamp-1 text-[10px] font-semibold uppercase leading-tight tracking-wide text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:text-[11px]">
           {headline}
         </p>
-        <p className="text-xs text-muted-foreground line-clamp-1">
+        <p className="mt-0.5 line-clamp-1 text-[9px] leading-snug text-white/85 drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)] sm:text-[10px]">
           @{auction.seller?.handle ?? "seller"}
           {bidCount > 0 ? ` · ${bidCount} bid${bidCount === 1 ? "" : "s"}` : ""}
         </p>
-        <p className="text-base font-semibold tabular-nums text-primary">{formatCurrency(highBidCents)}</p>
-        <div className="mt-auto flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
-            <span className="tabular-nums">
-              {mounted && auction.status === "LIVE" ? <CountdownTimer endAt={new Date(auction.endAt)} /> : "—"}
+        <div className="mt-1 flex items-end justify-between gap-2">
+          <p className="text-sm font-semibold tabular-nums text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:text-[15px]">
+            {formatCurrency(highBidCents)}
+          </p>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <span className="inline-flex items-center gap-0.5 text-[10px] font-medium tabular-nums text-white/95 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+              <Clock className="h-3 w-3 shrink-0 text-white/85" aria-hidden />
+              <span className="tabular-nums">
+                {mounted && auction.status === "LIVE" ? (
+                  <CountdownTimer
+                    endAt={new Date(auction.endAt)}
+                    variant="dark"
+                    className="!inline !text-[10px] !font-medium !leading-none"
+                  />
+                ) : (
+                  "—"
+                )}
+              </span>
             </span>
-          </span>
-          <GaugeDot percent={reservePercent} />
+            <GaugeDot percent={reservePercent} />
+          </div>
         </div>
       </div>
     </Link>
