@@ -11,7 +11,7 @@ export function FeedEmptyState({
   variant,
   currentUserId,
 }: {
-  variant: "trending" | "following";
+  variant: "latest" | "following";
   currentUserId: string | null;
 }) {
   const isFollowing = variant === "following";
@@ -24,7 +24,7 @@ export function FeedEmptyState({
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
         {isFollowing
           ? "Following blends posts and discussions from people you choose. Follow a few builders, then refresh this tab — or open Discussions to scout voices first."
-          : "Trending rewards momentum: a photo drop, a sharp question, a garage flex. Lead with something real — the community meets you where you are."}
+          : "Newest posts show up here first. Drop a photo, a build note, or a question — the community meets you where you are."}
       </p>
       <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
         {currentUserId ? (
@@ -37,8 +37,8 @@ export function FeedEmptyState({
           </Button>
         )}
         <Button variant="outline" asChild className={cn("sm:min-w-[180px] border-border", shellFocusRing)}>
-          <Link href={isFollowing ? "/discussions" : "/explore?tab=trending"}>
-            {isFollowing ? "Find people in Discussions" : "See what’s trending"}
+          <Link href={isFollowing ? "/discussions" : "/discussions"}>
+            {isFollowing ? "Find people in Discussions" : "Browse Discussions"}
           </Link>
         </Button>
       </div>

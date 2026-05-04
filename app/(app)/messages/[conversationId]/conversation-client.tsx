@@ -6,8 +6,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { InlineSpinner } from "@/components/ui/inline-spinner";
-import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { getProductHelpLinks } from "@/lib/help/product-help";
 import { cn } from "@/lib/utils";
+import { CircleHelp } from "lucide-react";
 
 type UserMini = {
   id: string;
@@ -69,6 +76,8 @@ export function ConversationClient({
     const u = parts.map((p) => p.user).find((p) => p.id !== viewerId);
     return u ?? (parts.length > 0 ? parts[0].user : null);
   }, [conversation, viewerId]);
+
+  const messageHelpLinks = useMemo(() => getProductHelpLinks("product.messages"), []);
 
   async function load() {
     setLoading(true);
@@ -195,9 +204,9 @@ export function ConversationClient({
   }
 
   return (
-    <div className="flex h-[calc(100vh-10rem)] min-h-[520px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-e2">
+    <div className="relative flex h-[calc(100vh-10rem)] min-h-[520px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-e2">
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <Button
             asChild
             variant="ghost"
@@ -227,15 +236,27 @@ export function ConversationClient({
             <p className="truncate text-sm font-semibold text-foreground">Conversation</p>
           )}
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 shrink-0 rounded-full border-border/80 bg-background/80 shadow-sm"
+              aria-label="Messages help"
+            >
+              <CircleHelp className="h-4 w-4 text-primary" aria-hidden />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            {messageHelpLinks.map((link) => (
+              <DropdownMenuItem key={link.topicId} asChild>
+                <Link href={link.href}>{link.label}</Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-
-      <ContextualHelpCard
-        context="product.messages"
-        showIntro={false}
-        maxPrimaryLinks={2}
-        relatedLimit={1}
-        className="rounded-none border-x-0 border-t-0 border-b border-border/80 bg-muted/10 py-3 shadow-none md:px-4"
-      />
 
       {conversation?.auction ? (
         <div className="shrink-0 border-b border-border bg-muted/25 px-4 py-3">
@@ -326,8 +347,8 @@ export function ConversationClient({
         ) : null}
         <div className="flex items-end gap-2">
           <Textarea
-            rows={2}
-            className="resize-none border-border bg-background text-sm text-foreground"
+            rows={1}
+            className="min-h-10 max-h-32 resize-y border-border bg-background text-sm text-foreground"
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Write a message…"

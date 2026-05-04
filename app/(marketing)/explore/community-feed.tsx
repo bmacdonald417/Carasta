@@ -163,7 +163,7 @@ export function CommunityFeed({
 }) {
   const router = useRouter();
   const [tab, setTab] = useState(initialTab);
-  const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
+  const [latestPosts, setLatestPosts] = useState<Post[]>([]);
   const [followingItems, setFollowingItems] = useState<FollowingFeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [onboardingOpen, setOnboardingOpen] = useState(
@@ -173,6 +173,10 @@ export function CommunityFeed({
   useEffect(() => {
     setOnboardingOpen(Boolean(needsCarmunityOnboarding && onboardingPack));
   }, [needsCarmunityOnboarding, onboardingPack]);
+
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
 
   useEffect(() => {
     let cancelled = false;
@@ -214,13 +218,13 @@ export function CommunityFeed({
       );
       if (cancelled) return;
       if (!res.ok) {
-        setTrendingPosts([]);
+        setLatestPosts([]);
         setLoading(false);
         return;
       }
       const data = await res.json();
       const rawPosts = (data.posts ?? []) as Record<string, unknown>[];
-      setTrendingPosts(rawPosts.map((p) => normalizeFeedPost(p)));
+      setLatestPosts(rawPosts.map((p) => normalizeFeedPost(p)));
       setLoading(false);
     })();
     return () => {
@@ -229,7 +233,7 @@ export function CommunityFeed({
   }, [tab, currentUserId]);
 
   const patchPost = useCallback((postId: string, fn: (p: Post) => Post) => {
-    setTrendingPosts((prev) => prev.map((p) => (p.id === postId ? fn(p) : p)));
+    setLatestPosts((prev) => prev.map((p) => (p.id === postId ? fn(p) : p)));
     setFollowingItems((prev) =>
       prev.map((item) => {
         if (item.type !== "post" || item.post.id !== postId) return item;
@@ -269,13 +273,13 @@ export function CommunityFeed({
         `/api/explore/feed?tab=${tab}${currentUserId ? `&userId=${currentUserId}` : ""}`
       );
       if (!res.ok) {
-        setTrendingPosts([]);
+        setLatestPosts([]);
         setLoading(false);
         return;
       }
       const data = await res.json();
       const rawPosts = (data.posts ?? []) as Record<string, unknown>[];
-      setTrendingPosts(rawPosts.map((p) => normalizeFeedPost(p)));
+      setLatestPosts(rawPosts.map((p) => normalizeFeedPost(p)));
       setLoading(false);
     })();
   }
@@ -291,14 +295,14 @@ export function CommunityFeed({
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="grid h-12 w-full grid-cols-2 gap-1 overflow-hidden rounded-2xl border border-border/80 bg-muted/40 p-1.5 shadow-e2 ring-1 ring-primary/[0.06]">
           <TabsTrigger
-            value="trending"
+            value="latest"
             className={cn(
               "flex h-full min-h-0 items-center justify-center rounded-xl py-0 text-sm font-semibold text-muted-foreground transition-all duration-150 ease-out",
               "data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-e1",
               "data-[state=inactive]:hover:bg-background/60 data-[state=inactive]:hover:text-foreground"
             )}
           >
-            Trending
+            Latest
           </TabsTrigger>
           <TabsTrigger
             value="following"
@@ -311,11 +315,11 @@ export function CommunityFeed({
             Following
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="trending" className="mt-6">
+        <TabsContent value="latest" className="mt-6">
           {loading ? (
             <FeedSkeletonList />
           ) : (
-            <PostList variant="trending" posts={trendingPosts} currentUserId={currentUserId} patchPost={patchPost} />
+            <PostList variant="latest" posts={latestPosts} currentUserId={currentUserId} patchPost={patchPost} />
           )}
         </TabsContent>
         <TabsContent value="following" className="mt-6">
@@ -573,7 +577,7 @@ function PostList({
   currentUserId,
   patchPost,
 }: {
-  variant: "trending" | "following";
+  variant: "latest" | "following";
   posts: Post[];
   currentUserId: string | null;
   patchPost: (postId: string, fn: (p: Post) => Post) => void;

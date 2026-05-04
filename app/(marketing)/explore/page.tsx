@@ -31,7 +31,8 @@ export default async function ExplorePage({
   searchParams: SearchParams;
 }) {
   const params = searchParams instanceof Promise ? await searchParams : searchParams;
-  const tab = typeof params.tab === "string" ? params.tab : "trending";
+  const rawTab = typeof params.tab === "string" ? params.tab : "";
+  const tab = rawTab === "following" ? "following" : "latest";
   const session = await getSession();
   const currentUserId = (session?.user as { id?: string } | undefined)?.id ?? null;
 

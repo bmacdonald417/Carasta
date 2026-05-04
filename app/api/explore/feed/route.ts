@@ -49,7 +49,7 @@ async function decoratePosts(
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const tab = searchParams.get("tab") ?? "trending";
+  const tab = searchParams.get("tab") ?? "latest";
   const userId = searchParams.get("userId");
 
   const countSelect = { likes: true, comments: true, postReactions: true } as const;
@@ -91,7 +91,11 @@ export async function GET(req: Request) {
   }
 
   const posts = await prisma.post.findMany({
-    orderBy: [{ postReactions: { _count: "desc" } }, { likes: { _count: "desc" } }],
+    orderBy: [
+      { postReactions: { _count: "desc" } },
+      { likes: { _count: "desc" } },
+      { createdAt: "desc" },
+    ],
     take: 50,
     include: {
       author: {
