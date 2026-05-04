@@ -22,6 +22,16 @@ export type ProfileDiscussionActivityRow =
       lowerGearSlug: string;
     };
 
+/** $queryRaw timestamps are usually Date, but some drivers return ISO strings — normalize. */
+function coerceRowDate(value: unknown): Date {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+  if (typeof value === "string" || typeof value === "number") {
+    const d = new Date(value);
+    if (!Number.isNaN(d.getTime())) return d;
+  }
+  return new Date(0);
+}
+
 /**
  * Unified Carmunity Discussions activity timeline (threads + replies) with offset pagination.
  */
@@ -34,11 +44,23 @@ export async function listProfileDiscussionActivityPage(input: {
   const page = Math.max(1, input.page);
   const skip = (page - 1) * take;
 
-  const rows = await prisma.$queryRaw<
+  let rows: Array<{
+    kind: "thread" | "reply";
+    id: string;
+    at: unknown;
+    title: string | null;
+    body: string | null;
+    thread_id: string | null;
+    thread_title: string | null;
+    gear_slug: string | null;
+    lower_gear_slug: string | null;
+  }>;
+  try {
+    rows = await prisma.$queryRaw<
     Array<{
       kind: "thread" | "reply";
       id: string;
-      at: Date;
+      at: unknown;
       title: string | null;
       body: string | null;
       thread_id: string | null;
@@ -87,16 +109,21 @@ export async function listProfileDiscussionActivityPage(input: {
     OFFSET ${skip}
     LIMIT ${take + 1}
   `);
+  } catch (err) {
+    console.error("[listProfileDiscussionActivityPage] query failed", err);
+    return { items: [], hasNextPage: false, page };
+  }
 
   const hasNextPage = rows.length > take;
   const slice = hasNextPage ? rows.slice(0, take) : rows;
 
   const items: ProfileDiscussionActivityRow[] = slice.map((r) => {
+    const at = coerceRowDate(r.at);
     if (r.kind === "thread") {
       return {
         kind: "thread",
         id: r.id,
-        at: r.at,
+        at,
         title: r.title ?? "",
         gearSlug: r.gear_slug ?? "",
         lowerGearSlug: r.lower_gear_slug ?? "",
@@ -105,7 +132,7 @@ export async function listProfileDiscussionActivityPage(input: {
     return {
       kind: "reply",
       id: r.id,
-      at: r.at,
+      at,
       body: r.body ?? "",
       threadId: r.thread_id ?? "",
       threadTitle: r.thread_title ?? "",

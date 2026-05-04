@@ -23,7 +23,7 @@ export function ReputationBadge({
   tier: CollectorTier;
   className?: string;
 }) {
-  const style = TIER_STYLES[tier];
+  const style = TIER_STYLES[tier] ?? TIER_STYLES.NEW;
   return (
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${style.className} ${className ?? ""}`}
