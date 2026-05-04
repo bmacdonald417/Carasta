@@ -111,13 +111,31 @@ export function SettingsForm({
         <Label htmlFor="avatarUrl" className="text-foreground">
           Avatar URL
         </Label>
-        <Input
-          id="avatarUrl"
-          type="url"
-          value={avatar}
-          onChange={(e) => setAvatar(e.target.value)}
-          placeholder="https://…"
-        />
+        <div className="flex items-start gap-3">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-border bg-muted">
+            {avatar ? (
+              <img
+                src={avatar}
+                alt="Avatar preview"
+                className="h-full w-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
+                onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = "1"; }}
+              />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center text-lg text-muted-foreground">👤</span>
+            )}
+          </div>
+          <div className="flex-1 space-y-1.5">
+            <Input
+              id="avatarUrl"
+              type="url"
+              value={avatar}
+              onChange={(e) => setAvatar(e.target.value)}
+              placeholder="https://…"
+            />
+            <p className="text-xs text-muted-foreground">Paste a public image URL. Preview updates live.</p>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4 border-t border-border pt-6">

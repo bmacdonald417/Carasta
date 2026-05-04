@@ -14,6 +14,7 @@ import {
 } from "@/components/marketing/seller-marketing-copilot";
 import type { MarketingCopilotIntakeMetricsSnapshot } from "@/lib/marketing/marketing-copilot-intake-metrics";
 import { SellerSectionPanel } from "@/components/marketing/seller-workspace-primitives";
+import { MarketingCopyButton } from "@/components/marketing/marketing-copy-button";
 
 export type WorkspacePlanState = {
   id: string;
@@ -417,7 +418,7 @@ export function SellerMarketingWorkspace({
             <div className="space-y-1">
               <p className="text-xs text-[hsl(var(--seller-muted))]">Type</p>
               <select
-                className="h-10 w-full rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-3 text-sm text-[hsl(var(--seller-foreground))]"
+                className="h-10 w-full rounded-xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] px-3 text-sm text-[hsl(var(--seller-foreground))]"
                 value={artifactType}
                 onChange={(e) =>
                   setArtifactType(e.target.value as ListingMarketingArtifactType)
@@ -458,16 +459,17 @@ export function SellerMarketingWorkspace({
               sortedArtifacts.map((a) => (
                 <div
                   key={a.id}
-                  className="rounded-2xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3 text-sm"
+                  className="rounded-xl border border-[hsl(var(--seller-border))] bg-[hsl(var(--seller-panel-muted))] p-3 text-sm"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[hsl(var(--seller-muted))]">
                     <span>
                       {a.type}
                       {a.channel ? ` · ${a.channel}` : ""}
                     </span>
-                    <span>
-                      v{a.version} · {new Date(a.createdAt).toLocaleString()}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span>v{a.version} · {new Date(a.createdAt).toLocaleString()}</span>
+                      <MarketingCopyButton text={a.content} label={`${a.type} draft`} />
+                    </div>
                   </div>
                   <pre className="mt-2 whitespace-pre-wrap font-sans text-[hsl(var(--seller-foreground))]">
                     {a.content}

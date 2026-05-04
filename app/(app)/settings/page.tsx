@@ -5,13 +5,6 @@ import {
   getCarmunityOnboardingState,
   listOnboardingSpaceOptions,
 } from "@/lib/carmunity/onboarding-service";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ContextualHelpCard } from "@/components/help/ContextualHelpCard";
 import { CarmunitySettingsSection } from "./carmunity-settings-section";
 import { SettingsForm } from "./settings-form";
@@ -57,29 +50,27 @@ export default async function SettingsPage() {
 
       <ContextualHelpCard context="settings.account" />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile</CardTitle>
-          <CardDescription>
+      <section>
+        <div className="mb-5">
+          <h2 className="text-base font-semibold text-foreground">Profile</h2>
+          <p className="mt-0.5 text-sm text-muted-foreground">
             This information appears on your public profile where applicable.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <SettingsForm
-            handle={user.handle}
-            accountEmail={user.email}
-            name={user.name ?? ""}
-            bio={user.bio ?? ""}
-            location={user.location ?? ""}
-            avatarUrl={user.avatarUrl ?? ""}
-            instagramUrl={user.instagramUrl ?? ""}
-            facebookUrl={user.facebookUrl ?? ""}
-            twitterUrl={user.twitterUrl ?? ""}
-            tiktokUrl={user.tiktokUrl ?? ""}
-            weeklyMarketingDigestOptIn={user.weeklyMarketingDigestOptIn}
-          />
-        </CardContent>
-      </Card>
+          </p>
+        </div>
+        <SettingsForm
+          handle={user.handle}
+          accountEmail={user.email}
+          name={user.name ?? ""}
+          bio={user.bio ?? ""}
+          location={user.location ?? ""}
+          avatarUrl={user.avatarUrl ?? ""}
+          instagramUrl={user.instagramUrl ?? ""}
+          facebookUrl={user.facebookUrl ?? ""}
+          twitterUrl={user.twitterUrl ?? ""}
+          tiktokUrl={user.tiktokUrl ?? ""}
+          weeklyMarketingDigestOptIn={user.weeklyMarketingDigestOptIn}
+        />
+      </section>
 
       <CarmunitySettingsSection
         spaces={carmunitySpaces}

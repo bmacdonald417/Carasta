@@ -13,13 +13,14 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b border-border bg-card shadow-e1">
+      <div className="border-b border-border bg-background">
         <div className="carasta-container py-4 md:py-5">
-          <h1 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Internal tools</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
             Admin
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Internal tools — auctions, moderation, and platform analytics.
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Auctions, moderation, and platform analytics.
           </p>
         </div>
       </div>
