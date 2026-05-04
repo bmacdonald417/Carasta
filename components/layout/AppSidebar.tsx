@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -26,6 +27,8 @@ import {
   ClipboardList,
   ArrowUpRight,
   Wallet,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
 
@@ -63,11 +66,49 @@ function getActivePillar(pathname: string, handle?: string | null): Pillar {
   return "carmunity";
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({
+  children,
+  collapsed,
+}: {
+  children: React.ReactNode;
+  collapsed: boolean;
+}) {
+  if (collapsed) return null;
   return (
     <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
       {children}
     </p>
+  );
+}
+
+function NavItem({
+  href,
+  icon: Icon,
+  label,
+  active,
+  collapsed,
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  label: string;
+  active: boolean;
+  collapsed: boolean;
+}) {
+  return (
+    <Link href={href} title={collapsed ? label : undefined}>
+      <motion.div
+        className={cn(
+          shellSidebarRowBase,
+          active ? shellSidebarActive : shellSidebarInactive,
+          collapsed && "justify-center px-2 gap-0"
+        )}
+        whileHover={hoverScale}
+        whileTap={tapScale}
+      >
+        <Icon className="h-5 w-5 shrink-0" aria-hidden />
+        {!collapsed && <span>{label}</span>}
+      </motion.div>
+    </Link>
   );
 }
 
@@ -94,10 +135,20 @@ function JumperRow({
   );
 }
 
+const STORAGE_KEY = "carasta-sidebar-collapsed";
+
 export function AppSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { openPalette } = useHelpPalette();
+
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(STORAGE_KEY) === "true";
+    }
+    return false;
+  });
+
   if (!session?.user) return null;
 
   const handle = (session?.user as { handle?: string } | undefined)?.handle;
@@ -121,7 +172,6 @@ export function AppSidebar() {
       pathname.startsWith(`/u/${handle}/following`));
 
   const garageActive = pathname.includes("/garage");
-
   const listingsActive = listingsHref != null && pathname.startsWith(listingsHref);
   const marketingActive =
     marketingHref != null &&
@@ -151,373 +201,247 @@ export function AppSidebar() {
   const pillarTitle =
     pillar === "carmunity" ? "Carmunity" : pillar === "market" ? "Market" : "Resources";
 
+  function toggle() {
+    const next = !isCollapsed;
+    setIsCollapsed(next);
+    localStorage.setItem(STORAGE_KEY, String(next));
+  }
+
   return (
     <aside
       className={cn(
-        "hidden w-56 shrink-0 flex-col border-r border-border bg-card/80 backdrop-blur-sm",
-        "lg:sticky lg:top-20 lg:flex lg:h-[calc(100dvh-5rem)] lg:max-h-[calc(100dvh-5rem)]"
+        "hidden shrink-0 flex-col border-r border-border bg-card/80 backdrop-blur-sm",
+        "lg:sticky lg:top-20 lg:flex lg:h-[calc(100dvh-5rem)] lg:max-h-[calc(100dvh-5rem)]",
+        "transition-[width] duration-200 ease-in-out",
+        isCollapsed ? "w-14" : "w-56"
       )}
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-2 pt-4">
-          <SectionLabel>{pillarTitle}</SectionLabel>
+        {/* Collapse toggle */}
+        <div
+          className={cn(
+            "flex shrink-0 border-b border-border/40 px-2 py-2",
+            isCollapsed ? "justify-center" : "justify-end"
+          )}
+        >
+          <button
+            type="button"
+            onClick={toggle}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+          >
+            {isCollapsed ? (
+              <ChevronRight className="h-4 w-4" aria-hidden />
+            ) : (
+              <ChevronLeft className="h-4 w-4" aria-hidden />
+            )}
+          </button>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2 pt-3">
+          <SectionLabel collapsed={isCollapsed}>{pillarTitle}</SectionLabel>
           <div className="space-y-0.5">
             {pillar === "carmunity" ? (
               <>
-                <Link href="/explore">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/explore")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <Users className="h-5 w-5 shrink-0" />
-                    Explore
-                  </motion.div>
-                </Link>
-                <Link href="/discussions">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/discussions")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <MessageSquare className="h-5 w-5 shrink-0" />
-                    Discussions
-                  </motion.div>
-                </Link>
-                <Link href="/messages">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/messages")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <Mail className="h-5 w-5 shrink-0" />
-                    Messages
-                  </motion.div>
-                </Link>
-                <Link href={profileHref}>
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      profileActive ? shellSidebarActive : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <UserRound className="h-5 w-5 shrink-0" />
-                    Profile
-                  </motion.div>
-                </Link>
-                <Link href={garageHref}>
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      garageActive ? shellSidebarActive : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <Car className="h-5 w-5 shrink-0" />
-                    Garage
-                  </motion.div>
-                </Link>
+                <NavItem
+                  href="/explore"
+                  icon={Users}
+                  label="Explore"
+                  active={pathname.startsWith("/explore")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/discussions"
+                  icon={MessageSquare}
+                  label="Discussions"
+                  active={pathname.startsWith("/discussions")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/messages"
+                  icon={Mail}
+                  label="Messages"
+                  active={pathname.startsWith("/messages")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href={profileHref}
+                  icon={UserRound}
+                  label="Profile"
+                  active={profileActive}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href={garageHref}
+                  icon={Car}
+                  label="Garage"
+                  active={garageActive}
+                  collapsed={isCollapsed}
+                />
               </>
             ) : null}
 
             {pillar === "market" ? (
               <>
-                <Link href="/auctions">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/auctions")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <Gavel className="h-5 w-5 shrink-0" />
-                    Live Auctions
-                  </motion.div>
-                </Link>
-                <Link href="/sell">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/sell")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <PlusCircle className="h-5 w-5 shrink-0" />
-                    Sell
-                  </motion.div>
-                </Link>
+                <NavItem
+                  href="/auctions"
+                  icon={Gavel}
+                  label="Live Auctions"
+                  active={pathname.startsWith("/auctions")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/sell"
+                  icon={PlusCircle}
+                  label="Sell"
+                  active={pathname.startsWith("/sell")}
+                  collapsed={isCollapsed}
+                />
                 {listingsHref ? (
-                  <Link href={listingsHref}>
-                    <motion.div
-                      className={cn(
-                        shellSidebarRowBase,
-                        listingsActive ? shellSidebarActive : shellSidebarInactive
-                      )}
-                      whileHover={hoverScale}
-                      whileTap={tapScale}
-                    >
-                      <ListOrdered className="h-5 w-5 shrink-0" />
-                      My Listings
-                    </motion.div>
-                  </Link>
+                  <NavItem
+                    href={listingsHref}
+                    icon={ListOrdered}
+                    label="My Listings"
+                    active={listingsActive}
+                    collapsed={isCollapsed}
+                  />
                 ) : null}
                 {marketingHref ? (
-                  <Link href={marketingHref}>
-                    <motion.div
-                      className={cn(
-                        shellSidebarRowBase,
-                        marketingActive ? shellSidebarActive : shellSidebarInactive
-                      )}
-                      whileHover={hoverScale}
-                      whileTap={tapScale}
-                    >
-                      <Megaphone className="h-5 w-5 shrink-0" />
-                      Marketing
-                    </motion.div>
-                  </Link>
+                  <NavItem
+                    href={marketingHref}
+                    icon={Megaphone}
+                    label="Marketing"
+                    active={marketingActive}
+                    collapsed={isCollapsed}
+                  />
                 ) : null}
                 {campaignsHref ? (
-                  <Link href={campaignsHref}>
-                    <motion.div
-                      className={cn(
-                        shellSidebarRowBase,
-                        campaignsActive ? shellSidebarActive : shellSidebarInactive
-                      )}
-                      whileHover={hoverScale}
-                      whileTap={tapScale}
-                    >
-                      <ClipboardList className="h-5 w-5 shrink-0" />
-                      Campaigns
-                    </motion.div>
-                  </Link>
+                  <NavItem
+                    href={campaignsHref}
+                    icon={ClipboardList}
+                    label="Campaigns"
+                    active={campaignsActive}
+                    collapsed={isCollapsed}
+                  />
                 ) : null}
-                <Link href="/merch">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/merch")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <ShoppingBag className="h-5 w-5 shrink-0" />
-                    Merch
-                  </motion.div>
-                </Link>
-                <Link href="/wallet">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/wallet")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <Wallet className="h-5 w-5 shrink-0" />
-                    Wallet
-                  </motion.div>
-                </Link>
+                <NavItem
+                  href="/merch"
+                  icon={ShoppingBag}
+                  label="Merch"
+                  active={pathname.startsWith("/merch")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/wallet"
+                  icon={Wallet}
+                  label="Wallet"
+                  active={pathname.startsWith("/wallet")}
+                  collapsed={isCollapsed}
+                />
               </>
             ) : null}
 
             {pillar === "resources" ? (
               <>
-                <Link href="/resources">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname === "/resources" ? shellSidebarActive : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    Resources hub
-                  </motion.div>
-                </Link>
-                <Link href="/how-it-works">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname === "/how-it-works"
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    How It Works
-                  </motion.div>
-                </Link>
-                <Link href="/why-carasta">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname === "/why-carasta"
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    Why Carasta
-                  </motion.div>
-                </Link>
-                <Link href="/resources/faq">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/resources/faq")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    FAQ
-                  </motion.div>
-                </Link>
-                <Link href="/resources/glossary">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/resources/glossary")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    Glossary
-                  </motion.div>
-                </Link>
-                <Link href="/resources/trust-and-safety">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname.startsWith("/resources/trust-and-safety")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    Trust &amp; Safety
-                  </motion.div>
-                </Link>
-                <Link href="/contact">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname === "/contact" || pathname.startsWith("/contact/")
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    Contact
-                  </motion.div>
-                </Link>
-                <Link href="/community-guidelines">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname === "/community-guidelines"
-                        ? shellSidebarActive
-                        : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    Community guidelines
-                  </motion.div>
-                </Link>
-                <Link href="/terms">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname === "/terms" ? shellSidebarActive : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    Terms
-                  </motion.div>
-                </Link>
-                <Link href="/privacy">
-                  <motion.div
-                    className={cn(
-                      shellSidebarRowBase,
-                      pathname === "/privacy" ? shellSidebarActive : shellSidebarInactive
-                    )}
-                    whileHover={hoverScale}
-                    whileTap={tapScale}
-                  >
-                    <BookOpen className="h-5 w-5 shrink-0" />
-                    Privacy
-                  </motion.div>
-                </Link>
+                <NavItem
+                  href="/resources"
+                  icon={BookOpen}
+                  label="Resources hub"
+                  active={pathname === "/resources"}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/how-it-works"
+                  icon={BookOpen}
+                  label="How It Works"
+                  active={pathname === "/how-it-works"}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/why-carasta"
+                  icon={BookOpen}
+                  label="Why Carasta"
+                  active={pathname === "/why-carasta"}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/resources/faq"
+                  icon={BookOpen}
+                  label="FAQ"
+                  active={pathname.startsWith("/resources/faq")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/resources/glossary"
+                  icon={BookOpen}
+                  label="Glossary"
+                  active={pathname.startsWith("/resources/glossary")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/resources/trust-and-safety"
+                  icon={BookOpen}
+                  label="Trust & Safety"
+                  active={pathname.startsWith("/resources/trust-and-safety")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/contact"
+                  icon={BookOpen}
+                  label="Contact"
+                  active={pathname === "/contact" || pathname.startsWith("/contact/")}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/community-guidelines"
+                  icon={BookOpen}
+                  label="Community guidelines"
+                  active={pathname === "/community-guidelines"}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/terms"
+                  icon={BookOpen}
+                  label="Terms"
+                  active={pathname === "/terms"}
+                  collapsed={isCollapsed}
+                />
+                <NavItem
+                  href="/privacy"
+                  icon={BookOpen}
+                  label="Privacy"
+                  active={pathname === "/privacy"}
+                  collapsed={isCollapsed}
+                />
               </>
             ) : null}
           </div>
         </div>
 
-        <div className="shrink-0 border-t border-border/50 px-3 py-2">
-          <button
-            type="button"
-            onClick={() => openPalette()}
-            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
-          >
-            <span className="truncate">Quick help</span>
-            <kbd className="ml-auto shrink-0 rounded border border-border/80 bg-muted/30 px-1 py-0.5 font-mono text-[9px] text-muted-foreground">
-              ⌃/
-            </kbd>
-          </button>
-        </div>
+        {!isCollapsed && (
+          <>
+            <div className="shrink-0 border-t border-border/50 px-3 py-2">
+              <button
+                type="button"
+                onClick={() => openPalette()}
+                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[11px] font-medium text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+              >
+                <span className="truncate">Quick help</span>
+                <kbd className="ml-auto shrink-0 rounded border border-border/80 bg-muted/30 px-1 py-0.5 font-mono text-[9px] text-muted-foreground">
+                  ⌃/
+                </kbd>
+              </button>
+            </div>
 
-        <div className="shrink-0 border-t border-border/60 bg-muted/20 px-3 py-3">
-          <p className="px-2 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-            More
-          </p>
-          <div className="space-y-0.5">{jumpers}</div>
-        </div>
+            <div className="shrink-0 border-t border-border/60 bg-muted/20 px-3 py-3">
+              <p className="px-2 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
+                More
+              </p>
+              <div className="space-y-0.5">{jumpers}</div>
+            </div>
+          </>
+        )}
       </div>
     </aside>
   );
