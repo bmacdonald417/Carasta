@@ -39,16 +39,18 @@ export default async function ExplorePage({
   }
 
   return (
-    <div className="carasta-container max-w-2xl py-10 pb-16 md:max-w-3xl">
+    <div className="carasta-container max-w-2xl py-10 pb-16 md:max-w-5xl">
       <header className="border-b border-border pb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Carmunity</h1>
-        <p className="mt-1 text-sm text-muted-foreground">by Carasta</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+          Carmunity
+        </h1>
+        <p className="mt-1 text-sm font-medium text-muted-foreground">by Carasta</p>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           One home for posts and discussions from people you follow — jump to{" "}
           <Link
             href="/discussions"
             className={cn(
-              "carmunity-nav-link font-medium text-primary hover:underline",
+              "carmunity-nav-link font-semibold text-primary hover:underline",
               shellFocusRing,
               "rounded-md"
             )}

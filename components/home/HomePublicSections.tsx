@@ -156,7 +156,7 @@ function SectionHeading({
 export function CarmunityHero() {
   return (
     <section className="border-b border-border bg-gradient-to-b from-background via-background to-muted/25">
-      <div className="carasta-container py-14 md:py-20">
+      <div className="carasta-container py-8 md:py-10">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] lg:items-center">
           <div>
             <p className="inline-flex items-center rounded-full border border-border bg-card px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground shadow-sm">
@@ -254,7 +254,7 @@ export function CarmunityHero() {
 
 export function ProductPillarsSection() {
   return (
-    <section className="border-b border-border bg-muted/30 py-16 md:py-20">
+    <section className="border-b border-border bg-muted/30 py-10 md:py-12">
       <div className="carasta-container">
         <SectionHeading
           eyebrow="Platform pillars"
@@ -291,7 +291,7 @@ export function ProductPillarsSection() {
 
 export function WhyCarastaSection() {
   return (
-    <section className="border-b border-border bg-background py-16 md:py-20">
+    <section className="border-b border-border bg-background py-10 md:py-12">
       <div className="carasta-container">
         <SectionHeading
           eyebrow="Why Carasta"
@@ -332,7 +332,7 @@ export function WhyCarastaSection() {
 
 export function SellerIntelligenceSection() {
   return (
-    <section className="border-b border-border bg-muted/40 py-16 md:py-20">
+    <section className="border-b border-border bg-muted/40 py-10 md:py-12">
       <div className="carasta-container">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] lg:items-center">
           <div>
@@ -391,7 +391,7 @@ export function SellerIntelligenceSection() {
 
 export function HowItWorksSnapshot() {
   return (
-    <section className="border-b border-border bg-muted/30 py-16 md:py-20">
+    <section className="border-b border-border bg-muted/30 py-10 md:py-12">
       <div className="carasta-container">
         <SectionHeading
           eyebrow="How it works"
@@ -430,7 +430,7 @@ export function HowItWorksSnapshot() {
 
 export function TrustResourcesBand() {
   return (
-    <section className="border-t border-border bg-gradient-to-b from-info-soft/25 via-background to-background py-16 md:py-20">
+    <section className="border-t border-border bg-gradient-to-b from-info-soft/25 via-background to-background py-10 md:py-12">
       <div className="carasta-container">
         <SectionHeading
           eyebrow="Support + trust"

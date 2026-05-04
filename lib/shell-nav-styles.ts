@@ -18,14 +18,16 @@ export const shellHeaderAppLinkBase =
   `carmunity-nav-link rounded-full px-3 py-2 text-[13px] font-medium transition ${shellFocusRing}`;
 export const shellHeaderAppInactive =
   "text-muted-foreground hover:bg-primary/12 hover:text-primary";
-export const shellHeaderAppActive = "bg-primary/15 text-primary";
+export const shellHeaderAppActive =
+  "bg-primary/15 text-primary ring-1 ring-inset ring-primary/25 font-semibold";
 
 /** Desktop sidebar rows */
 export const shellSidebarRowBase =
   `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${shellFocusRing}`;
 export const shellSidebarInactive =
   "text-muted-foreground hover:bg-primary/12 hover:text-primary";
-export const shellSidebarActive = "bg-primary/15 text-primary";
+export const shellSidebarActive =
+  "bg-primary/15 text-primary ring-1 ring-inset ring-primary/25 font-semibold";
 
 /** Sidebar nested items (listings, marketing) */
 export const shellSidebarSubRowBase =

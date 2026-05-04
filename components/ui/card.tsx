@@ -8,8 +8,10 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        solid: "border-border bg-card shadow-e1 hover:shadow-e2",
-        subtle: "border-border bg-muted/30 shadow-e1 hover:shadow-e2",
+        solid:
+          "border-border bg-card shadow-e1 hover:shadow-e2 hover:border-primary/20",
+        subtle:
+          "border-border bg-muted/30 shadow-e1 hover:shadow-e2 hover:border-primary/15",
         glass:
           "border-border/60 bg-background/70 shadow-e2 backdrop-blur-xl hover:shadow-e3",
       },

@@ -154,7 +154,7 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "hidden w-56 shrink-0 flex-col border-r border-border bg-card/50 backdrop-blur-sm",
+        "hidden w-56 shrink-0 flex-col border-r border-border bg-card/80 backdrop-blur-sm",
         "lg:sticky lg:top-20 lg:flex lg:h-[calc(100dvh-5rem)] lg:max-h-[calc(100dvh-5rem)]"
       )}
     >
