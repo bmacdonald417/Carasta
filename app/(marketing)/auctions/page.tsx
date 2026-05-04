@@ -223,12 +223,7 @@ export default async function AuctionsPage({
         </p>
       </header>
 
-      <ContextualHelpCard
-        context="market.auctions"
-        className="mt-5"
-        collapsible
-        defaultExpanded={false}
-      />
+      <ContextualHelpCard context="market.auctions" className="mt-5" />
 
       <AuctionFilters
         makes={makes}

@@ -191,7 +191,7 @@ export default async function AuctionDetailPage({
             currentUserHandle={(session?.user as any)?.handle ?? null}
           />
 
-          <ContextualHelpCard context="market.auctions" className="border-border/60 bg-muted/10" />
+          <ContextualHelpCard context="market.auctions" />
 
           {session?.user?.id && (session.user as any).id !== auction.sellerId ? (
             <MessageSellerButton auctionId={auction.id} sellerId={auction.sellerId} />

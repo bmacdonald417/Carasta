@@ -54,30 +54,24 @@ export default async function ExplorePage({
   const tabFollowing = tab === "following";
 
   return (
-    <div className="min-h-0 bg-gradient-to-b from-muted/60 via-background to-muted/30 pb-16 pt-4 md:pt-6">
+    <div className="min-h-0 bg-gradient-to-b from-muted/60 via-background to-muted/30 pb-12 pt-2 md:pt-3">
       <div className="carasta-container max-w-7xl px-4 sm:px-6">
-        <header className="border-b border-border/70 pb-5 md:flex md:items-end md:justify-between md:gap-6">
-          <div className="min-w-0">
-            <p className="carasta-page-eyebrow">Social feed</p>
-            <h1 className="carasta-page-title mt-1 text-2xl md:text-3xl">Carmunity</h1>
-            <p className="mt-0.5 text-xs font-medium text-muted-foreground">by Carasta</p>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Posts and motion from people you follow — plus{" "}
-              <Link
-                href="/discussions"
-                className={cn(
-                  "font-semibold text-primary underline-offset-4 hover:underline",
-                  shellFocusRing,
-                  "rounded-md"
-                )}
-              >
-                Discussions
-              </Link>{" "}
-              for full Gear threads.
-            </p>
+        <header className="border-b border-border/70 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+            <h1 className="min-w-0 text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+              Carmunity{" "}
+              <span className="font-normal text-muted-foreground">by Carasta</span>
+            </h1>
+            {currentUserId ? (
+              <ContextualHelpCard
+                context="carmunity.explore"
+                className="w-auto shrink-0"
+                menuAlign="end"
+              />
+            ) : null}
           </div>
           <nav
-            className="mt-4 flex flex-wrap items-center gap-2 md:mt-0 md:max-w-md md:justify-end"
+            className="mt-2.5 flex flex-wrap items-center gap-2"
             aria-label="Carmunity destinations"
           >
             <Link href="/explore" className={navPillClass(!tabFollowing)} scroll={false}>
@@ -93,10 +87,7 @@ export default async function ExplorePage({
             <Link href="/discussions" className={navPillClass(false)}>
               Discussions
             </Link>
-            <Link
-              href="#trending-dream-garage"
-              className={navPillClass(false)}
-            >
+            <Link href="#trending-dream-garage" className={navPillClass(false)}>
               Dream garage
             </Link>
           </nav>
@@ -105,13 +96,10 @@ export default async function ExplorePage({
         {!currentUserId ? (
           <SignedOutPreviewNotice
             nextUrl="/explore"
-            className="mt-5"
+            className="mt-3"
             title="Read-only preview"
             description="You’re viewing a read-only Carmunity preview. Join free to react, comment, follow voices, and shape your feed."
           />
-        ) : null}
-        {currentUserId ? (
-          <ContextualHelpCard context="carmunity.explore" className="mt-5" />
         ) : null}
 
         <TrendingDreamGarage />

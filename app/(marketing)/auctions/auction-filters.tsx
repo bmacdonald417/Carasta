@@ -137,7 +137,10 @@ export function AuctionFilters({
       <div className="overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-primary/[0.05] via-card to-card shadow-e2 ring-1 ring-primary/12">
         <div className="flex flex-nowrap items-end gap-2 overflow-x-auto p-3 [-ms-overflow-style:none] [scrollbar-width:none] md:gap-3 md:p-4 [&::-webkit-scrollbar]:hidden">
           <div className="min-w-0 flex-1 shrink basis-[min(100%,12rem)]">
-            <Label htmlFor="auction-q-compact" className="text-xs text-muted-foreground">
+            <Label
+              htmlFor="auction-q-compact"
+              className="text-sm font-semibold tracking-tight text-primary md:text-base"
+            >
               Search
             </Label>
             <Input
@@ -145,18 +148,20 @@ export function AuctionFilters({
               placeholder="Make, model, title…"
               defaultValue={q}
               onBlur={(e) => update("q", e.target.value.trim() || undefined)}
-              className="mt-1"
+              className="mt-1.5 h-11 border-primary/30 bg-background/95 text-base font-medium text-foreground shadow-sm ring-1 ring-inset ring-primary/10 placeholder:text-primary/45 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/25"
             />
           </div>
           {total != null ? (
-            <p className="hidden shrink-0 self-center pb-1 text-xs tabular-nums text-muted-foreground sm:block">
+            <p className="hidden shrink-0 self-end pb-2.5 text-sm font-medium tabular-nums text-primary/80 sm:block">
               {total.toLocaleString()} listings
             </p>
           ) : null}
-          <div className="w-[min(42vw,11rem)] shrink-0 sm:w-44">
-            <Label className="text-xs text-muted-foreground">Sort</Label>
+          <div className="w-[min(48vw,13.5rem)] shrink-0 sm:w-52">
+            <Label className="text-sm font-semibold tracking-tight text-primary md:text-base">
+              Sort
+            </Label>
             <Select value={sort ?? "ending"} onValueChange={(v) => update("sort", v)}>
-              <SelectTrigger className="mt-1 h-9">
+              <SelectTrigger className="mt-1.5 h-11 border-primary/30 bg-background/95 text-base font-semibold text-primary shadow-sm ring-1 ring-inset ring-primary/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/25 [&>span]:text-primary [&_svg]:text-primary [&_svg]:opacity-70">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -168,16 +173,16 @@ export function AuctionFilters({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex shrink-0 items-center gap-1.5 pb-0.5">
+          <div className="flex shrink-0 items-center gap-1.5">
             <span className="sr-only">Layout</span>
-            <div className="flex rounded-xl border border-border/70 bg-gradient-to-b from-muted/80 to-muted/50 p-0.5 shadow-inner ring-1 ring-primary/[0.06]">
+            <div className="flex h-11 items-stretch rounded-2xl border border-primary/25 bg-gradient-to-b from-primary/[0.07] to-primary/[0.02] p-0.5 shadow-sm ring-1 ring-inset ring-primary/15">
               <button
                 type="button"
                 onClick={() => update("view", undefined)}
-                className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-[color,background-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                className={`rounded-[0.65rem] px-3 text-sm font-semibold transition-[color,background-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   (view ?? "grid") === "grid"
-                    ? "bg-card text-primary shadow-md ring-1 ring-inset ring-primary/20"
-                    : "text-muted-foreground hover:bg-background/60 hover:text-foreground motion-safe:active:scale-[0.98]"
+                    ? "bg-card text-primary shadow-md ring-1 ring-inset ring-primary/25"
+                    : "text-primary/70 hover:bg-background/80 hover:text-primary motion-safe:active:scale-[0.98]"
                 }`}
               >
                 Grid
@@ -185,10 +190,10 @@ export function AuctionFilters({
               <button
                 type="button"
                 onClick={() => update("view", "map")}
-                className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-[color,background-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                className={`rounded-[0.65rem] px-3 text-sm font-semibold transition-[color,background-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   view === "map"
-                    ? "bg-card text-primary shadow-md ring-1 ring-inset ring-primary/20"
-                    : "text-muted-foreground hover:bg-background/60 hover:text-foreground motion-safe:active:scale-[0.98]"
+                    ? "bg-card text-primary shadow-md ring-1 ring-inset ring-primary/25"
+                    : "text-primary/70 hover:bg-background/80 hover:text-primary motion-safe:active:scale-[0.98]"
                 }`}
               >
                 Map
@@ -202,7 +207,7 @@ export function AuctionFilters({
             aria-expanded={filtersExpanded}
             aria-controls={filtersExpanded ? advancedPanelId : undefined}
             onClick={() => setFiltersExpanded((v) => !v)}
-            className="h-9 shrink-0 gap-1 border-primary/20 bg-primary/[0.06] px-2.5 text-xs font-semibold text-primary shadow-sm ring-1 ring-inset ring-primary/10 hover:bg-primary/12 hover:ring-primary/20"
+            className="h-11 shrink-0 gap-1.5 border-primary/25 bg-primary/[0.08] px-3.5 text-sm font-semibold text-primary shadow-sm ring-1 ring-inset ring-primary/12 hover:bg-primary/14 hover:ring-primary/20"
           >
             {filtersExpanded ? "Fewer" : "More"}
             <ChevronDown

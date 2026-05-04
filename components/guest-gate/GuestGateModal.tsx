@@ -103,7 +103,7 @@ export function GuestGateModal({
           <p className="text-xs leading-relaxed text-muted-foreground">
             You can still browse public previews, but reactions, comments, saves, bids, and seller tools require an account.
           </p>
-          <ContextualHelpCard context="guest.gate" />
+          <ContextualHelpCard context="guest.gate" className="justify-start" />
         </div>
 
         <DialogFooter className="sm:justify-between">

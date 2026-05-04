@@ -35,7 +35,7 @@ export function TrendingDreamGarage() {
   return (
     <section
       id="trending-dream-garage"
-      className="scroll-mt-24 rounded-2xl border border-border/80 bg-gradient-to-b from-primary/[0.04] to-card p-4 shadow-e2 ring-1 ring-primary/[0.08] sm:p-6"
+      className="mt-3 scroll-mt-24 rounded-2xl border border-border/80 bg-gradient-to-b from-primary/[0.04] to-card p-4 shadow-e2 ring-1 ring-primary/[0.08] sm:p-6"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
