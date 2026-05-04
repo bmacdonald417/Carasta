@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 
 type FilterPill = { key: string; label: string };
 
@@ -78,6 +78,8 @@ export function AuctionFilters({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const advancedPanelId = useId();
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [localZip, setLocalZip] = useState(zip ?? "");
   useEffect(() => {
     setLocalZip(zip ?? "");
@@ -132,16 +134,92 @@ export function AuctionFilters({
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-card p-4 shadow-e1">
-        <div className="w-full min-w-[140px] max-w-[200px]">
-          <Label className="text-xs">Search</Label>
-          <Input
-            placeholder="Make, model, title..."
-            defaultValue={q}
-            onBlur={(e) => update("q", e.target.value.trim() || undefined)}
-            className="mt-1"
-          />
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-e2 ring-1 ring-primary/[0.08]">
+        <div className="flex flex-nowrap items-end gap-2 overflow-x-auto p-3 [-ms-overflow-style:none] [scrollbar-width:none] md:gap-3 md:p-4 [&::-webkit-scrollbar]:hidden">
+          <div className="min-w-0 flex-1 shrink basis-[min(100%,12rem)]">
+            <Label htmlFor="auction-q-compact" className="text-xs text-muted-foreground">
+              Search
+            </Label>
+            <Input
+              id="auction-q-compact"
+              placeholder="Make, model, title…"
+              defaultValue={q}
+              onBlur={(e) => update("q", e.target.value.trim() || undefined)}
+              className="mt-1"
+            />
+          </div>
+          {total != null ? (
+            <p className="hidden shrink-0 self-center pb-1 text-xs tabular-nums text-muted-foreground sm:block">
+              {total.toLocaleString()} listings
+            </p>
+          ) : null}
+          <div className="w-[min(42vw,11rem)] shrink-0 sm:w-44">
+            <Label className="text-xs text-muted-foreground">Sort</Label>
+            <Select value={sort ?? "ending"} onValueChange={(v) => update("sort", v)}>
+              <SelectTrigger className="mt-1 h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ending">Ending soon</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="highest">Highest bid</SelectItem>
+                <SelectItem value="price_asc">Price: low → high</SelectItem>
+                <SelectItem value="price_desc">Price: high → low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex shrink-0 items-center gap-1.5 pb-0.5">
+            <span className="sr-only">Layout</span>
+            <div className="flex rounded-lg border border-border bg-muted/40 p-0.5">
+              <button
+                type="button"
+                onClick={() => update("view", undefined)}
+                className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                  (view ?? "grid") === "grid"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                onClick={() => update("view", "map")}
+                className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                  view === "map"
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Map
+              </button>
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-expanded={filtersExpanded}
+            aria-controls={filtersExpanded ? advancedPanelId : undefined}
+            onClick={() => setFiltersExpanded((v) => !v)}
+            className="h-9 shrink-0 gap-1 border-border/80 bg-background/80 px-2.5 text-xs font-medium shadow-sm hover:bg-muted/50"
+          >
+            {filtersExpanded ? "Fewer" : "More"}
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${filtersExpanded ? "rotate-180" : ""}`}
+              aria-hidden
+            />
+          </Button>
         </div>
+
+        {filtersExpanded ? (
+          <div
+            id={advancedPanelId}
+            role="region"
+            aria-label="Advanced auction filters"
+            className="border-t border-border/80 bg-muted/[0.35] p-3 md:p-4"
+          >
+            <div className="flex flex-wrap items-end gap-4">
         <div className="w-full min-w-[120px] max-w-[140px]">
           <Label className="text-xs">Make</Label>
           <Select
@@ -300,7 +378,7 @@ export function AuctionFilters({
               id="noReserve"
               checked={!!noReserve}
               onChange={(e) => update("noReserve", e.target.checked ? "1" : undefined)}
-              className="h-4 w-4 rounded border-border"
+              className="h-4 w-4 rounded border-border accent-primary"
             />
             <Label htmlFor="noReserve" className="text-sm">No reserve</Label>
           </div>
@@ -310,7 +388,7 @@ export function AuctionFilters({
               id="endingSoon"
               checked={!!endingSoon}
               onChange={(e) => update("endingSoon", e.target.checked ? "1" : undefined)}
-              className="h-4 w-4 rounded border-border"
+              className="h-4 w-4 rounded border-border accent-primary"
             />
             <Label htmlFor="endingSoon" className="text-sm">Ending in 24h</Label>
           </div>
@@ -321,28 +399,13 @@ export function AuctionFilters({
               checked={!!featured}
               title="Reserved for future featured listings"
               onChange={(e) => update("featured", e.target.checked ? "1" : undefined)}
-              className="h-4 w-4 rounded border-border"
+              className="h-4 w-4 rounded border-border accent-primary"
             />
             <Label htmlFor="featured" className="text-sm text-muted-foreground">
               Featured{" "}
               <span className="text-xs">(soon)</span>
             </Label>
           </div>
-        </div>
-        <div className="w-[180px]">
-          <Label className="text-xs">Sort</Label>
-          <Select value={sort ?? "ending"} onValueChange={(v) => update("sort", v)}>
-            <SelectTrigger className="mt-1">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ending">Ending soon</SelectItem>
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="highest">Highest bid</SelectItem>
-              <SelectItem value="price_asc">Price: low → high</SelectItem>
-              <SelectItem value="price_desc">Price: high → low</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
         <div className="w-[100px]">
           <Label className="text-xs">Zip</Label>
@@ -358,33 +421,6 @@ export function AuctionFilters({
             className="mt-1"
             maxLength={10}
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <Label className="text-xs">View</Label>
-          <div className="flex rounded-lg border border-border bg-muted/40 p-0.5">
-            <button
-              type="button"
-              onClick={() => update("view", undefined)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-                (view ?? "grid") === "grid"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Grid
-            </button>
-            <button
-              type="button"
-              onClick={() => update("view", "map")}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-                view === "map"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Map
-            </button>
-          </div>
         </div>
         <div className="w-[100px]">
           <Label className="text-xs">Radius</Label>
@@ -405,6 +441,9 @@ export function AuctionFilters({
             </SelectContent>
           </Select>
         </div>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {total != null && view !== "map" && (
