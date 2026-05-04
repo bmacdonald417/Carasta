@@ -17,9 +17,9 @@ export function FeaturedAuctionHero({
 }) {
   if (!auction) {
     return (
-      <section className="border-b border-border bg-muted/20 py-8 md:py-10">
+      <section className="border-b border-border bg-muted/20 py-4 md:py-5">
         <div className="carasta-container">
-          <div className="rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center shadow-e1">
+          <div className="rounded-2xl border border-dashed border-border bg-card/60 p-8 text-center shadow-e1 md:p-10">
             <p className="text-sm font-medium text-muted-foreground">
               No featured auction right now. Browse the marketplace for what&apos;s live.
             </p>
@@ -41,11 +41,11 @@ export function FeaturedAuctionHero({
   const bid = highBidCents ?? 0;
 
   return (
-    <section className="border-b border-border bg-background py-6 md:py-8">
+    <section className="border-b border-border bg-background py-2 md:py-3">
       <div className="carasta-container">
-        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-e2">
-          <div className="grid gap-0 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)]">
-            <div className="relative aspect-[16/10] w-full bg-muted lg:aspect-auto lg:min-h-[320px]">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-e3">
+          <div className="grid gap-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+            <div className="relative aspect-[16/9] max-h-[min(38vh,260px)] w-full bg-muted lg:aspect-auto lg:max-h-none lg:min-h-[220px] lg:max-h-[280px]">
               <Image
                 src={img}
                 alt={auction.title}
@@ -56,7 +56,7 @@ export function FeaturedAuctionHero({
                 sizes="(max-width: 1024px) 100vw, 55vw"
               />
             </div>
-            <div className="flex flex-col justify-center gap-5 p-6 md:p-10">
+            <div className="flex flex-col justify-center gap-3 p-4 md:gap-4 md:p-6 lg:p-8">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                   Featured auction
@@ -87,14 +87,14 @@ export function FeaturedAuctionHero({
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <Button asChild size="lg" className="rounded-2xl px-7">
+              <div className="flex flex-wrap gap-2.5">
+                <Button asChild className="rounded-xl px-6">
                   <Link href={href}>
                     View details
                     <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="rounded-2xl border-border bg-transparent">
+                <Button asChild variant="outline" className="rounded-xl border-border bg-transparent">
                   <Link href="/auctions">Browse all</Link>
                 </Button>
               </div>

@@ -13,9 +13,9 @@ export const shellHeaderMarketingInactive =
   "text-muted-foreground hover:bg-primary/12 hover:text-primary";
 export const shellHeaderMarketingActive = "bg-muted text-foreground";
 
-/** Header app rail (Carmunity, Discussions, …) */
+/** Header app rail (Carmunity, Discussions, …) — dense top nav */
 export const shellHeaderAppLinkBase =
-  `carmunity-nav-link rounded-full px-3 py-2 text-[13px] font-medium transition ${shellFocusRing}`;
+  `carmunity-nav-link rounded-full px-2.5 py-1.5 text-[12px] font-medium transition sm:px-3 sm:py-2 sm:text-[13px] ${shellFocusRing}`;
 export const shellHeaderAppInactive =
   "text-muted-foreground hover:bg-primary/12 hover:text-primary";
 export const shellHeaderAppActive =

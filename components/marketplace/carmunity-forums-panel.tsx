@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, MessagesSquare } from "lucide-react";
 import { discussionThreadPath } from "@/lib/discussions/discussion-paths";
 import { cn } from "@/lib/utils";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
@@ -22,7 +22,7 @@ export function CarmunityForumsPanel({
   return (
     <section
       className={cn(
-        "rounded-3xl border border-border bg-card p-5 shadow-e1 md:p-6",
+        "rounded-2xl border border-border bg-card p-4 shadow-e1 md:p-5",
         className
       )}
     >
@@ -66,16 +66,16 @@ export function CarmunityForumsPanel({
         )}
       </ul>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <Link
           href="/discussions"
           className={cn(
-            "inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-muted/30 px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted/50",
+            "inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-muted/30 px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted/50",
             shellFocusRing
           )}
         >
-          <Search className="h-4 w-4 opacity-70" aria-hidden />
-          Search forums
+          <MessagesSquare className="h-4 w-4 opacity-70" aria-hidden />
+          Browse discussions
         </Link>
       </div>
     </section>

@@ -36,7 +36,7 @@ export function UserGarageCard({
     return (
       <section
         className={cn(
-          "rounded-3xl border border-border bg-card p-5 shadow-e1 md:p-6",
+          "rounded-2xl border border-border bg-card p-4 shadow-e1 md:p-5",
           className
         )}
       >
@@ -55,7 +55,7 @@ export function UserGarageCard({
             Log in
           </Link>
           <Link
-            href={`/auth/sign-up?callbackUrl=${encodeURIComponent("/welcome?next=%2Fexplore")}`}
+            href="/auth/sign-up?callbackUrl=%2Fwelcome%3Fnext%3D%252Fexplore"
             className={cn(
               "inline-flex flex-1 items-center justify-center rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-e1 transition hover:bg-[hsl(var(--primary-hover))]",
               shellFocusRing
@@ -75,12 +75,12 @@ export function UserGarageCard({
   return (
     <section
       className={cn(
-        "rounded-3xl border border-border bg-card p-5 shadow-e1 md:p-6",
+        "rounded-2xl border border-border bg-card p-4 shadow-e1 md:p-5",
         className
       )}
     >
       <div className="flex items-start gap-4">
-        <Avatar className="h-14 w-14 border border-border">
+        <Avatar className="h-14 w-14 rounded-full border border-border ring-1 ring-border/60">
           <AvatarImage src={avatarUrl ?? undefined} alt="" />
           <AvatarFallback>{(displayName ?? handle ?? "U").slice(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>

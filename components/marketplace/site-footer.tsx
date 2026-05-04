@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Facebook, Instagram, Youtube } from "lucide-react";
 import { AppStoreBadges } from "@/components/ui/app-store-badges";
+import { getPublicSocialLinks } from "@/lib/marketing/social-links";
 
 const joinHref =
   "/auth/sign-up?callbackUrl=%2Fwelcome%3Fnext%3D%252Fexplore";
@@ -7,7 +9,7 @@ const joinHref =
 const footerProductLinks = [
   { href: "/explore", label: "Carmunity" },
   { href: "/discussions", label: "Discussions" },
-  { href: "/auctions", label: "Market" },
+  { href: "/auctions", label: "Auctions" },
   { href: "/sell", label: "Sell" },
 ];
 
@@ -20,11 +22,13 @@ const footerLearnLinks = [
 ];
 
 export function SiteFooter() {
+  const socialLinks = getPublicSocialLinks();
+
   return (
     <footer className="mt-auto">
-      <div className="relative border-t border-border/60 bg-[hsl(var(--navy))] pt-12 pb-16 text-white md:pt-14 md:pb-20">
+      <div className="relative border-t border-border/60 bg-[hsl(var(--navy))] pt-8 pb-10 text-white md:pt-10 md:pb-12">
         <div className="carasta-container">
-          <div className="grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)]">
+          <div className="grid gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)] md:gap-10">
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <img
@@ -104,9 +108,31 @@ export function SiteFooter() {
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">Company</p>
+                {socialLinks.length > 0 ? (
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {socialLinks.map(({ key, href }) => {
+                      const Icon =
+                        key === "instagram" ? Instagram : key === "youtube" ? Youtube : Facebook;
+                      const label =
+                        key === "instagram" ? "Instagram" : key === "youtube" ? "YouTube" : "Facebook";
+                      return (
+                        <a
+                          key={key}
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/85 transition hover:border-white/40 hover:text-white"
+                          aria-label={label}
+                        >
+                          <Icon className="h-5 w-5" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                ) : null}
                 <a
                   href="mailto:info@carasta.com"
-                  className="mt-4 inline-block text-primary-foreground/90 hover:text-white"
+                  className={`inline-block text-primary-foreground/90 hover:text-white ${socialLinks.length > 0 ? "mt-5" : "mt-4"}`}
                 >
                   info@carasta.com
                 </a>
@@ -125,7 +151,7 @@ export function SiteFooter() {
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent" />
       </div>
-      <div className="border-t border-white/10 bg-[hsl(var(--navy-soft))] py-6 text-white">
+      <div className="border-t border-white/10 bg-[hsl(var(--navy-soft))] py-4 text-white md:py-5">
         <div className="carasta-container flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
           <div className="text-center md:text-left">
             <p className="text-sm text-white/75">

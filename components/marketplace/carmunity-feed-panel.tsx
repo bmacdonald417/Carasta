@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { shellFocusRing } from "@/lib/shell-nav-styles";
@@ -30,11 +30,11 @@ export function CarmunityFeedPanel({
   return (
     <section
       className={cn(
-        "rounded-3xl border border-border bg-card p-5 shadow-e1 md:p-6",
+        "rounded-2xl border border-border bg-card p-4 shadow-e1 md:p-5",
         className
       )}
     >
-      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/70 pb-4">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/70 pb-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
             Carmunity Feed
@@ -43,9 +43,8 @@ export function CarmunityFeedPanel({
             Latest posts from the community — join to react and comment.
           </p>
         </div>
-        <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground">
+        <span className="rounded-full border border-border bg-muted/40 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
           Latest
-          <ChevronDown className="h-3.5 w-3.5 opacity-70" aria-hidden />
         </span>
       </div>
 
@@ -59,7 +58,7 @@ export function CarmunityFeedPanel({
             const display = p.author.name?.trim() || `@${p.author.handle}`;
             const excerpt = (p.content ?? "").replace(/\s+/g, " ").trim().slice(0, 220);
             return (
-              <article key={p.id} className="rounded-2xl border border-border/80 bg-background/60 p-4">
+              <article key={p.id} className="rounded-xl border border-border/80 bg-muted/20 p-4">
                 <div className="flex items-start gap-3">
                   <Avatar className="h-10 w-10 border border-border">
                     <AvatarImage src={p.author.avatarUrl ?? undefined} alt="" />
@@ -101,12 +100,24 @@ export function CarmunityFeedPanel({
                         />
                       </div>
                     ) : null}
-                    <div className="mt-3 flex flex-wrap items-center gap-4 text-[11px] text-muted-foreground">
-                      <span>{p._count.likes} likes</span>
-                      <span className="inline-flex items-center gap-1">
-                        <MessageCircle className="h-3.5 w-3.5" aria-hidden />
-                        {p._count.comments} comments
-                      </span>
+                    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
+                        <span>{p._count.likes} likes</span>
+                        <span className="inline-flex items-center gap-1">
+                          <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+                          {p._count.comments} comments
+                        </span>
+                      </div>
+                      <Link
+                        href={`/explore/post/${p.id}`}
+                        className={cn(
+                          "shrink-0 text-[11px] font-medium text-primary hover:underline sm:text-xs",
+                          shellFocusRing,
+                          "rounded-md"
+                        )}
+                      >
+                        View post
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -116,7 +127,7 @@ export function CarmunityFeedPanel({
         )}
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3 border-t border-border/70 pt-5">
+      <div className="mt-5 flex flex-wrap gap-3 border-t border-border/70 pt-4">
         <Link
           href="/explore"
           className={cn(
