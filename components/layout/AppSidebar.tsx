@@ -90,7 +90,7 @@ function NavItem({
         <Icon
           className={cn(
             "shrink-0 transition-all",
-            collapsed ? "h-5 w-5" : "h-4.5 w-4.5",
+            collapsed ? "h-5 w-5" : "h-4 w-4",
             active ? "text-white" : "text-white/60"
           )}
           aria-hidden
@@ -148,24 +148,27 @@ export function AppSidebar() {
 
   if (!session?.user) return null;
 
-  const handle = (session?.user as { handle?: string } | undefined)?.handle;
+  const rawHandle = (session?.user as { handle?: string } | undefined)?.handle?.trim();
+  const handle = rawHandle && rawHandle.length > 0 ? rawHandle : undefined;
   const marketingEnabled = Boolean(
     (session?.user as { marketingEnabled?: boolean } | undefined)?.marketingEnabled
   );
 
   const pillar = getActivePillar(pathname, handle ?? null);
 
-  const garageHref = handle ? `/u/${handle}/garage` : "/auth/sign-in";
-  const profileHref = handle ? `/u/${handle}` : "/settings";
-  const listingsHref = handle ? `/u/${handle}/listings` : null;
-  const marketingHref = handle && marketingEnabled ? `/u/${handle}/marketing` : null;
-  const campaignsHref = handle && marketingEnabled ? `/u/${handle}/marketing/campaigns` : null;
+  const profileHref = handle ? `/u/${encodeURIComponent(handle)}` : "/settings";
+  const garageHref = handle ? `/u/${encodeURIComponent(handle)}/garage` : "/settings";
+  const listingsHref = handle ? `/u/${encodeURIComponent(handle)}/listings` : null;
+  const marketingHref = handle && marketingEnabled ? `/u/${encodeURIComponent(handle)}/marketing` : null;
+  const campaignsHref =
+    handle && marketingEnabled ? `/u/${encodeURIComponent(handle)}/marketing/campaigns` : null;
 
   const profileActive =
-    Boolean(handle) &&
-    (pathname === `/u/${handle}` ||
-      pathname.startsWith(`/u/${handle}/followers`) ||
-      pathname.startsWith(`/u/${handle}/following`));
+    (!handle && pathname.startsWith("/settings")) ||
+    (Boolean(handle) &&
+      (pathname === `/u/${handle}` ||
+        pathname.startsWith(`/u/${handle}/followers`) ||
+        pathname.startsWith(`/u/${handle}/following`)));
 
   const garageActive = pathname.includes("/garage");
   const listingsActive = listingsHref != null && pathname.startsWith(listingsHref);
@@ -266,6 +269,10 @@ export function AppSidebar() {
             )}
             {pillar === "market" && (
               <>
+                <NavItem href={profileHref} icon={UserRound} label="Profile" active={profileActive} collapsed={isCollapsed} />
+                <NavItem href={garageHref} icon={Car} label="Garage" active={garageActive} collapsed={isCollapsed} />
+                <NavItem href="/explore" icon={Users} label="Explore" active={pathname.startsWith("/explore")} collapsed={isCollapsed} />
+                <NavItem href="/messages" icon={Mail} label="Messages" active={pathname.startsWith("/messages")} collapsed={isCollapsed} />
                 <NavItem href="/auctions" icon={Gavel} label="Live Auctions" active={pathname.startsWith("/auctions")} collapsed={isCollapsed} />
                 <NavItem href="/sell" icon={PlusCircle} label="Sell" active={pathname.startsWith("/sell")} collapsed={isCollapsed} />
                 {listingsHref && <NavItem href={listingsHref} icon={ListOrdered} label="My Listings" active={listingsActive} collapsed={isCollapsed} />}
@@ -277,6 +284,10 @@ export function AppSidebar() {
             )}
             {pillar === "resources" && (
               <>
+                <NavItem href={profileHref} icon={UserRound} label="Profile" active={profileActive} collapsed={isCollapsed} />
+                <NavItem href={garageHref} icon={Car} label="Garage" active={garageActive} collapsed={isCollapsed} />
+                <NavItem href="/explore" icon={Users} label="Explore" active={pathname.startsWith("/explore")} collapsed={isCollapsed} />
+                <NavItem href="/messages" icon={Mail} label="Messages" active={pathname.startsWith("/messages")} collapsed={isCollapsed} />
                 <NavItem href="/resources" icon={BookOpen} label="Resources" active={pathname === "/resources"} collapsed={isCollapsed} />
                 <NavItem href="/how-it-works" icon={BookOpen} label="How It Works" active={pathname === "/how-it-works"} collapsed={isCollapsed} />
                 <NavItem href="/why-carasta" icon={BookOpen} label="Why Carasta" active={pathname === "/why-carasta"} collapsed={isCollapsed} />

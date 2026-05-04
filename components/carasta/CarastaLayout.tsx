@@ -138,7 +138,10 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
   const [avatarSignOutStep, setAvatarSignOutStep] = useState<"idle" | "confirm">("idle");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const handle = (session?.user as { handle?: string } | undefined)?.handle ?? null;
+  const rawHandle = (session?.user as { handle?: string } | undefined)?.handle?.trim();
+  const handle = rawHandle && rawHandle.length > 0 ? rawHandle : null;
+  const profilePath = handle ? `/u/${encodeURIComponent(handle)}` : "/settings";
+  const garagePath = handle ? `/u/${encodeURIComponent(handle)}/garage` : "/settings";
   const marketingEnabled = Boolean(
     (session?.user as { marketingEnabled?: boolean } | undefined)?.marketingEnabled
   );
@@ -267,19 +270,15 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           <DropdownMenuItem asChild>
             <Link href="/discussions">Discussions</Link>
           </DropdownMenuItem>
-          {handle ? (
-            <DropdownMenuItem asChild>
-              <Link href={`/u/${handle}/garage`}>Garage</Link>
-            </DropdownMenuItem>
-          ) : null}
+          <DropdownMenuItem asChild>
+            <Link href={garagePath}>Garage</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/messages">Messages</Link>
           </DropdownMenuItem>
-          {handle ? (
-            <DropdownMenuItem asChild>
-              <Link href={`/u/${handle}`}>Profile</Link>
-            </DropdownMenuItem>
-          ) : null}
+          <DropdownMenuItem asChild>
+            <Link href={profilePath}>Profile</Link>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -482,12 +481,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                     className="min-w-[220px] border border-border bg-popover text-popover-foreground shadow-e2 backdrop-blur-xl"
                   >
                     <DropdownMenuItem asChild>
-                      <Link
-                        href={
-                          handle ? `/u/${handle}` : "/settings"
-                        }
-                        className="font-medium"
-                      >
+                      <Link href={profilePath} className="font-medium">
                         {displayMenuName(session)}
                       </Link>
                     </DropdownMenuItem>
@@ -499,11 +493,13 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <Link href={`/u/${handle}/listings`}>My Listings</Link>
+                          <Link href={`/u/${encodeURIComponent(handle)}/listings`}>My Listings</Link>
                         </DropdownMenuItem>
                         {session.user?.handle && session.user.marketingEnabled ? (
                           <DropdownMenuItem asChild>
-                            <Link href={`/u/${session.user.handle}/marketing`}>Marketing</Link>
+                            <Link href={`/u/${encodeURIComponent(session.user.handle)}/marketing`}>
+                              Marketing
+                            </Link>
                           </DropdownMenuItem>
                         ) : null}
                       </>
@@ -727,30 +723,28 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
                   >
                     Messages
                   </Link>
+                  <Link
+                    href={garagePath}
+                    onClick={() => setMobileNavOpen(false)}
+                    className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+                  >
+                    Garage
+                  </Link>
+                  <Link
+                    href={profilePath}
+                    onClick={() => setMobileNavOpen(false)}
+                    className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+                  >
+                    Profile
+                  </Link>
                   {handle ? (
-                    <>
-                      <Link
-                        href={`/u/${handle}/garage`}
-                        onClick={() => setMobileNavOpen(false)}
-                        className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
-                      >
-                        Garage
-                      </Link>
-                      <Link
-                        href={`/u/${handle}`}
-                        onClick={() => setMobileNavOpen(false)}
-                        className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        href={`/u/${handle}/listings`}
-                        onClick={() => setMobileNavOpen(false)}
-                        className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
-                      >
-                        My listings
-                      </Link>
-                    </>
+                    <Link
+                      href={`/u/${encodeURIComponent(handle)}/listings`}
+                      onClick={() => setMobileNavOpen(false)}
+                      className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+                    >
+                      My listings
+                    </Link>
                   ) : null}
                   <Link
                     href="/wallet"
