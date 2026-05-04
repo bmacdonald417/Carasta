@@ -3,13 +3,17 @@ import dynamic from "next/dynamic";
 import { Plus_Jakarta_Sans, Space_Grotesk, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { CarastaAssistantLauncher } from "@/components/assistant/carasta-assistant-launcher";
 import { CarastaLayout } from "@/components/carasta/CarastaLayout";
 import { Toaster } from "@/components/ui/toaster";
 import { getPublicSiteOrigin } from "@/lib/marketing/site-origin";
 
 const FeedbackWidget = dynamic(
   () => import("@/components/feedback/FeedbackWidget"),
+  { ssr: false }
+);
+
+const CarastaAssistantChat = dynamic(
+  () => import("@/components/assistant/CarastaAssistantChat").then((m) => ({ default: m.CarastaAssistantChat })),
   { ssr: false }
 );
 
@@ -53,10 +57,10 @@ export default function RootLayout({
       >
         <Providers>
           <CarastaLayout>{children}</CarastaLayout>
-          {/* Assistant above, Feedback below — shared pill stack, bottom-right */}
+          {/* Assistant chat panel + Feedback pill — bottom-right stack */}
           <div className="pointer-events-none fixed bottom-6 right-6 z-[70] flex flex-col gap-2">
             <div className="pointer-events-auto flex flex-col gap-2">
-              <CarastaAssistantLauncher />
+              <CarastaAssistantChat />
               <FeedbackWidget />
             </div>
           </div>

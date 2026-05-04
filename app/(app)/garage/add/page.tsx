@@ -8,10 +8,12 @@ export default async function AddGaragePage() {
 
   return (
     <div className="carasta-container max-w-xl py-8">
-      <h1 className="font-display text-2xl font-bold">Add to Garage</h1>
-      <p className="mt-1 text-muted-foreground">
-        Add a car you own.
-      </p>
+      <header className="border-b border-border pb-5">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Add to Garage</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Add a car you own to your Carmunity garage.
+        </p>
+      </header>
       <AddGarageCarForm type="GARAGE" className="mt-6" />
     </div>
   );
