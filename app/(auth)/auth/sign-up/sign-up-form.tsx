@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { safeCallbackPath } from "@/lib/safe-callback-path";
 
 type PolicyModal = "terms" | "privacy" | "community" | null;
 
@@ -31,6 +32,7 @@ const POLICY_CONFIG: Record<Exclude<PolicyModal, null>, { href: string; title: s
 
 export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabled?: boolean; callbackUrl?: string }) {
   const router = useRouter();
+  const nextPath = safeCallbackPath(callbackUrl);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -82,7 +84,7 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
         setError("Account created but sign-in failed. Try signing in.");
         return;
       }
-      router.push(callbackUrl || "/");
+      router.push(nextPath);
       router.refresh();
     } finally {
       setLoading(false);
@@ -263,7 +265,7 @@ export function SignUpForm({ googleEnabled = false, callbackUrl }: { googleEnabl
             variant="outline"
             className="w-full"
             disabled={loading}
-            onClick={() => signIn("google", { callbackUrl: callbackUrl || "/" })}
+            onClick={() => signIn("google", { callbackUrl: nextPath })}
           >
             Continue with Google
           </Button>

@@ -8,15 +8,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-/** Only allow same-origin relative paths (blocks open redirects like `//evil.com`). */
-function safeCallbackPath(raw: string | null): string {
-  const fallback = "/";
-  if (raw == null || raw === "") return fallback;
-  const p = raw.trim();
-  if (!p.startsWith("/") || p.startsWith("//")) return fallback;
-  return p;
-}
+import { safeCallbackPath } from "@/lib/safe-callback-path";
 
 export function SignInForm({ googleEnabled = false }: { googleEnabled?: boolean }) {
   const router = useRouter();

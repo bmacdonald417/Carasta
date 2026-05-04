@@ -1,7 +1,8 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Car, Gavel, MessageSquare, Sparkles, CheckCircle2 } from "lucide-react";
+import { Car, Gavel, MessageSquare, Sparkles } from "lucide-react";
+import { safeCallbackPathOptional } from "@/lib/safe-callback-path";
 import { SignUpForm } from "./sign-up-form";
 
 const FEATURES = [
@@ -34,8 +35,10 @@ export default async function SignUpPage({
 }) {
   const session = await getSession();
   const sp = await searchParams;
-  const callbackUrl = typeof sp.callbackUrl === "string" ? sp.callbackUrl : undefined;
-  if (session) redirect(callbackUrl || "/");
+  const rawCallback =
+    typeof sp.callbackUrl === "string" ? sp.callbackUrl : undefined;
+  const callbackUrl = safeCallbackPathOptional(rawCallback);
+  if (session) redirect(callbackUrl ?? "/");
 
   const googleEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
@@ -60,7 +63,6 @@ export default async function SignUpPage({
               src="/brand/carasta/logo-circle.png"
               alt="Carasta"
               className="h-10 w-10 object-contain transition-transform group-hover:scale-105"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
             <span className="flex flex-col leading-none">
               <span className="carasta-marketing-display text-lg font-semibold tracking-[0.14em] text-white">
@@ -89,7 +91,7 @@ export default async function SignUpPage({
             {FEATURES.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="flex items-start gap-4">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-primary/15 backdrop-blur-sm">
-                  <Icon className="h-4.5 w-4.5 text-primary/90" aria-hidden />
+                  <Icon className="h-4 w-4 text-primary/90" aria-hidden />
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-white">{title}</p>
@@ -127,7 +129,6 @@ export default async function SignUpPage({
               src="/brand/carasta/logo-circle.png"
               alt="Carasta"
               className="h-8 w-8 object-contain"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
             <span className="carasta-marketing-display text-base font-semibold tracking-[0.14em] text-foreground">
               Carmunity
@@ -170,7 +171,7 @@ export default async function SignUpPage({
             Already have an account?{" "}
             <Link
               href={
-                callbackUrl
+                callbackUrl != null
                   ? `/auth/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`
                   : "/auth/sign-in"
               }
