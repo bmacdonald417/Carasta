@@ -67,7 +67,9 @@ export function extensionForCarmunityImageMime(mime: string): string | null {
 }
 
 export function allowedMimeList(): string {
-  return [...ALLOWED_IMAGE_MIME, ...ALLOWED_VIDEO_MIME].join(",");
+  return Array.from(ALLOWED_IMAGE_MIME)
+    .concat(Array.from(ALLOWED_VIDEO_MIME))
+    .join(",");
 }
 
 /** Public URL path under the site origin (e.g. `/uploads/carmunity/...`). */
