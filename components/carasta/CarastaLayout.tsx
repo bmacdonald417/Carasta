@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
-import { AppStoreBadges } from "@/components/ui/app-store-badges";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +16,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BookOpen, ChevronDown, MessageSquare } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  Facebook,
+  Instagram,
+  Menu,
+  MessageSquare,
+  Pencil,
+  Search,
+  Youtube,
+} from "lucide-react";
 import { useHelpPalette } from "@/components/help/HelpPaletteProvider";
 import { cn } from "@/lib/utils";
 import {
@@ -25,22 +34,8 @@ import {
   shellHeaderAppInactive,
   shellHeaderAppLinkBase,
 } from "@/lib/shell-nav-styles";
-
-const footerProductLinks = [
-  { href: "/explore", label: "Carmunity" },
-  { href: "/discussions", label: "Discussions" },
-  { href: "/auctions", label: "Market" },
-  { href: "/sell", label: "Sell" },
-];
-
-/** Footer column: learn / trust paths (no longer mirrors removed marketing top strip). */
-const footerLearnLinks = [
-  { href: "/", label: "Home" },
-  { href: "/resources", label: "Resources" },
-  { href: "/how-it-works", label: "How It Works" },
-  { href: "/why-carasta", label: "Why Carasta" },
-  { href: "/contact", label: "Contact" },
-];
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { SiteFooter } from "@/components/marketplace/site-footer";
 
 const resourcesMenuLinks = [
   { href: "/how-it-works", label: "How It Works" },
@@ -71,19 +66,27 @@ function carmunityMenuActive(pathname: string, handle?: string | null) {
 }
 
 function marketMenuActive(pathname: string, handle?: string | null) {
-  if (pathname.startsWith("/auctions") || pathname.startsWith("/sell") || pathname.startsWith("/merch"))
+  if (
+    pathname.startsWith("/auctions") ||
+    pathname.startsWith("/sell") ||
+    pathname.startsWith("/merch") ||
+    pathname.startsWith("/wallet")
+  )
     return true;
   if (handle && (pathname.startsWith(`/u/${handle}/listings`) || pathname.startsWith(`/u/${handle}/marketing`)))
     return true;
   return false;
 }
 
-function resourcesMenuActive(pathname: string) {
-  if (pathname.startsWith("/resources")) return true;
-  if (pathname === "/how-it-works") return true;
-  if (pathname === "/why-carasta") return true;
-  if (pathname === "/contact" || pathname.startsWith("/contact/")) return true;
+function howCarmunityWorksMenuActive(pathname: string) {
+  if (pathname === "/how-it-works" || pathname === "/why-carasta" || pathname === "/resources")
+    return true;
+  if (pathname.startsWith("/resources/")) return true;
   return false;
+}
+
+function aboutMenuActive(pathname: string) {
+  return pathname === "/contact" || pathname.startsWith("/contact/") || pathname === "/community-guidelines";
 }
 
 /** Pillar menus: higher z than sticky header (z-50) so portaled content paints above page chrome. */
@@ -129,6 +132,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
   const [logoError, setLogoError] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [avatarSignOutStep, setAvatarSignOutStep] = useState<"idle" | "confirm">("idle");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const handle = (session?.user as { handle?: string } | undefined)?.handle ?? null;
   const marketingEnabled = Boolean(
@@ -145,18 +149,8 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const signedOutPillarLinks = (
+  const signedOutDesktopNav = (
     <>
-      <Link
-        href="/explore"
-        data-active={pathname.startsWith("/explore") ? "true" : "false"}
-        className={cn(
-          shellHeaderAppLinkBase,
-          pathname.startsWith("/explore") ? shellHeaderAppActive : shellHeaderAppInactive
-        )}
-      >
-        Carmunity
-      </Link>
       <Link
         href="/auctions"
         data-active={pathname.startsWith("/auctions") ? "true" : "false"}
@@ -165,31 +159,42 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           pathname.startsWith("/auctions") ? shellHeaderAppActive : shellHeaderAppInactive
         )}
       >
-        Market
+        Auctions
+      </Link>
+      <Link
+        href="/sell"
+        data-active={pathname.startsWith("/sell") ? "true" : "false"}
+        className={cn(
+          shellHeaderAppLinkBase,
+          pathname.startsWith("/sell") ? shellHeaderAppActive : shellHeaderAppInactive
+        )}
+      >
+        List a Vehicle
       </Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <PillarChevronTrigger active={resourcesMenuActive(pathname)}>
-            Resources
+          <PillarChevronTrigger active={howCarmunityWorksMenuActive(pathname)}>
+            How Carmunity Works
           </PillarChevronTrigger>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className={pillarMenuContentClass}>
           <DropdownMenuItem asChild>
+            <Link href="/how-it-works">How it works</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href="/resources">Resources hub</Link>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          {resourcesMenuLinks.map(({ href, label }) => (
-            <DropdownMenuItem key={href} asChild>
-              <Link href={href}>{label}</Link>
-            </DropdownMenuItem>
-          ))}
+          <DropdownMenuItem asChild>
+            <Link href="/resources/faq">FAQ</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/why-carasta">Why Carmunity</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/resources/trust-and-safety">Trust &amp; Safety</Link>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
-  );
-
-  const signedInPillarNav = (
-    <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <PillarChevronTrigger active={carmunityMenuActive(pathname, handle)}>
@@ -198,7 +203,63 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className={pillarMenuContentClass}>
           <DropdownMenuItem asChild>
-            <Link href="/explore">Explore</Link>
+            <Link href="/explore">Explore feed</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/discussions">Discussions</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <PillarChevronTrigger active={aboutMenuActive(pathname)}>About</PillarChevronTrigger>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className={pillarMenuContentClass}>
+          <DropdownMenuItem asChild>
+            <Link href="/contact">Contact</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/why-carasta">About Carasta</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/community-guidelines">Community guidelines</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+
+  const signedInDesktopNav = (
+    <>
+      <Link
+        href="/auctions"
+        data-active={pathname.startsWith("/auctions") ? "true" : "false"}
+        className={cn(
+          shellHeaderAppLinkBase,
+          pathname.startsWith("/auctions") ? shellHeaderAppActive : shellHeaderAppInactive
+        )}
+      >
+        Auctions
+      </Link>
+      <Link
+        href="/sell"
+        data-active={pathname.startsWith("/sell") ? "true" : "false"}
+        className={cn(
+          shellHeaderAppLinkBase,
+          pathname.startsWith("/sell") ? shellHeaderAppActive : shellHeaderAppInactive
+        )}
+      >
+        List a Vehicle
+      </Link>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <PillarChevronTrigger active={carmunityMenuActive(pathname, handle)}>
+            Carmunity
+          </PillarChevronTrigger>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className={pillarMenuContentClass}>
+          <DropdownMenuItem asChild>
+            <Link href="/explore">Explore feed</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/discussions">Discussions</Link>
@@ -221,11 +282,11 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <PillarChevronTrigger active={marketMenuActive(pathname, handle)}>Market</PillarChevronTrigger>
+          <PillarChevronTrigger active={marketMenuActive(pathname, handle)}>Selling</PillarChevronTrigger>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className={cn(pillarMenuContentClass, "min-w-[220px]")}>
           <DropdownMenuItem asChild>
-            <Link href="/auctions">Live Auctions</Link>
+            <Link href="/auctions">Live auctions</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/sell">Sell</Link>
@@ -248,14 +309,22 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           <DropdownMenuItem asChild>
             <Link href="/merch">Merch</Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/wallet">Wallet</Link>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <PillarChevronTrigger active={resourcesMenuActive(pathname)}>Resources</PillarChevronTrigger>
+          <PillarChevronTrigger active={howCarmunityWorksMenuActive(pathname)}>
+            How Carmunity Works
+          </PillarChevronTrigger>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className={pillarMenuContentClass}>
+          <DropdownMenuItem asChild>
+            <Link href="/how-it-works">How it works</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/resources">Resources hub</Link>
           </DropdownMenuItem>
@@ -267,48 +336,121 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <PillarChevronTrigger active={aboutMenuActive(pathname)}>About</PillarChevronTrigger>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className={pillarMenuContentClass}>
+          <DropdownMenuItem asChild>
+            <Link href="/contact">Contact</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/why-carasta">About Carasta</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/community-guidelines">Community guidelines</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 
   return (
     <div className="carasta-theme flex min-h-screen flex-col bg-background">
       <header
-        className={`sticky top-0 z-50 w-full border-b transition-[border-color,background-color,box-shadow,backdrop-filter] duration-300 ease-out ${
-          scrolled
-            ? "border-border/70 bg-background/80 shadow-e2 backdrop-blur-xl"
-            : "border-transparent bg-transparent"
-        }`}
+        className={cn(
+          "sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 shadow-e1 backdrop-blur-md transition-[box-shadow] duration-300 ease-out",
+          scrolled && "shadow-e2"
+        )}
       >
-        <div className="relative z-10 carasta-container flex h-16 items-center gap-4 md:h-20 md:gap-6">
-          <Link
-            href={session ? "/explore" : "/"}
-            className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-90"
-          >
+        <div className="relative z-10 carasta-container flex h-14 items-center gap-2 sm:gap-3 md:h-16 md:gap-4">
+          {isAuthShell && !session ? null : (
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-border/80 bg-muted/30 text-foreground transition hover:bg-muted/50 lg:hidden"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          )}
+
+          <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2 transition-opacity hover:opacity-90 sm:gap-3">
             {!logoError ? (
               <img
                 src="/brand/carasta/logo-circle.png"
-                alt="Carasta"
+                alt="Carmunity by Carasta"
                 width={48}
                 height={48}
-                className="h-10 w-10 object-contain md:h-12 md:w-12"
+                className="h-9 w-9 object-contain md:h-11 md:w-11"
                 onError={() => setLogoError(true)}
               />
             ) : null}
-            <span className="carasta-marketing-display text-xl font-semibold tracking-[0.18em] text-foreground">
-              Carasta
+            <span className="flex min-w-0 flex-col leading-none">
+              <span className="carasta-marketing-display truncate text-base font-semibold tracking-[0.14em] text-foreground sm:text-lg">
+                Carmunity
+              </span>
+              <span className="hidden text-[10px] font-medium uppercase tracking-[0.22em] text-muted-foreground sm:block">
+                by Carasta
+              </span>
             </span>
           </Link>
 
-          {/* Single pillar nav mount (mobile + desktop) — duplicate mounts broke Radix pillar dropdowns. */}
           {isAuthShell && !session ? (
             <span className="hidden min-w-0 flex-1 lg:block" aria-hidden />
           ) : session || !isAuthShell ? (
-            <nav className="flex min-w-0 flex-1 items-center justify-end gap-1 overflow-x-auto lg:overflow-visible">
-              {session ? signedInPillarNav : signedOutPillarLinks}
+            <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex xl:gap-1">
+              {session ? signedInDesktopNav : signedOutDesktopNav}
             </nav>
           ) : null}
 
-          <nav className="ml-auto flex shrink-0 items-center gap-2 text-sm sm:gap-3">
+          <nav className="ml-auto flex shrink-0 items-center gap-1.5 text-sm sm:gap-2 md:gap-3">
+            {isAuthShell && !session ? null : (
+              <>
+                <span className="hidden items-center gap-1.5 lg:inline-flex" aria-label="Follow Carmunity">
+                  <a
+                    href="https://www.instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full p-2 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground"
+                  >
+                    <Instagram className="h-4 w-4" />
+                    <span className="sr-only">Instagram</span>
+                  </a>
+                  <a
+                    href="https://www.youtube.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full p-2 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground"
+                  >
+                    <Youtube className="h-4 w-4" />
+                    <span className="sr-only">YouTube</span>
+                  </a>
+                  <a
+                    href="https://www.facebook.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-full p-2 text-muted-foreground transition hover:bg-muted/60 hover:text-foreground"
+                  >
+                    <Facebook className="h-4 w-4" />
+                    <span className="sr-only">Facebook</span>
+                  </a>
+                </span>
+                <Link
+                  href="/explore"
+                  title="Search Carmunity"
+                  aria-label="Search Carmunity"
+                  className={cn(
+                    "hidden rounded-full p-2 sm:inline-flex",
+                    shellHeaderAppLinkBase,
+                    pathname.startsWith("/explore") ? shellHeaderAppActive : shellHeaderAppInactive
+                  )}
+                >
+                  <Search className="h-5 w-5" />
+                </Link>
+              </>
+            )}
             {status === "loading" ? (
               <span className="text-muted-foreground">…</span>
             ) : session ? (
@@ -491,6 +633,187 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
             )}
           </nav>
         </div>
+
+        <Dialog open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+          <DialogContent variant="left-drawer" className="max-h-[100dvh] gap-0 border-0 p-0">
+            <div className="border-b border-white/15 px-5 pb-6 pt-14">
+              {session?.user ? (
+                <div className="flex items-start gap-4">
+                  <Avatar className="h-16 w-16 border-2 border-white/80 bg-white/10">
+                    <AvatarImage src={session.user?.image ?? undefined} />
+                    <AvatarFallback className="bg-white/20 text-lg font-semibold text-primary-foreground">
+                      {(session.user?.name ?? "U").slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-lg font-semibold text-primary-foreground">
+                      {displayMenuName(session)}
+                    </p>
+                    <Link
+                      href="/settings"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/80 px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-white/10"
+                    >
+                      <Pencil className="h-4 w-4" aria-hidden />
+                      Edit profile
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-lg font-semibold text-primary-foreground">Carmunity</p>
+                  <p className="mt-1 text-sm text-primary-foreground/80">
+                    Sign in to follow auctions, post, and manage your garage.
+                  </p>
+                  <div className="mt-5 flex flex-col gap-2">
+                    <Link
+                      href="/auth/sign-in"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="rounded-2xl border border-white/80 px-4 py-3 text-center text-sm font-semibold text-primary-foreground transition hover:bg-white/10"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href={joinHref}
+                      onClick={() => setMobileNavOpen(false)}
+                      className="rounded-2xl bg-white px-4 py-3 text-center text-sm font-semibold text-primary shadow-e1 transition hover:bg-white/90"
+                    >
+                      Join Carmunity
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <nav className="flex max-h-[calc(100dvh-12rem)] flex-col gap-0.5 overflow-y-auto overscroll-contain px-3 py-4 pb-10">
+              <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                Marketplace
+              </p>
+              <Link
+                href="/auctions"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                Auctions
+              </Link>
+              <Link
+                href="/sell"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                List a vehicle
+              </Link>
+              <p className="mt-4 px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                Carmunity
+              </p>
+              <Link
+                href="/explore"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                Explore feed
+              </Link>
+              <Link
+                href="/discussions"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                Discussions
+              </Link>
+              {session?.user ? (
+                <>
+                  <Link
+                    href="/messages"
+                    onClick={() => setMobileNavOpen(false)}
+                    className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+                  >
+                    Messages
+                  </Link>
+                  {handle ? (
+                    <>
+                      <Link
+                        href={`/u/${handle}/garage`}
+                        onClick={() => setMobileNavOpen(false)}
+                        className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+                      >
+                        Garage
+                      </Link>
+                      <Link
+                        href={`/u/${handle}`}
+                        onClick={() => setMobileNavOpen(false)}
+                        className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        href={`/u/${handle}/listings`}
+                        onClick={() => setMobileNavOpen(false)}
+                        className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+                      >
+                        My listings
+                      </Link>
+                    </>
+                  ) : null}
+                  <Link
+                    href="/wallet"
+                    onClick={() => setMobileNavOpen(false)}
+                    className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+                  >
+                    Wallet
+                  </Link>
+                </>
+              ) : null}
+              <p className="mt-4 px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                Learn
+              </p>
+              <Link
+                href="/how-it-works"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                How Carmunity works
+              </Link>
+              <Link
+                href="/resources/faq"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                FAQ
+              </Link>
+              <Link
+                href="/contact"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                Contact &amp; support
+              </Link>
+              <p className="mt-4 px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                Legal
+              </p>
+              <Link
+                href="/terms"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                Terms &amp; conditions
+              </Link>
+              <Link
+                href="/privacy"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                Privacy policy
+              </Link>
+              <Link
+                href="/community-guidelines"
+                onClick={() => setMobileNavOpen(false)}
+                className="rounded-xl px-3 py-3 text-[15px] font-medium text-primary-foreground hover:bg-white/10"
+              >
+                Community guidelines
+              </Link>
+            </nav>
+          </DialogContent>
+        </Dialog>
       </header>
 
       <div className="flex min-h-0 flex-1">
@@ -502,168 +825,7 @@ export function CarastaLayout({ children }: { children: React.ReactNode }) {
 
       <MobileBottomNav />
 
-      <footer className="mt-auto">
-        <div className="relative border-t border-border/60 bg-background pt-16 pb-24 md:pt-20 md:pb-28">
-          <div className="carasta-container">
-            <div className="grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)]">
-              <div>
-                <div className="flex items-center gap-2">
-                  <img
-                    src="/brand/carasta/wordmark.png"
-                    alt="Carasta"
-                    width={180}
-                    height={48}
-                    className="h-10 object-contain object-left md:h-12"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  <span className="carasta-marketing-display text-2xl font-semibold tracking-[0.15em] text-foreground md:text-3xl">
-                    Carasta
-                  </span>
-                </div>
-                <p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
-                  Carmunity by Carasta brings discussions, profiles, Garage
-                  identity, messaging, auctions, and seller tools into one
-                  platform built for enthusiasts.
-                </p>
-                <div className="mt-5 flex flex-wrap gap-3 text-sm">
-                  <Link
-                    href={joinHref}
-                    className="rounded-full bg-primary px-4 py-2 font-semibold text-primary-foreground transition hover:bg-primary/90"
-                  >
-                    Join Carmunity
-                  </Link>
-                  <Link
-                    href="/auctions"
-                    className="rounded-full border border-border px-4 py-2 font-semibold text-foreground transition hover:bg-primary/12 hover:text-primary"
-                  >
-                    Market
-                  </Link>
-                </div>
-              </div>
-              <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-1">
-                <div>
-                  <p className="text-lg font-semibold tracking-tight text-foreground">
-                    Learn
-                  </p>
-                  <nav className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
-                    {footerLearnLinks.map(({ href, label }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        className="transition hover:text-foreground"
-                      >
-                        {label}
-                      </Link>
-                    ))}
-                  </nav>
-                </div>
-                <div>
-                  <p className="text-lg font-semibold tracking-tight text-foreground">
-                    Support
-                  </p>
-                  <nav className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
-                    {[
-                      { href: "/resources/faq", label: "FAQ" },
-                      { href: "/resources/glossary", label: "Glossary" },
-                      { href: "/resources/trust-and-safety", label: "Trust & Safety" },
-                      { href: "/contact", label: "Get Help" },
-                    ].map(({ href, label }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        className="transition hover:text-foreground"
-                      >
-                        {label}
-                      </Link>
-                    ))}
-                  </nav>
-                </div>
-              </div>
-              <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-1">
-                <div>
-                  <p className="text-lg font-semibold tracking-tight text-foreground">
-                    Product
-                  </p>
-                  <nav className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground">
-                    {[
-                      ...footerProductLinks,
-                      { href: "/messages", label: "Messages" },
-                      { href: "/community-guidelines", label: "Community Guidelines" },
-                    ].map(({ href, label }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        className="transition hover:text-foreground"
-                      >
-                        {label}
-                      </Link>
-                    ))}
-                  </nav>
-                </div>
-                <div>
-                  <p className="text-lg font-semibold tracking-tight text-foreground">
-                    Contact
-                  </p>
-                  <a
-                    href="mailto:info@carasta.com"
-                    className="mt-4 inline-block text-primary/90 hover:text-primary"
-                  >
-                    info@carasta.com
-                  </a>
-                  <div className="mt-5">
-                    <p className="text-xs text-muted-foreground">
-                      Carmunity on mobile
-                    </p>
-                    <div className="mt-3">
-                      <AppStoreBadges />
-                    </div>
-                    <p className="mt-3 max-w-xs text-[11px] leading-relaxed text-muted-foreground">
-                      Same account identity and social graph as the web product,
-                      with a narrower surface area for now.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
-        </div>
-        <div className="border-t border-border/60 bg-[hsl(var(--navy))] py-6 text-white">
-          <div className="carasta-container flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
-            <div className="text-center md:text-left">
-              <p className="text-sm text-white/75">
-                © {new Date().getFullYear()} Carasta. All rights reserved.
-              </p>
-              <p className="mt-1 text-xs text-white/70">
-                Carmunity by Carasta — feed, discussions, garage, and auctions
-                in one place.
-              </p>
-            </div>
-            <nav className="flex flex-wrap justify-center gap-6 text-sm md:justify-end">
-              <Link
-                href="/terms"
-                className="text-white/75 transition hover:text-white"
-              >
-                Terms &amp; Conditions
-              </Link>
-              <Link
-                href="/privacy"
-                className="text-white/75 transition hover:text-white"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/community-guidelines"
-                className="text-white/75 transition hover:text-white"
-              >
-                Community Guidelines
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

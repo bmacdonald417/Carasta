@@ -19,7 +19,7 @@ export const shellHeaderAppLinkBase =
 export const shellHeaderAppInactive =
   "text-muted-foreground hover:bg-primary/12 hover:text-primary";
 export const shellHeaderAppActive =
-  "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20";
+  "bg-primary/15 text-primary ring-1 ring-inset ring-primary/25 font-semibold";
 
 /** Desktop sidebar rows */
 export const shellSidebarRowBase =
@@ -27,7 +27,7 @@ export const shellSidebarRowBase =
 export const shellSidebarInactive =
   "text-muted-foreground hover:bg-primary/12 hover:text-primary";
 export const shellSidebarActive =
-  "bg-primary/10 text-primary ring-1 ring-inset ring-primary/20";
+  "bg-primary/15 text-primary ring-1 ring-inset ring-primary/25 font-semibold";
 
 /** Sidebar nested items (listings, marketing) */
 export const shellSidebarSubRowBase =

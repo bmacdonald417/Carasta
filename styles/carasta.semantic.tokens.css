@@ -35,6 +35,7 @@
 
   /* Functional accent — royal/cobalt blue (mapped into shadcn primary) */
   --primary: 238 65% 45%;
+  --primary-hover: 238 61% 38%;
   --primary-foreground: 0 0% 100%;
   --ring: 238 65% 45%;
 
@@ -64,6 +65,12 @@
   --success: 160 84% 39%;
   --success-soft: 150 60% 96%;
   --success-foreground: 160 52% 30%;
+
+  /** Live auctions strip — green status dot (maps to success family) */
+  --live-accent: 160 84% 39%;
+
+  /** Full-width seller CTA wash */
+  --seller-cta-bg: 214 95% 97%;
 
   --caution: 38 92% 50%;
   --caution-soft: 42 100% 96%;
