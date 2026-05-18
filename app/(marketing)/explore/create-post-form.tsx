@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Film, ImageIcon, PenLine, X, Upload, Loader2 } from "lucide-react";
 
 import { MentionComposerTextarea } from "@/components/carmunity/MentionComposerTextarea";
@@ -14,6 +14,7 @@ import { createPost } from "./actions";
 
 type MediaPreview = {
   url: string;
+  previewUrl: string;
   isVideo: boolean;
   name: string;
 };
@@ -34,8 +35,21 @@ export function CreatePostForm({
 
   const acceptMimes = allowedMimeList();
 
+  useEffect(() => {
+    return () => {
+      setMedia((prev) => {
+        if (prev?.previewUrl.startsWith("blob:")) {
+          URL.revokeObjectURL(prev.previewUrl);
+        }
+        return null;
+      });
+    };
+  }, []);
+
   async function handleFile(file: File) {
     setUploading(true);
+    const previewUrl = URL.createObjectURL(file);
+    setMedia({ url: previewUrl, previewUrl, isVideo: file.type.startsWith("video/"), name: file.name });
     try {
       const form = new FormData();
       form.set("file", file);
@@ -55,7 +69,9 @@ export function CreatePostForm({
         return;
       }
       const url = data.mediaUrl ?? data.imageUrl ?? "";
-      setMedia({ url, isVideo: data.isVideo ?? false, name: file.name });
+      setMedia((prev) =>
+        prev ? { ...prev, url, isVideo: data.isVideo ?? prev.isVideo } : null
+      );
     } finally {
       setUploading(false);
     }
@@ -75,6 +91,9 @@ export function CreatePostForm({
     setLoading(false);
     if (result.ok) {
       setContent("");
+      if (media?.previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(media.previewUrl);
+      }
       setMedia(null);
       onCreated?.();
       toast({ title: "Post created" });
@@ -120,7 +139,7 @@ export function CreatePostForm({
           {media.isVideo ? (
             <div className="relative aspect-video w-full bg-black">
               <video
-                src={media.url}
+                src={media.previewUrl}
                 controls
                 className="h-full w-full object-contain"
               />
@@ -129,7 +148,7 @@ export function CreatePostForm({
             // Use plain <img> — the URL is a relative path from local upload
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={media.url}
+              src={media.previewUrl}
               alt="Media preview"
               className="max-h-48 w-full object-cover"
             />
@@ -145,7 +164,12 @@ export function CreatePostForm({
             </p>
             <button
               type="button"
-              onClick={() => setMedia(null)}
+              onClick={() => {
+                if (media?.previewUrl.startsWith("blob:")) {
+                  URL.revokeObjectURL(media.previewUrl);
+                }
+                setMedia(null);
+              }}
               className="shrink-0 text-muted-foreground hover:text-destructive transition-colors"
               aria-label="Remove media"
             >
